@@ -1118,7 +1118,23 @@ void edmByteClass::executeDeferred()
     if (is_executing)
     {
        lastval = value;
+       /****** SJS Modification 22/06/05 to cater for input from ******
+       ******* mbbi32Direct record - replace ******
        value = ((valuePvId->get_int() >> shft) & dmask);
+       ******* by ******/
+       switch (valuePvId->get_type().type)
+       {
+       case ProcessVariable::Type::real:
+           value = ((((unsigned int) (valuePvId->get_double()))
+                    >> shft) & dmask);
+           break;
+                                                                                
+       default:
+           value = ((valuePvId->get_int() >> shft) & dmask);
+           break;
+       }
+       /****** End of SJS modification ******/
+
        if (!actWin->isIconified)
            drawActive();
 

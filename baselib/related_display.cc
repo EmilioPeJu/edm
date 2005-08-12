@@ -2241,7 +2241,12 @@ XmString str;
       }
       else {
         destExists[i] = 1;
-        atLeastOneExists = 1;
+        // ****** SJS Modification 22/07/05                      ******
+        // ****** As we're not going to connect to the dest PVs  ******
+        // ****** at display call-up time we don't want to wait  ******
+        // ****** for a connect reply from them so remove the    ******
+        // ****** next line.                                     ******
+        // atLeastOneExists = 1;
       }
 
     }

@@ -1666,6 +1666,22 @@ int blink = 0;
 
   if ( !init ) {
     if ( needToDrawUnconnected ) {
+      /****** SJS mod 23/06/05 - do not show rectangle if widget is ******/
+      /****** part of a disabled group ******/
+      if (!enabled)
+      {
+        // If unconnected widget was drawn while group was enabled, erase it.
+        if ( needToEraseUnconnected )
+        {
+          actWin->executeGc.setLineWidth( 1 );
+          actWin->executeGc.setLineStyle( LineSolid );
+          XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          actWin->executeGc.eraseGC(), x, y, w, h );
+          needToEraseUnconnected = 0;
+        }
+        return 1;
+      }
+      /****** End of SJS mod ******/
       actWin->executeGc.saveFg();
       //actWin->executeGc.setFG( onColor.getDisconnected() );
       actWin->executeGc.setFG( onColor.getDisconnectedIndex(), &blink );

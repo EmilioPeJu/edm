@@ -3551,6 +3551,22 @@ int blink = 0;
 
   if ( !init && !connection.pvsConnected() ) {
     if ( needToDrawUnconnected ) {
+      /****** SJS mod 23/06/05 - do not show rectangle if widget is ******/
+      /****** part of a disabled group ******/
+      if (!enabled)
+      {
+        // If unconnected widget was drawn while group was enabled, erase it.
+        if (needToEraseUnconnected)
+        {
+          actWin->executeGc.setLineWidth( 2 );
+          actWin->executeGc.setLineStyle( LineSolid );
+          XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          actWin->executeGc.eraseGC(), x, y, w, h );
+          needToEraseUnconnected = 0;
+        }
+        return 1;
+      }
+      /****** End of SJS Mod ******/
       actWin->executeGc.saveFg();
       //actWin->executeGc.setFG( fgColor.getDisconnected() );
       actWin->executeGc.setFG( fgColor.getDisconnectedIndex(), &blink );
@@ -4773,8 +4789,13 @@ Atom importList[2];
         XtAddCallback( tf_widget, XmNfocusCallback,
          xtdoSetSelection, this );
 
+//****** SJS modification 16/06/05 ******
+//****** Comment out the following statement to allow 'Alt Tab' to work ******
+#ifdef COMMENT_OUT
         XtAddCallback( tf_widget, XmNmotionVerifyCallback,
          xtdoGrabUpdate, this );
+#endif
+//****** End of SJS modification ******
 
         XtAddCallback( tf_widget, XmNvalueChangedCallback,
          xtdoSetValueChanged, this );
