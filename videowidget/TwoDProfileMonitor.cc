@@ -1193,7 +1193,7 @@ int TwoDProfileMonitor::draw (void)
                        dataPvStr.getRaw (), strlen (dataPvStr.getRaw ()) );
   
     return activeGraphicClass::draw (); 
-} ;
+}
 
 // erase widget in responce to "cut" command
 // in edit-mode 
@@ -1205,7 +1205,7 @@ int TwoDProfileMonitor::erase (void)
                     actWin->drawGc.eraseGC (), x, y, w, h );
 
     return activeGraphicClass::erase (); 
-} ;
+}
 
 // returning to edit mode, pass values are 1 and 2
 int TwoDProfileMonitor::deactivate ( int pass )
