@@ -1870,11 +1870,21 @@ uch *src;
     }
     else { // build list manually, ugh!
 
-      for ( row=0; row<h; row++ ) {
-
+      // ****** SJS Modification 08/03/05 - replace ******
+      //      for ( row=0; row<h; row++ )
+      // ****** by ***************************************
+      int imageWidth = rowbytes / *pChannels;
+      for ( row=0; row<height; row++ )
+      // ****** End of modification **********************
+      {
         src = image_data + row * rowbytes;
 
-        for ( col=w; col>0; col-- ) {
+        // ****** SJS Modification 08/03/05 - replace ******
+        // for ( col=w; col>0; col-- ) 
+        // ****** by ***************************************
+        for ( col=imageWidth; col>0; col-- ) 
+        // ****** End of modification **********************
+        {
 
           alpha = 255;
           if ( *pChannels == 3 ) {
