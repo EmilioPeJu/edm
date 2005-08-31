@@ -6,19 +6,19 @@ ifdef EPICS_HOST_ARCH
    # Add Debugging
    #USR_CXXFLAGS_Linux += -g -O0
 
-   EdmBase_LIBS_Linux += cfcaa62e-8199-11d3-a77f-00104b8742df 
+   EdmBase_LIBS_Linux += EdmLib 
    EdmBase_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl
 
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_solaris = cfcaa62e-8199-11d3-a77f-00104b8742df Xm Xt Xmu X11 Xext pthread dl rt
+   USR_LIBS_solaris = EdmLib Xm Xt Xmu X11 Xext pthread dl rt
 
    USR_CXXFLAGS_hpux11_11_mt += +W652 -DHP_UX=1111 -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_hpux11_11_mt = cfcaa62e-8199-11d3-a77f-00104b8742df Xm Xt Xp Xtst X11 pthread
+   USR_LIBS_hpux11_11_mt = EdmLib Xm Xt Xp Xtst X11 pthread
 
    USR_LDFLAGS += -L$(INSTALL_LIB) -L$(INSTALL_BIN) 
    EdmBase_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
    
-   LIBRARY = EdmBase
+   LIBRARY_HOST = EdmBase
 
    PROD_LIBS += ca Com
    

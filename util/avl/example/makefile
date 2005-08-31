@@ -5,7 +5,7 @@ all : test_avl
 
 test_avl : test_avl.o
 	gcc $(LDFLAGS) -o test_avl -L/util \
-	-l114135a4-6f6c-11d3-95bc-00104b8742df \
+	-lEdmUtil \
 	-lpthread test_avl.o
 
 test_avl.o : test_avl.c

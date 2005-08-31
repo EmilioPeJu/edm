@@ -5,22 +5,22 @@ ifdef EPICS_HOST_ARCH
    
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
    
-   7e1b4e6f-239d-4650-95e6-a040d41ba633_LIBS_Linux += EdmBase cfcaa62e-8199-11d3-a77f-00104b8742df
-   7e1b4e6f-239d-4650-95e6-a040d41ba633_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl
+   EdmChoiceButton_LIBS_Linux += EdmBase EdmLib
+   EdmChoiceButton_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl
    
    
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_solaris = EdmBase cfcaa62e-8199-11d3-a77f-00104b8742df Xm Xt Xmu X11 Xext pthread dl rt
+   USR_LIBS_solaris = EdmBase EdmLib Xm Xt Xmu X11 Xext pthread dl rt
 
    USR_CXXFLAGS_hpux11_11_mt += -DHP_UX=1111 -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_hpux11_11_mt = cfcaa62e-8199-11d3-a77f-00104b8742df pthread
+   USR_LIBS_hpux11_11_mt = EdmLib pthread
    
    
    
    USR_LDFLAGS += -L$(INSTALL_LIB)
-   7e1b4e6f-239d-4650-95e6-a040d41ba633_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
+   EdmChoiceButton_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
    
-   LIBRARY = 7e1b4e6f-239d-4650-95e6-a040d41ba633
+   LIBRARY_HOST = EdmChoiceButton
 
    PROD_LIBS += ca Com
 
@@ -54,7 +54,7 @@ ifdef EPICS_HOST_ARCH
    
   
    LIB_SRCS += choice_button.cc
-   LIB_SRCS += reg_lib7e1b4e6f-239d-4650-95e6-a040d41ba633.cc
+   LIB_SRCS += reg_libEdmChoiceButton.cc
    
    
 

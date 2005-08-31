@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "reg_lib605432d2-f29d-11d2-973b-00104b8742df.str"
+#include "reg_libEdmChoiceButton.str"
 #include "environment.str"
 
 typedef struct libRecTag {
@@ -28,8 +28,7 @@ typedef struct libRecTag {
 static int libRecIndex = 0;
 
 static libRecType libRec[] = {
-  { "cfcf6c8a_dbeb_11d2_8a97_00104b8742df", global_str3, reg_str1 },
-  { "activePngClass", global_str3, reg_str2 }
+  { "activeChoiceButtonClass", global_str5, reg_str1 }
 };
 
 #ifdef __cplusplus

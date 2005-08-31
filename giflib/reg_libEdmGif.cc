@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "reg_archivePlot.str"
+#include "reg_libEdmGif.str"
 #include "environment.str"
 
 typedef struct libRecTag {
@@ -28,8 +28,7 @@ typedef struct libRecTag {
 static int libRecIndex = 0;
 
 static libRecType libRec[] = {
-  { "2d80926b_bf54_4096_ab21_af7d725f15a2", global_str3, reg_str1 },
-  { "458bb765_eab9_4d65_8fda_2ce55d2baec6", global_str3, reg_str2 }
+  { "cfcf6c8a_dbeb_11d2_8a97_00104b8742df", global_str3, reg_str1 }
 };
 
 #ifdef __cplusplus

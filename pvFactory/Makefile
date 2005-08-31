@@ -11,14 +11,14 @@ ifdef EPICS_HOST_ARCH
    
 
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_solaris = cfcaa62e-8199-11d3-a77f-00104b8742df pthread dl
+   USR_LIBS_solaris = EdmLib pthread dl
 
    USR_CXXFLAGS_hpux11_11_mt += -DHP_UX=1111 -DSINGLE_THREADED=1 -D__epics__=1
-   USR_LIBS_hpux11_11_mt = cfcaa62e-8199-11d3-a77f-00104b8742df pthread
+   USR_LIBS_hpux11_11_mt = EdmLib pthread
 
    USR_LDFLAGS += -L$(INSTALL_LIB)
 
-   LIBRARY = PV
+   LIBRARY_HOST = PV
 
    PROD_LIBS += ca Com
 

@@ -5,23 +5,23 @@ ifdef EPICS_HOST_ARCH
    IMAGELIB=/usr/local
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
    
-   57d79238-2924-420b-ba67-dfbecdf03fcd_LIBS_Linux += EdmBase cfcaa62e-8199-11d3-a77f-00104b8742df
-   57d79238-2924-420b-ba67-dfbecdf03fcd_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl png
+   EdmPng_LIBS_Linux += EdmBase EdmLib
+   EdmPng_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl png
    
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
 
-   USR_LIBS_solaris = EdmBase cfcaa62e-8199-11d3-a77f-00104b8742df Xm Xt Xmu X11 Xext pthread dl rt png
+   USR_LIBS_solaris = EdmBase EdmLib Xm Xt Xmu X11 Xext pthread dl rt png
 
    USR_CXXFLAGS_hpux11_11_mt += -DHP_UX=1111 -DSINGLE_THREADED=1 -D__epics__=1
 
-   USR_LIBS_hpux11_11_mt = EdmBase cfcaa62e-8199-11d3-a77f-00104b8742df Xm Xt X11 Xext pthread png
+   USR_LIBS_hpux11_11_mt = EdmBase EdmLib Xm Xt X11 Xext pthread png
    
    
    
    USR_LDFLAGS += -L$(INSTALL_LIB) -L$(IMAGELIB)
-   57d79238-2924-420b-ba67-dfbecdf03fcd_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
+   EdmPng_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
    
-   LIBRARY = 57d79238-2924-420b-ba67-dfbecdf03fcd
+   LIBRARY_HOST = EdmPng
 
    PROD_LIBS += ca Com
 
@@ -55,7 +55,7 @@ ifdef EPICS_HOST_ARCH
    
   
    LIB_SRCS += png.cc
-   LIB_SRCS += reg_lib57d79238-2924-420b-ba67-dfbecdf03fcd.cc
+   LIB_SRCS += reg_libEdmPng.cc
    
    
 

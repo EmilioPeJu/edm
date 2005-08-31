@@ -36,7 +36,7 @@ USR_LDFLAGS += -L$(INSTALL_LIB)
 # Add Debugging
 #USR_LDFLAGS += -g
 
-LIBRARY = cfcaa62e-8199-11d3-a77f-00104b8742df
+LIBRARY = EdmLib
 
 PROD_LIBS += ca Com
 

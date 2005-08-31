@@ -1,5 +1,5 @@
 //  object: 2ed7d2e8-f439-11d2-8fed-00104b8742df
-//     lib: 3014b6ee-f439-11d2-ad99-00104b8742df
+//     lib: EdmDoc
 
 // define SMARTDRAW if the widget may be part of an overlapping
 // stack of widgets

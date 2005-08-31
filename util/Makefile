@@ -48,8 +48,8 @@ INC += crc/crc.h
 
 
 
-LIBRARY_HOST += 114135a4-6f6c-11d3-95bc-00104b8742df
-LIB_LIB += 114135a4-6f6c-11d3-95bc-00104b8742df
+LIBRARY_HOST += EdmUtil
+LIB_LIB += EdmUtil
 
 SRC_DIRS += ../net/linux
 SRC_DIRS += ../sys/linux

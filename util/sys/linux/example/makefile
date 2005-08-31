@@ -5,7 +5,7 @@ all : test_queue
 
 test_queue : test_queue.o
 	gcc $(LDFLAGS) -o test_queue -L/util \
-	-l114135a4-6f6c-11d3-95bc-00104b8742df \
+	-lEdmUtil \
 	-lpthread test_queue.o
 
 test_queue.o : test_queue.c
