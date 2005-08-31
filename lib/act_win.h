@@ -410,6 +410,12 @@ typedef struct commentLinesTag {
   char *line;
 } commentLinesType, *commentLinesPtr;
 
+typedef struct pvDefTag {
+  struct pvDefTag *flink;
+  char *def;
+  ProcessVariable *id;
+} pvDefType, *pvDefPtr;
+
 class activeWindowClass {
 
 public:
@@ -429,6 +435,8 @@ int major, minor, release, fileLineNumber;
 int buttonPressX, buttonPressY;
 
 commentLinesPtr commentHead, commentTail;
+pvDefPtr pvDefHead, pvDefTail;
+int forceLocalPvs;
 
 int showActive;
 unsigned int crc; // crc of all symbols/values
@@ -835,6 +843,8 @@ char **expansions;
 int haveComments;
 char fileName[255+1], fileRev[31+1], fileNameAndRev[287+1], newPath[255+1];
 char prefix[127+1], displayName[127+1], postfix[127+1];
+char fileNameForSym[255+1], prefixForSym[127+1], displayNameForSym[127+1],
+ postfixForSym[127+1];
 expStringClass expStrTitle;
 
 colorInfoClass *ci;
@@ -1307,6 +1317,9 @@ void processObjects ( void );
 /* new new new */
 
 void storeFileName (
+  char *inName );
+
+void storeFileNameForSymbols (
   char *inName );
 
 FILE *openAny (

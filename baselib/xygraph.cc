@@ -22,6 +22,26 @@
 
 void _edmDebug ( void );
 
+static double dclamp (
+  double val
+) {
+
+  if ( val < -16000 ) return -16000;
+  if ( val >  16000 ) return  16000;
+  return val;
+
+}
+
+static short sclamp (
+  short val
+) {
+
+  if ( val < -16000 ) return -16000;
+  if ( val >  16000 ) return  16000;
+  return val;
+
+}
+
 static void updateTimerAction (
   XtPointer client,
   XtIntervalId *id )
@@ -113,6 +133,43 @@ xyGraphClass *xyo = (xyGraphClass *) client;
 
 }
 
+static void dump_edit_apply (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+xyGraphClass *xyo = (xyGraphClass *) client;
+
+  printf( "apply\n" );
+
+}
+
+static void dump_edit_ok (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+xyGraphClass *xyo = (xyGraphClass *) client;
+
+  dump_edit_apply( w, client, call );
+  xyo->efDump.popdown();
+
+}
+
+static void dump_edit_cancel (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+xyGraphClass *xyo = (xyGraphClass *) client;
+
+  xyo->efDump.popdown();
+
+}
+
 static void menu_cb (
   Widget w,
   XtPointer client,
@@ -201,6 +258,34 @@ int yi;
      xyo );
 
     xyo->ef.popup();
+
+  }
+  else if ( w == xyo->pbDumpData ) {
+
+    printf( "dump data\n" );
+
+    if ( !xyo->eBuf ) {
+      xyo->eBuf = new xyGraphClass::editBufType;
+    }
+
+    xyo->dumpFormX = xyo->popupMenuX;
+    xyo->dumpFormY = xyo->popupMenuY;
+    xyo->dumpFormW = 0;
+    xyo->dumpFormH = 0;
+    xyo->dumpFormMaxH = 600;
+
+    xyo->efDump.create( xyo->actWin->top,
+     xyo->actWin->appCtx->ci.getColorMap(),
+     &xyo->dumpFormX, &xyo->dumpFormY,
+     &xyo->dumpFormW, &xyo->dumpFormH, &xyo->dumpFormMaxH,
+     "Dump Data", NULL, NULL, NULL );
+
+    xyo->efDump.addTextField( "File", 35, xyo->dumpFileName, 255 );
+
+    xyo->efDump.finished( dump_edit_ok, dump_edit_apply, dump_edit_cancel,
+     xyo );
+
+    xyo->efDump.popup();
 
   }
 
@@ -1182,6 +1267,7 @@ double scaledX, scaledY;
           scaledY = xyo->plotAreaH -
            rint( ( dyValue - xyo->curY1Min[yi] ) *
            xyo->y1Factor[yi][i] - xyo->y1Offset[yi][i] );
+          scaledY = dclamp( scaledY );
 
           // There are two views of pv types, Type and specificType; this uses
           // specificType
@@ -1255,6 +1341,7 @@ double scaledX, scaledY;
 
           scaledX = rint( ( dxValue - xyo->curXMin ) *
            xyo->xFactor[i] + xyo->xOffset[i] );
+          scaledX = dclamp( scaledX );
 
           xyo->addPoint( dxValue, scaledX, scaledY, i );
 
@@ -1345,9 +1432,11 @@ double scaledX, scaledY;
             scaledY = xyo->plotAreaH -
              rint( ( dyValue - xyo->curY1Min[yi] ) *
              xyo->y1Factor[yi][i] - xyo->y1Offset[yi][i] );
+            scaledY = dclamp( scaledY );
 
             scaledX = rint( ( dxValue - xyo->curXMin ) *
              xyo->xFactor[i] + xyo->xOffset[i] );
+            scaledX = dclamp( scaledX );
 
             xyo->addPoint( dxValue, scaledX, scaledY, i );
 
@@ -1665,6 +1754,7 @@ double scaledX, scaledY;
         scaledY = xyo->plotAreaH -
          rint( ( dyValue - xyo->curY1Min[yi] ) *
          xyo->y1Factor[yi][i] - xyo->y1Offset[yi][i] );
+        scaledY = dclamp( scaledY );
 
         // There are two views of pv types, Type and specificType; this uses
         // specificType
@@ -1738,6 +1828,7 @@ double scaledX, scaledY;
 
         scaledX = rint( ( dxValue - xyo->curXMin ) *
          xyo->xFactor[i] + xyo->xOffset[i] );
+        scaledX = dclamp( scaledX );
 
         xyo->addPoint( dxValue, scaledX, scaledY, i );
 
@@ -2060,6 +2151,7 @@ int yi;
         scaledY = xyo->plotAreaH -
          rint( ( dyValue - xyo->curY1Min[yi] ) *
          xyo->y1Factor[yi][i] - xyo->y1Offset[yi][i] );
+        scaledY = dclamp( scaledY );
 
         // There are two views of pv types, Type and specificType; this uses
         // specificType
@@ -2133,6 +2225,7 @@ int yi;
 
         scaledX = rint( ( dxValue - xyo->curXMin ) *
          xyo->xFactor[i] + xyo->xOffset[i] );
+        scaledX = dclamp( scaledX );
 
         xyo->addPoint( dxValue, scaledX, scaledY, i );
 
@@ -2476,9 +2569,11 @@ double scaledX, scaledY;
         scaledY = xyo->plotAreaH -
          rint( ( dyValue - xyo->curY1Min[yi] ) *
          xyo->y1Factor[yi][i] - xyo->y1Offset[yi][i] );
+        scaledY = dclamp( scaledY );
 
         scaledX = rint( ( dxValue - xyo->curXMin ) *
          xyo->xFactor[i] + xyo->xOffset[i] );
+        scaledX = dclamp( scaledX );
 
         xyo->addPoint( dxValue, scaledX, scaledY, i );
 
@@ -3035,6 +3130,100 @@ xyGraphClass::~xyGraphClass ( void ) {
 
   if ( name ) delete[] name;
   if ( eBuf ) delete eBuf;
+
+}
+
+int xyGraphClass::getDbXMinXMax (
+  double *min,
+  double *max
+) {
+
+int i, start, allChronological;
+
+  *min = 0;
+  *max = 1;
+  allChronological = 1;
+
+  i = 0;
+  start = numTraces;
+  while ( i<numTraces ) {
+    if ( traceType[i] != XYGC_K_TRACE_CHRONOLOGICAL ) {
+      allChronological = 0;
+      *min = dbXMin[i];
+      *max = dbXMax[i];
+      start = i+1;
+      break;
+    }
+    i++;
+  }
+
+  for ( i=start; i<numTraces; i++ ) {
+    if ( traceType[i] != XYGC_K_TRACE_CHRONOLOGICAL ) {
+      allChronological = 0;
+      if ( dbXMin[i] < *min ) *min = dbXMin[i];
+      if ( dbXMax[i] > *max ) *max = dbXMax[i];
+    }
+  }
+
+  return allChronological;
+
+}
+
+void xyGraphClass::getDbYMinYMax (
+  double *min,
+  double *max,
+  int yi
+) {
+
+int i, start;
+
+  *min = 0;
+  *max = 1;
+
+  if ( yi == 0 ) {
+
+    i = 0;
+    start = numTraces;
+    while ( i<numTraces ) {
+      if ( !y2Scale[i] ) {
+        *min = dbYMin[i];
+        *max = dbYMax[i];
+        start = i+1;
+        break;
+      }
+      i++;
+    }
+
+    for ( i=start; i<numTraces; i++ ) {
+      if ( !y2Scale[i] ) {
+        if ( dbYMin[i] < *min ) *min = dbYMin[i];
+        if ( dbYMax[i] > *max ) *max = dbYMax[i];
+      }
+    }
+
+  }
+  else {
+
+    i = 0;
+    start = numTraces;
+    while ( i<numTraces ) {
+      if ( y2Scale[i] ) {
+        *min = dbYMin[i];
+        *max = dbYMax[i];
+        start = i+1;
+        break;
+      }
+      i++;
+    }
+
+    for ( i=start; i<numTraces; i++ ) {
+      if ( y2Scale[i] ) {
+        if ( dbYMin[i] < *min ) *min = dbYMin[i];
+        if ( dbYMax[i] > *max ) *max = dbYMax[i];
+      }
+    }
+
+  }
 
 }
 
@@ -4723,6 +4912,7 @@ double scaledX, scaledY;
       scaledY = plotAreaH -
        rint( ( dyValue - curY1Min[yi] ) *
        y1Factor[yi][i] - y1Offset[yi][i] );
+      scaledY = dclamp( scaledY );
 
       if ( traceType[i] == XYGC_K_TRACE_CHRONOLOGICAL ) {
 
@@ -4788,6 +4978,7 @@ double scaledX, scaledY;
 
       scaledX = rint( ( dxValue - curXMin ) *
        xFactor[i] + xOffset[i] );
+      scaledX = dclamp( scaledX );
 
       addPoint( dxValue, scaledX, scaledY, i );
 
@@ -4877,7 +5068,8 @@ char format[31+1];
     scaledY = plotAreaH -
      rint( ( dyValue - curY1Min[yi] ) *
      y1Factor[yi][i] - y1Offset[yi][i] );
-  
+    scaledY = dclamp( scaledY );
+
 #if 0
     // There are two views of pv types, Type and specificType; this uses
     // specificType
@@ -4938,6 +5130,7 @@ char format[31+1];
 
     scaledX = rint( ( dxValue - curXMin ) *
      xFactor[i] + xOffset[i] );
+    scaledX = dclamp( scaledX );
 
     addPoint( dxValue, scaledX, scaledY, i );
 
@@ -5100,7 +5293,8 @@ char format[31+1];
     scaledY = plotAreaH -
      rint( ( dyValue - curY1Min[yi] ) *
      y1Factor[yi][i] - y1Offset[yi][i] );
-  
+    scaledY = dclamp( scaledY );
+
     // There are two views of pv types, Type and specificType; this uses
     // specificType
     switch ( xPvType[i] ) {
@@ -5156,6 +5350,7 @@ char format[31+1];
 
     scaledX = rint( ( dxValue - curXMin ) *
      xFactor[i] + xOffset[i] );
+    scaledX = dclamp( scaledX );
 
     addPoint( dxValue, scaledX, scaledY, i );
 
@@ -6087,6 +6282,16 @@ XmString str;
         XtAddCallback( pbAdjustParams, XmNactivateCallback, menu_cb,
          (XtPointer) this );
 
+        str = XmStringCreateLocalized( "Dump to file" );
+        pbDumpData = XtVaCreateManagedWidget( "", xmPushButtonWidgetClass,
+         popUpMenu,
+         XmNlabelString, str,
+         NULL );
+        XmStringFree( str );
+
+        XtAddCallback( pbDumpData, XmNactivateCallback, menu_cb,
+         (XtPointer) this );
+
 	widgetsCreated = 1;
 
       }
@@ -6608,6 +6813,7 @@ void xyGraphClass::btnDrag (
 
 int rsw, rsh;
 int pmX, pmY;
+int tmpX, tmpY;
 
   if ( !enabled ) return;
 
@@ -6622,20 +6828,48 @@ int pmX, pmY;
     actWin->executeGc.setFGforGivenBG (
      actWin->ci->pix(fgColor), actWin->ci->pix(bgColor) );
 
+    if ( oldRescaleBoxW >= 0 ) {
+      tmpX = rescaleBoxX0;
+    }
+    else {
+      tmpX = rescaleBoxX0 + oldRescaleBoxW;
+    }
+
+    if ( oldRescaleBoxH >= 0 ) {
+      tmpY = rescaleBoxY0;
+    }
+    else {
+      tmpY = rescaleBoxY0 + oldRescaleBoxH;
+    }
+
     XDrawRectangle( actWin->d, pixmap,
-     actWin->executeGc.xorGC(), rescaleBoxX0, rescaleBoxY0,
-     oldRescaleBoxW, oldRescaleBoxH );
+     actWin->executeGc.xorGC(), tmpX, tmpY,
+     abs(oldRescaleBoxW), abs(oldRescaleBoxH) );
 
     rescaleBoxX1 = pmX;
     rescaleBoxY1 = pmY;
-    rsw = abs( rescaleBoxX1 - rescaleBoxX0 );
-    rsh = abs( rescaleBoxY1 - rescaleBoxY0 );
+    rsw = rescaleBoxX1 - rescaleBoxX0;
+    rsh = rescaleBoxY1 - rescaleBoxY0;
     oldRescaleBoxW = rsw;
     oldRescaleBoxH = rsh;
 
+    if ( rsw >= 0 ) {
+      tmpX = rescaleBoxX0;
+    }
+    else {
+      tmpX = rescaleBoxX0 + rsw;
+    }
+
+    if ( rsh >= 0 ) {
+      tmpY = rescaleBoxY0;
+    }
+    else {
+      tmpY = rescaleBoxY0 + rsh;
+    }
+
     XDrawRectangle( actWin->d, pixmap,
-     actWin->executeGc.xorGC(), rescaleBoxX0, rescaleBoxY0,
-     oldRescaleBoxW, oldRescaleBoxH );
+     actWin->executeGc.xorGC(), tmpX, tmpY,
+     abs(rsw), abs(rsh) );
 
     actWin->executeGc.restoreFg();
 
@@ -6660,6 +6894,7 @@ void xyGraphClass::btnUp (
 int pmX, pmY;
 double dx0, dy0, dx1, dy1;
 int yi = 0;
+int tmpX, tmpY;
 
   *action = 0;
 
@@ -6676,15 +6911,29 @@ int yi = 0;
     actWin->executeGc.setFGforGivenBG (
      actWin->ci->pix(fgColor), actWin->ci->pix(bgColor) );
 
+    if ( oldRescaleBoxW >= 0 ) {
+      tmpX = rescaleBoxX0;
+    }
+    else {
+      tmpX = rescaleBoxX0 + oldRescaleBoxW;
+    }
+
+    if ( oldRescaleBoxH >= 0 ) {
+      tmpY = rescaleBoxY0;
+    }
+    else {
+      tmpY = rescaleBoxY0 + oldRescaleBoxH;
+    }
+
     XDrawRectangle( actWin->d, pixmap,
-     actWin->executeGc.xorGC(), rescaleBoxX0, rescaleBoxY0,
-     oldRescaleBoxW, oldRescaleBoxH );
+     actWin->executeGc.xorGC(), tmpX, tmpY,
+     abs(oldRescaleBoxW), abs(oldRescaleBoxH) );
 
     actWin->executeGc.restoreFg();
 
     doingBoxRescale = 0;
 
-    if ( ( oldRescaleBoxW < 5 ) || ( oldRescaleBoxH < 5 ) ) return;
+    if ( ( abs(oldRescaleBoxW) < 5 ) || ( abs(oldRescaleBoxH) < 5 ) ) return;
 
     rescaleBoxX1 = pmX;
 
@@ -7075,7 +7324,7 @@ int i, ii, nc, ni, nu, nvu, nru, nr, ne, nd, nrstc, nrst, ntrgc, tmpC,
 double dyValue, dxValue, range, oneMax, oldXMin, xmin, xmax, ymin[2], ymax[2],
  scaledX, scaledY;
 char format[31+1];
-int yi, yScaleIndex;
+int yi, yScaleIndex, allChronological;
 
   if ( actWin->isIconified ) return;
 
@@ -7534,6 +7783,8 @@ int yi, yScaleIndex;
 
     fullRefresh();
 
+    nol = 1;
+
   }
 
   // this needs to come before nbs, nxresc, ny1resc
@@ -7714,6 +7965,14 @@ int yi, yScaleIndex;
 
     }
 
+    kpXMinEfDouble.setValue( curXMin );
+    kpXMaxEfDouble.setValue( curXMax );
+
+    for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
+      kpY1MinEfDouble[yi].setValue( curY1Min[yi] );
+      kpY1MaxEfDouble[yi].setValue( curY1Max[yi] );
+    }
+
     regenBuffer();
     fullRefresh();
 
@@ -7812,6 +8071,7 @@ int yi, yScaleIndex;
               scaledY = plotAreaH -
                rint( ( dyValue - curY1Min[yi] ) *
                y1Factor[yi][i] - y1Offset[yi][i] );
+              scaledY = dclamp( scaledY );
 
               if ( traceType[i] == XYGC_K_TRACE_CHRONOLOGICAL ) {
 
@@ -7877,6 +8137,7 @@ int yi, yScaleIndex;
 
               scaledX = rint( ( dxValue - curXMin ) *
                xFactor[i] + xOffset[i] );
+              scaledX = dclamp( scaledX );
 
               addPoint( dxValue, scaledX, scaledY, i );
 
@@ -8146,10 +8407,34 @@ int yi, yScaleIndex;
 
     for ( num=0; num<2; num++ ) {
 
-      curXMin = xMin.value();
-      if ( xmin < curXMin ) curXMin = xmin;
-      curXMax = xMax.value();
-      if ( xmax > curXMax ) curXMax = xmax;
+      curXNumLabelTicks = xNumLabelIntervals.value();
+      if ( curXNumLabelTicks < 1 ) curXNumLabelTicks = 1;
+      curXMajorsPerLabel = xNumMajorPerLabel.value();
+      curXMinorsPerMajor = xNumMinorPerMajor.value();
+
+      if ( xAxisSource == XYGC_K_FROM_PV ) {
+        allChronological = getDbXMinXMax( &curXMin, &curXMax );
+      }
+      else if ( xAxisSource == XYGC_K_USER_SPECIFIED ) {
+        curXMin = xMin.value();
+        curXMax = xMax.value();
+      }
+      else {
+        curXMin = xMin.value();
+        curXMax = xMax.value();
+        if ( xmin < curXMin ) curXMin = xmin;
+        if ( xmax > curXMax ) curXMax = xmax;
+        if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+	else {
+          get_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+      }
       if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
         curXMin = log10( curXMin );
         curXMax = log10( curXMax );
@@ -8157,6 +8442,28 @@ int yi, yScaleIndex;
       else if ( xAxisStyle == XYGC_K_AXIS_STYLE_TIME_LOG10 ) {
         curXMin = log10( curXMin );
         curXMax = log10( curXMax );
+      }
+
+      if ( allChronological ) { // then autoscale X
+        if ( xmin < curXMin ) curXMin = xmin;
+        if ( xmax > curXMax ) curXMax = xmax;
+        if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+	else {
+          get_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+      }
+
+      for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
+        curY1NumLabelTicks[yi] = y1NumLabelIntervals[yi].value();
+        if ( curY1NumLabelTicks[yi] < 1 ) curY1NumLabelTicks[yi] = 1;
+        curY1MajorsPerLabel[yi] = y1NumMajorPerLabel[yi].value();
+        curY1MinorsPerMajor[yi] = y1NumMinorPerMajor[yi].value();
       }
 
       for ( i=0; i<numTraces; i++ ) {
@@ -8167,13 +8474,32 @@ int yi, yScaleIndex;
 
       for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
 
-        curY1Min[yi] = y1Min[yi].value();
-        if ( ymin[yi] < curY1Min[yi] ) curY1Min[yi] = ymin[yi];
-        curY1Max[yi] = y1Max[yi].value();
-        if ( ymax[yi] > curY1Max[yi] ) curY1Max[yi] = ymax[yi];
+        if ( y1AxisSource[yi] == XYGC_K_FROM_PV ) {
+          getDbYMinYMax( &curY1Min[yi], &curY1Max[yi], yi );
+	}
+	else if ( y1AxisSource[yi] == XYGC_K_USER_SPECIFIED ) {
+          curY1Min[yi] = y1Min[yi].value();
+          curY1Max[yi] = y1Max[yi].value();
+	}
+	else {
+          curY1Min[yi] = y1Min[yi].value();
+          if ( ymin[yi] < curY1Min[yi] ) curY1Min[yi] = ymin[yi];
+          curY1Max[yi] = y1Max[yi].value();
+          if ( ymax[yi] > curY1Max[yi] ) curY1Max[yi] = ymax[yi];
+	}
         if ( y1AxisStyle[yi] == XYGC_K_AXIS_STYLE_LOG10 ) {
           curY1Min[yi] = log10( curY1Min[yi] );
           curY1Max[yi] = log10( curY1Max[yi] );
+	}
+        if ( y1AxisStyle[yi] == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curY1Min[yi], curY1Max[yi], &curY1Min[yi],
+           &curY1Max[yi], &curY1NumLabelTicks[yi], &curY1MajorsPerLabel[yi],
+           &curY1MinorsPerMajor[yi], format );
+        }
+        else {
+          get_scale_params1( curY1Min[yi], curY1Max[yi], &curY1Min[yi],
+           &curY1Max[yi], &curY1NumLabelTicks[yi], &curY1MajorsPerLabel[yi],
+           &curY1MinorsPerMajor[yi], format );
         }
 
         for ( i=0; i<numTraces; i++ ) {
@@ -8184,21 +8510,18 @@ int yi, yScaleIndex;
 
       }
     
-      curXNumLabelTicks = xNumLabelIntervals.value();
-      if ( curXNumLabelTicks < 1 ) curXNumLabelTicks = 1;
-      curXMajorsPerLabel = xNumMajorPerLabel.value();
-      curXMinorsPerMajor = xNumMinorPerMajor.value();
-
-      for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
-        curY1NumLabelTicks[yi] = y1NumLabelIntervals[yi].value();
-        if ( curY1NumLabelTicks[yi] < 1 ) curY1NumLabelTicks[yi] = 1;
-        curY1MajorsPerLabel[yi] = y1NumMajorPerLabel[yi].value();
-        curY1MinorsPerMajor[yi] = y1NumMinorPerMajor[yi].value();
-      }
-
       updateDimensions();
 
     }
+
+    for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
+      if ( numYTraces[yi] > 0 ) {
+        kpY1MinEfDouble[yi].setNull(1);
+        kpY1MaxEfDouble[yi].setNull(1);
+      }
+    }
+    kpXMinEfDouble.setNull(1);
+    kpXMaxEfDouble.setNull(1);
 
     regenBuffer();
     fullRefresh();
@@ -8349,6 +8672,115 @@ int yi, yScaleIndex;
       plotState[i] = XYGC_K_STATE_INITIALIZING;
     }
 
+    // --------------------------
+
+    for ( num=0; num<2; num++ ) {
+
+      curXNumLabelTicks = xNumLabelIntervals.value();
+      if ( curXNumLabelTicks < 1 ) curXNumLabelTicks = 1;
+      curXMajorsPerLabel = xNumMajorPerLabel.value();
+      curXMinorsPerMajor = xNumMinorPerMajor.value();
+
+      if ( xAxisSource == XYGC_K_FROM_PV ) {
+        allChronological = getDbXMinXMax( &curXMin, &curXMax );
+      }
+      else if ( xAxisSource == XYGC_K_USER_SPECIFIED ) {
+        curXMin = xMin.value();
+        curXMax = xMax.value();
+      }
+      else {
+        curXMin = xMin.value();
+        curXMax = xMax.value();
+        if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+	else {
+          get_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+      }
+      if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
+        curXMin = log10( curXMin );
+        curXMax = log10( curXMax );
+      }
+      else if ( xAxisStyle == XYGC_K_AXIS_STYLE_TIME_LOG10 ) {
+        curXMin = log10( curXMin );
+        curXMax = log10( curXMax );
+      }
+
+      if ( allChronological ) { // then autoscale X
+        if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+	else {
+          get_scale_params1( curXMin, curXMax, &curXMin, &curXMax,
+           &curXNumLabelTicks, &curXMajorsPerLabel, &curXMinorsPerMajor,
+           format );
+	}
+      }
+
+      for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
+        curY1NumLabelTicks[yi] = y1NumLabelIntervals[yi].value();
+        if ( curY1NumLabelTicks[yi] < 1 ) curY1NumLabelTicks[yi] = 1;
+        curY1MajorsPerLabel[yi] = y1NumMajorPerLabel[yi].value();
+        curY1MinorsPerMajor[yi] = y1NumMinorPerMajor[yi].value();
+      }
+
+      for ( i=0; i<numTraces; i++ ) {
+        xFactor[i] =
+         (double) ( plotAreaW ) / ( curXMax - curXMin );
+        xOffset[i] = plotAreaX;
+      }
+
+      for ( yi=0; yi<xyGraphClass::NUM_Y_AXES; yi++ ) {
+
+        if ( y1AxisSource[yi] == XYGC_K_FROM_PV ) {
+          getDbYMinYMax( &curY1Min[yi], &curY1Max[yi], yi );
+	}
+	else if ( y1AxisSource[yi] == XYGC_K_USER_SPECIFIED ) {
+          curY1Min[yi] = y1Min[yi].value();
+          curY1Max[yi] = y1Max[yi].value();
+	}
+	else {
+          curY1Min[yi] = y1Min[yi].value();
+          curY1Max[yi] = y1Max[yi].value();
+	}
+        if ( y1AxisStyle[yi] == XYGC_K_AXIS_STYLE_LOG10 ) {
+          curY1Min[yi] = log10( curY1Min[yi] );
+          curY1Max[yi] = log10( curY1Max[yi] );
+	}
+        if ( y1AxisStyle[yi] == XYGC_K_AXIS_STYLE_LOG10 ) {
+          get_log10_scale_params1( curY1Min[yi], curY1Max[yi], &curY1Min[yi],
+           &curY1Max[yi], &curY1NumLabelTicks[yi], &curY1MajorsPerLabel[yi],
+           &curY1MinorsPerMajor[yi], format );
+        }
+        else {
+          get_scale_params1( curY1Min[yi], curY1Max[yi], &curY1Min[yi],
+           &curY1Max[yi], &curY1NumLabelTicks[yi], &curY1MajorsPerLabel[yi],
+           &curY1MinorsPerMajor[yi], format );
+        }
+
+        for ( i=0; i<numTraces; i++ ) {
+          y1Factor[yi][i] =
+           (double) ( plotAreaH ) / ( curY1Max[yi] - curY1Min[yi] );
+          y1Offset[yi][i] = plotAreaY;
+        }
+
+      }
+    
+      updateDimensions();
+
+    }
+
+    // --------------------------
+
+#if 0
+
     curXMin = xMin.value();
     curXMax = xMax.value();
     if ( xAxisStyle == XYGC_K_AXIS_STYLE_LOG10 ) {
@@ -8395,6 +8827,10 @@ int yi, yScaleIndex;
       curY1MinorsPerMajor[yi] = y1NumMinorPerMajor[yi].value();
     }
 
+#endif
+
+    // --------------------------
+
     if ( !firstBoxRescale ) {
 
       firstBoxRescale = 1;
@@ -8418,8 +8854,7 @@ int yi, yScaleIndex;
     kpXMinEfDouble.setNull(1);
     kpXMaxEfDouble.setNull(1);
 
-    updateDimensions();
-
+    regenBuffer();
     fullRefresh();
 
   }
@@ -8660,6 +9095,7 @@ double n;
           }
           prevX = (short) rint( ( n - curXMin ) *
            xFactor[trace] + xOffset[trace] );
+          prevX = sclamp( prevX );
         }
         else {
           prevX = plotInfo[trace][i].firstX;
@@ -8690,6 +9126,7 @@ double n;
           }
           curX = (short) rint( ( n - curXMin ) *
            xFactor[trace] + xOffset[trace] );
+          curX = sclamp( curX );
         }
         else {
           curX = plotInfo[trace][i].firstX;

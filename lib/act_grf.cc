@@ -126,6 +126,30 @@ activeGraphicClass::~activeGraphicClass ( void ) {
 
 }
 
+int activeGraphicClass::baseMajorVersion ( void ) {
+
+   return MAJOR_VERSION;
+
+}
+
+int activeGraphicClass::baseMinorVersion ( void ) {
+
+   return MINOR_VERSION;
+
+}
+
+void activeGraphicClass::checkBaseClassVersion (
+  int ver,
+  char *file
+) {
+
+  if ( baseMajorVersion() != ver ) {
+    printf( "Incompatible base class version - %s\n", file );
+    exit(-1);
+  }
+
+}
+
 void activeGraphicClass::setObjType (
   char *strObjType ) {
 
@@ -1204,7 +1228,7 @@ int boxH;
 
   if ( deleteRequest ) return 1;
 
-  actWin->executeGc.setLineWidth( 1 );
+  actWin->drawGc.setLineWidth( 1 );
   actWin->drawGc.setLineStyle( LineSolid );
 
   boxX = sboxX-3;
@@ -1273,7 +1297,7 @@ int boxH;
   actWin->drawGc.saveFg();
   actWin->drawGc.setFG( actWin->ci->pix(actWin->fgColor) );
 
-  actWin->executeGc.setLineWidth( 1 );
+  actWin->drawGc.setLineWidth( 1 );
   actWin->drawGc.setLineStyle( LineSolid );
 
   boxX = sboxX-3;
