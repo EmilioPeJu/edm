@@ -11,6 +11,9 @@ ifdef EPICS_HOST_ARCH
  DIRS += pnglib 
  DIRS += pvFactory 
  DIRS += choiceButton
+ DIRS += helpFiles
+ DIRS += widgets
+ DIRS += setup
  include $(TOP)/configure/RULES_DIRS
 
 else
@@ -18,13 +21,13 @@ else
     ifneq ($(wildcard $(TOP)/config)x,x)
       # New Makefile.Host config file location
       include $(TOP)/config/CONFIG_EXTENSIONS
-      DIRS = util lib baselib edmMain pvlib giflib pnglib pvFactory choiceButton
+      DIRS = util lib baselib edmMain pvlib giflib pnglib pvFactory choiceButton helpFiles widgets setup
       include $(TOP)/config/RULES_DIRS
     else
       # Old Makefile.Unix config file location
       EPICS=../../..
       include $(EPICS)/config/CONFIG_EXTENSIONS
-      DIRS = util lib baselib edmMain pvlib giflib pnglib pvFactory choiceButton
+      DIRS = util lib baselib edmMain pvlib giflib pnglib pvFactory choiceButton helpFiles widgets setup
       include $(EPICS)/config/RULES_DIRS
     endif
 endif
