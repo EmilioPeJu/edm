@@ -1,19 +1,39 @@
-18
-activeLineClass /home/sinclair/edm/sources/libEdmBase.so Graphics Lines
-activeRectangleClass /home/sinclair/edm/sources/libEdmBase.so Graphics Rectangle
-activeCircleClass /home/sinclair/edm/sources/libEdmBase.so Graphics Circle
-activeXTextClass /home/sinclair/edm/sources/libEdmBase.so Graphics Static Text
-activeMeterClass /home/sinclair/edm/sources/libEdmBase.so Monitors Meter
-activeBarClass /home/sinclair/edm/sources/libEdmBase.so Monitors Bar
-activeMessageBoxClass /home/sinclair/edm/sources/libEdmBase.so Monitors Message Box
-activeXTextDspClass /home/sinclair/edm/sources/libEdmBase.so Controls Text
-activeSliderClass /home/sinclair/edm/sources/libEdmBase.so Controls Slider
-activeButtonClass /home/sinclair/edm/sources/libEdmBase.so Controls Button
-activeMenuButtonClass /home/sinclair/edm/sources/libEdmBase.so Controls Menu Button
-activeMessageButtonClass /home/sinclair/edm/sources/libEdmBase.so Controls Message Button
-activeExitButtonClass /home/sinclair/edm/sources/libEdmBase.so Controls Exit Button
-menuMuxClass /home/sinclair/edm/sources/libEdmBase.so Controls Menu Mux
-relatedDisplayClass /home/sinclair/edm/sources/libEdmBase.so Controls Related Display
-shellCmdClass /home/sinclair/edm/sources/libEdmBase.so Controls Shell Command
-cfcf6c8a_dbeb_11d2_8a97_00104b8742df /home/sinclair/edm/sources/lib605432d2-f29d-11d2-973b-00104b8742df.so Graphics GIF Image
-activePngClass /home/sinclair/edm/sources/lib605432d2-f29d-11d2-973b-00104b8742df.so Graphics PNG Image
+38
+activeArcClass              $(EDMLIBS)/libEdmBase.so Graphics Arc
+activeBarClass              $(EDMLIBS)/libEdmBase.so Monitors Bar
+activeButtonClass           $(EDMLIBS)/libEdmBase.so Controls Button
+activeChoiceButtonClass     $(EDMLIBS)/libEdmChoiceButton.so Controls Choice Button
+activeCircleClass           $(EDMLIBS)/libEdmBase.so Graphics Circle
+activeExitButtonClass       $(EDMLIBS)/libEdmBase.so Controls Exit Button
+activeLineClass             $(EDMLIBS)/libEdmBase.so Graphics Lines
+activeMenuButtonClass       $(EDMLIBS)/libEdmBase.so Controls Menu Button
+activeMessageBoxClass       $(EDMLIBS)/libEdmBase.so Monitors Message Box
+activeMessageButtonClass    $(EDMLIBS)/libEdmBase.so Controls Message Button
+activeMeterClass            $(EDMLIBS)/libEdmBase.so Monitors Meter
+activeMotifSliderClass      $(EDMLIBS)/libEdmBase.so Controls Motif Slider
+activePipClass              $(EDMLIBS)/libEdmBase.so Graphics Embedded Window
+activePngClass              $(EDMLIBS)/libEdmPng.so Graphics PNG Image
+activeRadioButtonClass      $(EDMLIBS)/libEdmBase.so Controls Radio Box
+activeRectangleClass        $(EDMLIBS)/libEdmBase.so Graphics Rectangle
+activeSliderClass           $(EDMLIBS)/libEdmBase.so Controls Slider
+activeTableClass            $(EDMLIBS)/libEdmBase.so Monitors Table
+activeUpdownButtonClass     $(EDMLIBS)/libEdmBase.so Controls Up/Down Button
+activeVsBarClass            $(EDMLIBS)/libEdmVsbar.so Monitors Variable Scale Bar
+activeXRegTextClass         $(EDMLIBS)/libEdmBase.so Graphics Text w. Reg. Exp.
+activeXTextClass            $(EDMLIBS)/libEdmBase.so Graphics Static Text
+activeXTextDspClass         $(EDMLIBS)/libEdmBase.so Controls Text Control
+activeXTextDspClass:noedit  $(EDMLIBS)/libEdmBase.so Monitors Text Monitor
+ByteClass                   $(EDMLIBS)/libPV.so Monitors Byte
+cfcf6c8a_dbeb_11d2_8a97_00104b8742df $(EDMLIBS)/libEdmGif.so Graphics GIF Image
+ExtendedRelatedDisplayClass $(EDMLIBS)/libExtendedRelatedDisplay.so Controls Extended Related Display
+menuMuxClass                $(EDMLIBS)/libEdmBase.so Controls Menu Mux
+pvInspectorClass            $(EDMLIBS)/libEdmBase.so Monitors PV Inspector
+RegTextupdateClass          $(EDMLIBS)/libPV.so Monitors RegTextupdate
+relatedDisplayClass         $(EDMLIBS)/libEdmBase.so Controls Related Display
+shellCmdClass               $(EDMLIBS)/libEdmBase.so Controls Shell Command
+StripClass                  $(EDMLIBS)/libPV.so Monitors Stripchart
+TextentryClass              $(EDMLIBS)/libPV.so Controls Textentry
+TextupdateClass             $(EDMLIBS)/libPV.so Monitors Textupdate
+TwoDProfileMonitorClass     $(EDMLIBS)/libTwoDProfileMonitor.so Monitors TwoDProfileMonitor
+wheelSwitchClass            $(EDMLIBS)/libEdmWheelswitch.so Controls Wheelswitch
+xyGraphClass                $(EDMLIBS)/libEdmBase.so Monitors X-Y Graph
