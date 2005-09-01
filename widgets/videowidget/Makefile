@@ -1,15 +1,16 @@
-EDM = $(EPICS_EXTENSIONS)/src/edm
-LDFLAGS =  -L/usr/X11R6/lib -lXpm
-CXXFLAGS += -I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib -I$(EPICS_BASE)/include -I/home/tools/applications/include -I. -Wno-deprecated
+TOP = ../../../..
 
-TwoDProfileMonitor.so: TwoDProfileMonitor.o widget.o
-	g++ $(LDFLAGS) -shared -o TwoDProfileMonitor.so TwoDProfileMonitor.o widget.o
+include $(TOP)/configure/CONFIG
 
-TwoDProfileMonitor.o: TwoDProfileMonitor.cc widget.h
-	g++ $(CXXFLAGS) -c TwoDProfileMonitor.cc -g -O -Wall -ansi -pedantic
+EDM=../../..
+USR_INCLUDES=-I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib
+USR_INCLUDES += -I$(TOP)/include/sys/linux
+USR_INCLUDES += -I$(TOP)/include/thread/linux
+USR_INCLUDES += -I$(TOP)/include/avl
+USR_INCLUDES += -I$(TOP)/include/crc
 
-widget.o: widget.cc widget.h pixmap.xpm twoD.xpm
-	g++ $(CXXFLAGS) -c widget.cc -g -O -Wall -ansi -pedantic -I/usr/X11R6/include
+LIBRARY_HOST = TwoDProfileMonitor
+LIB_SRCS += TwoDProfileMonitor.cc
+LIB_SRCS += widget.cc
 
-clean:
-	rm -f TwoDProfileMonitor.so TwoDProfileMonitor.o widget.o
+include $(TOP)/configure/RULES

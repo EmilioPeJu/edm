@@ -1,10 +1,14 @@
-EDM = $(EPICS_EXTENSIONS)/src/edm
-CXXFLAGS += -I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib -I$(EPICS_BASE)/include -I/home/tools/applications/include -I. -Wno-deprecated -g
+TOP = ../../../..
 
-all: wheelswitch.so
+include $(TOP)/configure/CONFIG
 
-wheelswitch.so : onekeypad.o wheelSwitch.o
-	gcc $(LDFLAGS) -shared -static $^ -o $@
+EDM=../../..
+USR_INCLUDES=-I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib
+USR_INCLUDES += -I$(TOP)/include/sys/linux
+USR_INCLUDES += -I$(TOP)/include/thread/linux
+USR_INCLUDES += -I$(TOP)/include/avl
 
-clean:
-	rm -f *.o *.so
+LIBRARY_HOST = EdmWheelswitch
+LIB_SRCS += onekeypad.cc wheelSwitch.cc
+
+include $(TOP)/configure/RULES

@@ -1,12 +1,14 @@
-EDM = $(EPICS_EXTENSIONS)/src/edm
-LDFLAGS =  -L/usr/X11R6/lib -lXpm
-CXXFLAGS += -I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib -I$(EPICS_BASE)/include -I/home/tools/applications/include -I. -Wno-deprecated
+TOP = ../../../..
 
-vsbar.so: vsbar.o
-	g++ $(LDFLAGS) -shared -o vsbar.so vsbar.o
+include $(TOP)/configure/CONFIG
 
-vsbar.o: vsbar.cc vsbar.h vsbar.str
-	g++ $(CXXFLAGS) -c vsbar.cc -g -O -Wall -ansi -pedantic
+EDM=../../..
+USR_INCLUDES=-I$(EDM)/lib -I$(EDM)/util -I$(EDM)/pvlib
+USR_INCLUDES += -I$(TOP)/include/sys/linux
+USR_INCLUDES += -I$(TOP)/include/thread/linux
+USR_INCLUDES += -I$(TOP)/include/avl
 
-clean:
-	rm -f vsbar.so vsbar.o vsbar.o
+LIBRARY_HOST = EdmVsbar
+LIB_SRCS += vsbar.cc
+
+include $(TOP)/configure/RULES
