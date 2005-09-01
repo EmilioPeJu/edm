@@ -1,5 +1,5 @@
 #include <sys/time.h>
-#include <stream.h> // cout
+#include <iostream> // cout
 #include <stdio.h> // sprintf ()
 #include <X11/X.h> // Xlib
 #include <X11/Intrinsic.h> // Xt
