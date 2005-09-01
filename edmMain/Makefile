@@ -5,9 +5,9 @@ ifdef EPICS_HOST_ARCH
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
    # Add Debugging
    #USR_CXXFLAGS_Linux += -g -O0
-   edm_LIBS_Linux += EdmBase EdmLib 
-   edm_LIBS_Linux += EdmUtil
-   edm_SYS_LIBS_Linux += Xm Xmu Xt Xp Xtst X11 pthread dl
+   edmMain_LIBS_Linux += EdmBase EdmLib 
+   edmMain_LIBS_Linux += EdmUtil
+   edmMain_SYS_LIBS_Linux += Xm Xmu Xt Xp Xtst X11 pthread dl
    
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
    USR_LIBS_solaris = EdmBase EdmLib EdmUtil Xm Xt Xmu X11 Xext pthread dl rt
@@ -16,9 +16,9 @@ ifdef EPICS_HOST_ARCH
    USR_LIBS_hpux11_11_mt = EdmBase EdmLib EdmUtil Xm Xt Xmu X11 Xext pthread
 
    USR_LDFLAGS += -L$(INSTALL_LIB)
-   edm_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
+   edmMain_LDFLAGS += -L$(MOTIF_LIB) -L$(X11_LIB)
    
-   PROD_HOST = edm
+   PROD_HOST = edmMain
    
    PROD_LIBS += ca Com
    
@@ -50,7 +50,7 @@ ifdef EPICS_HOST_ARCH
    Xlib_DIR = $(X11_LIB)
    HCLXmu_DIR = $(X11_LIB)
    
-   edm_SRCS += main.cc
+   edmMain_SRCS += main.cc
    
    include $(TOP)/configure/RULES
    
