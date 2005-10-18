@@ -139,6 +139,9 @@ int init, active, activeMode, opComplete, controlExists, colorExists,
 
 int iValue;
 double controlVals[SYMBOL_K_MAX_PVS], controlV, curControlV, curColorV;
+// ****** SJS Addition 17/10/05 ******
+short controlSevr[SYMBOL_K_MAX_PVS], curControlSevr;
+// ****** End of SJS Addition ******
 double stateMinValue[SYMBOL_K_NUM_STATES];
 double stateMaxValue[SYMBOL_K_NUM_STATES];
 char symbolFileName[127+1];

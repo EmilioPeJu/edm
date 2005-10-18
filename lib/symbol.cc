@@ -112,6 +112,9 @@ activeGraphicListPtr head, cur, next, sourceHead, curSource;
   aso->index = 0;
   for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
     aso->controlVals[i] = 0.0;
+// ****** SJS addition  17/10/05 ******
+    aso->controlSevr[i] = 0;
+// ****** End of SJS addition ******
     aso->controlPvExpStr[i].setRaw( _aso->controlPvExpStr[i].rawString );
     aso->xorMask[i] = 0;
     aso->andMask[i] = 0;
@@ -248,11 +251,21 @@ int i;
     if ( aso->binaryTruthTable ) {
 
       aso->controlVals[ptr->index] = pv->get_double();
+// ****** SJS addition  17/10/05 ******
+      aso->controlSevr[ptr->index] = pv->get_severity ();
+// ****** End of SJS addition ******
       if ( aso->controlVals[ptr->index] != 0 )
         aso->iValue |= ptr->setMask;
       else
         aso->iValue &= ptr->clrMask;
       aso->curControlV = (double) aso->iValue;
+// ****** SJS addition  17/10/05 ******
+      aso->curControlSevr = 0;
+      for ( i=0; i<aso->numPvs; i++ ) {
+          if (aso->curControlSevr < aso->controlSevr[i])
+              aso->curControlSevr = aso->controlSevr[i];
+      }
+// ****** End of SJS addition ******
 
     }
     else {
@@ -264,11 +277,16 @@ int i;
              ( aso->shiftCount[ptr->index] == 0 ) ) {
 
           aso->curControlV = pv->get_double();
-
+// ****** SJS addition  17/10/05 ******
+          aso->curControlSevr = pv->get_severity ();
+// ****** End of SJS addition ******
 	}
 	else {
 
           aso->curUiVal[ptr->index] = (unsigned int) pv->get_int();
+// ****** SJS addition  17/10/05 ******
+          aso->controlSevr[ptr->index] = pv->get_severity ();
+// ****** End of SJS addition ******
 
           if ( aso->andMask[ptr->index] ) {
             aso->curUiVal[ptr->index] &= aso->andMask[ptr->index];
@@ -287,12 +305,22 @@ int i;
 
           aso->curControlV = (double) aso->curUiVal[ptr->index];
 
+// ****** SJS addition  17/10/05 ******
+          aso->curControlSevr = 0;
+          for ( i=0; i<aso->numPvs; i++ ) {
+              if (aso->curControlSevr < aso->controlSevr[i])
+                  aso->curControlSevr = aso->controlSevr[i];
+          }
+// ****** End of SJS addition ******
 	}
 
       }
       else {
 
         aso->curUiVal[ptr->index] = (unsigned int) pv->get_int();
+// ****** SJS addition  17/10/05 ******
+        aso->controlSevr[ptr->index] = pv->get_severity ();
+// ****** End of SJS addition ******
 
         if ( aso->andMask[ptr->index] ) {
           aso->curUiVal[ptr->index] &= aso->andMask[ptr->index];
@@ -310,8 +338,15 @@ int i;
 	}
 
         uiVal = 0;
+// ****** SJS addition  17/10/05 ******
+        aso->curControlSevr = 0;
+// ****** End of SJS addition ******
         for ( i=0; i<aso->numPvs; i++ ) {
           uiVal |= aso->curUiVal[i];
+// ****** SJS addition  17/10/05 ******
+          if (aso->curControlSevr < aso->controlSevr[i])
+              aso->curControlSevr = aso->controlSevr[i];
+// ****** End of SJS addition ******
 	}
 
         aso->curControlV = (double) uiVal;
@@ -582,6 +617,9 @@ int i;
   controlV = 0.0;
   for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
     controlVals[i] = 0.0;
+// ****** SJS addition  17/10/05 ******
+    controlSevr[i] = 0;
+// ****** End of SJS addition ******
     xorMask[i] = 0;
     andMask[i] = 0;
     shiftCount[i] = 0;
@@ -753,6 +791,9 @@ int i;
   controlV = 0.0;
   for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
     controlVals[i] = 0.0;
+// ****** SJS addition  17/10/05 ******
+    controlSevr[i] = 0;
+// ****** End of SJS addition ******
     controlPvExpStr[i].setRaw( source->controlPvExpStr[i].rawString );
     strncpy( cXorMask[i], source->cXorMask[i], 9 );
     strncpy( cAndMask[i], source->cAndMask[i], 9 );
@@ -2413,6 +2454,9 @@ int num;
 
     for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
       curUiVal[i] = 0; /* this gets set via XOR/AND/SHIFT operations */
+// ****** SJS addition  17/10/05 ******
+      controlSevr[i] = 0;
+// ****** End of SJS addition ******
       andMask[i] = strtol( cAndMask[i], NULL, 16 );
       xorMask[i] = strtol( cXorMask[i], NULL, 16 );
       controlPvId[i] = NULL;
@@ -3455,12 +3499,18 @@ int i;
 void activeSymbolClass::executeDeferred ( void ) {
 
 double v;
+// ****** SJS addition  17/10/05 ******
+short sevr;
+// ****** End of SJS addition ******
 int stat, i, nci, nc[SYMBOL_K_MAX_PVS], nr, ne, nd, ncolori, ncr;
 
   if ( actWin->isIconified ) return;
 
   actWin->appCtx->proc->lock();
   v = curControlV;
+// ****** SJS addition  17/10/05 ******
+  sevr = curControlSevr;
+// ****** End of SJS addition ******
   nci = needConnectInit; needConnectInit = 0;
   for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
     nc[i] = needConnect[i];
@@ -3539,6 +3589,7 @@ int stat, i, nci, nc[SYMBOL_K_MAX_PVS], nr, ne, nd, ncolori, ncr;
     controlV = v;
 
     index = 0;
+/****** SJS change 17/10/05 - replace *******
     for ( i=0; i<numStates; i++ ) {
 
       if ( ( controlV >= stateMinValue[i] ) &&
@@ -3550,7 +3601,22 @@ int stat, i, nci, nc[SYMBOL_K_MAX_PVS], nr, ne, nd, ncolori, ncr;
       }
 
     }
+****** by ******/
+    if (sevr < INVALID_ALARM)
+    {
+        for ( i=0; i<numStates; i++ ) {
 
+          if ( ( controlV >= stateMinValue[i] ) &&
+               ( controlV < stateMaxValue[i] ) ) {
+
+            index = i;
+            break;
+
+          }
+
+        }
+    }
+// ****** End of SJS modification
     if ( !active ) {
       index = 0;
     }
@@ -4252,6 +4318,9 @@ int i;
   index = 0;
   for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
     controlVals[i] = 0.0;
+// ****** SJS addition  17/10/05 ******
+    controlSevr[i] = 0;
+// ****** End of SJS addition ******
     controlPvExpStr[i].setRaw( ptr->aso->controlPvExpStr[i].rawString );
     strncpy( cAndMask[i], ptr->aso->cAndMask[i], 9 );
     strncpy( cXorMask[i], ptr->aso->cXorMask[i], 9 );
