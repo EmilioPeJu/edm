@@ -202,7 +202,13 @@ char tmp[PV_Factory::MAX_PV_NAME+1], *tk, *ctx;
 
     while ( tk ) {
 
+/****** SJS mod 16/12/05 to fix fault found by valgrind - replace *****
       enums[numEnumStates] = new char[strlen(tk)];
+ ****** by ******/
+      enums[numEnumStates] = new char[strlen(tk) + 1];
+                                       /* Allow for null char at string end */
+/****** End of SJS mod *****/
+
       strcpy( enums[numEnumStates], tk );
       if ( numEnumStates < MAX_ENUM_NUM ) numEnumStates++;
 
