@@ -1,4 +1,4 @@
-38
+39
 activeArcClass              $(EDMLIBS)/libEdmBase.so Graphics Arc
 activeBarClass              $(EDMLIBS)/libEdmBase.so Monitors Bar
 activeButtonClass           $(EDMLIBS)/libEdmBase.so Controls Button
@@ -37,3 +37,4 @@ TextupdateClass             $(EDMLIBS)/libPV.so Monitors Textupdate
 TwoDProfileMonitorClass     $(EDMLIBS)/libTwoDProfileMonitor.so Monitors TwoDProfileMonitor
 wheelSwitchClass            $(EDMLIBS)/libEdmWheelswitch.so Controls Wheelswitch
 xyGraphClass                $(EDMLIBS)/libEdmBase.so Monitors X-Y Graph
+menuMuxPVClass              $(EDMLIBS)/libmenu_muxPV.so Controls Menu Mux PV
