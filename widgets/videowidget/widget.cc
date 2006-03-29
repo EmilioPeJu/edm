@@ -1,5 +1,5 @@
 #include <sys/time.h>
-#include <iostream> // cout
+#include <stream.h> // cout
 #include <stdio.h> // sprintf ()
 #include <X11/X.h> // Xlib
 #include <X11/Intrinsic.h> // Xt
@@ -100,6 +100,7 @@ Widget widgetCreateWidget (widgetData wd, XtAppContext app, Display *d,
 }
 
 #include "pixmap.xpm"
+#include "falsecolour.xpm"
 #include <stdlib.h> // malloc ()
 
 void widgetNewDisplayData (widgetData wd,
@@ -109,12 +110,20 @@ void widgetNewDisplayData (widgetData wd,
                            unsigned long widgeth,
                            unsigned long dataw,
                            unsigned long datah,
-                           const double *data)
+                           unsigned long maxDataW,
+                           unsigned long maxDataH,
+                           unsigned long widthOffset,
+                           unsigned long heightOffset,
+                           unsigned long gridSize,
+                           const double *data,
+                           int useFalseColour,
+                           int gridOn)
 {
 #ifdef DEBUG
-    printf ("Start of widgetNewDisplayData\n");
+    printf ("Start of widgetNewDisplayData - grid size = %d\n", (int)gridSize);
 #endif
-
+    unsigned long gridSizeWidget;
+    long gridXStart, gridY, gridXZero, gridYZero;
     if (!data || !widgetw || !widgeth || !dataw || !datah)
     {
         printf ("widgetNewDisplayData - missing data, width or height\n");
@@ -144,7 +153,10 @@ void widgetNewDisplayData (widgetData wd,
 
     unsigned int index;
     for (index = 1; index < 257; index++)
-        pixmapData[index] = pixmap[index];
+        if (useFalseColour)
+            pixmapData[index] = falseColour[index];
+        else
+            pixmapData[index] = pixmap[index];
   
     while (index < (widgeth + 256 + 1))
     {
@@ -168,7 +180,62 @@ void widgetNewDisplayData (widgetData wd,
             pixmapLine[1 + i * 2] =
                                 (((unsigned char)dataLine[datai]) % 16) + 'a';
         }
+        
     } 
+
+    // Add grid if required
+    if (gridOn)
+    {
+        gridSizeWidget = gridSize * widgetw /dataw;
+        gridXZero = gridXStart =
+                           ((maxDataW / 2) - widthOffset) * widgetw / dataw;
+#ifdef DEBUG
+        printf (
+            "WidgetNDD - widget grid size %d dataw %d widgetw %d woffset %d\n",
+            (int)gridSize, (int)dataw, (int)widgetw, (int)widthOffset);
+        printf ("WidgetNDD - grid X size %d   zero at pixel %d\n",
+                (int)gridSizeWidget, (int)gridXStart);
+#endif
+        while (gridXStart < 0)
+        {
+            gridXStart += gridSizeWidget;
+        }
+        while (gridXStart > (long)gridSizeWidget)
+        {
+            gridXStart -= gridSizeWidget;
+        }
+        gridYZero = gridY = ((maxDataH / 2) - heightOffset) * widgeth / datah;
+        while (gridY < 0)
+        {
+            gridY += gridSizeWidget;
+        }
+        while (gridY > (long) gridSizeWidget)
+        {
+            gridY -= gridSizeWidget;
+        }
+        for (unsigned long j = 0; j < widgeth; j++)
+        {
+            pixmapLine = pixmapData[257 + j];
+            if (j == (unsigned long) gridY)
+            {
+                int iincr = 3;
+                if (j == (unsigned long) gridYZero)
+                    iincr = 1;
+                for (unsigned long i = 0; i < widgetw; i += iincr)
+                    pixmapLine[i * 2] = pixmapLine[1 + i * 2] = 'a';
+                gridY += gridSizeWidget;
+            }
+            else
+            {
+                for (unsigned long i = gridXStart; i < widgetw;
+                     i+= gridSizeWidget)
+                {
+                    if ((j % 3 == 0) || (i == (unsigned long)gridXZero)) 
+                        pixmapLine[i * 2] = pixmapLine[1 + i * 2] = 'a';
+                }
+            }
+        }
+    }
     // gettimeofday (&tv, 0);
     // printf ("widgetNDD after create pixmapData - time %ld %ld\n", tv.tv_sec,
     //         tv.tv_usec);

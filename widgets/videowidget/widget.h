@@ -9,7 +9,21 @@ widgetData widgetCreate(void);
 Widget widgetCreateWidget(widgetData wd, XtAppContext app, Display *d, Colormap cm, Widget parent, int x, int y, int h, int w);
 
 // feed the widget new information to use in rendering the display
-void widgetNewDisplayData(widgetData wd, time_t time, unsigned long nano, unsigned long widgetw, unsigned long widgeth, unsigned long dataw, unsigned long datah, const double *data);
+void widgetNewDisplayData(widgetData wd,
+                          time_t time,
+                          unsigned long nano,
+                          unsigned long widgetw,
+                          unsigned long widgeth,
+                          unsigned long dataw,
+                          unsigned long datah,
+                          unsigned long maxDataW,
+                          unsigned long maxDataH,
+                          unsigned long widthOffset,
+                          unsigned long heightOffset,
+                          unsigned long gridSize,
+                          const double *data,
+                          int useFalseColour,
+                          int gridOn);
 void widgetNewDisplayInfo(widgetData wd, bool valid, short status, short severity);
 
 // free up resources associated with widget instance
