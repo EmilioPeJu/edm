@@ -12,8 +12,8 @@
 #define VIDEO_MAX_DATA_WIDTH 10000
 #define VIDEO_MAX_DATA_HEIGHT 10000
 #define VIDEO_MAJOR_VERSION 4
-#define VIDEO_MINOR_VERSION 1
-#define VIDEO_RELEASE 0
+#define VIDEO_MINOR_VERSION 2
+#define VIDEO_RELEASE 1
 
 #include <time.h>
 #include <stream.h>
@@ -43,6 +43,7 @@ class TwoDProfileMonitor : public activeGraphicClass
     int pvBasedGridSize;
     int useFalseColour, pvBasedUseFalseColour;
     int showGrid, pvBasedShowGrid;
+    int gridColour, pvBasedGridColour;
     // globals for the edit popup
     int xBuf;
     int yBuf;
@@ -58,13 +59,16 @@ class TwoDProfileMonitor : public activeGraphicClass
     char gridSizePvBuf[activeGraphicClass::MAX_PV_NAME+1];
     char useFalseColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
     char showGridPvBuf[activeGraphicClass::MAX_PV_NAME+1];
+    char gridColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
 
     expStringClass dataPvStr, widthPvStr, heightPvStr, useFalseColourPvStr;
     expStringClass widthOffsetPvStr, heightOffsetPvStr, gridSizePvStr;
     expStringClass showGridPvStr;
+    expStringClass gridColourPvStr;
     ProcessVariable *dataPv, *widthPv, *heightPv, *useFalseColourPv;
     ProcessVariable *widthOffsetPv, *heightOffsetPv, *gridSizePv;
     ProcessVariable *showGridPv;
+    ProcessVariable *gridColourPv;
 
     // text stuff (for edit mode drawing)
     char *textFontTag;
@@ -75,11 +79,13 @@ class TwoDProfileMonitor : public activeGraphicClass
     int initialWidthOffsetConnection, initialHeightOffsetConnection;
     int initialGridSizeConnection;
     int initialUseFalseColourConnection, initialShowGridConnection;
+    int initialGridColourConnection;
     int needConnectInit, needInfoInit, needDraw, needRefresh;
-    unsigned char pvNotConnectedMask;
+    unsigned int  pvNotConnectedMask;
     int dataPvExists, widthPvExists, heightPvExists, useFalseColourPvExists;
     int widthOffsetPvExists, heightOffsetPvExists, gridSizePvExists;
     int showGridPvExists;
+    int gridColourPvExists;
     int init, active, activeMode;
     struct timeval lasttv;
     unsigned long average_time_usec;
@@ -110,9 +116,12 @@ public:
     // Called when the use false colour process variable connects or disconnects
     static void monitorUseFalseColourConnectState (ProcessVariable *pv,
                                                    void *userarg );
-    // Called when the use false colour process variable connects or disconnects
+    // Called when the show grid process variable connects or disconnects
     static void monitorShowGridConnectState (ProcessVariable *pv,
                                              void *userarg );
+    // Called when the grid colour process variable connects or disconnects
+    static void monitorGridColourConnectState (ProcessVariable *pv,
+                                               void *userarg );
     // Called when the width offset process variable connects or disconnects
     static void monitorWidthOffsetConnectState (ProcessVariable *pv,
                                                 void *userarg );
@@ -138,7 +147,7 @@ public:
     {
     
         TwoDProfileMonitor *me = (TwoDProfileMonitor *) closure;
-        // normalize dimensions (button and motion events store x,y in the
+        // normalize dimensions (button and motion events store x, y in the
         // same location)
         event->xbutton.x += me->getX0 ();
         event->xbutton.y += me->getY0 ();
@@ -236,6 +245,9 @@ public:
         if (stat)
             stat = showGridPvStr.expand1st (numMacros, macros,
                                             expansions);
+        if (stat)
+            stat = gridColourPvStr.expand1st (numMacros, macros,
+                                            expansions);
         return stat;
     
     }
@@ -262,6 +274,9 @@ public:
                                                   expansions);
         if (stat)
             stat = showGridPvStr.expand2nd (numMacros, macros,
+                                            expansions);
+        if (stat)
+            stat = gridColourPvStr.expand2nd (numMacros, macros,
                                             expansions);
         return stat;
     
@@ -444,6 +459,17 @@ public:
                 showGridPv->add_value_callback ( dataUpdate,
                                                  this );
             }
+            if (initialGridColourConnection)
+            {
+                initialGridColourConnection = 0;
+#ifdef DEBUG
+                printf (
+                    "TwoDProfMon::execDeferred - add grid colour value"
+                    " callback\n");
+#endif
+                gridColourPv->add_value_callback ( dataUpdate,
+                                                   this );
+            }
         }
         
         // need to check if we're being updated because of width change
@@ -595,6 +621,23 @@ public:
                 showGrid = 0;
             }
         }
+        if (gridColourPv && gridColourPv->is_valid ())
+        {
+            switch (gridColourPv->get_type ().type)
+            {
+            case ProcessVariable::Type::real:
+                gridColour = (int) gridColourPv->get_double ();
+                break;
+            case ProcessVariable::Type::integer:
+                gridColour = (int) gridColourPv->get_int ();
+                break;
+            case ProcessVariable::Type::enumerated:
+                gridColour = (int) gridColourPv->get_int ();
+                break;
+            default:
+                gridColour = 0;
+            }
+        }
     
         if (dataWidth <= 0 || dataWidth > VIDEO_MAX_DATA_WIDTH ||
             dataHeight < 0 || dataHeight > VIDEO_MAX_DATA_HEIGHT ||
@@ -602,7 +645,8 @@ public:
             heightOffset < 0 || heightOffset > VIDEO_MAX_DATA_WIDTH ||
             gridSize < 2 || // 0 would crash, 1 would obliterate image.
             useFalseColour < 0 || useFalseColour > 1 ||
-            showGrid < 0 || showGrid > 1)
+            showGrid < 0 || showGrid > 1 ||
+            gridColour < 0 || gridColour > 1)
         {
             printf (
                 "TwoDProfMon::execDef - return dataWidth %d dataHeight %d"
@@ -610,8 +654,8 @@ public:
                 dataWidth, dataHeight, useFalseColour, showGrid);
             printf (
                 "TwoDProfMon::execDef - widthOffset %d heightOffset %d"
-                " gridSize %d\n",
-                widthOffset, heightOffset, gridSize);
+                " gridSize %d gridColour %d\n",
+                widthOffset, heightOffset, gridSize, gridColour);
             return; 
         }   
         if ((dataHeight != 0) &&
@@ -660,7 +704,8 @@ public:
                     gridSize,
                     (const double *) dataPv->get_double_array (),
                     useFalseColour,
-                    showGrid
+                    showGrid,
+                    gridColour
                     );
                 break;
 
@@ -676,7 +721,7 @@ public:
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
                         (unsigned long)w, (unsigned long) h, dataWidth,
                         (dataHeight > 0 ? dataHeight 
-                                        : dataPv->get_dimension() / dataWidth),
+                                        : dataPv->get_dimension () / dataWidth),
                         maxDataWidth,
                         maxDataHeight,
                         widthOffset,
@@ -684,7 +729,8 @@ public:
                         gridSize,
                         temp,
                         useFalseColour,
-                        showGrid
+                        showGrid,
+                        gridColour
                         );
                    free (temp);
                 }
@@ -699,7 +745,7 @@ public:
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
                         (unsigned long) w, (unsigned long) h, dataWidth,
                         (dataHeight > 0 ? dataHeight 
-                                        : dataPv->get_dimension() / dataWidth),
+                                        : dataPv->get_dimension () / dataWidth),
                         maxDataWidth,
                         maxDataHeight,
                         widthOffset,
@@ -707,7 +753,8 @@ public:
                         gridSize,
                         temp,
                         useFalseColour,
-                        showGrid
+                        showGrid,
+                        gridColour
                         );
                     free (temp);
                 }
@@ -731,7 +778,8 @@ public:
     
         // Get approx average elapsed time for call - no point in being precise
         gettimeofday (&tv, 0);
-        elapsedusec = (tv.tv_sec - lasttv.tv_sec) * 1000000 + tv.tv_usec - lasttv.tv_usec;
+        elapsedusec = (tv.tv_sec - lasttv.tv_sec) * 1000000 +
+                       tv.tv_usec - lasttv.tv_usec;
         if (!average_time_usec)
             average_time_usec = elapsedusec;
         else
@@ -849,13 +897,15 @@ public:
               expStringClass *gridSizePvStr,
               expStringClass *useFalseColourPvStr,
               expStringClass *showGridPvStr,
+              expStringClass *gridColourPvStr,
               int *pvBasedDataSize,
               int *maxDataWidth,
               int *maxDataHeight,
               int *pvBasedOffsets,
               int *pvBasedGridSize,
               int *pvBasedUseFalseColour,
-              int *pvBasedShowGrid)
+              int *pvBasedShowGrid,
+              int *pvBasedGridColour)
     {
         int major, minor, release;
         int stat;
@@ -875,6 +925,7 @@ public:
         loadR ( "gridSizePvStr", gridSizePvStr, (char *) "" );
         loadR ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
         loadR ( "showGridPvStr", showGridPvStr, (char *) "" ); 
+        loadR ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
         loadR ( "pvBasedDataSize", pvBasedDataSize);
         loadR ( "maxDataWidth", maxDataWidth);
         loadR ( "maxDataHeight", maxDataHeight);
@@ -882,6 +933,7 @@ public:
         loadR ( "pvBasedGridSize", pvBasedGridSize);
         loadR ( "pvBasedUseFalseColour", pvBasedUseFalseColour);
         loadR ( "pvBasedShowGrid", pvBasedShowGrid);
+        loadR ( "pvBasedGridColour", pvBasedGridColour);
         stat = readTags ( fptr, "endObjectProperties" );
         if (major > VIDEO_MAJOR_VERSION ||
             (major == VIDEO_MAJOR_VERSION && minor > VIDEO_MINOR_VERSION))
@@ -909,19 +961,15 @@ public:
                expStringClass *gridSizePvStr,
                expStringClass *useFalseColourPvStr,
                expStringClass *showGridPvStr,
-//             int *dataWidth,
+               expStringClass *gridColourPvStr,
                int *pvBasedDataSize,
                int *maxDataWidth,
                int *maxDataHeight,
-//             int *widthOffset,
-//             int *heightOffset,
                int *pvBasedOffsets,
-//             int *gridSize,
                int *pvBasedGridSize,
-//             int *useFalseColour,
                int *pvBasedUseFalseColour,
-//             int *showGrid,
-               int *pvBasedShowGrid)
+               int *pvBasedShowGrid,
+               int *pvBasedGridColour)
     {
         int major, minor, release;
         major = VIDEO_MAJOR_VERSION;
@@ -943,19 +991,15 @@ public:
         loadW ( "gridSizePvStr", gridSizePvStr, (char *) "" );
         loadW ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
         loadW ( "showGridPvStr", showGridPvStr, (char *) "" ); 
-//      loadW ( "dataWidth", dataWidth);
+        loadW ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
         loadW ( "pvBasedDataSize", pvBasedDataSize);
         loadW ( "maxDataWidth", maxDataWidth);
         loadW ( "maxDataHeight", maxDataHeight);
-//      loadW ( "widthOffset", widthOffset);
-//      loadW ( "heightOffset", heightOffset);
         loadW ( "pvBasedOffsets", pvBasedOffsets);
-//      loadW ( "gridSize", gridSize);
         loadW ( "pvBasedGridSize", pvBasedGridSize);
-//      loadW ( "useFalseColour", useFalseColour);
         loadW ( "pvBasedUseFalseColour", pvBasedUseFalseColour);
-//      loadW ( "showGrid", showGrid);
         loadW ( "pvBasedShowGrid", pvBasedShowGrid);
+        loadW ( "pvBasedGridColour", pvBasedGridColour);
         loadW ( "endObjectProperties" );
         loadW ( "" );
   
@@ -1057,6 +1101,8 @@ void TwoDProfileMonitor::constructCommon (void)
     pvBasedUseFalseColour = 0;
     showGrid = 0;
     pvBasedShowGrid = 0;
+    gridColour = 0;
+    pvBasedGridColour = 0;
     dataWidth = -1;
     dataHeight = 0; // 0 if no PV supplied which is OK, -1 if invalid PV
     maxDataWidth = 0;
@@ -1081,6 +1127,7 @@ void TwoDProfileMonitor::constructCommon (void)
     gridSizePvStr.setRaw ("");
     useFalseColourPvStr.setRaw ("");
     showGridPvStr.setRaw ("");
+    gridColourPvStr.setRaw ("");
   
     dataPv = NULL;
     widthPv = NULL;
@@ -1090,6 +1137,7 @@ void TwoDProfileMonitor::constructCommon (void)
     gridSizePv = NULL;
     useFalseColourPv = NULL;
     showGridPv = NULL;
+    gridColourPv = NULL;
 
     strcpy (dataPvBuf, ""); // just to be safe
     strcpy (widthPvBuf, ""); // just to be safe
@@ -1099,6 +1147,7 @@ void TwoDProfileMonitor::constructCommon (void)
     strcpy (gridSizePvBuf, "");
     strcpy (useFalseColourPvBuf, ""); // just to be safe
     strcpy (showGridPvBuf, ""); // just to be safe
+    strcpy (gridColourPvBuf, ""); // just to be safe
     twoDWidget = NULL;
 
     average_time_usec = 0;
@@ -1139,6 +1188,7 @@ TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
     gridSizePvStr.setRaw (s.gridSizePvStr.rawString);
     useFalseColourPvStr.setRaw (s.useFalseColourPvStr.rawString);
     showGridPvStr.setRaw (s.showGridPvStr.rawString);
+    gridColourPvStr.setRaw (s.gridColourPvStr.rawString);
 
     pvBasedDataSize = s.pvBasedDataSize;
     maxDataWidth = s.maxDataWidth;
@@ -1147,6 +1197,8 @@ TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
     pvBasedUseFalseColour = s.pvBasedUseFalseColour;
     showGrid = s.showGrid;
     pvBasedShowGrid = s.pvBasedShowGrid;
+    gridColour = s.gridColour;
+    pvBasedGridColour = s.pvBasedGridColour;
     dataWidth = s.dataWidth; 
     widthOffset = s.widthOffset;
     heightOffset = s.heightOffset;
@@ -1176,6 +1228,7 @@ int TwoDProfileMonitor::activate ( int pass )
         initialGridSizeConnection = 0;
         initialUseFalseColourConnection = 0;
         initialShowGridConnection = 0;
+        initialGridColourConnection = 0;
         needConnectInit = needInfoInit = needRefresh = 0;
         pvNotConnectedMask = active = init = 0;
         activeMode = 1;
@@ -1316,6 +1369,26 @@ int TwoDProfileMonitor::activate ( int pass )
             }
         }
 
+        if (!pvBasedGridColour)
+        {
+            gridColourPvExists = 0;
+            gridColour = atoi (gridColourPvStr.getRaw ());
+        }
+        else
+        {
+            if (!gridColourPvStr.getExpanded () ||
+                blankOrComment (gridColourPvStr.getExpanded ()))
+            {
+                gridColourPvExists = 0;
+            }
+            else
+            {
+                gridColourPvExists = 1;
+                initialGridColourConnection = 1;
+                pvNotConnectedMask |= 256;
+            }
+        }
+
 #ifdef DEBUG
         printf (
             "TwoDProfileMonitor::activate pass 1 - pvNotConnectedMask = %d\n",
@@ -1357,8 +1430,8 @@ int TwoDProfileMonitor::activate ( int pass )
             if (widthPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - width PV = %s = %s\n", 
-                //         widthPvStr.getRaw(),
-                //         widthPvStr.getExpanded());
+                //         widthPvStr.getRaw (),
+                //         widthPvStr.getExpanded ());
                 widthPv = the_PV_Factory->create ( widthPvStr.getExpanded () );
                 if ( widthPv )
                 {
@@ -1375,8 +1448,8 @@ int TwoDProfileMonitor::activate ( int pass )
             if (heightPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - height PV = %s = %s\n", 
-                //         heightPvStr.getRaw(),
-                //         heightPvStr.getExpanded());
+                //         heightPvStr.getRaw (),
+                //         heightPvStr.getExpanded ());
                 heightPv = the_PV_Factory->create ( heightPvStr.getExpanded ());
                 if ( heightPv )
                 {
@@ -1395,8 +1468,8 @@ int TwoDProfileMonitor::activate ( int pass )
             {
                 // printf ("activate (TwoDMon.cc) - width offset PV"
                 //         " = %s = %s\n", 
-                //         widthOffsetPvStr.getRaw(),
-                //         widthOffsetPvStr.getExpanded());
+                //         widthOffsetPvStr.getRaw (),
+                //         widthOffsetPvStr.getExpanded ());
                 widthOffsetPv = the_PV_Factory->create (
                                             widthOffsetPvStr.getExpanded () );
                 if ( widthOffsetPv )
@@ -1415,8 +1488,8 @@ int TwoDProfileMonitor::activate ( int pass )
             {
                 // printf ("activate (TwoDMon.cc) - height offset PV"
                 //         " = %s = %s\n", 
-                //         heightOffsetPvStr.getRaw(),
-                //         heightOffsetPvStr.getExpanded());
+                //         heightOffsetPvStr.getRaw (),
+                //         heightOffsetPvStr.getExpanded ());
                 heightOffsetPv = the_PV_Factory->create (
                                           heightOffsetPvStr.getExpanded () );
                 if ( heightOffsetPv )
@@ -1434,8 +1507,8 @@ int TwoDProfileMonitor::activate ( int pass )
             if (gridSizePvExists)
             {
                 // printf ("activate (TwoDMon.cc) - grid size PV = %s = %s\n", 
-                //         gridSizePvStr.getRaw(),
-                //         gridSizePvStr.getExpanded());
+                //         gridSizePvStr.getRaw (),
+                //         gridSizePvStr.getExpanded ());
                 gridSizePv = the_PV_Factory->create (
                                                  gridSizePvStr.getExpanded ());
                 if ( gridSizePv )
@@ -1458,8 +1531,8 @@ int TwoDProfileMonitor::activate ( int pass )
             {
                 // printf ("activate (TwoDMon.cc) - use false colour"
                 //         " PV = %s = %s\n", 
-                //         useFalseColourPvStr.getRaw(),
-                //         useFalseColourPvStr.getExpanded());
+                //         useFalseColourPvStr.getRaw (),
+                //         useFalseColourPvStr.getExpanded ());
                 useFalseColourPv = the_PV_Factory->create (
                                         useFalseColourPvStr.getExpanded () );
                 if ( useFalseColourPv )
@@ -1482,8 +1555,8 @@ int TwoDProfileMonitor::activate ( int pass )
             if (showGridPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - show grid PV = %s = %s\n", 
-                //         showGridPvStr.getRaw(),
-                //         showGridPvStr.getExpanded());
+                //         showGridPvStr.getRaw (),
+                //         showGridPvStr.getExpanded ());
                 showGridPv = the_PV_Factory->create (
                                         showGridPvStr.getExpanded () );
                 if ( showGridPv )
@@ -1497,6 +1570,30 @@ int TwoDProfileMonitor::activate ( int pass )
                                              monitorShowGridConnectState,
                                              this);
                     //showGridPv->add_value_callback ( pvUpdate, this );
+                }
+            }
+#ifdef DEBUG
+            printf ("TwoDProfileMonitor::activate pass 2 -"
+                    " gridColourPvExists = %d\n", gridColourPvExists);
+#endif
+            if (gridColourPvExists)
+            {
+                // printf ("activate (TwoDMon.cc) - grid col PV = %s = %s\n", 
+                //         gridColourPvStr.getRaw (),
+                //         gridColourPvStr.getExpanded ());
+                gridColourPv = the_PV_Factory->create (
+                                        gridColourPvStr.getExpanded () );
+                if ( gridColourPv )
+                {
+#ifdef DEBUG
+                    printf (
+                        "TwoDProfMon::activate pass 2 - adding grid colour"
+                        " connect cb\n");
+#endif
+                    gridColourPv->add_conn_state_callback (
+                                             monitorGridColourConnectState,
+                                             this);
+                    //gridColourPv->add_value_callback ( pvUpdate, this );
                 }
             }
 #ifdef DEBUG
@@ -1514,6 +1611,10 @@ int TwoDProfileMonitor::activate ( int pass )
                     useFalseColourPv->is_valid ());
             printf ("activate (TwoDMon.cc) - showGridPv->is_valid = %d\n",
                     showGridPv->is_valid ());
+            printf ("activate (TwoDMon.cc) - gridSizePv->is_valid = %d\n",
+                    gridSizePv->is_valid ());
+            printf ("activate (TwoDMon.cc) - gridColourPv->is_valid = %d\n",
+                    gridColourPv->is_valid ());
 #endif
         }
         break;
@@ -1640,6 +1741,13 @@ void TwoDProfileMonitor::editApply (Widget w,
     else
          me->showGrid = 0; // just to be safe
 
+    // now the grid colour: if fixed is indicated, interpret PV string as int
+    me->gridColourPvStr.setRaw ( me->gridColourPvBuf );
+    if (!me->pvBasedGridColour)
+         me->gridColour = atoi ( me->gridColourPvBuf );
+    else
+         me->gridColour = 0; // just to be safe
+
     // support auto-save
     me->actWin->setChanged ();
 
@@ -1710,7 +1818,7 @@ void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
     strncpy (widthPvBuf, widthPvStr.getRaw (), sizeof (widthPvBuf) - 1);
     ef.addTextField ("Data Width (Fixed/PV)", 30, widthPvBuf,
                      sizeof (widthPvBuf) - 1);
-    strncpy (heightPvBuf,heightPvStr.getRaw (), sizeof (heightPvBuf) - 1);
+    strncpy (heightPvBuf, heightPvStr.getRaw (), sizeof (heightPvBuf) - 1);
     ef.addTextField ("Data Height PV (ignored for fixed size)",
                      30, heightPvBuf, sizeof (heightPvBuf) - 1);
     maxDataWidthBuf = maxDataWidth;
@@ -1739,6 +1847,10 @@ void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
              sizeof (showGridPvBuf) - 1);
     ef.addTextField ("Show Grid (0/1/PV)", 30, showGridPvBuf,
                      sizeof (showGridPvBuf) - 1);
+    strncpy (gridColourPvBuf, gridColourPvStr.getRaw (),
+             sizeof (gridColourPvBuf) - 1);
+    ef.addTextField ("Grid Colour (0/1/PV)", 30, gridColourPvBuf,
+                     sizeof (gridColourPvBuf) - 1);
     ef.addOption ("Data Size Type", "Fixed|PV-based", &pvBasedDataSize);
     ef.addOption ("Width/Height Offset Type", "Fixed|PV-based",
                                                       &pvBasedOffsets);
@@ -1748,6 +1860,8 @@ void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
                   &pvBasedShowGrid);
     ef.addOption ("Grid Size Type", "Fixed|PV-based",
                   &pvBasedGridSize);
+    ef.addOption ("Grid Colour Type", "Fixed|PV-based",
+                  &pvBasedGridColour);
     // ef.addToggle ("PV-based Width", &height);
 
     // Map dialog box form buttons to callbacks
@@ -1809,17 +1923,14 @@ int TwoDProfileMonitor::createFromFile (FILE *fptr,
                           &gridSizePvStr,
                           &useFalseColourPvStr,
                           &showGridPvStr,
-//                        &dataWidth,
+                          &gridColourPvStr,
                           &pvBasedDataSize,
                           &maxDataWidth, &maxDataHeight,
-//                        &widthOffset, &heightOffset,
                           &pvBasedOffsets,
-//                        &gridSize,
                           &pvBasedGridSize,
-//                        &useFalseColour,
                           &pvBasedUseFalseColour,
-//                        &showGrid,
-                          &pvBasedShowGrid ) ) )
+                          &pvBasedShowGrid,
+                          &pvBasedGridColour ) ) )
     {
         actWin->appCtx->postMessage ( tag.errMsg () );
     }
@@ -1851,17 +1962,14 @@ int TwoDProfileMonitor::save ( FILE *fptr )
                        &gridSizePvStr,
                        &useFalseColourPvStr,
                        &showGridPvStr,
-//                     &dataWidth,
+                       &gridColourPvStr,
                        &pvBasedDataSize,
                        &maxDataWidth, &maxDataHeight,
-//                     &widthOffset, &heightOffset,
                        &pvBasedOffsets,
-//                     &gridSize,
                        &pvBasedGridSize,
-//                     &useFalseColour,
                        &pvBasedUseFalseColour,
-//                     &showGrid,
-                       &pvBasedShowGrid );
+                       &pvBasedShowGrid,
+                       &pvBasedGridColour );
   
 }
 
@@ -1881,7 +1989,7 @@ int TwoDProfileMonitor::draw (void)
                        dataPvStr.getRaw (), strlen (dataPvStr.getRaw ()) );
   
     return activeGraphicClass::draw (); 
-}
+} 
 
 // erase widget in responce to "cut" command
 // in edit-mode 
@@ -1929,7 +2037,7 @@ int TwoDProfileMonitor::deactivate ( int pass )
     {
 
         actWin->appCtx->proc->lock ();
-        heightPv->remove_conn_state_callback ( monitorHeightConnectState, this );
+        heightPv->remove_conn_state_callback (monitorHeightConnectState, this);
         heightPv->remove_value_callback ( sizeUpdate, this );
         heightPv->release ();
         heightPv = NULL;
@@ -1994,6 +2102,17 @@ int TwoDProfileMonitor::deactivate ( int pass )
         showGridPv = NULL;
         actWin->appCtx->proc->unlock ();
     }
+    if ( gridColourPv != NULL )
+    {
+
+        actWin->appCtx->proc->lock ();
+        gridColourPv->remove_conn_state_callback (
+                               monitorGridColourConnectState, this );
+        gridColourPv->remove_value_callback ( dataUpdate, this );
+        gridColourPv->release ();
+        gridColourPv = NULL;
+        actWin->appCtx->proc->unlock ();
+    }
     // disconnect PV timeout on pass 1
     if ( pass == 1 )
     {
@@ -2029,9 +2148,9 @@ void TwoDProfileMonitor::monitorDataConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 1); 
+            me->pvNotConnectedMask &= ~((unsigned int) 1); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monDataConState - set pvNotConnMask to %d\n",
                     me->pvNotConnectedMask);
@@ -2047,7 +2166,7 @@ void TwoDProfileMonitor::monitorDataConnectState (ProcessVariable *pv,
         {
             me->pvNotConnectedMask |= 1;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2064,9 +2183,9 @@ void TwoDProfileMonitor::monitorWidthConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 2); 
+            me->pvNotConnectedMask &= ~((unsigned int) 2); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthConState - set pvNotConMask to %d\n",
                     me->pvNotConnectedMask);
@@ -2082,7 +2201,7 @@ void TwoDProfileMonitor::monitorWidthConnectState (ProcessVariable *pv,
         {
             me->pvNotConnectedMask |= 2;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2099,9 +2218,9 @@ void TwoDProfileMonitor::monitorHeightConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 4); 
+            me->pvNotConnectedMask &= ~((unsigned int) 4); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monHeightConState - set pvNotConMsk to %d\n",
                     me->pvNotConnectedMask);
@@ -2115,9 +2234,9 @@ void TwoDProfileMonitor::monitorHeightConnectState (ProcessVariable *pv,
         }
         else
         {
-            me->pvNotConnectedMask |= 2;
+            me->pvNotConnectedMask |= 4;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2135,9 +2254,9 @@ void TwoDProfileMonitor::monitorUseFalseColourConnectState (
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 8); 
+            me->pvNotConnectedMask &= ~((unsigned int) 8); 
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monUseFalseColConState - set pvNotConMask to %d\n",
@@ -2154,7 +2273,7 @@ void TwoDProfileMonitor::monitorUseFalseColourConnectState (
         {
             me->pvNotConnectedMask |= 8;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2172,9 +2291,9 @@ void TwoDProfileMonitor::monitorShowGridConnectState (
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 16); 
+            me->pvNotConnectedMask &= ~((unsigned int) 16); 
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monShowGridConState - set pvNotConMask to %d\n",
@@ -2191,7 +2310,44 @@ void TwoDProfileMonitor::monitorShowGridConnectState (
         {
             me->pvNotConnectedMask |= 16;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
+            me->needDraw = 1;
+            me->actWin->addDefExeNode (me->aglPtr);
+        }
+    }
+    me->actWin->appCtx->proc->unlock ();
+}
+
+void TwoDProfileMonitor::monitorGridColourConnectState (
+                                                   ProcessVariable *pv,
+                                                   void *userarg )
+{
+
+    TwoDProfileMonitor *me = ( TwoDProfileMonitor *) userarg;
+
+    me->actWin->appCtx->proc->lock ();
+    if (me->activeMode)
+    {
+        if (pv->is_valid ())
+        {
+            me->pvNotConnectedMask &= ~((unsigned int) 256); 
+#ifdef DEBUG
+            printf (
+               "TwoDProfMon::monGridColConState - set pvNotConMask to %d\n",
+               me->pvNotConnectedMask);
+#endif
+            if (!me->pvNotConnectedMask)
+            {
+                // All PVs connected
+                me->needConnectInit = 1;
+                me->actWin->addDefExeNode (me->aglPtr);
+            }
+        }
+        else
+        {
+            me->pvNotConnectedMask |= 256;
+            me->active = 0;
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2208,9 +2364,9 @@ void TwoDProfileMonitor::monitorWidthOffsetConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 32); 
+            me->pvNotConnectedMask &= ~((unsigned int) 32); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);
@@ -2226,7 +2382,7 @@ void TwoDProfileMonitor::monitorWidthOffsetConnectState (ProcessVariable *pv,
         {
             me->pvNotConnectedMask |= 32;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2243,9 +2399,9 @@ void TwoDProfileMonitor::monitorHeightOffsetConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 64); 
+            me->pvNotConnectedMask &= ~((unsigned int) 64); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monHeightOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);
@@ -2261,7 +2417,7 @@ void TwoDProfileMonitor::monitorHeightOffsetConnectState (ProcessVariable *pv,
         {
             me->pvNotConnectedMask |= 64;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }
@@ -2278,9 +2434,9 @@ void TwoDProfileMonitor::monitorGridSizeConnectState (ProcessVariable *pv,
     me->actWin->appCtx->proc->lock ();
     if (me->activeMode)
     {
-        if (pv->is_valid())
+        if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned char) 128); 
+            me->pvNotConnectedMask &= ~((unsigned int) 128); 
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);
@@ -2296,7 +2452,7 @@ void TwoDProfileMonitor::monitorGridSizeConnectState (ProcessVariable *pv,
         {
             me->pvNotConnectedMask |= 128;
             me->active = 0;
-            me->bufInvalidate();
+            me->bufInvalidate ();
             me->needDraw = 1;
             me->actWin->addDefExeNode (me->aglPtr);
         }

@@ -117,7 +117,8 @@ void widgetNewDisplayData (widgetData wd,
                            unsigned long gridSize,
                            const double *data,
                            int useFalseColour,
-                           int gridOn)
+                           int gridOn,
+                           unsigned char gridColour)
 {
 #ifdef DEBUG
     printf ("Start of widgetNewDisplayData - grid size = %d\n", (int)gridSize);
@@ -213,16 +214,23 @@ void widgetNewDisplayData (widgetData wd,
         {
             gridY -= gridSizeWidget;
         }
+        unsigned char gridChar = 'a'; // 'aa' = black for both pixmaps
+        int dotSpacing = 3;
+        if (gridColour)
+        {
+            gridChar = 'p';           // 'pp' = white for both pixmaps
+            dotSpacing = 5;           // Wider spacing better on white grid.
+        }
         for (unsigned long j = 0; j < widgeth; j++)
         {
             pixmapLine = pixmapData[257 + j];
             if (j == (unsigned long) gridY)
             {
-                int iincr = 3;
+                int iincr = dotSpacing;
                 if (j == (unsigned long) gridYZero)
                     iincr = 1;
                 for (unsigned long i = 0; i < widgetw; i += iincr)
-                    pixmapLine[i * 2] = pixmapLine[1 + i * 2] = 'a';
+                    pixmapLine[i * 2] = pixmapLine[1 + i * 2] = gridChar;
                 gridY += gridSizeWidget;
             }
             else
@@ -230,8 +238,9 @@ void widgetNewDisplayData (widgetData wd,
                 for (unsigned long i = gridXStart; i < widgetw;
                      i+= gridSizeWidget)
                 {
-                    if ((j % 3 == 0) || (i == (unsigned long)gridXZero)) 
-                        pixmapLine[i * 2] = pixmapLine[1 + i * 2] = 'a';
+                    if ((j % dotSpacing == 0) ||
+                        (i == (unsigned long)gridXZero)) 
+                        pixmapLine[i * 2] = pixmapLine[1 + i * 2] = gridChar;
                 }
             }
         }
@@ -267,7 +276,7 @@ void widgetNewDisplayData (widgetData wd,
     if (dataw != md->dataw_old || datah != md->datah_old)
     {
 #ifdef DEBUG
-        printf ("widgetNDD - new data dimensions w %lu h %lu (old w %lu h %lu)\n",
+        printf ("widgetNDD - new data sizes w %lu h %lu (old w %lu h %lu)\n",
                 dataw, datah, md->dataw_old, md->datah_old);
 #endif
         md->dataw_old = dataw;

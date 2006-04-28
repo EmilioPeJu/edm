@@ -23,7 +23,8 @@ void widgetNewDisplayData(widgetData wd,
                           unsigned long gridSize,
                           const double *data,
                           int useFalseColour,
-                          int gridOn);
+                          int gridOn,
+                          unsigned char gridColour);
 void widgetNewDisplayInfo(widgetData wd, bool valid, short status, short severity);
 
 // free up resources associated with widget instance
