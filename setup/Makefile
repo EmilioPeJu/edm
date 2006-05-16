@@ -24,7 +24,7 @@ else
 endif   
 
 % : ../%.sh
-	msi -MEDM_CONFIGS=$(shell cd $(INSTALL_TEMPLATES)/edm; pwd) \
+	msi -MEDM_CONFIGS=$(shell $(MKDIR) -p $(INSTALL_TEMPLATES)/edm; cd $(INSTALL_TEMPLATES)/edm; pwd) \
 	    -MEDM_HELP=$(shell cd $(INSTALL_HTML)/edm; pwd)        \
 	    -MEDM_INSTALL=$(shell cd $(INSTALL_BIN); pwd)           \
             -MEDM_LIBS=$(shell cd $(INSTALL_LIB); pwd)    -o$@ $<
