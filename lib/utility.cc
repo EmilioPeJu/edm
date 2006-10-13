@@ -19,6 +19,7 @@
 // utility functions
 
 #include "utility.h"
+#include "environment.str"
 
 static int g_serverSocketFd = -1;
 
@@ -39,6 +40,156 @@ char *envPtr;
 
 }
 
+static int g_needDiagModeInit = 1;
+static int g_diagMode = 0;
+
+int diagnosticMode ( void ) {
+
+int val;
+char *envPtr;
+
+  if ( g_needDiagModeInit ) {
+
+    g_needDiagModeInit = 0;
+
+    envPtr = getenv( "EDMDIAGNOSTICMODE" );
+    if ( envPtr ) {
+      g_diagMode = atol(envPtr);
+      if ( !g_diagMode ) val = 1; // if value is non-numeric make it 1
+    }
+    else {
+      g_diagMode = 0;
+    }
+
+  }
+
+  return g_diagMode;
+
+}
+
+static int g_needDiagInit = 1;
+static char g_diagFileName[255+1];
+
+int logDiagnostic (
+  char *text
+) {
+
+char *envPtr;
+char time_string[34+1];
+static FILE *diagFile = NULL;
+static pid_t procPid;
+static char hostName[63+1], buf[255+1];
+int i, ii, l, fd;
+mode_t curMode;
+
+  if ( g_needDiagInit ) {
+
+    g_needDiagInit = 0;
+
+    procPid = getpid();
+    gethostname( hostName, 63 );
+
+    sys_get_datetime_string( 31, time_string );
+    time_string[31] = 0;
+    Strncat( time_string, " : ", 34 );
+
+    envPtr = getenv( environment_str8 );
+    if ( envPtr ) {
+      strncpy( g_diagFileName, envPtr, 255 );
+      if ( envPtr[strlen(envPtr)] != '/' ) {
+        Strncat( g_diagFileName, "/", 255 );
+      }
+    }
+    else {
+      strncpy( g_diagFileName, "/tmp/", 255 );
+    }
+
+    Strncat( g_diagFileName, "edmStdErr", 255 );
+
+    Strncat( g_diagFileName, "_XXXXXX", 255 );
+
+    mkstemp( g_diagFileName );
+
+    l = strlen( g_diagFileName );
+    for ( i=l-7, ii=0; i<l; i++, ii++ ) {
+      buf[ii] = g_diagFileName[i];
+    }
+    buf[ii] = 0;
+
+    close( 2 );
+    curMode = umask( 0 );
+    fd = open( g_diagFileName, O_CREAT|O_WRONLY );
+    umask( curMode );
+    fprintf( stderr, time_string );
+    fprintf( stderr, "host %s, pid %-d - ", hostName, procPid );
+    fprintf( stderr, "first diagnostic message\n" );
+    fprintf( stderr, time_string );
+    fprintf( stderr, text );
+
+    envPtr = getenv( environment_str8 );
+    if ( envPtr ) {
+      strncpy( g_diagFileName, envPtr, 255 );
+      if ( envPtr[strlen(envPtr)] != '/' ) {
+        Strncat( g_diagFileName, "/", 255 );
+      }
+    }
+    else {
+      strncpy( g_diagFileName, "/tmp/", 255 );
+    }
+
+    Strncat( g_diagFileName, "edmDiag", 255 );
+
+    Strncat( g_diagFileName, buf, 255 );
+
+    curMode = umask( 0 );
+    diagFile = fopen( g_diagFileName, "a" );
+    umask( curMode );
+
+    if ( diagFile ) {
+
+      fprintf( diagFile, time_string );
+      fprintf( diagFile, "host %s, pid %-d - ", hostName, procPid );
+      fprintf( diagFile, "first diagnostic message\n" );
+      fprintf( diagFile, time_string );
+      fprintf( diagFile, text );
+
+    }
+    else {
+
+      return 2;
+
+    }
+
+  }
+  else {
+
+    curMode = umask( 0 );
+    diagFile = fopen( g_diagFileName, "a" );
+    umask( curMode );
+
+    if ( diagFile ) {
+
+      sys_get_datetime_string( 31, time_string );
+      time_string[31] = 0;
+      Strncat( time_string, " : ", 34 );
+      fprintf( diagFile, time_string );
+      fprintf( diagFile, text );
+
+    }
+    else {
+
+      return 2;
+
+    }
+
+  }
+
+  fclose( diagFile );
+
+  return 1;
+
+}
+
 char *getEnvironmentVar (
   char *name
 ) {
@@ -52,7 +203,7 @@ static char *var = NULL;
   strncpy( buf, getenv(name), 255 );
   buf[255] = 0;
 
-  //printf( "name = [%s]\n", buf );
+  //fprintf( stderr, "name = [%s]\n", buf );
 
   context = NULL;
   tk = strtok_r( buf, " \t\n", &context );
@@ -69,7 +220,7 @@ static char *var = NULL;
 
   if ( !tk ) return NULL;
 
-  //printf( "read env var values from file: [%s]\n", tk );
+  //fprintf( stderr, "read env var values from file: [%s]\n", tk );
 
   f = fileOpen( tk, "r" );
 
@@ -102,16 +253,46 @@ void setServerSocketFd (
 }
 
 // From Stevens' book
+
+#ifdef OPEN_MAX
+static int g_openMax = OPEN_MAX;
+#else
+static int g_openMax = 0;
+#endif
+
+#define OPEN_MAX_GUESS 256
+
+static int open_max ( void ) {
+
+  if ( !g_openMax ) {
+    errno = 0;
+    if ( ( g_openMax = sysconf( _SC_OPEN_MAX ) ) < 0 ) {
+      g_openMax = OPEN_MAX_GUESS;
+    }
+  }
+
+  return g_openMax;
+
+}
+
+// From Stevens' book
+
 int executeCmd (
   const char *cmdString
 ) {
 
 pid_t pid;
-int status;
+int status, i, l;
 struct sigaction ignore, saveintr, savequit;
 sigset_t chldmask, savemask;
+char buf[2048+1];
 
   if ( !cmdString ) return 1;
+
+  l = strlen( cmdString);
+  if ( l > 2048 ) return 1;
+
+  strcpy( buf, cmdString );
 
   ignore.sa_handler = SIG_IGN;
   sigemptyset( &ignore.sa_mask );
@@ -139,7 +320,15 @@ sigset_t chldmask, savemask;
       close( g_serverSocketFd );
     }
 
-    execl( "/bin/sh", "sh", "-c", cmdString, (char *) NULL );
+    // close all open files
+    for ( i=3; i<open_max(); i++ ) {
+      close( i );
+    }
+
+    // create new process group session
+    setsid();
+
+    execl( "/bin/sh", "sh", "-c", buf, (char *) NULL );
     _exit(127);
 
   }
@@ -160,6 +349,78 @@ sigset_t chldmask, savemask;
   if ( sigprocmask( SIG_SETMASK, &savemask, NULL ) < 0 ) return -1;
 
   return status;
+
+}
+
+#ifdef __linux__
+static void *executeCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
+#ifdef darwin
+static void *executeCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
+#ifdef __solaris__
+static void *executeCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
+#ifdef __osf__
+static void executeCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
+#ifdef HP_UX
+static void *executeCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
+int stat;
+char *cmd = (char *) thread_get_app_data( h );
+
+  stat = executeCmd( cmd );
+
+  stat = thread_request_free_ptr( (void *) cmd );
+  stat = thread_detached_exit( h, NULL ); // this call deallocates h
+
+#ifdef __linux__
+  return (void *) NULL;
+#endif
+
+#ifdef darwin
+  return (void *) NULL;
+#endif
+  
+#ifdef __solaris__
+  return (void *) NULL;
+#endif
+
+}
+
+void executeCommandInThread (
+  char *_cmd
+) {
+
+char *cmd;
+THREAD_HANDLE thread;
+int stat;
+
+  if ( !_cmd ) return;
+  if ( blankOrComment(_cmd) ) return;
+
+  cmd = new char[strlen(_cmd)+1];
+  strcpy( cmd, _cmd );
+
+  stat = thread_create_handle( &thread, (void *) cmd );
+  stat = thread_create_proc( thread, executeCmdThread );
+  stat = thread_detach( thread );
 
 }
 
@@ -293,13 +554,13 @@ static const int FINDING_RIGHT_PAREN = 3;
 
 syntaxErr:
 
-  printf( "Syntax error in env var reference\n" );
+  fprintf( stderr, "Syntax error in env var reference\n" );
   if ( bufOnHeap ) delete [] buf;
   return NULL;
 
 limitErr:
 
-  printf( "Parameter size limit exceeded in env var reference\n" );
+  fprintf( stderr, "Parameter size limit exceeded in env var reference\n" );
   if ( bufOnHeap ) delete [] buf;
   return NULL;
 
@@ -2179,7 +2440,7 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
 
   diff = dmax - dmin;
 
-  /* printf( "dmin = %-g, dmax = %-g, diff =  %-g\n", dmin, dmax, diff ); */
+  /* fprintf( stderr, "dmin = %-g, dmax = %-g, diff =  %-g\n", dmin, dmax, diff ); */
 
   mag = log10( diff );
   imag = (int ) floor( mag ) - 1;
@@ -2187,8 +2448,8 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
   norm = diff * pow(10.0,-1.0*imag);
   inorm = (int) ceil( norm );
 
-  //printf( "mag = %-g, imag = %-d\n", mag, imag );
-  //printf( "norm = %-d\n", inorm );
+  //fprintf( stderr, "mag = %-g, imag = %-d\n", mag, imag );
+  //fprintf( stderr, "norm = %-d\n", inorm );
 
 
   /* normalize min & max */
@@ -2202,7 +2463,7 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
   imax1 = imax;
   if ( inc1 < 8 ) ok = 1;
 
-  //printf( "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
+  //fprintf( stderr, "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
 
   if ( imin < 0 ) {
     if ( imin % 2 )
@@ -2227,7 +2488,7 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
   inc2 = ( imax2 - imin2 ) / 2;
   if ( inc2 < 8 ) ok = 1;
 
-  //printf( "1st adj min 2 = %-d, 1st adj max 2 = %-d\n", imin2, imax2 );
+  //fprintf( stderr, "1st adj min 2 = %-d, 1st adj max 2 = %-d\n", imin2, imax2 );
 
   if ( imin < 0 ) {
     if ( imin % 5 )
@@ -2252,11 +2513,11 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
   inc5 = ( imax5 - imin5 ) / 5;
   if ( inc5 < 8 ) ok = 1;
 
-  //printf( "1st adj min 5 = %-d, 1st adj max 5 = %-d\n", imin5, imax5 );
+  //fprintf( stderr, "1st adj min 5 = %-d, 1st adj max 5 = %-d\n", imin5, imax5 );
 
-  //printf( "1 inc1 = %-d\n", inc1 );
-  //printf( "1 inc2 = %-d\n", inc2 );
-  //printf( "1 inc5 = %-d\n", inc5 );
+  //fprintf( stderr, "1 inc1 = %-d\n", inc1 );
+  //fprintf( stderr, "1 inc2 = %-d\n", inc2 );
+  //fprintf( stderr, "1 inc5 = %-d\n", inc5 );
 
   if ( ! ok ) {
 
@@ -2271,7 +2532,7 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
     imax1 = imax;
     if ( inc1 < 8 ) ok = 1;
 
-    //printf( "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
+    //fprintf( stderr, "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
 
     if ( imin < 0 ) {
       if ( imin % 2 )
@@ -2296,7 +2557,7 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
     inc2 = ( imax2 - imin2 ) / 2;
     if ( inc2 < 8 ) ok = 1;
 
-    //printf( "1st adj min 2 = %-d, 1st adj max 2 = %-d\n", imin2, imax2 );
+    //fprintf( stderr, "1st adj min 2 = %-d, 1st adj max 2 = %-d\n", imin2, imax2 );
 
     if ( imin < 0 ) {
       if ( imin % 5 )
@@ -2321,11 +2582,11 @@ int imag, inorm, imin, imax, inc1, inc2, inc5, imin1, imax1,
     inc5 = ( imax5 - imin5 ) / 5;
     if ( inc5 < 8 ) ok = 1;
 
-    //printf( "1st adj min 5 = %-d, 1st adj max 5 = %-d\n", imin5, imax5 );
+    //fprintf( stderr, "1st adj min 5 = %-d, 1st adj max 5 = %-d\n", imin5, imax5 );
 
-    //printf( "2 inc1 = %-d\n", inc1 );
-    //printf( "2 inc2 = %-d\n", inc2 );
-    //printf( "2 inc5 = %-d\n", inc5 );
+    //fprintf( stderr, "2 inc1 = %-d\n", inc1 );
+    //fprintf( stderr, "2 inc2 = %-d\n", inc2 );
+    //fprintf( stderr, "2 inc5 = %-d\n", inc5 );
 
   }
 
@@ -2404,15 +2665,15 @@ int imin, imax, inc1, imin1, imax1,
  bestInc, bestMin, bestMax, idiff, idiv,
  choice, ok, div;
 
-//printf( "\n\n=========================================================\n" );
-//printf( "get_log10_scale_params1, min=%-g, max=%-g\n", min, max );
+//fprintf( stderr, "\n\n=========================================================\n" );
+//fprintf( stderr, "get_log10_scale_params1, min=%-g, max=%-g\n", min, max );
 
   div = 1;
   ok = 0;
 
   imin = (int) floor( min );
   imax = (int) ceil( max );
-  //printf( "imin = %-d, imax = %-d\n", imin, imax );
+  //fprintf( stderr, "imin = %-d, imax = %-d\n", imin, imax );
 
   do {
 
@@ -2443,14 +2704,14 @@ int imin, imax, inc1, imin1, imax1,
     if ( inc1 < 1 ) inc1 = 1;
     if ( inc1 < 8 ) ok = 1;
 
-    //printf( "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
-    //printf( "inc1 = %-d\n", inc1 );
+    //fprintf( stderr, "1st adj min 1 = %-d, 1st adj max 1 = %-d\n", imin1, imax1 );
+    //fprintf( stderr, "inc1 = %-d\n", inc1 );
 
     if ( !ok ) div *= 10;
 
   } while ( !ok );
 
-  //printf( "2 inc1 = %-d\n", inc1 );
+  //fprintf( stderr, "2 inc1 = %-d\n", inc1 );
 
   bestInc = inc1;
   bestMin = imin1;
@@ -4463,8 +4724,8 @@ int fontAscent, fontDescent, fontHeight,
 char buf[31+1];
 unsigned int white, black;
 
-//printf( "adj_min = %-g\n", adj_min );
-//printf( "adj_max = %-g\n", adj_max );
+//fprintf( stderr, "adj_min = %-g\n", adj_min );
+//fprintf( stderr, "adj_max = %-g\n", adj_max );
 
   if ( scaleHeight < 1 ) return;
   if ( num_label_ticks < 1 ) return;
@@ -4486,11 +4747,11 @@ unsigned int white, black;
   yFactor = (double) ( scaleHeight ) / ( adj_max - adj_min );
   yOffset = y;
 
-  //printf( "adj_min = %-g\n", adj_min );
-  //printf( "adj_max = %-g\n", adj_max );
-  //printf( "yOffset = %-g\n", yOffset );
-  //printf( "yFactor = %-g\n", yFactor );
-  //printf( "scaleHeight = %-d\n", scaleHeight );
+  //fprintf( stderr, "adj_min = %-g\n", adj_min );
+  //fprintf( stderr, "adj_max = %-g\n", adj_max );
+  //fprintf( stderr, "yOffset = %-g\n", yOffset );
+  //fprintf( stderr, "yFactor = %-g\n", yFactor );
+  //fprintf( stderr, "scaleHeight = %-d\n", scaleHeight );
 
   labelVal = adj_min;
 
@@ -4622,19 +4883,19 @@ unsigned int white, black;
           val1 = val0 * 10;
           minorInc = ( val1 - val0 ) / minors_per_major;
 
-	  //printf( "val0 = %-g\n", val0 );
-	  //printf( "val1 = %-g\n", val1 );
-	  //printf( "minorInc = %-g\n", minorInc );
-	  //printf( "minors_per_major = %-d\n", minors_per_major );
+	  //fprintf( stderr, "val0 = %-g\n", val0 );
+	  //fprintf( stderr, "val1 = %-g\n", val1 );
+	  //fprintf( stderr, "minorInc = %-g\n", minorInc );
+	  //fprintf( stderr, "minors_per_major = %-d\n", minors_per_major );
 
           val = val0 + minorInc;
-	  //printf( "val = %-g\n", val );
-	  //printf( "adj_min = %-g\n", adj_min );
+	  //fprintf( stderr, "val = %-g\n", val );
+	  //fprintf( stderr, "adj_min = %-g\n", adj_min );
 
           for ( iii=1; iii<minors_per_major; iii++ ) {
 
             minorVal = log10( val );
-	    //printf( "minorVal = %-g\n", minorVal );
+	    //fprintf( stderr, "minorVal = %-g\n", minorVal );
 
             x0 = x;
             x1 = x0 - minor_tick_height;

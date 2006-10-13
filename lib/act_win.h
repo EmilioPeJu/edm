@@ -51,6 +51,7 @@
 #include "scheme.h"
 #include "undo.h"
 #include "msg_dialog.h"
+#include "pv_action.h"
 
 #include "tag_pkg.h"
 
@@ -122,6 +123,7 @@
 #define AWC_POPUP_SAVE_TO_PATH 155
 #define AWC_POPUP_DUMP_PVLIST 156
 #define AWC_POPUP_OPEN_SELF 157
+#define AWC_POPUP_SHOW_MACROS 158
 
 #define AWC_NONE_SELECTED 1
 #define AWC_ONE_SELECTED 2
@@ -346,6 +348,11 @@ static void awc_save_and_exit_cb (
   XtPointer client,
   XtPointer call );
 
+static void action_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call );
+
 #endif
 
 class appContextClass;
@@ -453,7 +460,7 @@ XtIntervalId autosaveTimer, restoreTimer;
 int changeSinceAutoSave, doAutoSave;
 char autosaveName[255+1];
 
-int doClose;
+int doClose, doActiveClose;
 
 widgetAndPointerType wpFileSelect, wpSchemeSelect, pvlistFileSelect;
 
@@ -660,6 +667,11 @@ friend void awc_save_and_exit_cb (
   XtPointer client,
   XtPointer call );
 
+friend void action_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call );
+
 msgDialogClass msgDialog;
 int msgDialogCreated, msgDialogPoppedUp;
 
@@ -723,10 +735,11 @@ pvBindingClass pvObj;
 
 Widget b1OneSelectPopup, b1ManySelectPopup, b1NoneSelectPopup,
  b2NoneSelectPopup, b2OneSelectPopup, b2ManySelectPopup, b3NoneSelectPopup,
- b2ExecutePopup, chPd, grPd, grCb, mnPd, mnCb, ctlPd, ctlCb, alignPd, alignCb,
- centerPd, centerCb, distributePd, distributeCb, sizePd, sizeCb, orientPd1,
- orientPdM, orientCb1, orientCbM, editPd1, editPdM, editCb1, editCbM,
- dragPopup, undoPb1, undoPb2, undoPb3, setSchemePd, setSchemeCb;
+ b2ExecutePopup, actionPopup, chPd, grPd, grCb, mnPd, mnCb, ctlPd, ctlCb,
+ alignPd, alignCb, centerPd, centerCb, distributePd, distributeCb, sizePd,
+ sizeCb, orientPd1, orientPdM, orientCb1, orientCbM, editPd1, editPdM,
+ editCb1, editCbM, dragPopup, undoPb1, undoPb2, undoPb3, setSchemePd,
+ setSchemeCb;
 
 int state;
 int savedState;
@@ -890,6 +903,10 @@ int loadFailure;
 
 int bufDisableScroll, disableScroll;
 
+pvActionClass *pvAction;
+
+int ctlKeyPressed;
+
 activeWindowClass ( void );
 
 ~activeWindowClass ( void );
@@ -1043,6 +1060,11 @@ int genericCreate (
   char **_macros,
   char **_expansions );
 
+int createNodeForCrawler (
+  appContextClass *ctx,
+  char *filename
+);
+
 void map ( void );
 
 void realize ( void );
@@ -1059,6 +1081,8 @@ int setGraphicEnvironment (
 Display *display ( void );
 
 Widget topWidgetId ( void );
+
+Widget actualTopWidgetId ( void );
 
 Widget drawWidgetId ( void );
 
@@ -1418,9 +1442,9 @@ int sameAncestorName (
   char *name
 );
 
-void	reconfig();
+void reconfig ( void );
 
-void	clip();
+void clip ( void );
 
 char endSignature[15+1];
 

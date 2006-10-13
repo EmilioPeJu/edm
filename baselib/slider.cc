@@ -213,7 +213,7 @@ int stat, xOfs;
 
   if ( slo->controlExists ) {
     stat = slo->controlPvId->put( fvalue );
-    if ( !stat ) printf( activeSliderClass_str1 );
+    if ( !stat ) fprintf( stderr, activeSliderClass_str1 );
   }
   else if ( slo->anyCallbackFlag ) {
     slo->needCtlRefresh = 1;
@@ -285,7 +285,7 @@ int stat, xOfs;
 
   if ( slo->controlExists ) {
     stat = slo->controlPvId->put( fvalue );
-    if ( !stat ) printf( activeSliderClass_str2 );
+    if ( !stat ) fprintf( stderr, activeSliderClass_str2 );
   }
   else if ( slo->anyCallbackFlag ) {
     slo->needCtlRefresh = 1;
@@ -336,7 +336,7 @@ activeSliderClass *slo = (activeSliderClass *) client;
 
   if ( slo->controlExists ) {
     stat = slo->controlPvId->put( fvalue );
-    if ( !stat ) printf( activeSliderClass_str3 );
+    if ( !stat ) fprintf( stderr, activeSliderClass_str3 );
     slo->needErase = 1;
     slo->needDraw = 1;
     slo->actWin->appCtx->proc->lock();
@@ -371,11 +371,6 @@ activeSliderClass *slo = (activeSliderClass *) client;
 
   slo->ef.popdown();
 
-  if ( slo->eBuf ) {
-    delete slo->eBuf;
-    slo->eBuf = NULL;
-  }
-
 }
 
 static void slc_value_cancel (
@@ -387,11 +382,6 @@ static void slc_value_cancel (
 activeSliderClass *slo = (activeSliderClass *) client;
 
   slo->ef.popdown();
-
-  if ( slo->eBuf ) {
-    delete slo->eBuf;
-    slo->eBuf = NULL;
-  }
 
 }
 
@@ -536,11 +526,6 @@ activeSliderClass *slo = (activeSliderClass *) client;
   slo->ef.popdown();
   slo->operationComplete();
 
-  if ( slo->eBuf ) {
-    delete slo->eBuf;
-    slo->eBuf = NULL;
-  }
-
 }
 
 static void slc_edit_cancel (
@@ -554,11 +539,6 @@ activeSliderClass *slo = (activeSliderClass *) client;
   slo->ef.popdown();
   slo->operationCancel();
 
-  if ( slo->eBuf ) {
-    delete slo->eBuf;
-    slo->eBuf = NULL;
-  }
-
 }
 
 static void slc_edit_cancel_delete (
@@ -571,11 +551,6 @@ activeSliderClass *slo = (activeSliderClass *) client;
 
   slo->ef.popdown();
   slo->operationCancel();
-
-  if ( slo->eBuf ) {
-    delete slo->eBuf;
-    slo->eBuf = NULL;
-  }
 
   slo->erase();
   slo->deleteRequest = 1;
@@ -936,7 +911,7 @@ int stat, xOfs;
 
   if ( controlExists ) {
     stat = controlPvId->put( fvalue );
-    if ( !stat ) printf( activeSliderClass_str2 );
+    if ( !stat ) fprintf( stderr, activeSliderClass_str2 );
   }
   else if ( anyCallbackFlag ) {
     needCtlRefresh = 1;
@@ -992,7 +967,7 @@ int stat, xOfs;
 
   if ( controlExists ) {
     stat = controlPvId->put( fvalue );
-    if ( !stat ) printf( activeSliderClass_str1 );
+    if ( !stat ) fprintf( stderr, activeSliderClass_str1 );
   }
   else if ( anyCallbackFlag ) {
     needCtlRefresh = 1;
@@ -2221,7 +2196,7 @@ int adjW = w - 4;
 
 void zzz( void ) {
 
-  printf( "zzz\n" );
+  fprintf( stderr, "zzz\n" );
 
 }
 
@@ -2444,7 +2419,7 @@ void sliderEventHandler(
 XMotionEvent *me;
 XButtonEvent *be;
 activeSliderClass *slo;
-int stat, deltaX, xOfs, newX;
+int stat, deltaX, xOfs, newX, popupDialog = 0;
 double fvalue;
 char title[32], *ptr;
 int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
@@ -2553,7 +2528,7 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
 
         if ( slo->controlExists ) {
           stat = slo->controlPvId->put( fvalue );
-          if ( !stat ) printf( activeSliderClass_str56 );
+          if ( !stat ) fprintf( stderr, activeSliderClass_str56 );
         }
         else if ( slo->anyCallbackFlag ) {
           slo->needCtlRefresh = 1;
@@ -2651,34 +2626,7 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
         }
 	else {
 
-          if ( !slo->eBuf ) {
-            slo->eBuf = new activeSliderClass::editBufType;
-          }
-
-          slo->eBuf->bufIncrement = slo->increment;
-          slo->eBuf->bufAccelMultiplier = slo->accelMultiplier;
-          slo->eBuf->bufControlV = slo->controlV;
-          slo->valueFormX = be->x_root;
-          slo->valueFormY = be->y_root;
-          slo->valueFormW = 0;
-          slo->valueFormH = 0;
-          slo->valueFormMaxH = 600;
-
-          slo->ef.create( slo->actWin->top,
-           slo->actWin->appCtx->ci.getColorMap(),
-           &slo->valueFormX, &slo->valueFormY,
-           &slo->valueFormW, &slo->valueFormH, &slo->valueFormMaxH,
-           title, NULL, NULL, NULL );
-
-          slo->ef.addTextField( activeSliderClass_str57, 14,
-           &slo->eBuf->bufControlV );
-          slo->ef.addTextField( activeSliderClass_str58, 14,
-           &slo->eBuf->bufIncrement );
-          slo->ef.addTextField( activeSliderClass_str86, 14,
-           &slo->eBuf->bufAccelMultiplier );
-          slo->ef.finished( slc_value_ok, slc_value_apply, slc_value_cancel,
-           slo );
-          slo->ef.popup();
+	  popupDialog = 1;
 
 	}
 
@@ -2724,6 +2672,11 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
         slo->xRef = be->x;
 
         slo->controlState = SLC_STATE_MOVING;
+
+      }
+      else {
+
+	popupDialog = 1;
 
       }
 
@@ -2780,6 +2733,10 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
            !( be->state & ControlMask ) ) {
         stat = slo->selectDragValue( be );
       }
+      else if ( ( be->state & ShiftMask ) &&
+                ( be->state & ControlMask ) ) {
+        slo->doActions( be, be->x, be->y );
+      }
 
       break;
 
@@ -2835,7 +2792,7 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
 
         if ( slo->controlExists ) {
           stat = slo->controlPvId->put( fvalue );
-          if ( !stat ) printf( activeSliderClass_str59 );
+          if ( !stat ) fprintf( stderr, activeSliderClass_str59 );
         }
         else if ( slo->anyCallbackFlag ) {
           slo->needCtlRefresh = 1;
@@ -2900,7 +2857,7 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
 
         if ( slo->controlExists ) {
           stat = slo->controlPvId->put( fvalue );
-          if ( !stat ) printf( activeSliderClass_str60 );
+          if ( !stat ) fprintf( stderr, activeSliderClass_str60 );
         }
         else if ( slo->anyCallbackFlag ) {
           slo->needCtlRefresh = 1;
@@ -3093,6 +3050,39 @@ int tX, tY, x0, y0, x1, y1, incX0, incY0, incX1, incY1;
 
   }
 
+  if ( popupDialog ) {
+
+    if ( !slo->eBuf ) {
+      slo->eBuf = new activeSliderClass::editBufType;
+    }
+
+    slo->eBuf->bufIncrement = slo->increment;
+    slo->eBuf->bufAccelMultiplier = slo->accelMultiplier;
+    slo->eBuf->bufControlV = slo->controlV;
+    slo->valueFormX = be->x_root;
+    slo->valueFormY = be->y_root;
+    slo->valueFormW = 0;
+    slo->valueFormH = 0;
+    slo->valueFormMaxH = 600;
+
+    slo->ef.create( slo->actWin->top,
+     slo->actWin->appCtx->ci.getColorMap(),
+     &slo->valueFormX, &slo->valueFormY,
+     &slo->valueFormW, &slo->valueFormH, &slo->valueFormMaxH,
+     title, NULL, NULL, NULL );
+
+    slo->ef.addTextField( activeSliderClass_str57, 14,
+     &slo->eBuf->bufControlV );
+    slo->ef.addTextField( activeSliderClass_str58, 14,
+     &slo->eBuf->bufIncrement );
+    slo->ef.addTextField( activeSliderClass_str86, 14,
+     &slo->eBuf->bufAccelMultiplier );
+    slo->ef.finished( slc_value_ok, slc_value_apply, slc_value_cancel,
+     slo );
+    slo->ef.popup();
+
+  }
+
 }
 
 int activeSliderClass::activate (
@@ -3136,7 +3126,7 @@ char callbackName[63+1];
        NULL );
 
       if ( !frameWidget ) {
-        printf( activeSliderClass_str61 );
+        fprintf( stderr, activeSliderClass_str61 );
         return 0;
       }
 
@@ -3150,7 +3140,7 @@ char callbackName[63+1];
        NULL );
 
       if ( !sliderWidget ) {
-        printf( activeSliderClass_str62 );
+        fprintf( stderr, activeSliderClass_str62 );
         return 0;
       }
 
@@ -3271,7 +3261,7 @@ char callbackName[63+1];
            sl_monitor_control_connect_state, this );
 	}
 	else {
-          printf( activeSliderClass_str63 );
+          fprintf( stderr, activeSliderClass_str63 );
           opStat = 0;
         }
       }
@@ -3323,7 +3313,7 @@ char callbackName[63+1];
            sl_monitor_control_label_connect_state, this );
 	}
 	else {
-          printf( activeSliderClass_str63 );
+          fprintf( stderr, activeSliderClass_str63 );
           opStat = 0;
         }
       }
@@ -3335,7 +3325,7 @@ char callbackName[63+1];
            this );
 	}
 	else {
-          printf( activeSliderClass_str63 );
+          fprintf( stderr, activeSliderClass_str63 );
           opStat = 0;
         }
       }
@@ -3348,7 +3338,7 @@ char callbackName[63+1];
            sl_monitor_read_label_connect_state, this );
 	}
 	else {
-          printf( activeSliderClass_str63 );
+          fprintf( stderr, activeSliderClass_str63 );
           opStat = 0;
         }
       }
@@ -3361,7 +3351,7 @@ char callbackName[63+1];
            sl_monitor_saved_connect_state, this );
 	}
 	else {
-          printf( activeSliderClass_str63 );
+          fprintf( stderr, activeSliderClass_str63 );
           opStat = 0;
         }
       }
@@ -4265,6 +4255,56 @@ void activeSliderClass::getPvs (
   pvs[0] = controlPvId;
   pvs[1] = readPvId;
   pvs[2] = savedValuePvId;
+
+}
+
+// crawler functions may return blank pv names
+char *activeSliderClass::crawlerGetFirstPv ( void ) {
+
+  crawlerPvIndex = 0;
+  return controlPvName.getExpanded();
+
+}
+
+char *activeSliderClass::crawlerGetNextPv ( void ) {
+
+int max;
+
+  max = 2;
+
+  if ( controlLabelType != SLC_K_LITERAL ) {
+    max++;
+  }
+
+  if ( readLabelType != SLC_K_LITERAL ) {
+    max++;
+  }
+
+  if ( crawlerPvIndex >=max ) return NULL;
+
+  crawlerPvIndex++;
+
+  if ( crawlerPvIndex == 1 ) {
+    return readPvName.getExpanded();
+  }
+  else if ( crawlerPvIndex == 2 ) {
+    return savedValuePvName.getExpanded();
+  }
+  else if ( crawlerPvIndex == 3 ) {
+
+    if ( controlLabelType != SLC_K_LITERAL ) {
+      return controlLabelName.getExpanded();
+    }
+    else if ( readLabelType != SLC_K_LITERAL ) {
+      return readLabelName.getExpanded();
+    }
+
+  }
+  else if ( crawlerPvIndex == 4 ) {
+    return readLabelName.getExpanded();
+  }
+
+  return NULL;
 
 }
 

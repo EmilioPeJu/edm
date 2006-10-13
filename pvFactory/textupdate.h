@@ -28,6 +28,10 @@
 static void drag(Widget w, XEvent *e, String *params, Cardinal numParams);
 static void selectDrag(Widget w, XEvent *e, String *params,
  Cardinal numParams);
+static void selectActions(Widget w, XEvent *e, String *params,
+ Cardinal numParams);
+static void pvInfo(Widget w, XEvent *e, String *params,
+ Cardinal numParams);
 
 class edmTextupdateClass : public activeGraphicClass
 {
@@ -80,9 +84,12 @@ public:
                        int numAlarmPvs,
                        char *alarmPvs[]);
 
-void getPvs(int max,
-				ProcessVariable *pvs[],
-				int *n);
+    void getPvs(int max,
+      ProcessVariable *pvs[],
+      int *n);
+
+    char *crawlerGetFirstPv ( void );
+    char *crawlerGetNextPv ( void );
     
     // Macro support
     int containsMacros();

@@ -234,7 +234,7 @@ libRecPtr head, tail, cur, prev, next;
   f = fopen( fileName, "r" );
   if ( f ) {
 
-    printf( appContextClass_str1, fileName );
+    fprintf( stderr, appContextClass_str1, fileName );
 
     fileExists = 1;
     fileEmpty = 0;
@@ -246,13 +246,13 @@ libRecPtr head, tail, cur, prev, next;
       tk = strtok( line, "\n" );
       numComponents = atol( tk );
       if ( numComponents <= 0 ) {
-        printf( appContextClass_str2, fileName );
+        fprintf( stderr, appContextClass_str2, fileName );
         fileEmpty = 1;
         fclose( f );
       }
     }
     else {
-      printf( appContextClass_str2, fileName );
+      fprintf( stderr, appContextClass_str2, fileName );
       fileEmpty = 1;
       fclose( f );
     }
@@ -287,7 +287,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( line, " \t\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->className = new char[strlen(tk)+1];
@@ -295,7 +295,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( NULL, " \t\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->fileName = new char[strlen(tk)+1];
@@ -303,7 +303,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( NULL, " \t\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->typeName = new char[strlen(tk)+1];
@@ -311,7 +311,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( NULL, "\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->text = new char[strlen(tk)+1];
@@ -328,7 +328,7 @@ libRecPtr head, tail, cur, prev, next;
       fclose( f );
 
       if ( index != numComponents ) {
-        printf( appContextClass_str4, fileName );
+        fprintf( stderr, appContextClass_str4, fileName );
         return;
       }
 
@@ -345,8 +345,8 @@ libRecPtr head, tail, cur, prev, next;
   }
 
   if ( libFile[0] != '/' ) {
-    printf( appContextClass_str5 );
-    printf( appContextClass_str6 );
+    fprintf( stderr, appContextClass_str5 );
+    fprintf( stderr, appContextClass_str6 );
     return;
   }
 
@@ -362,13 +362,13 @@ libRecPtr head, tail, cur, prev, next;
     strcpy( line, "author" );
     cfunc = (CHARFUNC) dlsym( dllHandle, line );
     if ((error = dlerror()) == NULL)  {
-      printf( "\nAuthor: %s\n", (*cfunc)() );
+      fprintf( stderr, "\nAuthor: %s\n", (*cfunc)() );
     }
     else {
-      printf( "\nAuthor name not registered\n" );
+      fprintf( stderr, "\nAuthor name not registered\n" );
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstRegRecord" );
     func = (REGFUNC) dlsym( dllHandle, line );
@@ -389,7 +389,7 @@ libRecPtr head, tail, cur, prev, next;
     if ( !stat ) {
       strncpy( line, appContextClass_str10, 255 );
       Strncat( line, appContextClass_str11, 255 );
-      printf( "%s\n\n", line );
+      fprintf( stderr, "%s\n\n", line );
     }
 
     while ( !stat ) {
@@ -410,22 +410,22 @@ libRecPtr head, tail, cur, prev, next;
       Strncat( line, "                                        ", 255 );
       strncpy( &line[index], textPtr, 255 );
 
-      printf( "%s\n", line );
+      fprintf( stderr, "%s\n", line );
 
       stat = (*func)( &classNamePtr, &typeNamePtr, &textPtr );
 
     }
 
-    printf( "\n\n" );
+    fprintf( stderr, "\n\n" );
 
   }
   else if ( strcmp( op, global_str6 ) == 0 ) {  // add
 
     if ( !fileExists ) {
-      printf( appContextClass_str13, fileName );
+      fprintf( stderr, appContextClass_str13, fileName );
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstRegRecord" );
     func = (REGFUNC) dlsym( dllHandle, line );
@@ -452,7 +452,7 @@ libRecPtr head, tail, cur, prev, next;
       cur = head->flink;
       while ( cur ) {
         if ( strcmp( classNamePtr, cur->className ) == 0 ) {
-          printf( appContextClass_str15, classNamePtr );
+          fprintf( stderr, appContextClass_str15, classNamePtr );
           doAdd = 0;
           alreadyExists = 1;
           break;
@@ -464,7 +464,7 @@ libRecPtr head, tail, cur, prev, next;
 
         numToAdd++;
 
-        printf( appContextClass_str16,
+        fprintf( stderr, appContextClass_str16,
          classNamePtr, typeNamePtr, textPtr );
 
         cur = new libRecType;
@@ -490,18 +490,18 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToAdd == 0 ) {
-      printf( "\n" );
+      fprintf( stderr, "\n" );
       if ( alreadyExists ) {
-        printf( appContextClass_str122, fileName );
+        fprintf( stderr, appContextClass_str122, fileName );
       }
       else {
-        printf(
+        fprintf( stderr,
          appContextClass_str17, fileName );
       }
       return;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strncpy( line, fileName, 255 );
     Strncat( line, "~", 255 );
@@ -510,7 +510,7 @@ libRecPtr head, tail, cur, prev, next;
 
       stat = unlink( line );
 
-      printf( appContextClass_str18, line );
+      fprintf( stderr, appContextClass_str18, line );
       stat = rename( fileName, line );
       if ( stat ) {
         perror( appContextClass_str19 );
@@ -537,19 +537,19 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToAdd == 1 )
-      printf( appContextClass_str20 );
+      fprintf( stderr, appContextClass_str20 );
     else if ( numToAdd > 1 )
-      printf( appContextClass_str21 );
+      fprintf( stderr, appContextClass_str21 );
 
   }
   else if ( strcmp( op, global_str7 ) == 0 ) {  // remove
 
     if ( !fileExists ) {
-      printf( appContextClass_str123 );
+      fprintf( stderr, appContextClass_str123 );
       return;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstRegRecord" );
     func = (REGFUNC) dlsym( dllHandle, line );
@@ -575,7 +575,7 @@ libRecPtr head, tail, cur, prev, next;
       while ( cur ) {
         next = cur->flink;
         if ( strcmp( classNamePtr, cur->className ) == 0 ) {
-          printf( appContextClass_str124, classNamePtr );
+          fprintf( stderr, appContextClass_str124, classNamePtr );
           numToRemove++;
           prev->flink = next;
           delete cur;
@@ -592,7 +592,7 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToRemove == 0 ) {
-      printf( appContextClass_str125, fileName );
+      fprintf( stderr, appContextClass_str125, fileName );
       return;
     }
 
@@ -604,7 +604,7 @@ libRecPtr head, tail, cur, prev, next;
       cur = cur->flink;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strncpy( line, fileName, 255 );
     Strncat( line, "~", 255 );
@@ -613,7 +613,7 @@ libRecPtr head, tail, cur, prev, next;
 
       stat = unlink( line );
 
-      printf( appContextClass_str18, line );
+      fprintf( stderr, appContextClass_str18, line );
       stat = rename( fileName, line );
       if ( stat ) {
         perror( appContextClass_str19 );
@@ -640,12 +640,12 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToRemove == 1 )
-      printf( appContextClass_str126 );
+      fprintf( stderr, appContextClass_str126 );
     else if ( numToRemove > 1 )
-      printf( appContextClass_str127 );
+      fprintf( stderr, appContextClass_str127 );
 
     if ( numComponents == 0 ) {
-      printf( appContextClass_str128 );
+      fprintf( stderr, appContextClass_str128 );
     }
 
   }
@@ -690,7 +690,7 @@ libRecPtr head, tail, cur, prev, next;
   f = fopen( fileName, "r" );
   if ( f ) {
 
-    printf( appContextClass_str1, fileName );
+    fprintf( stderr, appContextClass_str1, fileName );
 
     fileExists = 1;
     fileEmpty = 0;
@@ -702,13 +702,13 @@ libRecPtr head, tail, cur, prev, next;
       tk = strtok( line, "\n" );
       numComponents = atol( tk );
       if ( numComponents <= 0 ) {
-        printf( appContextClass_str2, fileName );
+        fprintf( stderr, appContextClass_str2, fileName );
         fileEmpty = 1;
         fclose( f );
       }
     }
     else {
-      printf( appContextClass_str2, fileName );
+      fprintf( stderr, appContextClass_str2, fileName );
       fileEmpty = 1;
       fclose( f );
     }
@@ -743,7 +743,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( line, " \t\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->className = new char[strlen(tk)+1];
@@ -751,7 +751,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( NULL, " \t\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->fileName = new char[strlen(tk)+1];
@@ -759,7 +759,7 @@ libRecPtr head, tail, cur, prev, next;
 
             tk = strtok( NULL, "\n" );
             if ( !tk ) {
-              printf( appContextClass_str3 );
+              fprintf( stderr, appContextClass_str3 );
               return;
             }
             cur->text = new char[strlen(tk)+1];
@@ -776,7 +776,7 @@ libRecPtr head, tail, cur, prev, next;
       fclose( f );
 
       if ( index != numComponents ) {
-        printf( appContextClass_str4, fileName );
+        fprintf( stderr, appContextClass_str4, fileName );
         return;
       }
 
@@ -793,8 +793,8 @@ libRecPtr head, tail, cur, prev, next;
   }
 
   if ( libFile[0] != '/' ) {
-    printf( appContextClass_str5 );
-    printf( appContextClass_str6 );
+    fprintf( stderr, appContextClass_str5 );
+    fprintf( stderr, appContextClass_str6 );
     return;
   }
 
@@ -807,7 +807,7 @@ libRecPtr head, tail, cur, prev, next;
 
   if ( strcmp( op, global_str65 ) == 0 ) {  // showpv
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstPvRegRecord" );
     func = (PVREGFUNC) dlsym( dllHandle, line );
@@ -828,7 +828,7 @@ libRecPtr head, tail, cur, prev, next;
     if ( !stat ) {
       strncpy( line, appContextClass_str110, 255 );
       Strncat( line, appContextClass_str111, 255 );
-      printf( "%s\n\n", line );
+      fprintf( stderr, "%s\n\n", line );
     }
 
     while ( !stat ) {
@@ -842,23 +842,23 @@ libRecPtr head, tail, cur, prev, next;
       Strncat( line, "                                        ", 255 );
       strncpy( &line[index], textPtr, 255 );
 
-      printf( "%s\n", line );
+      fprintf( stderr, "%s\n", line );
 
       // get next
       stat = (*func)( &classNamePtr, &textPtr );
 
     }
 
-    printf( "\n\n" );
+    fprintf( stderr, "\n\n" );
 
   }
   else if ( strcmp( op, global_str63 ) == 0 ) {  // addpv
 
     if ( !fileExists ) {
-      printf( appContextClass_str13, fileName );
+      fprintf( stderr, appContextClass_str13, fileName );
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstPvRegRecord" );
     func = (PVREGFUNC) dlsym( dllHandle, line );
@@ -885,7 +885,7 @@ libRecPtr head, tail, cur, prev, next;
       cur = head->flink;
       while ( cur ) {
         if ( strcmp( classNamePtr, cur->className ) == 0 ) {
-          printf( appContextClass_str15, classNamePtr );
+          fprintf( stderr, appContextClass_str15, classNamePtr );
           doAdd = 0;
           alreadyExists = 1;
 	}
@@ -896,7 +896,7 @@ libRecPtr head, tail, cur, prev, next;
 
         numToAdd++;
 
-        printf( appContextClass_str109, classNamePtr, textPtr );
+        fprintf( stderr, appContextClass_str109, classNamePtr, textPtr );
 
         cur = new libRecType;
         tail->flink = cur;
@@ -919,18 +919,18 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToAdd == 0 ) {
-      printf( "\n" );
+      fprintf( stderr, "\n" );
       if ( alreadyExists ) {
-        printf( appContextClass_str122, fileName );
+        fprintf( stderr, appContextClass_str122, fileName );
       }
       else {
-        printf(
+        fprintf( stderr,
          appContextClass_str17, fileName );
       }
       return;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strncpy( line, fileName, 255 );
     Strncat( line, "~", 255 );
@@ -939,7 +939,7 @@ libRecPtr head, tail, cur, prev, next;
 
       stat = unlink( line );
 
-      printf( appContextClass_str18, line );
+      fprintf( stderr, appContextClass_str18, line );
       stat = rename( fileName, line );
       if ( stat ) {
         perror( appContextClass_str19 );
@@ -966,19 +966,19 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToAdd == 1 )
-      printf( appContextClass_str20 );
+      fprintf( stderr, appContextClass_str20 );
     else if ( numToAdd > 1 )
-      printf( appContextClass_str21 );
+      fprintf( stderr, appContextClass_str21 );
 
   }
   else if ( strcmp( op, global_str64 ) == 0 ) {  // removepv
 
     if ( !fileExists ) {
-      printf( appContextClass_str123 );
+      fprintf( stderr, appContextClass_str123 );
       return;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strcpy( line, "firstPvRegRecord" );
     func = (PVREGFUNC) dlsym( dllHandle, line );
@@ -1004,7 +1004,7 @@ libRecPtr head, tail, cur, prev, next;
       while ( cur ) {
         next = cur->flink;
         if ( strcmp( classNamePtr, cur->className ) == 0 ) {
-          printf( appContextClass_str124, classNamePtr );
+          fprintf( stderr, appContextClass_str124, classNamePtr );
           numToRemove++;
           prev->flink = next;
           delete cur;
@@ -1021,7 +1021,7 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToRemove == 0 ) {
-      printf( appContextClass_str125, fileName );
+      fprintf( stderr, appContextClass_str125, fileName );
       return;
     }
 
@@ -1033,7 +1033,7 @@ libRecPtr head, tail, cur, prev, next;
       cur = cur->flink;
     }
 
-    printf( "\n" );
+    fprintf( stderr, "\n" );
 
     strncpy( line, fileName, 255 );
     Strncat( line, "~", 255 );
@@ -1042,7 +1042,7 @@ libRecPtr head, tail, cur, prev, next;
 
       stat = unlink( line );
 
-      printf( appContextClass_str18, line );
+      fprintf( stderr, appContextClass_str18, line );
       stat = rename( fileName, line );
       if ( stat ) {
         perror( appContextClass_str19 );
@@ -1069,12 +1069,12 @@ libRecPtr head, tail, cur, prev, next;
     }
 
     if ( numToRemove == 1 )
-      printf( appContextClass_str126 );
+      fprintf( stderr, appContextClass_str126 );
     else if ( numToRemove > 1 )
-      printf( appContextClass_str127 );
+      fprintf( stderr, appContextClass_str127 );
 
     if ( numComponents == 0 ) {
-      printf( appContextClass_str128 );
+      fprintf( stderr, appContextClass_str128 );
     }
 
   }
@@ -1194,9 +1194,23 @@ callbackBlockPtr cbPtr = (callbackBlockPtr) client;
 char *item = (char *) cbPtr->ptr;
 appContextClass *apco = (appContextClass *) cbPtr->apco;
 
-  //printf( "setPath_cb, item = [%s]\n", item );
+  //fprintf( stderr, "setPath_cb, item = [%s]\n", item );
 
   strncpy( apco->curPath, item, 127 );
+
+}
+
+void selectPath_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+callbackBlockPtr cbPtr = (callbackBlockPtr) client;
+char *item = (char *) cbPtr->ptr;
+appContextClass *apco = (appContextClass *) cbPtr->apco;
+
+  apco->pathList.popup();
 
 }
 
@@ -1542,7 +1556,12 @@ void abort_cb (
 appContextClass *apco = (appContextClass *) client;
 
   apco->confirm.popdown();
+
+  apco->pathList.popdown();
+
   apco->exitFlag = 1;
+
+  if ( diagnosticMode() ) logDiagnostic( "Program exit requested\n" );
 
 }
 
@@ -1581,7 +1600,11 @@ unsigned int mask;
     return;
   }
 
+  apco->pathList.popdown();
+
   apco->exitFlag = 1;
+
+  if ( diagnosticMode() ) logDiagnostic( "Program exit requested\n" );
 
 }
 
@@ -1755,6 +1778,11 @@ activeWindowListPtr cur;
     }
     else {
       apco->postMessage( cur->node.displayName );
+      for ( i=0; i<cur->node.numMacros; i++ ) {
+        snprintf( string, 79, "  %s=%s", cur->node.macros[i],
+         cur->node.expansions[i] );
+        apco->postMessage( string );
+      }
     }
     nodeCount++;
     cur = cur->flink;
@@ -1836,6 +1864,18 @@ int found;
     found = apco->fi.getNextFontMapping( tag, 63, spec, 255 );
 
   }
+
+}
+
+void viewEnv_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+appContextClass *apco = (appContextClass *) client;
+
+  apco->showEnv();
 
 }
 
@@ -2040,6 +2080,9 @@ appContextClass::appContextClass (
 
   ddgc = NULL;
   ddFixedFont = NULL;
+
+  useStdErrFlag = 0;
+  errMsgPrefix = NULL;
 
 }
 
@@ -2409,7 +2452,7 @@ char *envPtr, *gotIt, *buf, save[127+1], path[127+1], msg[127+1], *tk,
 
       gotIt = getcwd( save, 127 );
       if ( !gotIt ) {
-        printf( appContextClass_str118, __LINE__, __FILE__ );
+        fprintf( stderr, appContextClass_str118, __LINE__, __FILE__ );
         exit(0);
       }
 
@@ -2452,7 +2495,7 @@ char *envPtr, *gotIt, *buf, save[127+1], path[127+1], msg[127+1], *tk,
 
       gotIt = getcwd( save, 127 );
       if ( !gotIt ) {
-        printf( appContextClass_str118, __LINE__, __FILE__ );
+        fprintf( stderr, appContextClass_str118, __LINE__, __FILE__ );
         exit(0);
       }
 
@@ -2693,7 +2736,7 @@ int stat, dup, state, i;
   schemeSet = (AVL_HANDLE) NULL;
   schemeSetList = (char **) NULL;
 
-  //printf( "build scheme list\n" );
+  //fprintf( stderr, "build scheme list\n" );
   stat = avl_init_tree( compare_nodes, compare_key, copy_nodes,
    &(this->schemeList) );
   if ( !( stat & 1 ) ) {
@@ -2738,7 +2781,7 @@ int stat, dup, state, i;
 
     case GETTING_SET_NAME:
 
-      //printf( "GETTING_SET_NAME\n" );
+      //fprintf( stderr, "GETTING_SET_NAME\n" );
 
       do {
 
@@ -2760,7 +2803,7 @@ int stat, dup, state, i;
         if ( tk ) {
 
           if ( strcmp( tk, "{" ) != 0 ) {
-            printf( "appContextClass::buildSchemeList syntax err 1\n" );
+            fprintf( stderr, "appContextClass::buildSchemeList syntax err 1\n" );
             fclose( f );
             numSchemeSets = 0;
             schemeListExists = 0;
@@ -2769,7 +2812,7 @@ int stat, dup, state, i;
 
 	}
 	else {
-          printf( "appContextClass::buildSchemeList syntax err 2\n" );
+          fprintf( stderr, "appContextClass::buildSchemeList syntax err 2\n" );
           fclose( f );
           numSchemeSets = 0;
           schemeListExists = 0;
@@ -2778,7 +2821,7 @@ int stat, dup, state, i;
 
       }
       else {
-        printf( "appContextClass::buildSchemeList syntax err 3\n" );
+        fprintf( stderr, "appContextClass::buildSchemeList syntax err 3\n" );
         fclose( f );
         numSchemeSets = 0;
         schemeListExists = 0;
@@ -2796,7 +2839,7 @@ int stat, dup, state, i;
         return;
       }
       if ( dup ) {
-        printf( "appContextClass::buildSchemeList dups\n" );
+        fprintf( stderr, "appContextClass::buildSchemeList dups\n" );
       }
       else {
         numSchemeSets++;
@@ -2808,13 +2851,13 @@ int stat, dup, state, i;
 
     case GETTING_LIST:
 
-      //printf( "GETTING_LIST\n" );
+      //fprintf( stderr, "GETTING_LIST\n" );
 
       do {
 
         ptr = fgets ( line, 255, f );
         if ( !ptr ) {
-          printf( "appContextClass::buildSchemeList syntax err 4\n" );
+          fprintf( stderr, "appContextClass::buildSchemeList syntax err 4\n" );
           fclose( f );
           numSchemeSets = 0;
           schemeListExists = 0;
@@ -2864,12 +2907,12 @@ int stat, dup, state, i;
             return;
           }
           if ( dup ) {
-            printf( "appContextClass::buildSchemeList dups\n" );
+            fprintf( stderr, "appContextClass::buildSchemeList dups\n" );
           }
 
         }
         else {
-          printf( "appContextClass::buildSchemeList syntax err 5\n" );
+          fprintf( stderr, "appContextClass::buildSchemeList syntax err 5\n" );
           fclose( f );
           numSchemeSets = 0;
           schemeListExists = 0;
@@ -2878,7 +2921,7 @@ int stat, dup, state, i;
 
       }
       else {
-        printf( "appContextClass::buildSchemeList syntax err 6\n" );
+        fprintf( stderr, "appContextClass::buildSchemeList syntax err 6\n" );
         fclose( f );
         numSchemeSets = 0;
         schemeListExists = 0;
@@ -2893,7 +2936,7 @@ int stat, dup, state, i;
 
 done:
 
-  //printf( "numSchemeSets = %-d\n", numSchemeSets );
+  //fprintf( stderr, "numSchemeSets = %-d\n", numSchemeSets );
 
   stat = avl_get_first( schemeSet, (void **) &curSet );
   if ( !( stat & 1 ) ) {
@@ -2906,7 +2949,7 @@ done:
   i = 0;
   while ( curSet ) {
 
-    //printf( "curSet->objName = [%s]\n", curSet->objName );
+    //fprintf( stderr, "curSet->objName = [%s]\n", curSet->objName );
 
     schemeSetList[i] = new char[strlen(curSet->objName)+1];
     strcpy( schemeSetList[i], curSet->objName );
@@ -3051,7 +3094,7 @@ char buf[255+1];
   Strncat( buf, "-", 255 );
   Strncat( buf, objName, 255 );
 
-  //printf( "get scheme file for %s\n", buf );
+  //fprintf( stderr, "get scheme file for %s\n", buf );
 
   stat = avl_get_match( this->schemeList, (void *) buf,
    (void **) &cur );
@@ -3089,17 +3132,17 @@ int i, stat;
 
   stat = sys_iniq( &appDefExeFreeQueue );
   if ( !( stat & 1 ) ) {
-    printf( appContextClass_str30 );
+    fprintf( stderr, appContextClass_str30 );
     return 2;
   }
   stat = sys_iniq( &appDefExeActiveQueue );
   if ( !( stat & 1 ) ) {
-    printf( appContextClass_str30 );
+    fprintf( stderr, appContextClass_str30 );
     return 2;
   }
   stat = sys_iniq( &appDefExeActiveNextQueue );
   if ( !( stat & 1 ) ) {
-    printf( appContextClass_str30 );
+    fprintf( stderr, appContextClass_str30 );
     return 2;
   }
 
@@ -3115,7 +3158,7 @@ int i, stat;
     stat = INSQTI( (void *) &appDefExeNodes[i], (void *) &appDefExeFreeQueue,
      0 );
     if ( !( stat & 1 ) ) {
-      printf( appContextClass_str30 );
+      fprintf( stderr, appContextClass_str30 );
       return 2;
     }
 
@@ -3145,12 +3188,12 @@ APPDEFEXE_NODE_PTR node;
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveQueue,
        0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else if ( q_stat_r != QUEWASEMP ) {
-      printf( appContextClass_str32 );
+      fprintf( stderr, appContextClass_str32 );
     }
 
   } while ( q_stat_r & 1 );
@@ -3168,7 +3211,7 @@ APPDEFEXE_NODE_PTR node;
 
           q_stat_i = INSQTI( (void *) node, (void *) &appDefExeFreeQueue, 0 );
           if ( !( q_stat_i & 1 ) ) {
-            printf( appContextClass_str31 );
+            fprintf( stderr, appContextClass_str31 );
           }
 
 	}
@@ -3177,7 +3220,7 @@ APPDEFEXE_NODE_PTR node;
           q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveNextQueue,
            0 );
           if ( !( q_stat_i & 1 ) ) {
-            printf( appContextClass_str33 );
+            fprintf( stderr, appContextClass_str33 );
           }
 
 	}
@@ -3189,7 +3232,7 @@ APPDEFEXE_NODE_PTR node;
 
           q_stat_i = INSQTI( (void *) node, (void *) &appDefExeFreeQueue, 0 );
           if ( !( q_stat_i & 1 ) ) {
-            printf( appContextClass_str31 );
+            fprintf( stderr, appContextClass_str31 );
           }
 
 	}
@@ -3198,7 +3241,7 @@ APPDEFEXE_NODE_PTR node;
           q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveNextQueue,
            0 );
           if ( !( q_stat_i & 1 ) ) {
-            printf( appContextClass_str33 );
+            fprintf( stderr, appContextClass_str33 );
           }
 
 	}
@@ -3207,7 +3250,7 @@ APPDEFEXE_NODE_PTR node;
 
     }
     else if ( q_stat_r != QUEWASEMP ) {
-      printf( appContextClass_str32 );
+      fprintf( stderr, appContextClass_str32 );
     }
 
   } while ( q_stat_r & 1 );
@@ -3231,12 +3274,12 @@ APPDEFEXE_NODE_PTR node;
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveQueue,
        0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else if ( q_stat_r != QUEWASEMP ) {
-      printf( appContextClass_str32 );
+      fprintf( stderr, appContextClass_str32 );
     }
 
   } while ( q_stat_r & 1 );
@@ -3253,12 +3296,12 @@ APPDEFEXE_NODE_PTR node;
 
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeFreeQueue, 0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str31 );
+        fprintf( stderr, appContextClass_str31 );
       }
 
     }
     else if ( q_stat_r != QUEWASEMP ) {
-      printf( appContextClass_str32 );
+      fprintf( stderr, appContextClass_str32 );
     }
 
   } while ( q_stat_r & 1 );
@@ -3281,12 +3324,12 @@ APPDEFEXE_NODE_PTR node;
 
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveQueue, 0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else {
-      printf( appContextClass_str34 );
+      fprintf( stderr, appContextClass_str34 );
     }
 
 }
@@ -3307,12 +3350,12 @@ APPDEFEXE_NODE_PTR node;
 
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveQueue, 0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else {
-      printf( appContextClass_str34 );
+      fprintf( stderr, appContextClass_str34 );
     }
 
 }
@@ -3334,12 +3377,12 @@ APPDEFEXE_NODE_PTR node;
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveNextQueue,
        0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else {
-      printf( appContextClass_str34 );
+      fprintf( stderr, appContextClass_str34 );
     }
 
 }
@@ -3361,12 +3404,12 @@ APPDEFEXE_NODE_PTR node;
       q_stat_i = INSQTI( (void *) node, (void *) &appDefExeActiveNextQueue,
        0 );
       if ( !( q_stat_i & 1 ) ) {
-        printf( appContextClass_str33 );
+        fprintf( stderr, appContextClass_str33 );
       }
 
     }
     else {
-      printf( appContextClass_str34 );
+      fprintf( stderr, appContextClass_str34 );
     }
 
 }
@@ -3375,7 +3418,7 @@ void appContextClass::createMainWindow ( void ) {
 
 XmString menuStr, str;
 callbackBlockPtr curBlock;
-int i;
+int i, numVisible;
 
   mainWin = XtVaCreateManagedWidget( "main", xmMainWindowWidgetClass,
    appTop,
@@ -3557,38 +3600,94 @@ int i;
   XtAddCallback( viewFontMappingB, XmNactivateCallback, viewFontMapping_cb,
    (XtPointer) this );
 
-
-  pathPullDown = XmCreatePulldownMenu( menuBar, "path", NULL, 0 );
-
-  menuStr = XmStringCreateLocalized( appContextClass_str121 );
-  pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
-   menuBar,
-   XmNlabelString, menuStr,
-   XmNmnemonic, 'v',
-   XmNsubMenuId, pathPullDown,
+  str = XmStringCreateLocalized( appContextClass_str144 );
+  viewEnvB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
+   viewPullDown,
+   XmNlabelString, str,
    NULL );
-  XmStringFree( menuStr );
+  XmStringFree( str );
+  XtAddCallback( viewEnvB, XmNactivateCallback, viewEnv_cb,
+   (XtPointer) this );
 
-  for ( i=0; i<numPaths; i++ ) {
+  // --------------------------------------------------------------------
+
+  if ( numPaths <= 30 ) {
+
+    pathPullDown = XmCreatePulldownMenu( menuBar, "path", NULL, 0 );
+
+    menuStr = XmStringCreateLocalized( appContextClass_str121 );
+    pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
+     menuBar,
+     XmNlabelString, menuStr,
+     XmNmnemonic, 'v',
+     XmNsubMenuId, pathPullDown,
+     NULL );
+    XmStringFree( menuStr );
+
+    for ( i=0; i<numPaths; i++ ) {
+
+      curBlock = new callbackBlockType;
+      curBlock->ptr = (void *) dataFilePrefix[i];
+      curBlock->apco = this;
+
+      callbackBlockTail->flink = curBlock;
+      callbackBlockTail = curBlock;
+      callbackBlockTail->flink = NULL;
+
+      str = XmStringCreateLocalized( dataFilePrefix[i] );
+      msgB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
+       pathPullDown,
+       XmNlabelString, str,
+       NULL );
+      XmStringFree( str );
+      XtAddCallback( msgB, XmNactivateCallback, setPath_cb,
+       (XtPointer) curBlock );
+
+    }
+
+  }
+  else {
+
+    pathPullDown = XmCreatePulldownMenu( menuBar, "path", NULL, 0 );
+
+    numVisible = ( numPaths > 30 ? 30 : numPaths );
+    pathList.create( numPaths, mainWin, numVisible, this );
+
+    XtAddCallback( msgB, XmNactivateCallback, setPath_cb,
+     (XtPointer) curBlock );
+
+    menuStr = XmStringCreateLocalized( appContextClass_str121 );
+    pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
+     menuBar,
+     XmNlabelString, menuStr,
+     XmNmnemonic, 'v',
+     XmNsubMenuId, pathPullDown,
+     NULL );
+    XmStringFree( menuStr );
 
     curBlock = new callbackBlockType;
-    curBlock->ptr = (void *) dataFilePrefix[i];
+    curBlock->ptr = NULL;
     curBlock->apco = this;
 
     callbackBlockTail->flink = curBlock;
     callbackBlockTail = curBlock;
     callbackBlockTail->flink = NULL;
 
-    str = XmStringCreateLocalized( dataFilePrefix[i] );
+    str = XmStringCreateLocalized( appContextClass_str143 );
     msgB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
      pathPullDown,
      XmNlabelString, str,
      NULL );
     XmStringFree( str );
-    XtAddCallback( msgB, XmNactivateCallback, setPath_cb,
+    XtAddCallback( msgB, XmNactivateCallback, selectPath_cb,
      (XtPointer) curBlock );
 
+    for ( i=0; i<numPaths; i++ ) {
+      pathList.addItem( dataFilePrefix[i] );
+    }
+
   }
+
 
   helpPullDown = XmCreatePulldownMenu( menuBar, "help", NULL, 0 );
 
@@ -3882,127 +3981,130 @@ activeWindowListPtr cur;
 
 static void displayVersion ( void ) {
 
-  printf( "  edm version %s Copyright (C) 1999 John W. Sinclair\n", VERSION );
-  printf( "\n" );
+  fprintf( stderr, "  edm version %s Copyright (C) 1999 John W. Sinclair\n", VERSION );
+  fprintf( stderr, "\n" );
 
-  printf( "  This program is free software; you can redistribute it and/or modify\n" );
-  printf( "  it under the terms of the GNU General Public License as published by\n" );
-  printf( "  the Free Software Foundation; either version 2 of the License, or\n" );
-  printf( "  (at your option) any later version.\n" );
-  printf( "\n" );
+  fprintf( stderr, "  This program is free software; you can redistribute it and/or modify\n" );
+  fprintf( stderr, "  it under the terms of the GNU General Public License as published by\n" );
+  fprintf( stderr, "  the Free Software Foundation; either version 2 of the License, or\n" );
+  fprintf( stderr, "  (at your option) any later version.\n" );
+  fprintf( stderr, "\n" );
 
-printf( "  This program is distributed in the hope that it will be useful,\n" );
-  printf( "  but WITHOUT ANY WARRANTY; without even the implied warranty of\n" );
-  printf( "  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" );
-  printf( "  GNU General Public License for more details.\n" );
-  printf( "\n" );
+fprintf( stderr, "  This program is distributed in the hope that it will be useful,\n" );
+  fprintf( stderr, "  but WITHOUT ANY WARRANTY; without even the implied warranty of\n" );
+  fprintf( stderr, "  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" );
+  fprintf( stderr, "  GNU General Public License for more details.\n" );
+  fprintf( stderr, "\n" );
  
-printf( "  You should have received a copy of the GNU General Public License\n" );
-  printf( "  along with this program; if not, write to the Free Software\n" );
-  printf( "  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n" );
+fprintf( stderr, "  You should have received a copy of the GNU General Public License\n" );
+  fprintf( stderr, "  along with this program; if not, write to the Free Software\n" );
+  fprintf( stderr, "  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n" );
 
 }
 
 static void displayParamInfo ( void ) {
 
-  printf( "\n" );
+  fprintf( stderr, "\n" );
   displayVersion();
 
-  printf( "\n" );
-   printf( global_str24 );
-  printf( "\n" );
+  fprintf( stderr, "\n" );
+   fprintf( stderr, global_str24 );
+  fprintf( stderr, "\n" );
 
-  printf( global_str25 );
+  fprintf( stderr, global_str25 );
 
-  printf( global_str27 );
+  fprintf( stderr, global_str27 );
 
-  printf( global_str28 );
+  fprintf( stderr, global_str28 );
 
-  printf( global_str29 );
+  fprintf( stderr, global_str29 );
 
-  printf( global_str30 );
-  printf( global_str31 );
-  printf( global_str99 );
-  printf( global_str101 );
+  fprintf( stderr, global_str30 );
+  fprintf( stderr, global_str31 );
+  fprintf( stderr, global_str99 );
+  fprintf( stderr, global_str101 );
 
-  printf( global_str32 );
-  printf( global_str33 );
+  fprintf( stderr, global_str32 );
+  fprintf( stderr, global_str33 );
 
-  printf( global_str35 );
-  printf( global_str36 );
-  printf( global_str37 );
-  printf( global_str87 );
-  printf( global_str88 );
+  fprintf( stderr, global_str35 );
+  fprintf( stderr, global_str36 );
+  fprintf( stderr, global_str37 );
+  fprintf( stderr, global_str87 );
+  fprintf( stderr, global_str88 );
 
-  printf( global_str77 );
-  printf( global_str78 );
-  printf( global_str85 );
-  printf( global_str92 );
+  fprintf( stderr, global_str77 );
+  fprintf( stderr, global_str78 );
+  fprintf( stderr, global_str85 );
+  fprintf( stderr, global_str92 );
 
-  printf( global_str57 );
-  printf( global_str58 );
-  printf( global_str59 );
+  fprintf( stderr, global_str57 );
+  fprintf( stderr, global_str58 );
+  fprintf( stderr, global_str59 );
 
-  printf( global_str74 );
+  fprintf( stderr, global_str74 );
 
-  printf( global_str60 );
-  printf( global_str61 );
+  fprintf( stderr, global_str60 );
+  fprintf( stderr, global_str61 );
 
-  printf( global_str90 );
+  fprintf( stderr, global_str90 );
 
-  printf( global_str94 );
+  fprintf( stderr, global_str94 );
 
-  printf( global_str97 );
+  fprintf( stderr, global_str97 );
 
-  printf( global_str38 );
+  fprintf( stderr, global_str103 );
+  fprintf( stderr, global_str105 );
 
-  printf( global_str39 );
+  fprintf( stderr, global_str38 );
 
-  printf( global_str40 );
+  fprintf( stderr, global_str39 );
 
-  printf( global_str41 );
-  printf( global_str42 );
-  printf( global_str43 );
-  printf( global_str44 );
-  printf( global_str45 );
+  fprintf( stderr, global_str40 );
 
-  printf( global_str66 );
+  fprintf( stderr, global_str41 );
+  fprintf( stderr, global_str42 );
+  fprintf( stderr, global_str43 );
+  fprintf( stderr, global_str44 );
+  fprintf( stderr, global_str45 );
 
-  printf( global_str67 );
+  fprintf( stderr, global_str66 );
 
-  printf( global_str68 );
-  printf( global_str69 );
-  printf( global_str70 );
-  printf( global_str71 );
-  printf( global_str72 );
+  fprintf( stderr, global_str67 );
 
-  printf( global_str46 );
-  printf( global_str47 );
-  printf( "\n" );
-  printf( global_str75 );
-  printf( "\n" );
-  printf( global_str48 );
-  printf( "\n" );
-  printf( global_str49 );
-  printf( "\n" );
-  printf( global_str50 );
-  printf( "\n" );
-  printf( global_str51 );
-  printf( global_str52 );
-  printf( "\n" );
-  printf( global_str53 );
-  printf( "\n" );
-  printf( global_str80 );
-  printf( global_str81 );
-  printf( global_str82 );
-  printf( global_str83 );
-  printf( "\n" );
-  printf( global_str84 );
-  printf( "\n" );
-  printf( global_str95 );
-  printf( "\n" );
-  printf( global_str54 );
-  printf( "\n" );
+  fprintf( stderr, global_str68 );
+  fprintf( stderr, global_str69 );
+  fprintf( stderr, global_str70 );
+  fprintf( stderr, global_str71 );
+  fprintf( stderr, global_str72 );
+
+  fprintf( stderr, global_str46 );
+  fprintf( stderr, global_str47 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str75 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str48 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str49 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str50 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str51 );
+  fprintf( stderr, global_str52 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str53 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str80 );
+  fprintf( stderr, global_str81 );
+  fprintf( stderr, global_str82 );
+  fprintf( stderr, global_str83 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str84 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str95 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str54 );
+  fprintf( stderr, "\n" );
 
 }
 
@@ -4036,12 +4138,12 @@ fileListPtr curFile;
          ( strcmp( argv[1], global_str7 ) == 0 ) ||
          ( strcmp( argv[1], global_str8 ) == 0 ) ) {
       if ( argc < 3 ) {
-        printf( appContextClass_str77 );
+        fprintf( stderr, appContextClass_str77 );
         displayParamInfo();
         exit(0);
       }
       manageComponents( argv[1], argv[2] );
-      printf( "\n\n" );
+      fprintf( stderr, "\n\n" );
       exit(0);
     }
 
@@ -4053,12 +4155,12 @@ fileListPtr curFile;
          ( strcmp( argv[1], global_str64 ) == 0 ) ||
          ( strcmp( argv[1], global_str65 ) == 0 ) ) {
       if ( argc < 3 ) {
-        printf( appContextClass_str77 );
+        fprintf( stderr, appContextClass_str77 );
         displayParamInfo();
         exit(0);
       }
       managePvComponents( argv[1], argv[2] );
-      printf( "\n\n" );
+      fprintf( stderr, "\n\n" );
       exit(0);
     }
 
@@ -4085,21 +4187,21 @@ fileListPtr curFile;
           exit(0);
         }
         else if ( strcmp( argv[n], global_str14 ) == 0 ) {
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           displayVersion();
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           exit(0);
         }
         else if ( strcmp( argv[n], global_str15 ) == 0 ) {
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           displayVersion();
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           exit(0);
         }
         else if ( strcmp( argv[n], global_str16 ) == 0 ) {
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           displayVersion();
-          printf( "\n" );
+          fprintf( stderr, "\n" );
           exit(0);
         }
         else if ( strcmp( argv[n], global_str17 ) == 0 ) {
@@ -4113,6 +4215,10 @@ fileListPtr curFile;
         else if ( strcmp( argv[n], global_str89 ) == 0 ) {
         }
         else if ( strcmp( argv[n], global_str91 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str102 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str104 ) == 0 ) {
         }
         else if ( strcmp( argv[n], global_str93 ) == 0 ) {
         }
@@ -4309,23 +4415,23 @@ XmString xmStr1;
   if ( !( stat & 1 ) ) {
     switch ( stat ) {
     case 2:
-      printf( appContextClass_str93 );
+      fprintf( stderr, appContextClass_str93 );
       goto err_return;
     case 4:
-      printf( appContextClass_str94 );
+      fprintf( stderr, appContextClass_str94 );
       goto err_return;
     case 6:
-      printf( appContextClass_str95 );
+      fprintf( stderr, appContextClass_str95 );
       goto err_return;
     case 8:
-      printf( appContextClass_str96 );
+      fprintf( stderr, appContextClass_str96 );
       goto err_return;
     case -2:
-      printf( appContextClass_str97 );
+      fprintf( stderr, appContextClass_str97 );
       goto err_return;
     }
 err_return:
-    printf( global_str55 );
+    fprintf( stderr, global_str55 );
     exitFlag = 1;
     return 0; // error
   }
@@ -4547,7 +4653,7 @@ err_return:
   }
 
   if ( !( opStat & 1 ) ) {
-    printf( appContextClass_str106 );
+    fprintf( stderr, appContextClass_str106 );
     exitFlag = 1;
     return 0; // error
   }
@@ -4580,7 +4686,7 @@ err_return:
   closeNote();
 
   if ( !( opStat & 1 ) ) {
-    printf( appContextClass_str107 );
+    fprintf( stderr, appContextClass_str107 );
     exitFlag = 1;
     return 0; // error
   }
@@ -4663,7 +4769,7 @@ char *macTk, *macBuf, macTmp[255+1];
 int stat;
 char name[127+1], prefix[127+1];
 
-  //printf( "list = [%s]\n", list );
+  //fprintf( stderr, "list = [%s]\n", list );
 
   buf1 = NULL;
   strncpy( tmpMsg, list, 255 );
@@ -4680,17 +4786,22 @@ char name[127+1], prefix[127+1];
   tk = strtok_r( NULL, "|", &buf1 );
   while ( tk ) {
 
-    //printf( "state = %-d\n", state );
+    //fprintf( stderr, "state = %-d\n", state );
     //if ( tk ) {
-    //  printf( "tk = [%s]\n", tk );
+    //  fprintf( stderr, "tk = [%s]\n", tk );
     //}
     //else {
-    //  printf( "tk is null\n" );
+    //  fprintf( stderr, "tk is null\n" );
     //}
 
     if ( state == GETTING_INITIAL ) {
 
-      if ( strcmp( tk, global_str93 ) == 0 ) {
+      if ( strcmp( tk, global_str73 ) == 0 ) {
+        tk = strtok_r( NULL, "|", &buf1 );
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+      }
+      else if ( strcmp( tk, global_str93 ) == 0 ) {
 
         state = GETTING_FILES;
         tk = strtok_r( NULL, "|", &buf1 );
@@ -4702,6 +4813,11 @@ char name[127+1], prefix[127+1];
         state = GETTING_1ST_MACRO;
         tk = strtok_r( NULL, "|", &buf1 );
 	if ( !tk ) return;
+
+      }
+      else if ( tk[0] == '-' ) { //skip other options if present
+        tk = strtok_r( NULL, "|", &buf1 );
+        if ( !tk ) return;
 
       }
       else {
@@ -4716,10 +4832,10 @@ char name[127+1], prefix[127+1];
 
     if ( state == GETTING_FILES ) {
 
-      //printf( "Getting files\n" );
+      //fprintf( stderr, "Getting files\n" );
 
       //for ( i=0; i<locNumMacros; i++ ) {
-      //  printf( "%s[%-d] = %s\n", locMacros[i], i, locExpansions[i] );
+      //  fprintf( stderr, "%s[%-d] = %s\n", locMacros[i], i, locExpansions[i] );
       //}
 
       if ( strcmp( tk, global_str93 ) != 0 ) {
@@ -4756,7 +4872,7 @@ char name[127+1], prefix[127+1];
 
         if ( doOpen ) {
 
-          //printf( "Do open\n" );
+          //fprintf( stderr, "Do open\n" );
 
           cur = new activeWindowListType;
           cur->requestDelete = 0;
@@ -4802,16 +4918,16 @@ char name[127+1], prefix[127+1];
 
       macBuf = NULL;
       strcpy( macTmp, tk );
-      //printf( "getting 1st macro, macTmp = [%s]\n", macTmp );
+      //fprintf( stderr, "getting 1st macro, macTmp = [%s]\n", macTmp );
       macTk = strtok_r( macTmp, "=,", &macBuf );
       if ( macTk ) {
-        //printf( "getting 1st macro, sym = [%s]\n", macTk );
+        //fprintf( stderr, "getting 1st macro, sym = [%s]\n", macTk );
         locMacros[0] = macTk;
       }
 
       macTk = strtok_r( NULL, "=,", &macBuf );
       if ( macTk ) {
-        //printf( "getting 1st macro, val = [%s]\n", macTk );
+        //fprintf( stderr, "getting 1st macro, val = [%s]\n", macTk );
         locExpansions[0] = macTk;
         locNumMacros = 1;
         state = GETTING_MACROS;
@@ -4833,13 +4949,13 @@ char name[127+1], prefix[127+1];
           postMessage( appContextClass_str142 );
 	  return;
 	}
-        //printf( "getting macros, sym = [%s]\n", macTk );
+        //fprintf( stderr, "getting macros, sym = [%s]\n", macTk );
         locMacros[locNumMacros] = macTk;
       }
       
       macTk = strtok_r( NULL, "=,", &macBuf );
       if ( macTk ) {
-        //printf( "getting macros, val = [%s]\n", macTk );
+        //fprintf( stderr, "getting macros, val = [%s]\n", macTk );
         locExpansions[locNumMacros] = macTk;
         locNumMacros++;
       }
@@ -4866,7 +4982,7 @@ char tmpName[127+1], prefix[127+1];
   curFile = fileHead->flink;
   while ( curFile != fileHead ) {
 
-    //printf( "[%s]\n", curFile->file );
+    //fprintf( stderr, "[%s]\n", curFile->file );
 
     doOpen = 1;
     cur = head->flink;
@@ -4881,11 +4997,11 @@ char tmpName[127+1], prefix[127+1];
       getFileName( tmpName, curFile->file, 127 );
       getFilePrefix( prefix, curFile->file, 127 );
 
-      //printf( "crc = %-ud\n", crc );
-      //printf( "cur->node.crc = %-ud\n", cur->node.crc );
-      //printf( "curFile->file = %s\n", tmpName );
-      //printf( "cur->node.displayName = %s\n", cur->node.displayName );
-      //printf( "cur->node.isEmbedded = %-d\n", cur->node.isEmbedded );
+      //fprintf( stderr, "crc = %-ud\n", crc );
+      //fprintf( stderr, "cur->node.crc = %-ud\n", cur->node.crc );
+      //fprintf( stderr, "curFile->file = %s\n", tmpName );
+      //fprintf( stderr, "cur->node.displayName = %s\n", cur->node.displayName );
+      //fprintf( stderr, "cur->node.isEmbedded = %-d\n", cur->node.isEmbedded );
 
       if ( ( strcmp( tmpName, cur->node.displayName ) == 0 ) &&
            ( strcmp( prefix, cur->node.prefix ) == 0 ) &&
@@ -4906,7 +5022,7 @@ char tmpName[127+1], prefix[127+1];
 
     if ( doOpen ) {
 
-      //printf( "Do open\n" );
+      //fprintf( stderr, "Do open\n" );
 
       cur = new activeWindowListType;
       cur->requestDelete = 0;
@@ -5114,7 +5230,7 @@ char msg[127+1];
             stat = cur->node.load();
             if ( cur->requestConvertAndExit ) {
               cur->requestConvertAndExit = 0;
-	      printf( "Converting file [%s]\n", cur->node.fileName );
+	      fprintf( stderr, "Converting file [%s]\n", cur->node.fileName );
               cur->node.save( cur->node.fileName );
               exitFlag = 1;
 	    }
@@ -5229,7 +5345,11 @@ char msg[127+1];
 
     if ( nodeCount ) atLeastOneOpen = 1;
     if ( exitOnLastClose && atLeastOneOpen ) {
-      if ( nodeCount == 0 ) exitFlag = 1;
+      if ( nodeCount == 0 ) {
+        pathList.popdown();
+        exitFlag = 1;
+        if ( diagnosticMode() ) logDiagnostic( "Program exit requested\n" );
+      }
     }
 
     processAllEvents( app, display );
@@ -5305,11 +5425,40 @@ Widget appContextClass::importSelectBoxWidgetId ( void )
 
 }
 
+void appContextClass::setErrMsgPrefix (
+  char *prefix
+) {
+
+  errMsgPrefix = new char[strlen(prefix)+1];
+  strcpy( errMsgPrefix, prefix );
+
+}
+
+void appContextClass::useStdErr (
+  int flag
+) {
+
+  useStdErrFlag = flag;
+
+}
+
 void appContextClass::postMessage (
   char *msg )
 {
 
-  msgBox.addText( msg );
+  if ( useStdErrFlag ) {
+    if ( errMsgPrefix ) {
+      fprintf( stderr, errMsgPrefix );
+    }
+    fprintf( stderr, msg );
+    int l = strlen( msg );
+    if ( !l || ( msg[l-1] != '\n' ) ) {
+      fprintf( stderr, "\n" );
+    }
+  }
+  else {
+    msgBox.addText( msg );
+  }
 
 }
 
@@ -5554,7 +5703,9 @@ void appContextClass::performShutdown (
   if ( !saveContextOnExit ) {
     shutdownFilePtr = f;
     saveContextOnExit = 1;
+    pathList.popdown();
     exitFlag = 1;
+    if ( diagnosticMode() ) logDiagnostic( "Program exit requested\n" );
     //abort_cb( (Widget) NULL, (XtPointer) this, (XtPointer) NULL );
   }
 
@@ -5596,7 +5747,7 @@ int n, stat;
 char *newMacros[100+1];
 char *newValues[100+1];
 
-  //printf( "appContextClass::openCheckPointScreen\n" );
+  //fprintf( stderr, "appContextClass::openCheckPointScreen\n" );
 
   if ( numCheckPointMacros ) {
     stat = parseSymbolsAndValues( checkPointMacros, 100,
@@ -5606,16 +5757,16 @@ char *newValues[100+1];
     n = 0;
   }
 
-  //printf( "screenName = [%s]\n", screenName );
-  //printf( "x = %-d\n", x );
-  //printf( "y = %-d\n", y );
-  //printf( "icon = %-d\n", icon );
-  //printf( "numCheckPointMacros = %-d\n", numCheckPointMacros );
-  //printf( "checkPointMacros = [%s]\n", checkPointMacros );
+  //fprintf( stderr, "screenName = [%s]\n", screenName );
+  //fprintf( stderr, "x = %-d\n", x );
+  //fprintf( stderr, "y = %-d\n", y );
+  //fprintf( stderr, "icon = %-d\n", icon );
+  //fprintf( stderr, "numCheckPointMacros = %-d\n", numCheckPointMacros );
+  //fprintf( stderr, "checkPointMacros = [%s]\n", checkPointMacros );
 
-  //printf( "found %-d macros\n", n );
+  //fprintf( stderr, "found %-d macros\n", n );
   //for ( i=0; i<n; i++ ) {
-  //  printf( "sym=[%s]  val=[%s]\n", newMacros[i], newValues[i] );
+  //  fprintf( stderr, "sym=[%s]  val=[%s]\n", newMacros[i], newValues[i] );
   //}
 
   cur = new activeWindowListType;
@@ -5717,5 +5868,283 @@ actionsPtr curAct;
   XtAppAddActions( app, actions, n );
 
   thread_unlock( actionsLock );
+
+}
+
+void appContextClass::showEnv ( void ) {
+
+char *envPtr, text[255+1];
+
+  snprintf( text, 255, "Environment:" );
+  postMessage( text );
+
+  envPtr = getenv( environment_str2 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str2, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str2 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str3 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str3, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str3 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str4 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str4, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str4 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str5 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str5, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str5 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str7 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str7, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str7 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str8 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str8, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str8 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str9 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str9, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str9 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str10 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str10, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str10 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str11 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str11, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str11 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str12 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str12, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str12 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str13 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str13, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str13 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str14 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str14, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str14 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str15 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str15, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str15 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMCOMMENTS" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMCOMMENTS", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMCOMMENTS" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMHTTPDOCROOT" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMHTTPDOCROOT", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMHTTPDOCROOT" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "CALC_ENV" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "CALC_ENV", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "CALC_ENV" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMCOLORMODE" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMCOLORMODE", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMCOLORMODE" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMPRINTER" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMPRINTER", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMPRINTER" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMSERVERS" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMSERVERS", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMSERVERS" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+
+  // site specific vars
+
+  snprintf( text, 255, " " );
+  postMessage( text );
+  snprintf( text, 255, "  (Site Specific)" );
+  postMessage( text );
+
+  envPtr = getenv( "EDMRDDHS" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMRDDHS", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMRDDHS" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+
+// diagnostic vars
+
+  snprintf( text, 255, " " );
+  postMessage( text );
+  snprintf( text, 255, "  (Diagnostic)" );
+  postMessage( text );
+
+  envPtr = getenv( "EDMSUPERVISORMODE" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMSUPERVISORMODE", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMSUPERVISORMODE" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMGENDOC" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMGENDOC", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMGENDOC" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMDEBUGMODE" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMDEBUGMODE", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMDEBUGMODE" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMDIAGNOSTICMODE" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMDIAGNOSTICMODE", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMDIAGNOSTICMODE" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( "EDMXSYNC" );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", "EDMXSYNC", envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", "EDMXSYNC" );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  snprintf( text, 255, " " );
+  postMessage( text );
 
 }

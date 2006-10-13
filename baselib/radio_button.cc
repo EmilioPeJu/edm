@@ -34,12 +34,15 @@ static char g_dragTrans[] =
    ~Ctrl~Shift<Btn2Down>: startDrag()\n\
    Ctrl~Shift<Btn2Down>: pvInfo()\n\
    Shift~Ctrl<Btn2Down>: dummy()\n\
+   Shift Ctrl<Btn2Down>: dummy()\n\
+   Shift Ctrl<Btn2Up>: selectActions()\n\
    Shift~Ctrl<Btn2Up>: selectDrag()";
 
 static XtActionsRec g_dragActions[] = {
   { "startDrag", (XtActionProc) drag },
   { "pvInfo", (XtActionProc) pvInfo },
   { "dummy", (XtActionProc) dummy },
+  { "selectActions", (XtActionProc) selectActions },
   { "selectDrag", (XtActionProc) selectDrag }
 };
 
@@ -1016,7 +1019,7 @@ int opStat;
            rbt_monitor_control_connect_state, this );
 	}
 	else {
-          printf( activeRadioButtonClass_str20,
+          fprintf( stderr, activeRadioButtonClass_str20,
            controlPvExpStr.getExpanded() );
           opStat = 0;
         }
@@ -1151,6 +1154,23 @@ XButtonEvent *be = (XButtonEvent *) e;
 
 }
 
+static void selectActions (
+   Widget w,
+   XEvent *e,
+   String *params,
+   Cardinal numParams )
+{
+
+activeRadioButtonClass *rbto;
+int stat;
+XButtonEvent *be = (XButtonEvent *) e;
+
+  XtVaGetValues( w, XmNuserData, &rbto, NULL );
+
+  rbto->doActions( be, be->x, be->y );
+
+}
+
 static void pvInfo (
    Widget w,
    XEvent *e,
@@ -1281,7 +1301,8 @@ char msg[79+1];
        XmNindicatorOn, XmINDICATOR_CHECK_BOX,
        XmNtranslations, g_parsedTrans,
        XmNuserData, this,
-       XmNspacing, 0,
+       XmNmarginHeight, 0,
+       XmNmarginWidth, 0,
        XmNselectColor, actWin->ci->pix(selectColor),
        NULL );
 
@@ -1532,6 +1553,20 @@ void activeRadioButtonClass::getPvs (
 
   *n = 1;
   pvs[0] = controlPvId;
+
+}
+
+// crawler functions may return blank pv names
+char *activeRadioButtonClass::crawlerGetFirstPv ( void ) {
+
+  crawlerPvIndex = 0;
+  return controlPvExpStr.getExpanded();
+
+}
+
+char *activeRadioButtonClass::crawlerGetNextPv ( void ) {
+
+  return NULL;
 
 }
 

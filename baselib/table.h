@@ -27,7 +27,7 @@
 
 #define TABLEC_MAJOR_VERSION 4
 #define TABLEC_MINOR_VERSION 0
-#define TABLEC_RELEASE 0
+#define TABLEC_RELEASE 1
 
 #ifdef __table_cc
 
@@ -275,6 +275,10 @@ void getPvs (
   int max,
   ProcessVariable *pvs[],
   int *n );
+
+char *crawlerGetFirstPv ( void );
+
+char *crawlerGetNextPv ( void );
 
 };
 

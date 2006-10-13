@@ -7,8 +7,10 @@ ifdef EPICS_HOST_ARCH
   USE_CURL=NO
 
   ifeq ($(USE_CURL), YES)
+        USR_CXXFLAGS_Darwin += -DUSECURL -DSINGLE_THREADED=1 -D__epics__=1 -pedantic
         USR_CXXFLAGS_Linux += -DUSECURL -DSINGLE_THREADED=1 -D__epics__=1 -pedantic
   else
+        USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
         USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
   endif
 
@@ -16,11 +18,64 @@ ifdef EPICS_HOST_ARCH
   #USR_CXXFLAGS_Linux += -g -O0
 
   ifeq ($(USE_CURL), YES)
+        EdmLib_SYS_LIBS_Darwin = Xm Xt Xp Xtst X11 pthread dl curl
         EdmLib_SYS_LIBS_Linux = Xm Xt Xp Xtst X11 pthread dl curl
   else
+        EdmLib_SYS_LIBS_Darwin = Xm Xt Xp Xtst X11 pthread dl
         EdmLib_SYS_LIBS_Linux = Xm Xt Xp Xtst X11 pthread dl
   endif
 
+  INSTALL_INCLUDE = $(TOP)/include/edm
+  INC += act_grf.h
+  INC += act_win.h
+  INC += app_pkg.h
+  INC += bindings.h
+  INC += btnActionListType.h
+  INC += calc_pv_factory.h
+  INC += calpad.h
+  INC += clipbd.h
+  INC += color_button.h
+  INC += color_helper.h
+  INC += color_list.h
+  INC += color_pkg.h
+  INC += confirm_dialog.h
+  INC += cursor.h
+  INC += dl_list.h
+  INC += dynSymbol.h
+  INC += edmPrint.h
+  INC += entry_form.h
+  INC += epics_pv_factory.h
+  INC += expString.h
+  INC += fileSelect.h
+  INC += font_menu.h
+  INC += font_pkg.h
+  INC += gc_pkg.h
+  INC += group.h
+  INC += hashtable.h
+  INC += keypad.h
+  INC += loc_pv_factory.h
+  INC += msg_dialog.h
+  INC += postfix.h
+  INC += postfixPvt.h
+  INC += process.h
+  INC += pvBindings.h
+  INC += pvColor.h
+  INC += pvConnection.h
+  INC += pv_factory.h
+  INC += remFileOpen.h
+  INC += scheme.h
+  INC += scrolled_list.h
+  INC += scrolled_text.h
+  INC += symbol.h
+  INC += tableObj.h
+  INC += tag_pkg.h
+  INC += ulBindings.h
+  INC += undo.h
+  INC += utility.h
+  INC += path_list.h
+  INC += crawler.h
+  INC += lookup.h
+  INC += pv_action.h
 
   USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
   USR_LIBS_solaris = Xm Xt Xmu X11 Xext pthread dl rt
@@ -39,14 +94,8 @@ ifdef EPICS_HOST_ARCH
 
   PROD_LIBS += ca Com
 
-  USR_INCLUDES = -I../ -I../../util -I../../pvlib
-  USR_INCLUDES += -I$(TOP)/include/sys/linux
-  USR_INCLUDES += -I$(TOP)/include/net/linux
-  USR_INCLUDES += -I$(TOP)/include/msg
-  USR_INCLUDES += -I$(TOP)/include/thread/linux
-  USR_INCLUDES += -I$(TOP)/include/iprpc/osf
-  USR_INCLUDES += -I$(TOP)/include/avl
-  USR_INCLUDES += -I$(TOP)/include/crc
+  USR_INCLUDES = -I../
+  USR_INCLUDES += -I$(TOP)/include/edm -I../../util -I../../lib -I../../pvlib
   
   USR_INCLUDES += -I$(MOTIF_INC) -I$(X11_INC)
 
@@ -110,6 +159,11 @@ ifdef EPICS_HOST_ARCH
   LIB_SRCS += remFileOpen.cc
   LIB_SRCS += tableObj.cc
   LIB_SRCS += scrolledWAcceleratorSupport.c
+  LIB_SRCS += postfix.c
+  LIB_SRCS += path_list.cc
+  LIB_SRCS += crawler.cc
+  LIB_SRCS += lookup.cc
+  LIB_SRCS += pv_action.cc
 
   include $(TOP)/configure/RULES
 

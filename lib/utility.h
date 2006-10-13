@@ -21,13 +21,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
-#include <sys/types.h>
-#include <wait.h>
+#include <sys/time.h>
+
+#if defined(darwin) || defined(HP_UX)
+	#include <sys/wait.h>
+#else
+	#include <wait.h>
+#endif
+
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <X11/Xlib.h>
 #include <Xm/Xm.h>
@@ -39,6 +48,12 @@
 
 int debugMode ( void );
 
+int diagnosticMode ( void );
+
+int logDiagnostic (
+  char *text
+);
+
 char *getEnvironmentVar (
   char *name
 );
@@ -49,6 +64,10 @@ void setServerSocketFd (
 
 int executeCmd (
   const char *cmdString
+);
+
+void executeCommandInThread (
+  char *_cmd
 );
 
 char *expandEnvVars (

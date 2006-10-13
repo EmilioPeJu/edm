@@ -35,7 +35,7 @@ activeSymbolClass *aso;
 undoSymbolOpClass ()
 {
 
-  printf( "undoSymbolOpClass::undoSymbolOpClass\n" );
+  fprintf( stderr, "undoSymbolOpClass::undoSymbolOpClass\n" );
   aso = NULL;
 
 }
@@ -47,7 +47,7 @@ undoSymbolOpClass (
 int i;
 activeGraphicListPtr head, cur, next, sourceHead, curSource;
 
-  // printf( "undoSymbolOpClass::undoSymbolOpClass\n" );
+  // fprintf( stderr, "undoSymbolOpClass::undoSymbolOpClass\n" );
 
   // copy display list and editable attributes from current symbol
   aso = new activeSymbolClass;
@@ -494,7 +494,10 @@ int stat, resizeStat, i, saveW, saveH, saveX, saveY;
   aso->prevOr = aso->orientation;
 
   if ( !( stat & 1 ) ) {
-    aso->actWin->appCtx->postMessage( activeSymbolClass_str8 );
+    char msg[255+1];
+    snprintf( msg, 255, activeSymbolClass_str8, aso->actWin->fileName,
+     aso->symbolFileName );
+    aso->actWin->appCtx->postMessage( msg );
   }
   else {
 
@@ -660,7 +663,7 @@ int i;
 
 activeSymbolClass::~activeSymbolClass ( void ) {
 
-//   printf( "In activeSymbolClass::~activeSymbolClass\n" );
+//   fprintf( stderr, "In activeSymbolClass::~activeSymbolClass\n" );
 
 activeGraphicListPtr head;
 activeGraphicListPtr cur, next;
@@ -1067,7 +1070,7 @@ int visInverted;
     // for forward compatibility
     stat = actWin->readUntilEndOfData( f, winMajor, winMinor, winRelease );
     if ( !( stat & 1 ) ) {
-      fclose( f );
+      fileClose( f );
       actWin->setLine( saveLine );
       tagClass::popLevel();
       return stat;
@@ -1085,13 +1088,13 @@ int visInverted;
       if ( !gotOne ) {
         if ( i == 0 ) {
           // numStates = 0;
-          fclose( f );
+          fileClose( f );
           actWin->setLine( saveLine );
           tagClass::popLevel();
           return 0;
         }
         numStates = i+1;
-        fclose( f );
+        fileClose( f );
         actWin->setLine( saveLine );
         tagClass::popLevel();
         return 1;
@@ -1100,7 +1103,7 @@ int visInverted;
       tk = strtok( itemName, " \t\n" );
       if ( strcmp( tk, "activeGroupClass" ) != 0 ) {
         // numStates = 0;
-        fclose( f );
+        fileClose( f );
         actWin->setLine( saveLine );
         tagClass::popLevel();
         return 0;
@@ -1126,7 +1129,7 @@ int visInverted;
         gotOne = fgets( itemName, 127, f );
         if ( !gotOne ) {
           // numStates = 0;
-          fclose( f );
+          fileClose( f );
           actWin->setLine( saveLine );
           tagClass::popLevel();
           return 0;
@@ -1145,8 +1148,8 @@ int visInverted;
 
           cur = new activeGraphicListType;
           if ( !cur ) {
-            fclose( f );
-            printf( activeSymbolClass_str20 );
+            fileClose( f );
+            fprintf( stderr, activeSymbolClass_str20 );
             // numStates = 0;
             actWin->setLine( saveLine );
             tagClass::popLevel();
@@ -1163,7 +1166,7 @@ int visInverted;
             stat = actWin->readUntilEndOfData( f, winMajor, winMinor,
              winRelease );
             if ( !( stat & 1 ) ) {
-              fclose( f );
+              fileClose( f );
               actWin->setLine( saveLine );
               tagClass::popLevel();
               return stat;
@@ -1179,8 +1182,8 @@ int visInverted;
 
           }
           else {
-            fclose( f );
-            printf( activeSymbolClass_str21 );
+            fileClose( f );
+            fprintf( stderr, activeSymbolClass_str21 );
             // numStates = 0;
             actWin->setLine( saveLine );
             tagClass::popLevel();
@@ -1194,7 +1197,7 @@ int visInverted;
       // for forward compatibility
       stat = actWin->readUntilEndOfData( f, winMajor, winMinor, winRelease );
       if ( !( stat & 1 ) ) {
-        fclose( f );
+        fileClose( f );
         actWin->setLine( saveLine );
         tagClass::popLevel();
         return stat;
@@ -1220,7 +1223,7 @@ int visInverted;
 
       if ( gotOne ) {
 
-        //printf( "name = [%s]\n", tagName );
+        //fprintf( stderr, "name = [%s]\n", tagName );
 
         if ( strcmp( tagName, "object" ) == 0 ) {
 
@@ -1229,7 +1232,7 @@ int visInverted;
 
           if ( strcmp( itemName, "activeGroupClass" ) != 0 ) {
             //numStates = 0;
-            fclose( f );
+            fileClose( f );
             tag.setLine( saveLine );
             tagClass::popLevel();
             return 0;
@@ -1239,7 +1242,7 @@ int visInverted;
         }
         else {
           //numStates = 0;
-          fclose( f );
+          fileClose( f );
           tag.setLine( saveLine );
           tagClass::popLevel();
           return 0;
@@ -1251,7 +1254,7 @@ int visInverted;
 
         if ( i == 0 ) {
           //numStates = 0;
-          fclose( f );
+          fileClose( f );
           tag.setLine( saveLine );
           tagClass::popLevel();
           return 0;
@@ -1308,7 +1311,7 @@ int visInverted;
         gotOne = tag.getName( tagName, 255, f );
         if ( !gotOne ) {
           //numStates = 0;
-          fclose( f );
+          fileClose( f );
           tag.setLine( saveLine );
           tagClass::popLevel();
           return 0;
@@ -1316,7 +1319,7 @@ int visInverted;
 
         if ( gotOne ) {
 
-          //printf( "name = [%s]\n", tagName );
+          //fprintf( stderr, "name = [%s]\n", tagName );
 
           if ( strcmp( tagName, "object" ) == 0 ) {
 
@@ -1326,16 +1329,16 @@ int visInverted;
             // =======================================================
             // Create object
 
-            //printf( "objName = [%s]\n", itemName );
+            //fprintf( stderr, "objName = [%s]\n", itemName );
 
             more = 1;
 
             cur = new activeGraphicListType;
             if ( !cur ) {
-              fclose( f );
-              printf( "Insufficient virtual memory - abort\n" );
+              fileClose( f );
+              fprintf( stderr, "Insufficient virtual memory - abort\n" );
               //numStates = 0;
-              fclose( f );
+              fileClose( f );
               tag.setLine( saveLine );
 	      tagClass::popLevel();
               return 0;
@@ -1358,8 +1361,8 @@ int visInverted;
             }
             else {
 
-              fclose( f );
-              printf( "Insufficient virtual memory - abort\n" );
+              fileClose( f );
+              fprintf( stderr, "Insufficient virtual memory - abort\n" );
               //numStates = 0;
               tag.setLine( saveLine );
 	      tagClass::popLevel();
@@ -1375,7 +1378,7 @@ int visInverted;
           }
           else {
             //numStates = 0;
-            fclose( f );
+            fileClose( f );
             tag.setLine( saveLine );
 	    tagClass::popLevel();
             return 0;
@@ -1404,7 +1407,7 @@ int visInverted;
 
   }
 
-  fclose( f );
+  fileClose( f );
 
   w = maxW;
   sboxW = w;
@@ -1469,7 +1472,7 @@ expStringClass expStr;
   // for forward compatibility
   stat = actWin->readUntilEndOfData( f, winMajor, winMinor, winRelease );
   if ( !( stat & 1 ) ) {
-    fclose( f );
+    fileClose( f );
     actWin->setLine( saveLine );
     return stat;
   }
@@ -1486,12 +1489,12 @@ expStringClass expStr;
     if ( !gotOne ) {
       if ( i == 0 ) {
         // numStates = 0;
-        fclose( f );
+        fileClose( f );
         actWin->setLine( saveLine );
         return 0;
       }
       numStates = i+1;
-      fclose( f );
+      fileClose( f );
       actWin->setLine( saveLine );
       return 1;
     }
@@ -1499,7 +1502,7 @@ expStringClass expStr;
     tk = strtok( itemName, " \t\n" );
     if ( strcmp( tk, "activeGroupClass" ) != 0 ) {
       // numStates = 0;
-      fclose( f );
+      fileClose( f );
       actWin->setLine( saveLine );
       return 0;
     }
@@ -1524,7 +1527,7 @@ expStringClass expStr;
       gotOne = fgets( itemName, 127, f );
       if ( !gotOne ) {
         // numStates = 0;
-        fclose( f );
+        fileClose( f );
         actWin->setLine( saveLine );
         return 0;
       }
@@ -1542,8 +1545,8 @@ expStringClass expStr;
 
         cur = new activeGraphicListType;
         if ( !cur ) {
-          fclose( f );
-          printf( activeSymbolClass_str20 );
+          fileClose( f );
+          fprintf( stderr, activeSymbolClass_str20 );
           // numStates = 0;
           actWin->setLine( saveLine );
           return 0;
@@ -1559,7 +1562,7 @@ expStringClass expStr;
           stat = actWin->readUntilEndOfData( f, winMajor, winMinor,
            winRelease );
           if ( !( stat & 1 ) ) {
-            fclose( f );
+            fileClose( f );
             actWin->setLine( saveLine );
             return stat;
 	  }
@@ -1574,8 +1577,8 @@ expStringClass expStr;
 
         }
         else {
-          fclose( f );
-          printf( activeSymbolClass_str21 );
+          fileClose( f );
+          fprintf( stderr, activeSymbolClass_str21 );
           // numStates = 0;
           actWin->setLine( saveLine );
           return 0;
@@ -1588,14 +1591,14 @@ expStringClass expStr;
     // for forward compatibility
     stat = actWin->readUntilEndOfData( f, winMajor, winMinor, winRelease );
     if ( !( stat & 1 ) ) {
-      fclose( f );
+      fileClose( f );
       actWin->setLine( saveLine );
       return stat;
     }
 
   }
 
-  fclose( f );
+  fileClose( f );
 
   w = maxW;
   sboxW = w;
@@ -1938,7 +1941,10 @@ int resizeStat, readSymfileStat, i, n1, n2, saveW, saveH;
 
   readSymfileStat = readSymbolFile();
   if ( !( readSymfileStat & 1 ) ) {
-    actWin->appCtx->postMessage( activeSymbolClass_str22 );
+    char msg[255+1];
+    snprintf( msg, 255, activeSymbolClass_str22, actWin->fileName,
+     symbolFileName );
+    actWin->appCtx->postMessage( msg );
   }
   else {
     if ( !useOriginalSize ) {
@@ -2115,7 +2121,10 @@ float val;
 
   stat = readSymbolFile();
   if ( !( stat & 1 ) ) {
-    actWin->appCtx->postMessage( activeSymbolClass_str22 );
+    char msg[255+1];
+    snprintf( msg, 255, activeSymbolClass_str22, actWin->fileName,
+     symbolFileName );
+    actWin->appCtx->postMessage( msg );
   }
   else {
     if ( !useOriginalSize ) {
@@ -2524,7 +2533,7 @@ int num;
              symbol_monitor_control_connect_state, &argRec[i] );
 	  }
 	  else {
-            printf( activeSymbolClass_str24 );
+            fprintf( stderr, activeSymbolClass_str24 );
             opStat = 0;
           }
 
@@ -2547,7 +2556,7 @@ int num;
             symbol_monitor_color_connect_state, this );
 	}
 	else {
-          printf( activeSymbolClass_str24 );
+          fprintf( stderr, activeSymbolClass_str24 );
           opStat = 0;
         }
 
@@ -4461,5 +4470,29 @@ int i;
     pvs[i] = controlPvId[i];
   }
   pvs[i] = colorPvId;
+
+}
+
+// crawler functions may return blank pv names
+char *activeSymbolClass::crawlerGetFirstPv ( void ) {
+
+  crawlerPvIndex = 0;
+  return controlPvExpStr[0].getExpanded();
+
+}
+
+char *activeSymbolClass::crawlerGetNextPv ( void ) {
+
+  crawlerPvIndex++;
+
+  if ( crawlerPvIndex < SYMBOL_K_MAX_PVS ) {
+    return controlPvExpStr[crawlerPvIndex].getExpanded();
+  }
+  else if ( crawlerPvIndex == SYMBOL_K_MAX_PVS ) {
+    return colorPvExpStr.getExpanded();
+  }
+  else {
+    return NULL;
+  }
 
 }

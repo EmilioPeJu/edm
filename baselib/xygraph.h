@@ -99,7 +99,7 @@
 #define XYGC_K_PLOT_SORTED_X_MODE 1
 
 #define XYGC_MAJOR_VERSION 4
-#define XYGC_MINOR_VERSION 1
+#define XYGC_MINOR_VERSION 3
 #define XYGC_RELEASE 0
 
 #ifdef __xygraph_cc
@@ -857,7 +857,7 @@ time_t timeOffset;
 
 int widgetsCreated;
 Widget popUpMenu, pullDownMenu, pbAutoScale, pbOrigScale, pbAdjustParams,
- pbDumpData;
+ pbDumpData, pbClearPlot;
 
 int adjpFormX, adjpFormY, adjpFormW, adjpFormH, adjpFormMaxH;
 
@@ -1086,6 +1086,10 @@ void getPvs (
   int max,
   ProcessVariable *pvs[],
   int *n );
+
+char *crawlerGetFirstPv ( void );
+
+char *crawlerGetNextPv ( void );
 
 };
 

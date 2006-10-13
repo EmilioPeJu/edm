@@ -38,6 +38,12 @@ static void *shellCmdThread (
 {
 #endif
 
+#ifdef darwin
+static void *shellCmdThread (
+  THREAD_HANDLE h )
+{
+#endif
+
 #ifdef __solaris__
 static void *shellCmdThread (
   THREAD_HANDLE h )
@@ -67,13 +73,13 @@ threadParamBlockPtr threadParamBlock =
   stat = executeCmd( threadParamBlock->cmd );
 
   if ( threadParamBlock->multipleInstancesAllowed ) {
-    delete threadParamBlock->cmd;
-    delete threadParamBlock;
+    stat = thread_request_free_ptr( (void *) threadParamBlock->cmd );
+    stat = thread_request_free_ptr( (void *) threadParamBlock );
     stat = thread_detached_exit( h, NULL ); // this call deallocates h
   }
   else {
-    delete threadParamBlock->cmd;
-    delete threadParamBlock;
+    stat = thread_request_free_ptr( (void *) threadParamBlock->cmd );
+    stat = thread_request_free_ptr( (void *) threadParamBlock );
     stat = thread_exit( h, NULL ); // this requires a join
   }
 
@@ -81,6 +87,10 @@ threadParamBlockPtr threadParamBlock =
   return (void *) NULL;
 #endif
 
+#ifdef darwin
+  return (void *) NULL;
+#endif
+  
 #ifdef __solaris__
   return (void *) NULL;
 #endif
@@ -215,13 +225,14 @@ char buffer[255+1];
 
   i = 0; // this is called from an X timer, always use command index 0
 
-  if ( shcmdo->timerActive ) {
+  if ( !shcmdo->timerActive ) {
+    return;
+  }
+
+  if ( shcmdo->timerActive && !shcmdo->oneShot ) {
     shcmdo->timer = appAddTimeOut(
      shcmdo->actWin->appCtx->appContext(),
      shcmdo->timerValue, shcmdc_executeCmd, client );
-  }
-  else {
-    return;
   }
 
   shcmdo->actWin->substituteSpecial( 255,
@@ -229,9 +240,9 @@ char buffer[255+1];
    buffer );
 
   if ( shcmdo->multipleInstancesAllowed ) {
-    threadParamBlock = new threadParamBlockType;
-    threadParamBlock->cmd =
-     new char[strlen(buffer)+1];
+    threadParamBlock =
+     (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+    threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
     strcpy( threadParamBlock->cmd, buffer );
     threadParamBlock->multipleInstancesAllowed =
      shcmdo->multipleInstancesAllowed;
@@ -244,10 +255,10 @@ char buffer[255+1];
     if ( shcmdo->thread ) {
       stat = thread_wait_til_complete_no_block( shcmdo->thread );
       if ( stat & 1 ) {
-        stat = thread_destroy_handle( shcmdo->thread );
-        threadParamBlock = new threadParamBlockType;
-        threadParamBlock->cmd =
-         new char[strlen(buffer)+1];
+        thread_request_free_handle( shcmdo->thread );
+        threadParamBlock =
+         (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+        threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
         strcpy( threadParamBlock->cmd, buffer );
         threadParamBlock->multipleInstancesAllowed =
          shcmdo->multipleInstancesAllowed;
@@ -258,9 +269,9 @@ char buffer[255+1];
       }
     }
     else {
-      threadParamBlock = new threadParamBlockType;
-      threadParamBlock->cmd =
-       new char[strlen(buffer)+1];
+      threadParamBlock =
+       (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+      threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
       strcpy( threadParamBlock->cmd, buffer );
       threadParamBlock->multipleInstancesAllowed =
        shcmdo->multipleInstancesAllowed;
@@ -383,6 +394,12 @@ int i;
   strncpy( shcmdo->requiredHostName, shcmdo->buf->bufRequiredHostName, 15 );
   shcmdo->requiredHostName[15] = 0;
 
+  shcmdo->oneShot = shcmdo->buf->bufOneShot;
+
+  shcmdo->swapButtons = shcmdo->buf->bufSwapButtons;
+
+  shcmdo->includeHelpIcon = shcmdo->buf->bufIncludeHelpIcon;
+
   shcmdo->updateDimensions();
 
 }
@@ -471,6 +488,9 @@ shellCmdClass::shellCmdClass ( void ) {
   strcpy( pw, "" );
   usePassword = 0;
   lock = 0;
+  oneShot = 0;
+  swapButtons = 0;
+  includeHelpIcon = 0;
   numCmds = 0;
   cmdIndex = 0;
   buf = NULL;
@@ -539,6 +559,12 @@ int i;
   strcpy( pw, source->pw );
   usePassword = source->usePassword;
   lock = source->lock;
+
+  oneShot = source->oneShot;
+
+  swapButtons = source->swapButtons;
+
+  includeHelpIcon = source->includeHelpIcon;
 
   numCmds = source->numCmds;
   cmdIndex = 0;
@@ -625,12 +651,15 @@ char *emptyStr = "";
   tag.loadW( "initialDelay", &threadSecondsToDelay, &dzero );
   tag.loadW( "password", pw, emptyStr );
   tag.loadBoolW( "lock", &lock, &zero );
+  tag.loadBoolW( "oneShot", &oneShot, &zero );
+  tag.loadBoolW( "swapButtons", &swapButtons, &zero );
   tag.loadBoolW( "multipleInstances", &multipleInstancesAllowed,
    &zero );
   tag.loadW( "requiredHostName", requiredHostName, emptyStr );
   tag.loadW( "numCmds", &numCmds );
   tag.loadW( "commandLabel", label, numCmds, emptyStr );
   tag.loadW( "command", shellCommand, numCmds, emptyStr );
+  tag.loadBoolW( "includeHelpIcon", &includeHelpIcon, &zero );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -761,11 +790,14 @@ char *emptyStr = "";
   tag.loadR( "initialDelay", &threadSecondsToDelay, &dzero );
   tag.loadR( "password", 31, pw, emptyStr );
   tag.loadR( "lock", &lock, &zero );
+  tag.loadR( "oneShot", &oneShot, &zero );
+  tag.loadR( "swapButtons", &swapButtons, &zero );
   tag.loadR( "multipleInstances", &multipleInstancesAllowed, &zero );
   tag.loadR( "requiredHostName", 15, requiredHostName, emptyStr );
   tag.loadR( "numCmds", &numCmds, &zero );
   tag.loadR( "commandLabel", maxCmds, label, &n, emptyStr );
   tag.loadR( "command", maxCmds, shellCommand, &n, emptyStr );
+  tag.loadR( "includeHelpIcon", &includeHelpIcon, &zero );
   tag.loadR( "endObjectProperties" );
 
   stat = tag.readTags( f, "endObjectProperties" );
@@ -837,6 +869,9 @@ float val;
   fscanf( f, "%d\n", &h ); actWin->incLine();
 
   this->initSelectBox(); // call after getting x,y,w,h
+
+  swapButtons = 0;
+  includeHelpIcon = 0;
 
   if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 2 ) ) ) {
 
@@ -1021,6 +1056,9 @@ char *tk, *gotData, *context, buffer[255+1];
 
   fgColor.setColorIndex( actWin->defaultTextFgColor, actWin->ci );
   bgColor.setColorIndex( actWin->defaultBgColor, actWin->ci );
+
+  swapButtons = 0;
+  includeHelpIcon = 0;
 
   // continue until tag is <eod>
 
@@ -1335,6 +1373,12 @@ char title[32], *ptr, *envPtr, saveLock;
   strncpy( buf->bufRequiredHostName, requiredHostName, 15 );
   buf->bufRequiredHostName[15] = 0;
 
+  buf->bufOneShot = oneShot;
+
+  buf->bufSwapButtons = swapButtons;
+
+  buf->bufIncludeHelpIcon = includeHelpIcon;
+
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
@@ -1399,6 +1443,9 @@ char title[32], *ptr, *envPtr, saveLock;
   ef.addToggle( shellCmdClass_str17, &buf->bufMultipleInstancesAllowed );
   ef.addTextField( shellCmdClass_str20, 35, &buf->bufThreadSecondsToDelay );
   ef.addTextField( shellCmdClass_str18, 35, &buf->bufAutoExecInterval );
+  ef.addToggle( shellCmdClass_str33, &buf->bufOneShot );
+  ef.addToggle( shellCmdClass_str34, &buf->bufSwapButtons );
+  ef.addToggle( shellCmdClass_str35, &buf->bufIncludeHelpIcon );
 
   ef.addColorButton( shellCmdClass_str8, actWin->ci, &fgCb, &buf->bufFgColor );
   ef.addColorButton( shellCmdClass_str9, actWin->ci, &bgCb, &buf->bufBgColor );
@@ -1687,10 +1734,10 @@ XmString str;
 
       if ( numCmds == 1 ) {
         cmdIndex = 0;
-        if ( autoExecInterval > 0.5 ) {
+        if ( oneShot || ( autoExecInterval > 0.5 ) ) {
           timerValue = (int) ( autoExecInterval * 1000.0 );
           timer = appAddTimeOut( actWin->appCtx->appContext(),
-           timerValue, shcmdc_executeCmd, this );
+           0, shcmdc_executeCmd, this );
           timerActive = 1;
         }
       }
@@ -1758,7 +1805,6 @@ int stat;
     if ( thread ) {
       if ( !multipleInstancesAllowed ) {
         stat = thread_detach( thread );
-        stat = thread_destroy_handle( thread );
         thread = NULL;
       }
     }
@@ -1848,6 +1894,17 @@ void shellCmdClass::btnUp (
 
   if ( !enabled ) return;
 
+  if ( swapButtons ) {
+    if ( buttonNumber == 1 ) {
+      buttonNumber = 3;
+    }
+    else if ( buttonNumber == 3 ) {
+      buttonNumber = 1;
+    }
+  }
+
+  if ( buttonNumber != 1 ) return;
+
   if ( numCmds < 2 ) return;
 
   XmMenuPosition( popUpMenu, be );
@@ -1873,9 +1930,9 @@ char buffer[255+1];
    buffer );
 
   if ( multipleInstancesAllowed ) {
-
-    threadParamBlock = new threadParamBlockType;
-    threadParamBlock->cmd = new char[strlen(buffer)+1];
+    threadParamBlock =
+     (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+    threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
     strcpy( threadParamBlock->cmd, buffer );
     threadParamBlock->multipleInstancesAllowed =
      multipleInstancesAllowed;
@@ -1894,9 +1951,10 @@ char buffer[255+1];
         actWin->appCtx->postMessage( shellCmdClass_str19 );
       }
       else {
-        stat = thread_destroy_handle( thread );
-        threadParamBlock = new threadParamBlockType;
-        threadParamBlock->cmd = new char[strlen(buffer)+1];
+        thread_request_free_handle( thread );
+        threadParamBlock =
+         (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+        threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
         strcpy( threadParamBlock->cmd, buffer );
         threadParamBlock->multipleInstancesAllowed =
          multipleInstancesAllowed;
@@ -1908,8 +1966,9 @@ char buffer[255+1];
     }
     else {
 
-      threadParamBlock = new threadParamBlockType;
-      threadParamBlock->cmd = new char[strlen(buffer)+1];
+      threadParamBlock =
+       (threadParamBlockPtr) calloc( 1, sizeof(threadParamBlockType) );
+      threadParamBlock->cmd = (char *) calloc( strlen(buffer)+1, 1 );
       strcpy( threadParamBlock->cmd, buffer );
       threadParamBlock->multipleInstancesAllowed =
        multipleInstancesAllowed;
@@ -1935,6 +1994,15 @@ void shellCmdClass::btnDown (
   if ( !enabled ) {
     *action = 0;
     return;
+  }
+
+  if ( swapButtons ) {
+    if ( buttonNumber == 1 ) {
+      buttonNumber = 3;
+    }
+    else if ( buttonNumber == 3 ) {
+      buttonNumber = 1;
+    }
   }
 
   if ( buttonNumber != 1 ) return;
@@ -1997,6 +2065,28 @@ void shellCmdClass::btnDown (
 
     *action = 0;
 
+  }
+
+}
+
+void shellCmdClass::pointerIn (
+  XMotionEvent *me,
+  int _x,
+  int _y,
+  int buttonState )
+{
+
+  if ( !enabled ) return;
+
+  activeGraphicClass::pointerIn( me, me->x, me->y, buttonState );
+
+  if ( includeHelpIcon ) {
+    actWin->cursor.set( XtWindow(actWin->executeWidget),
+     CURSOR_K_RUN_WITH_HELP );
+  }
+  else {
+    actWin->cursor.set( XtWindow(actWin->executeWidget),
+     CURSOR_K_RUN );
   }
 
 }

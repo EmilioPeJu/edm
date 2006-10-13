@@ -4,60 +4,54 @@ include $(TOP)/configure/CONFIG
 
 USR_CFLAGS += -D__osf__=1
 
-USR_INCLUDES += -I$(TOP)/include/sys/linux
-USR_INCLUDES += -I$(TOP)/include/net/linux
-USR_INCLUDES += -I$(TOP)/include/msg
-USR_INCLUDES += -I$(TOP)/include/thread/linux
-USR_INCLUDES += -I$(TOP)/include/iprpc/osf
-USR_INCLUDES += -I$(TOP)/include/avl
-USR_INCLUDES += -I$(TOP)/include/crc
+ifeq ($(EPICS_HOST_ARCH),$(T_A))
+INSTALL_INCLUDE = $(TOP)/include/edm
 
-#INSTALL_INCLUDE = $(TOP)/src/edm/include
-INC += sys/linux/os.h
-INC += sys/linux/os_objs.h
-INC += sys/linux/sys_types.h
-INC += sys/linux/os_priv.h
-
-INC += net/linux/ipncl.h
-INC += net/linux/ipncl_priv.h
-INC += net/linux/ipnsv.h
-INC += net/linux/ipnsv_priv.h
-INC += net/linux/ipport.h
-INC += net/linux/ipport_priv.h
-INC += net/linux/ipnis.h
-INC += net/linux/ipnis_priv.h
-
-INC += msg/msg.h
-INC += msg/msg_priv.h
-
-INC += thread/linux/thread.h
-INC += thread/linux/thread_priv.h
-
-INC += iprpc/osf/client_iprpc.h
-INC += iprpc/osf/iprpc.h
-INC += iprpc/osf/iprpc_priv.h
-INC += iprpc/osf/server_iprpc_priv.h
-INC += iprpc/osf/client_iprpc_priv.h
-INC += iprpc/osf/server_iprpc.h
-
-INC += avl/avl.h
-INC += avl/avl_priv.h
-
-INC += crc/crc.h
+SRC_DIRS += ../sys/$(OS_CLASS)
+INC += os.h
+INC += os_objs.h
+INC += sys_types.h
+INC += os_priv.h
 
 
+SRC_DIRS += ../net/$(OS_CLASS)
+INC += ipncl.h
+INC += ipncl_priv.h
+INC += ipnsv.h
+INC += ipnsv_priv.h
+INC += ipport.h
+INC += ipport_priv.h
+INC += ipnis.h
+INC += ipnis_priv.h
 
+SRC_DIRS += ../msg
+INC += msg.h
+INC += msg_priv.h
+
+
+SRC_DIRS += ../thread/$(OS_CLASS)
+INC += thread.h
+INC += thread_priv.h
+
+
+SRC_DIRS += ../iprpc/osf
+INC += client_iprpc.h
+INC += iprpc.h
+INC += iprpc_priv.h
+INC += server_iprpc_priv.h
+INC += client_iprpc_priv.h
+INC += server_iprpc.h
+
+SRC_DIRS += ../avl
+INC += avl.h
+INC += avl_priv.h
+
+SRC_DIRS += ../crc
+INC += crc.h
+endif
 
 LIBRARY_HOST += EdmUtil
 LIB_LIB += EdmUtil
-
-SRC_DIRS += ../net/linux
-SRC_DIRS += ../sys/linux
-SRC_DIRS += ../msg
-SRC_DIRS += ../thread/linux
-SRC_DIRS += ../iprpc/osf
-SRC_DIRS += ../avl
-SRC_DIRS += ../crc
 
 LIB_SRCS += ipncl_pkg.c
 LIB_SRCS += ipnsv_pkg.c

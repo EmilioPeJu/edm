@@ -3,11 +3,16 @@ ifdef EPICS_HOST_ARCH
   include $(TOP)/configure/CONFIG
 
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
+   USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
    # Add Debugging
    #USR_CXXFLAGS_Linux += -g -O0
    edmMain_LIBS_Linux += EdmBase EdmLib 
    edmMain_LIBS_Linux += EdmUtil
    edmMain_SYS_LIBS_Linux += Xm Xmu Xt Xp Xtst X11 pthread dl
+   
+   edm_LIBS_Darwin += EdmBase EdmLib 
+   edm_LIBS_Darwin += EdmUtil
+   edm_SYS_LIBS_Darwin += Xm Xmu Xt Xp Xtst X11 pthread dl
    
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
    USR_LIBS_solaris = EdmBase EdmLib EdmUtil Xm Xt Xmu X11 Xext pthread dl rt
@@ -22,14 +27,9 @@ ifdef EPICS_HOST_ARCH
    
    PROD_LIBS += ca Com
    
-   USR_INCLUDES = -I../ -I../../util -I../../pvlib -I../../lib
-   USR_INCLUDES += -I$(TOP)/include/sys/linux
-   USR_INCLUDES += -I$(TOP)/include/net/linux
-   USR_INCLUDES += -I$(TOP)/include/msg
-   USR_INCLUDES += -I$(TOP)/include/thread/linux
-   USR_INCLUDES += -I$(TOP)/include/iprpc/osf
-   USR_INCLUDES += -I$(TOP)/include/avl
-   USR_INCLUDES += -I$(TOP)/include/crc
+   USR_INCLUDES = -I../ 
+   USR_INCLUDES += -I$(TOP)/include/edm -I../../util -I../../pvlib -I../../lib
+
    USR_INCLUDES += -I$(MOTIF_INC) -I$(X11_INC)
 
    Xm_DIR =   $(MOTIF_LIB)

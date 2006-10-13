@@ -23,7 +23,7 @@
 #include "entry_form.h"
 
 #define SHCMDC_MAJOR_VERSION 4
-#define SHCMDC_MINOR_VERSION 0
+#define SHCMDC_MINOR_VERSION 2
 #define SHCMDC_RELEASE 0
 
 #ifdef __shell_cmd_cc
@@ -31,6 +31,11 @@
 #include "shell_cmd.str"
 
 #ifdef __linux__
+static void *shellCmdThread (
+  THREAD_HANDLE h );
+#endif
+
+#ifdef darwin
 static void *shellCmdThread (
   THREAD_HANDLE h );
 #endif
@@ -116,6 +121,11 @@ private:
 
 #ifdef __linux__
 friend void *shellCmdThread (
+  THREAD_HANDLE h );
+#endif
+
+#ifdef darwin
+	friend void *shellCmdThread (
   THREAD_HANDLE h );
 #endif
 
@@ -208,6 +218,9 @@ typedef struct bufTag {
   double bufAutoExecInterval;
   int bufMultipleInstancesAllowed;
   char bufRequiredHostName[63+1];
+  int bufOneShot;
+  int bufSwapButtons;
+  int bufIncludeHelpIcon;
 } bufType, *bufPtr;
 
 // static char * const nullHost = "";
@@ -245,7 +258,8 @@ int opComplete;
 
 double threadSecondsToDelay, autoExecInterval;
 XtIntervalId timer;
-int timerActive, timerValue, multipleInstancesAllowed;
+int oneShot, timerActive, timerValue, multipleInstancesAllowed,
+ swapButtons, includeHelpIcon;
 THREAD_HANDLE thread;
 
 int pwFormX, pwFormY, pwFormW, pwFormH, pwFormMaxH;
@@ -353,6 +367,12 @@ void btnDown (
   int buttonState,
   int buttonNumber,
   int *action );
+
+void pointerIn (
+  XMotionEvent *me,
+  int _x,
+  int _y,
+  int buttonState );
 
 int getButtonActionRequest (
   int *up,

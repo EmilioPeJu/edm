@@ -1,11 +1,6 @@
 #ifndef __thread_priv_h
 #define __thread_priv_h 1
 
-/* The following is needed due to the change
-   in RH 7.1 to /usr/include/sys/time.h
-*/
-#define __USE_GNU
-
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -14,10 +9,20 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <time.h>
-#include <linux/unistd.h>
+#include <unistd.h>
 #include <errno.h>
 #include "sys_types.h"
 #include "thread.h"
+
+#define THREAD_PTR_TYPE_GENERIC 1
+#define THREAD_PTR_TYPE_HANDLE 2
+#define THREAD_PTR_TYPE_LOCK 3
+
+typedef struct cleanupListTag {
+  struct cleanupListTag *flink;
+  int ptrType;
+  void *ptr;
+} cleanupListType, *cleanupListPtr;
 
 /* typedef void *pthread_mutexattr_t; */
 typedef void *ptread_condattr_t;
@@ -51,6 +56,7 @@ typedef struct thread_id_tag {
   int wantJoin;
   void *application_data;
   int process_active;
+  int parent_detached;
 } THREAD_ID_TYPE;
 typedef THREAD_ID_TYPE *THREAD_ID_PTR;
 

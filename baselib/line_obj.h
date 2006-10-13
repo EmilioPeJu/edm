@@ -301,6 +301,11 @@ virtual int movePoint (
   int x,
   int y );
 
+virtual int movePointRel (
+  pointPtr curPoint,
+  int xofs,
+  int yofs );
+
 int select (
   int x,
   int y );
@@ -450,6 +455,10 @@ void getPvs (
   int max,
   ProcessVariable *pvs[],
   int *n );
+
+char *crawlerGetFirstPv ( void );
+
+char *crawlerGetNextPv ( void );
 
 };
 

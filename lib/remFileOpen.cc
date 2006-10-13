@@ -366,6 +366,10 @@ int fileClose (
 
   }
 
+  if ( diagnosticMode() ) {
+    logDiagnostic( "close file\n" );
+  }
+
   return fclose( f );
 
 }
@@ -476,9 +480,9 @@ FILE *fileOpen (
 char fullName[255+1], cmd[255+1], prog[255+1];
 char oneExt[32], *oneExtPtr, *filterCmd, *ptr1, *ptr2, *ptr3;
  int gotExt, i, l, startPos, stat;
+FILE *f;
 
 #ifdef USECURL
-FILE *f;
 char buf[255+1], name[255+1], allPaths[10239+1], plainName[255+1],
  *urlList, *tk, *context;
 int gotFile, useHttp;
@@ -496,7 +500,7 @@ mode_t curMode, newMode;
   }
 
 #ifndef USECURL
-  if ( debugMode() ) printf( "Using local access only\n" );
+  if ( debugMode() ) fprintf( stderr, "Using local access only\n" );
 
   if ( strcmp( mode, "r" ) != 0 ) {
 
@@ -540,18 +544,19 @@ mode_t curMode, newMode;
       if ( stat & 1 ) {
 
         if ( !filterInstalled( prog ) ) {
-          printf( "Filter %s (%s) is not installed\n", prog, oneExt );
+          fprintf( stderr, "Filter %s (%s) is not installed\n", prog, oneExt );
           return NULL;
         }
 
         if ( gPipeIsOpen ) {
-          printf( "Pipe is already open\n" );
-          return NULL;
+          fprintf( stderr, "Pipe is already open (1)\n" );
+          pclose( gPipeF );
+          //return NULL;
         }
 
         gPipeIsOpen = 1;
 
-	if ( debugMode() ) printf( "1 Filter cmd is [%s]\n", cmd );
+	if ( debugMode() ) fprintf( stderr, "1 Filter cmd is [%s]\n", cmd );
 
         // change extension, if any, to .edl
         ptr1 = ptr2 = strstr( fullName, oneExt );
@@ -581,13 +586,23 @@ mode_t curMode, newMode;
 
   }
 
-  return fopen( fullName, mode );
+  f = fopen( fullName, mode );
+
+  if ( diagnosticMode() ) {
+    char diagBuf[255+1];
+    if ( f ) {
+      snprintf( diagBuf, 255, "open [%s]\n", fullName );
+      logDiagnostic( diagBuf );
+    }
+  }
+
+  return f;
 
 #endif
 
 #ifdef USECURL
 
-  if ( debugMode() ) printf( "Using curl for URL-based access\n" );
+  if ( debugMode() ) fprintf( stderr, "Using curl for URL-based access\n" );
 
   if ( gGetUserUmask ) {
     gGetUserUmask = 0;
@@ -596,7 +611,7 @@ mode_t curMode, newMode;
       gUseUmask = 1;
       context = NULL;
       gUmask = (mode_t) strtol( tk, &context, 0 );
-      if ( debugMode() ) printf( "Temp dir umask = 0%-o\n", (int) gUmask );
+      if ( debugMode() ) fprintf( stderr, "Temp dir umask = 0%-o\n", (int) gUmask );
     }
   }
 
@@ -676,7 +691,7 @@ mode_t curMode, newMode;
 
     strncpy( buf, tmpDir, 255 );
     Strncat( buf, plainName, 255 );
-    if ( debugMode() ) printf( "open [%s]\n", buf );
+    if ( debugMode() ) fprintf( stderr, "open [%s]\n", buf );
     if ( gUseUmask ) {
       newMode = gUmask;
       curMode = umask( newMode );
@@ -689,7 +704,7 @@ mode_t curMode, newMode;
 
     strncpy( buf, fullName, 255 );
 
-    if ( debugMode() ) printf( "get [%s]\n", buf );
+    if ( debugMode() ) fprintf( stderr, "get [%s]\n", buf );
 
     curl_easy_setopt( curlH, CURLOPT_URL, buf );
     curl_easy_setopt( curlH, CURLOPT_FILE, f );
@@ -699,9 +714,9 @@ mode_t curMode, newMode;
     curl_easy_setopt( curlH, CURLOPT_SSL_VERIFYHOST, 0 );
     strcpy( errBuf, "" );
     result = curl_easy_perform( curlH );
-    if ( debugMode() ) printf( "result = %-d, errno = %-d\n",
+    if ( debugMode() ) fprintf( stderr, "result = %-d, errno = %-d\n",
      (int) result, errno );
-    if ( debugMode() ) printf( "errBuf = [%s]\n", errBuf );
+    if ( debugMode() ) fprintf( stderr, "errBuf = [%s]\n", errBuf );
 
     fclose( f );
 
@@ -719,18 +734,19 @@ mode_t curMode, newMode;
         if ( stat & 1 ) {
 
           if ( !filterInstalled( prog ) ) {
-            printf( "Filter %s (%s) is not installed\n", prog, oneExt );
+            fprintf( stderr, "Filter %s (%s) is not installed\n", prog, oneExt );
             return NULL;
           }
 
           if ( gPipeIsOpen ) {
-            printf( "Pipe is already open\n" );
-            return NULL;
+            fprintf( stderr, "Pipe is already open (2)\n" );
+            pclose( gPipeF );
+            //return NULL;
           }
 
           gPipeIsOpen = 1;
 
-          if ( debugMode() ) printf( "2 Filter cmd is [%s]\n", cmd );
+          if ( debugMode() ) fprintf( stderr, "2 Filter cmd is [%s]\n", cmd );
 
           // change extension, if any, to .edl
           ptr1 = ptr2 = strstr( buf, oneExt );
@@ -762,7 +778,17 @@ mode_t curMode, newMode;
     }
 
     strncpy( fullName, plainName, 255 );
+
     f = fopen( buf, "r" );
+
+    if ( diagnosticMode() ) {
+      char diagBuf[255+1];
+      if ( f ) {
+        snprintf( diagBuf, 255, "open [%s]\n", buf );
+        logDiagnostic( diagBuf );
+      }
+    }
+
     return f;
 
   }
@@ -812,18 +838,19 @@ mode_t curMode, newMode;
         if ( stat & 1 ) {
 
           if ( !filterInstalled( prog ) ) {
-            printf( "Filter %s (%s) is not installed\n", prog, oneExt );
+            fprintf( stderr, "Filter %s (%s) is not installed\n", prog, oneExt );
             return NULL;
           }
 
           if ( gPipeIsOpen ) {
-            printf( "Pipe is already open\n" );
-            return NULL;
+            fprintf( stderr, "Pipe is already open (3)\n" );
+            pclose( gPipeF );
+            //return NULL;
           }
 
           gPipeIsOpen = 1;
 
-          if ( debugMode() ) printf( "3 Filter cmd is [%s]\n", cmd );
+          if ( debugMode() ) fprintf( stderr, "3 Filter cmd is [%s]\n", cmd );
 
           // change extension, if any, to .edl
           ptr1 = ptr2 = strstr( fullName, oneExt );
@@ -853,7 +880,17 @@ mode_t curMode, newMode;
 
     }
 
-    return fopen( fullName, mode );
+    f = fopen( fullName, mode );
+
+    if ( diagnosticMode() ) {
+      char diagBuf[255+1];
+      if ( f ) {
+        snprintf( diagBuf, 255, "open [%s]\n", fullName );
+        logDiagnostic( diagBuf );
+      }
+    }
+
+    return f;
 
   }
 
@@ -905,7 +942,7 @@ mode_t curMode, newMode;
   strncpy( name, fullName, 255 );
   name[255] = 0;
 
-  if ( debugMode() ) printf( "Open file [%s] [%s]\n", name, mode );
+  if ( debugMode() ) fprintf( stderr, "Open file [%s] [%s]\n", name, mode );
 
   if ( !strcmp( mode, "r" ) || !strcmp( mode, "rb" ) ) {
 
@@ -931,7 +968,7 @@ mode_t curMode, newMode;
 
       strncpy( buf, tmpDir, 255 );
       Strncat( buf, name, 255 );
-      if ( debugMode() ) printf( "open [%s]\n", buf );
+      if ( debugMode() ) fprintf( stderr, "open [%s]\n", buf );
       if ( gUseUmask ) {
         newMode = gUmask;
         curMode = umask( newMode );
@@ -945,7 +982,7 @@ mode_t curMode, newMode;
       strcpy( buf, tk );
       Strncat( buf, fullName, 255 );
 
-      if ( debugMode() ) printf( "get [%s]\n", buf );
+      if ( debugMode() ) fprintf( stderr, "get [%s]\n", buf );
 
       curl_easy_setopt( curlH, CURLOPT_URL, buf );
       curl_easy_setopt( curlH, CURLOPT_FILE, f );
@@ -955,9 +992,9 @@ mode_t curMode, newMode;
       curl_easy_setopt( curlH, CURLOPT_SSL_VERIFYHOST, 0 );
       strcpy( errBuf, "" );
       result = curl_easy_perform( curlH );
-      if ( debugMode() ) printf( "result = %-d, errno = %-d\n",
+      if ( debugMode() ) fprintf( stderr, "result = %-d, errno = %-d\n",
        (int) result, errno );
-      if ( debugMode() ) printf( "errBuf = [%s]\n", errBuf );
+      if ( debugMode() ) fprintf( stderr, "errBuf = [%s]\n", errBuf );
 
       fclose( f );
 
@@ -983,18 +1020,19 @@ mode_t curMode, newMode;
         if ( stat & 1 ) {
 
           if ( !filterInstalled( prog ) ) {
-            printf( "Filter %s (%s) is not installed\n", prog, oneExt );
+            fprintf( stderr, "Filter %s (%s) is not installed\n", prog, oneExt );
             return NULL;
           }
 
           if ( gPipeIsOpen ) {
-            printf( "Pipe is already open\n" );
-            return NULL;
+            fprintf( stderr, "Pipe is already open (4)\n" );
+            pclose( gPipeF );
+            //return NULL;
           }
 
           gPipeIsOpen = 1;
 
-          if ( debugMode() ) printf( "4 Filter cmd is [%s]\n", cmd );
+          if ( debugMode() ) fprintf( stderr, "4 Filter cmd is [%s]\n", cmd );
 
           // change extension, if any, to .edl
           ptr1 = ptr2 = strstr( buf, oneExt );
@@ -1025,6 +1063,14 @@ mode_t curMode, newMode;
     }
 
     f = fopen( buf, "r" );
+
+    if ( diagnosticMode() ) {
+      char diagBuf[255+1];
+      if ( f ) {
+        snprintf( diagBuf, 255, "open [%s]\n", buf );
+        logDiagnostic( diagBuf );
+      }
+    }
 
   }
   else {

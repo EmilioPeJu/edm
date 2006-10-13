@@ -33,5 +33,8 @@
 #define shellCmdClass_str30 (char *) "Required Host"
 #define shellCmdClass_str31 (char *) "Auto-execute command may only run on host %s"
 #define shellCmdClass_str32 (char *) "Command must be executed on host %s, this is %s"
+#define shellCmdClass_str33 (char *) "One shot"
+#define shellCmdClass_str34 (char *) "Swap L/R Buttons"
+#define shellCmdClass_str35 (char *) "Include Help Icon"
 
 #endif

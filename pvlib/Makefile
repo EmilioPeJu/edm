@@ -3,10 +3,19 @@ ifdef EPICS_HOST_ARCH
   include $(TOP)/configure/CONFIG
 
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
+   USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
    # Add Debugging
    #USR_CXXFLAGS_Linux += -g -O0
+
+   INSTALL_INCLUDE = $(TOP)/include/edm
+   INC += pv.h
+   INC += epicsPv.h
+
    Epics_LIBS_Linux += EdmLib
    Epics_SYS_LIBS_Linux += pthread dl
+
+   Epics_LIBS_Darwin += EdmLib
+   Epics_SYS_LIBS_Darwin += pthread dl
 
    USR_CXXFLAGS_solaris += -D__solaris__ -DSINGLE_THREADED=1 -D__epics__=1
    USR_LIBS_solaris = EdmLib pthread dl
@@ -20,7 +29,9 @@ ifdef EPICS_HOST_ARCH
 
    PROD_LIBS += ca Com
 
-   USR_INCLUDES = -I../ -I../../lib
+   USR_INCLUDES = -I../ 
+   USR_INCLUDES += -I$(TOP)/include/edm -I../../lib
+
 
    LIB_SRCS += reg_pvs.cc
    LIB_SRCS += epicsPv.cc

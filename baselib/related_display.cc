@@ -34,6 +34,9 @@
 #include "thread.h"
 #include "crc.h"
 
+#ifdef TRIUMF
+#endif
+
 static void doBlink (
   void *ptr
 ) {
@@ -303,6 +306,8 @@ relatedDisplayClass *rdo = (relatedDisplayClass *) client;
 
   rdo->icon = rdo->buf->bufIcon;
 
+  rdo->swapButtons = rdo->buf->bufSwapButtons;
+
   rdo->x = rdo->buf->bufX;
   rdo->sboxX = rdo->buf->bufX;
 
@@ -323,6 +328,8 @@ relatedDisplayClass *rdo = (relatedDisplayClass *) client;
   }
 
   rdo->colorPvExpString.setRaw( rdo->buf->bufColorPvName );
+
+  rdo->helpCommandExpString.setRaw( rdo->buf->bufHelpCommand );
 
   rdo->updateDimensions();
 
@@ -408,6 +415,7 @@ int i;
   useFocus = 0;
   button3Popup = 0;
   icon = 0;
+  swapButtons = 0;
 
   for ( i=0; i<maxDsps; i++ ) {
     closeAction[i] = 0;
@@ -424,6 +432,8 @@ int i;
   aw = NULL;
   buf = NULL;
 
+  helpItem = -1;
+
   unconnectedTimer = 0;
 
   connection.setMaxPvs( NUMPVS + 1 );
@@ -437,7 +447,7 @@ relatedDisplayClass::~relatedDisplayClass ( void ) {
 int okToClose;
 activeWindowListPtr cur;
 
-/*   printf( "In relatedDisplayClass::~relatedDisplayClass\n" ); */
+/*   fprintf( stderr, "In relatedDisplayClass::~relatedDisplayClass\n" ); */
 
   if ( aw ) {
 
@@ -508,6 +518,7 @@ activeGraphicClass *rdo = (activeGraphicClass *) this;
   useFocus = source->useFocus;
   button3Popup = source->button3Popup;
   icon = source->icon;
+  swapButtons = source->swapButtons;
 
   for ( i=0; i<maxDsps; i++ ) {
     closeAction[i] = source->closeAction[i];
@@ -516,11 +527,8 @@ activeGraphicClass *rdo = (activeGraphicClass *) this;
     cascade[i] = source->cascade[i];
     propagateMacros[i] = source->propagateMacros[i];
     displayFileName[i].copy( source->displayFileName[i] );
-    //strncpy( displayFileName[i], source->displayFileName[i], 127 );
     label[i].copy( source->label[i] );
-    // strncpy( label[i], source->label[i], 127 );
     symbolsExpStr[i].copy( source->symbolsExpStr[i] );
-    // strncpy( symbols[i], source->symbols[i], 255 );
     replaceSymbols[i] = source->replaceSymbols[i];
   }
 
@@ -537,14 +545,55 @@ activeGraphicClass *rdo = (activeGraphicClass *) this;
 
   colorPvExpString.copy( source->colorPvExpString );
 
+  helpCommandExpString.copy( source->helpCommandExpString );
+
   aw = NULL;
   buf = NULL;
+
+  helpItem = -1;
 
   unconnectedTimer = 0;
 
   connection.setMaxPvs( NUMPVS + 1 );
 
   setBlinkFunction( (void *) doBlink );
+
+}
+
+void relatedDisplayClass::setHelpItem ( void ) {
+
+char *ctx, *tk, *err, buf[255+1];
+int item;
+
+  helpItem = -1;
+
+  if ( !blank( helpCommandExpString.getExpanded() ) ) {
+
+    strncpy( buf, helpCommandExpString.getExpanded(), 255 );
+    buf[255] = 0;
+
+    ctx = NULL;
+    tk = strtok_r( buf, " \t", &ctx );
+
+    if ( tk ) {
+
+      if ( strcmp( tk, "item" ) == 0 ) {
+
+        tk = strtok_r( NULL, " \t", &ctx );
+
+        if ( tk ) {
+
+          errno = 0;
+          item = strtol( tk, &err, 0 );
+          if ( !errno ) helpItem = item;
+
+	}
+
+      }
+
+    }
+
+  }
 
 }
 
@@ -555,11 +604,18 @@ int relatedDisplayClass::createInteractive (
   int _w,
   int _h ) {
 
+char *ptr;
+
   actWin = (activeWindowClass *) aw_obj;
   x = _x;
   y = _y;
   w = _w;
   h = _h;
+
+  ptr = getenv( "EDMRDDHS" );
+  if ( ptr ) {
+    helpCommandExpString.setRaw( ptr );
+  }
 
   strcpy( fontTag, actWin->defaultBtnFontTag );
   actWin->fi->loadFontTag( fontTag );
@@ -650,6 +706,8 @@ static int setPosEnum[3] = {
   tag.loadW( "closeDisplay", closeAction, numDsps, &zero );
   tag.loadW( "colorPv", &colorPvExpString, emptyStr );
   tag.loadBoolW( "icon", &icon, &zero );
+  tag.loadBoolW( "swapButtons", &swapButtons, &zero );
+  tag.loadW( "helpCommand", &helpCommandExpString, emptyStr );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -865,9 +923,9 @@ static int setPosEnum[3] = {
   tag.loadR( "closeDisplay", maxDsps, closeAction, &n2, &zero );
   tag.loadR( "colorPv", &colorPvExpString, emptyStr );
   tag.loadR( "icon", &icon, &zero );
+  tag.loadR( "swapButtons", &swapButtons, &zero );
+  tag.loadW( "helpCommand", &helpCommandExpString, emptyStr );
   tag.loadR( "endObjectProperties" );
-
-  stat = tag.loadR( "endObjectProperties" );
 
   stat = tag.readTags( f, "endObjectProperties" );
 
@@ -1241,6 +1299,7 @@ char onePvName[PV_Factory::MAX_PV_NAME+1];
   }
 
   icon = 0;
+  swapButtons = 0;
 
   actWin->fi->loadFontTag( fontTag );
   actWin->drawGc.setFontTag( fontTag, actWin->fi );
@@ -1536,6 +1595,7 @@ int i;
   propagateMacros[0] = 1;
   closeAction[0] = 0;
   icon = 0;
+  swapButtons = 0;
   displayFileName[0].setRaw( fname );
   
   this->initSelectBox(); // call after getting x,y,w,h
@@ -1554,7 +1614,7 @@ void relatedDisplayClass::sendMsg (
 {
 
   if ( param ) {
-    //printf( "  msg = [%s]\n", param );
+    //fprintf( stderr, "  msg = [%s]\n", param );
     popupDisplay( 0 );
   }
 
@@ -1673,6 +1733,13 @@ char title[32], *ptr;
 
   buf->bufIcon = icon;
 
+  buf->bufSwapButtons = swapButtons;
+
+  if ( helpCommandExpString.getRaw() )
+    strncpy( buf->bufHelpCommand, helpCommandExpString.getRaw(), 255 );
+  else
+    strncpy( buf->bufHelpCommand, "", 255 );
+
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
@@ -1697,7 +1764,6 @@ char title[32], *ptr;
   ef.addTextField( relatedDisplayClass_str33, 35, &buf->bufOfsY );
   ef.addToggle( relatedDisplayClass_str20, &buf->bufCloseAction[0] );
   ef.addToggle( relatedDisplayClass_str21, &buf->bufAllowDups[0] );
-  //ef.addToggle( relatedDisplayClass_str22, &buf->bufCascade[0] );
 
   ef.addEmbeddedEf( relatedDisplayClass_str14, "...", &ef1 );
 
@@ -1709,7 +1775,7 @@ char title[32], *ptr;
 
   for ( i=1; i<maxDsps; i++ ) {
 
-    ef1->beginSubForm();
+    ef1->beginLeftSubForm();
     ef1->addTextField( relatedDisplayClass_str38, 35, buf->bufLabel[i], 127 );
     ef1->addLabel( relatedDisplayClass_str39 );
     ef1->addTextField( "", 35, buf->bufDisplayFileName[i], 127 );
@@ -1740,6 +1806,8 @@ char title[32], *ptr;
   //ef1->finished( rdc_edit_ok1, rdc_edit_apply1, rdc_edit_cancel1, this );
   ef1->finished( rdc_edit_ok1, this );
 
+  ef.addTextField( relatedDisplayClass_str49, 35, buf->bufHelpCommand, 255 );
+
   ef.addTextField( relatedDisplayClass_str13, 35, buf->bufButtonLabel, 127 );
 
   ef.addToggle( relatedDisplayClass_str17, &buf->bufUseFocus );
@@ -1747,6 +1815,7 @@ char title[32], *ptr;
   ef.addToggle( relatedDisplayClass_str29, &buf->bufNoEdit );
   ef.addToggle( relatedDisplayClass_str34, &buf->bufButton3Popup );
   ef.addToggle( relatedDisplayClass_str47, &buf->bufIcon );
+  ef.addToggle( relatedDisplayClass_str48, &buf->bufSwapButtons );
 
   ef.addTextField( "Color PV", 35, buf->bufColorPvName,
    PV_Factory::MAX_PV_NAME );
@@ -2200,6 +2269,9 @@ int i, ii, opStat, n;
 Arg args[5];
 XmString str;
 
+#ifdef TRIUMF
+#endif
+
   switch ( pass ) {
 
   case 1:
@@ -2211,6 +2283,8 @@ XmString str;
     atLeastOneExists = 0;
     init = 0;
     active = 0;
+
+    setHelpItem();
 
   case 2:
 
@@ -2287,7 +2361,7 @@ XmString str;
           singleOpComplete = 1;
 	}
 	else {
-          printf( relatedDisplayClass_str27 );
+          fprintf( stderr, relatedDisplayClass_str27 );
           opStat = 0;
         }
 
@@ -2312,22 +2386,30 @@ XmString str;
 
           pullDownMenu = XmCreatePulldownMenu( popUpMenu, "", NULL, 0 );
 
+          numMenuItems = 0;
+
           for ( ii=0; ii<numDsps; ii++ ) {
 
-            if ( label[ii].getExpanded() ) {
-              str = XmStringCreateLocalized( label[ii].getExpanded() );
-	    }
-	    else {
-              str = XmStringCreateLocalized( " " );
-	    }
-            pb[ii] = XtVaCreateManagedWidget( "", xmPushButtonWidgetClass,
-             popUpMenu,
-             XmNlabelString, str,
-             NULL );
-            XmStringFree( str );
+	    if ( ii != helpItem ) {
 
-            XtAddCallback( pb[ii], XmNactivateCallback, menu_cb,
-             (XtPointer) this );
+              numMenuItems++;
+
+              if ( label[ii].getExpanded() ) {
+                str = XmStringCreateLocalized( label[ii].getExpanded() );
+	      }
+	      else {
+                str = XmStringCreateLocalized( " " );
+	      }
+              pb[ii] = XtVaCreateManagedWidget( "", xmPushButtonWidgetClass,
+               popUpMenu,
+               XmNlabelString, str,
+               NULL );
+              XmStringFree( str );
+
+              XtAddCallback( pb[ii], XmNactivateCallback, menu_cb,
+               (XtPointer) this );
+
+	    }
 
 	  }
 
@@ -2348,7 +2430,7 @@ XmString str;
             opComplete[i] = 1;
 	  }
 	  else {
-            printf( relatedDisplayClass_str27 );
+            fprintf( stderr, relatedDisplayClass_str27 );
             opStat = 0;
           }
 
@@ -2438,6 +2520,58 @@ void relatedDisplayClass::updateDimensions ( void )
 
 }
 
+int relatedDisplayClass::isRelatedDisplay ( void ) {
+
+  return 1;
+
+}
+
+int relatedDisplayClass::getNumRelatedDisplays ( void ) {
+
+  return numDsps;
+
+}
+
+int relatedDisplayClass::getRelatedDisplayProperty (
+  int index,
+  char *key
+) {
+
+  if ( strcmp( key, "propagate" ) == 0 ) {
+    return propagateMacros[index];
+  }
+  else if ( strcmp( key, "replace" ) == 0 ) {
+    return replaceSymbols[index];
+  }
+
+  return 0;
+
+}
+
+char *relatedDisplayClass::getRelatedDisplayName (
+  int index
+) {
+
+  if ( ( index < 0 ) || ( index >= numDsps ) ) {
+    return NULL;
+  }
+
+  return displayFileName[index].getExpanded();
+
+}
+
+char *relatedDisplayClass::getRelatedDisplayMacros (
+  int index
+) {
+
+  if ( ( index < 0 ) || ( index >= numDsps ) ) {
+    return NULL;
+  }
+
+  return symbolsExpStr[index].getExpanded();
+
+}
+
 int relatedDisplayClass::expand1st (
   int numMacros,
   char *macros[],
@@ -2445,6 +2579,9 @@ int relatedDisplayClass::expand1st (
 {
 
 int i;
+
+int n;
+char *m[255], *e[255];
 
   colorPvExpString.expand1st( numMacros, macros, expansions );
 
@@ -2460,6 +2597,28 @@ int i;
   }
 
   buttonLabel.expand1st( numMacros, macros, expansions );
+
+  for ( i=0, n=0; i<numMacros; i++, n++ ) {
+    m[i] = new char[strlen(macros[i])+1];
+    strcpy( m[i], macros[i] );
+    e[i] = new char[strlen(expansions[i])+1];
+    strcpy( e[i], expansions[i] );
+  }
+
+  if ( i+1 < 255 ) {
+    m[i] = new char[strlen("!label")+1];
+    strcpy( m[i], "!label" );
+    e[i] = new char[strlen(buttonLabel.getExpanded())+1];
+    strcpy( e[i], buttonLabel.getExpanded() );
+    n++;
+  }
+
+  helpCommandExpString.expand1st( n, m, e );
+
+  for ( i=0; i<n; i++ ) {
+    delete[] m[i];
+    delete[] e[i];
+  }
 
   return 1;
 
@@ -2488,6 +2647,8 @@ int i;
 
   buttonLabel.expand2nd( numMacros, macros, expansions );
 
+  helpCommandExpString.expand2nd( numMacros, macros, expansions );
+
   return 1;
 
 }
@@ -2511,6 +2672,8 @@ int i;
 
   if ( buttonLabel.containsPrimaryMacros() ) return 1;
 
+  if ( helpCommandExpString.containsPrimaryMacros() ) return 1;
+
   return 0;
 
 }
@@ -2520,7 +2683,7 @@ void relatedDisplayClass::popupDisplay (
 {
 
 activeWindowListPtr cur;
-int i, l, stat, newX, newY;
+int i, ii, dup, numDeleted, l, stat, newX, newY;
 char name[127+1], symbolsWithSubs[255+1];
 pvValType destV;
 unsigned int crc;
@@ -2542,7 +2705,8 @@ int numNewMacros, max, numFound;
 char prefix[127+1];
 
   focus = useFocus;
-  if ( numDsps > 1 ) {
+  //if ( numDsps > 1 ) {
+  if ( numMenuItems > 1 ) {
     focus = 0;
   }
 
@@ -2790,6 +2954,65 @@ char prefix[127+1];
 
   }
 
+  // ??????????????????????
+  //if ( numNewMacros > 0 ) fprintf( stderr, "\n" );
+  //for ( i=0; i<numNewMacros; i++ ) {
+  //  fprintf( stderr, "[%s]=[%s]", newMacros[i], newValues[i] );
+  //  if ( i < numNewMacros-1 ) fprintf( stderr, "," );
+  //}
+  //if ( numNewMacros > 0 ) fprintf( stderr, "\n" );
+
+  // Eliminate duplicate symbols
+
+  numDeleted = 0;
+
+  for ( i=numNewMacros-1; i>0; i-- ) {
+
+    dup = 0;
+    ii = 0;
+    while ( ii < i ) {
+
+      if ( strcmp( newMacros[ii], newMacros[i] ) == 0 ) {
+        dup = 1;
+	break;
+      }
+
+      ii++;
+
+    }
+
+    if ( dup ) {
+
+      // delete entry i
+
+      if ( !useSmallArrays ) {
+        delete newMacros[i];
+        delete newValues[i];
+      }
+
+      for ( ii=i; ii<numNewMacros-1; ii++ ) {
+        newMacros[ii] = newMacros[ii+1];
+        newValues[ii] = newValues[ii+1];
+      }
+
+      numDeleted++;
+
+    }
+
+  }
+
+  numNewMacros -= numDeleted;
+
+  // ??????????????????
+  //if ( numDeleted ) {
+  //  fprintf( stderr, "Removed %-d duplicate symbol(s)\n", numDeleted );
+  //  for ( i=0; i<numNewMacros; i++ ) {
+  //    fprintf( stderr, "[%s]=[%s]", newMacros[i], newValues[i] );
+  //    if ( i < numNewMacros-1 ) fprintf( stderr, "," );
+  //  }
+  //  if ( numNewMacros > 0 ) fprintf( stderr, "\n" );
+  //}
+
   stat = getFileName( name, displayFileName[index].getExpanded(), 127 );
   stat = getFilePrefix( prefix, displayFileName[index].getExpanded(), 127 );
 
@@ -2911,7 +3134,17 @@ void relatedDisplayClass::btnUp (
 
   if ( !enabled ) return;
 
+  if ( swapButtons ) {
+    if ( buttonNumber == 1 ) {
+      buttonNumber = 3;
+    }
+    else if ( buttonNumber == 3 ) {
+      buttonNumber = 1;
+    }
+  }
+
   if ( numDsps == 1 ) {
+  //if ( numMenuItems == 1 ) {
     if ( button3Popup ) {
       needClose = 1;
       actWin->addDefExeNode( aglPtr );
@@ -2919,7 +3152,8 @@ void relatedDisplayClass::btnUp (
     }
   }
 
-  if ( numDsps < 2 ) return;
+  //if ( numDsps < 2 ) return;
+  if ( numMenuItems < 2 ) return;
 
   if ( buttonNumber != 1 ) return;
 
@@ -2930,6 +3164,9 @@ void relatedDisplayClass::btnUp (
   XtManageChild( popUpMenu );
 
 }
+
+#ifdef TRIUMF
+#endif
 
 void relatedDisplayClass::btnDown (
   XButtonEvent *be,
@@ -2946,22 +3183,52 @@ int focus;
 
   if ( !enabled ) return;
 
+  if ( ( numDsps > 1 ) && button3Popup ) return;
+
+  if ( !blank( helpCommandExpString.getExpanded() ) ) {
+    if ( ( buttonNumber == 3 ) && ( buttonState == 0 ) ) {
+      if ( helpItem != -1 ) {
+        if ( helpItem < numDsps ) popupDisplay( helpItem );
+      }
+      else {
+        executeCommandInThread( helpCommandExpString.getExpanded() );
+      }
+      return;
+    }
+  }
+
+  if ( swapButtons ) {
+    if ( buttonNumber == 1 ) {
+      buttonNumber = 3;
+    }
+    else if ( buttonNumber == 3 ) {
+      buttonNumber = 1;
+    }
+  }
+
   focus = useFocus;
-  if ( numDsps > 1 ) focus = 0;
+  if ( numMenuItems > 1 ) focus = 0;
 
   if ( focus ) {
+
     if ( buttonNumber != -1 ) return;
+
   }
   else {
+
+#ifdef TRIUMF
+#endif
+
     if ( ( buttonNumber != 1 ) && ( buttonNumber != 3 ) ) return;
     if ( ( buttonNumber == 3 ) && !button3Popup ) return;
     if ( ( buttonNumber == 1 ) && button3Popup ) return;
     if ( button3Popup && aw ) return;
+
   }
 
-  if ( numDsps < 1 ) return;
+  if ( numMenuItems < 1 ) return;
 
-  if ( numDsps == 1 ) {
+  if ( numMenuItems == 1 ) {
     posX = x + _x - be->x;
     posY = y + _y - be->y;
     popupDisplay( 0 );
@@ -2986,6 +3253,14 @@ int focus;
 
     activeGraphicClass::pointerIn( me, me->x, me->y, buttonState );
 
+  }
+
+  if ( !blankOrComment( helpCommandExpString.getExpanded() ) ) {
+    actWin->cursor.set( XtWindow(actWin->executeWidget),
+     CURSOR_K_WILL_OPEN_WITH_HELP );
+  }
+  else {
+    actWin->cursor.set( XtWindow(actWin->executeWidget), CURSOR_K_WILL_OPEN );
   }
 
 }
@@ -3026,7 +3301,8 @@ XButtonEvent *be;
   if ( !enabled ) return;
 
   focus = useFocus;
-  if ( numDsps > 1 ) focus = 0;
+  //if ( numDsps > 1 ) focus = 0;
+  if ( numMenuItems > 1 ) focus = 0;
 
   if ( focus ) {
 
@@ -3051,7 +3327,8 @@ int focus;
   if ( !enabled ) return;
 
   focus = useFocus;
-  if ( numDsps > 1 ) focus = 0;
+  //if ( numDsps > 1 ) focus = 0;
+  if ( numMenuItems > 1 ) focus = 0;
 
   if ( focus ) {
 
@@ -3147,6 +3424,8 @@ activeWindowListPtr cur;
        (void *) this );
     }
 
+    smartDrawAllActive();
+
   }
 
   if ( nu ) {
@@ -3195,6 +3474,22 @@ activeWindowListPtr cur;
     }
 
   }
+
+}
+
+// crawler functions may return blank pv names
+char *relatedDisplayClass::crawlerGetFirstPv ( void ) {
+
+  crawlerPvIndex = 0;
+  return destPvExpString[crawlerPvIndex].getExpanded();
+
+}
+
+char *relatedDisplayClass::crawlerGetNextPv ( void ) {
+
+  if ( crawlerPvIndex >= NUMPVS-1 ) return NULL;
+  crawlerPvIndex++;
+  return destPvExpString[crawlerPvIndex].getExpanded();
 
 }
 

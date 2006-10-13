@@ -4,9 +4,13 @@ ifdef EPICS_HOST_ARCH
    
    IMAGELIB=/usr/local
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
+   USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
    
    EdmGif_LIBS_Linux += EdmBase EdmLib
    EdmGif_SYS_LIBS_Linux += Xm Xt Xp Xtst X11 pthread dl ungif
+   
+   EdmGif_LIBS_Darwin += EdmBase EdmLib
+   EdmGif_SYS_LIBS_Darwin += Xm Xt Xp Xtst X11 pthread dl ungif
    
    
    
@@ -25,15 +29,11 @@ ifdef EPICS_HOST_ARCH
 
    PROD_LIBS += ca Com
 
-   USR_INCLUDES = -I../ -I../../util -I../../lib -I../../pvlib
-   USR_INCLUDES += -I$(TOP)/include/sys/linux
-   USR_INCLUDES += -I$(TOP)/include/net/linux
-   USR_INCLUDES += -I$(TOP)/include/msg
-   USR_INCLUDES += -I$(TOP)/include/thread/linux
-   USR_INCLUDES += -I$(TOP)/include/iprpc/osf
-   USR_INCLUDES += -I$(TOP)/include/avl
-   USR_INCLUDES += -I$(TOP)/include/crc
+   USR_INCLUDES = -I../
+   USR_INCLUDES += -I$(TOP)/include/edm -I../../util -I../../lib -I../../pvlib
+
    USR_INCLUDES += -I$(MOTIF_INC) -I$(X11_INC)
+
 
    Xm_DIR =   $(MOTIF_LIB)
    Xt_DIR =   $(X11_LIB)

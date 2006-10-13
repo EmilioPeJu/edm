@@ -31,11 +31,15 @@ static char g_dragTrans[] =
   "#override\n\
    ~Ctrl~Shift<Btn2Down>: startDrag()\n\
    Ctrl~Shift<Btn2Down>: pvInfo()\n\
+   Shift Ctrl<Btn2Down>: dummy()\n\
+   Shift Ctrl<Btn2Up>: selectActions()\n\
    Shift~Ctrl<Btn2Up>: selectDrag()";
 
 static XtActionsRec g_dragActions[] = {
   { "startDrag", (XtActionProc) drag },
   { "pvInfo", (XtActionProc) pvInfo },
+  { "dummy", (XtActionProc) dummy },
+  { "selectActions", (XtActionProc) selectActions },
   { "selectDrag", (XtActionProc) selectDrag }
 };
 
@@ -1247,6 +1251,7 @@ unsigned short svalue;
           axtdo->fgColor.setNotNull();
         }
       }
+
       break;
 
     case ProcessVariable::specificType::shrt:
@@ -1254,6 +1259,34 @@ unsigned short svalue;
 
       ivalue = pv->get_int();
       sprintf( axtdo->curValue, axtdo->format, ivalue );
+      axtdo->curDoubleValue = pv->get_int();
+
+      if ( !axtdo->noSval ) {
+        if ( axtdo->nullDetectMode == 0 ) {
+          if ( axtdo->curDoubleValue == axtdo->curSvalValue ) {
+            axtdo->fgColor.setNull();
+            axtdo->bufInvalidate();
+	  }
+	  else {
+            axtdo->fgColor.setNotNull();
+            axtdo->bufInvalidate();
+	  }
+	}
+	else if ( axtdo->nullDetectMode == 1 ) {
+          if ( axtdo->curSvalValue == 0 ) {
+            axtdo->fgColor.setNull();
+            axtdo->bufInvalidate();
+	  }
+	  else {
+            axtdo->fgColor.setNotNull();
+            axtdo->bufInvalidate();
+	  }
+	}
+        else {
+          axtdo->fgColor.setNotNull();
+        }
+      }
+
       break;
 
     case ProcessVariable::specificType::enumerated:
@@ -1267,11 +1300,39 @@ unsigned short svalue;
       else {
         strcpy( axtdo->curValue, "" );
       }
+      axtdo->curDoubleValue = pv->get_int();
+
+      if ( !axtdo->noSval ) {
+        if ( axtdo->nullDetectMode == 0 ) {
+          if ( axtdo->curDoubleValue == axtdo->curSvalValue ) {
+            axtdo->fgColor.setNull();
+            axtdo->bufInvalidate();
+	  }
+	  else {
+            axtdo->fgColor.setNotNull();
+            axtdo->bufInvalidate();
+	  }
+	}
+	else if ( axtdo->nullDetectMode == 1 ) {
+          if ( axtdo->curSvalValue == 0 ) {
+            axtdo->fgColor.setNull();
+            axtdo->bufInvalidate();
+	  }
+	  else {
+            axtdo->fgColor.setNotNull();
+            axtdo->bufInvalidate();
+	  }
+	}
+        else {
+          axtdo->fgColor.setNotNull();
+        }
+      }
 
       break;
 
     default:
       strcpy( axtdo->curValue, "" );
+      axtdo->curDoubleValue = 0;
       break;
 
     } // end switch
@@ -1316,6 +1377,8 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) userarg;
     switch ( axtdo->svalPvType ) {
 
     case ProcessVariable::specificType::integer:
+    case ProcessVariable::specificType::enumerated:
+    case ProcessVariable::specificType::shrt:
 
       axtdo->curSvalValue = pv->get_int();
 
@@ -1394,6 +1457,7 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) userarg;
       break;
 
     default:
+      axtdo->curSvalValue = 0;
       break;
 
     } // end switch
@@ -1878,6 +1942,8 @@ activeXTextDspClass::activeXTextDspClass ( void ) {
   unconnectedTimer = 0;
 
   eBuf = NULL;
+
+  pvIndex = 0;
 
   setBlinkFunction( (void *) doBlink );
 
@@ -3611,6 +3677,7 @@ int activeXTextDspClass::drawActive ( void ) {
 Arg args[10];
 int n;
 int blink = 0;
+unsigned int color;
 
   if ( !init && !connection.pvsConnected() ) {
     if ( needToDrawUnconnected ) {
@@ -3666,17 +3733,19 @@ int blink = 0;
           n = 0;
           XtSetArg( args[n], XmNvalue, (XtArgVal) value ); n++;
           if ( useAlarmBorder && ( colorMode == XTDC_K_COLORMODE_ALARM ) ) {
-            XtSetArg( args[n], XmNforeground, fgColor.pixelColor() );
+	    color = fgColor.pixelColor();
+            XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
           }
           else {
-            XtSetArg( args[n], XmNforeground, fgColor.getColor() ); n++;
+	    color = fgColor.getColor();
+            XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
           }
           if ( colorMode == XTDC_K_COLORMODE_ALARM ) {
             if ( fgColor.getSeverity() != prevAlarmSeverity ) {
               if ( fgColor.getSeverity() && useAlarmBorder ) {
                 XtSetArg( args[n], XmNborderWidth, (XtArgVal) 2 ); n++;
-                XtSetArg( args[n], XmNborderColor, fgColor.getColor() );
-                 n++;
+	        color = fgColor.getColor();
+                XtSetArg( args[n], XmNborderColor, (XtArgVal) color ); n++;
               }
               else {
                 XtSetArg( args[n], XmNborderWidth, (XtArgVal) 0 ); n++;
@@ -3973,7 +4042,7 @@ char callbackName[63+1];
 	  pvId->add_conn_state_callback( xtdo_monitor_connect_state, this );
 	}
 	else {
-          printf( activeXTextDspClass_str33 );
+          fprintf( stderr, activeXTextDspClass_str33 );
           return 0;
         }
 
@@ -3985,7 +4054,7 @@ char callbackName[63+1];
              this );
           }
           else {
-            printf( activeXTextDspClass_str33 );
+            fprintf( stderr, activeXTextDspClass_str33 );
             return 0;
           }
 
@@ -3999,7 +4068,7 @@ char callbackName[63+1];
              this );
           }
           else {
-            printf( activeXTextDspClass_str33 );
+            fprintf( stderr, activeXTextDspClass_str33 );
             return 0;
           }
 
@@ -4403,6 +4472,15 @@ int activeXTextDspClass::getButtonActionRequest (
 
 }
 
+static void dummy (
+   Widget w,
+   XEvent *e,
+   String *params,
+   Cardinal numParams )
+{
+
+}
+
 static void drag (
    Widget w,
    XEvent *e,
@@ -4433,6 +4511,22 @@ XButtonEvent *be = (XButtonEvent *) e;
   XtVaGetValues( w, XmNuserData, &atdo, NULL );
 
   stat = atdo->selectDragValue( be );
+
+}
+
+static void selectActions (
+   Widget w,
+   XEvent *e,
+   String *params,
+   Cardinal numParams )
+{
+
+activeXTextDspClass *atdo;
+XButtonEvent *be = (XButtonEvent *) e;
+
+  XtVaGetValues( w, XmNuserData, &atdo, NULL );
+
+  atdo->doActions( be, be->x, be->y );
 
 }
 
@@ -4726,6 +4820,12 @@ Atom importList[2];
         case ProcessVariable::specificType::enumerated:
 
           sprintf( format, "%%s" );
+
+          if ( svalPvExists ) {
+	    if ( svalPvId ) {
+              svalPvId->add_value_callback( XtextDspSvalUpdate, this );
+	    }
+	  }
 
           break;
 
@@ -5315,6 +5415,32 @@ void activeXTextDspClass::getPvs (
   pvs[0] = pvId;
   pvs[1] = svalPvId;
   pvs[2] = fgPvId;
+
+}
+
+char *activeXTextDspClass::crawlerGetFirstPv ( void ) {
+
+  pvIndex = 0;
+  return pvExpStr.getExpanded();
+
+}
+
+char *activeXTextDspClass::crawlerGetNextPv ( void ) {
+
+  if ( pvIndex >= 2 ) return NULL;
+
+  pvIndex++;
+
+  switch ( pvIndex ) {
+  case 1:
+    return svalPvExpStr.getExpanded();
+    break;
+  case 2:
+    return fgPvExpStr.getExpanded();
+    break;
+  }
+
+  return NULL;
 
 }
 

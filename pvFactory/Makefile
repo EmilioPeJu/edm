@@ -4,6 +4,10 @@ ifdef EPICS_HOST_ARCH
 
    USR_CXXFLAGS_Linux += -DSINGLE_THREADED=1 -D__epics__=1
    USR_CFLAGS_Linux = $(USR_CXXFLAGS_Linux)
+
+   #USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
+   USR_CXXFLAGS_Darwin += -DSINGLE_THREADED=1 -D__epics__=1
+   USR_CFLAGS_Darwin = $(USR_CXXFLAGS_Darwin)
    
    
    # Add Debugging
@@ -22,15 +26,9 @@ ifdef EPICS_HOST_ARCH
 
    PROD_LIBS += ca Com
 
-   USR_INCLUDES = -I../../lib -I../../util -I../../pvlib
-   USR_INCLUDES += -I$(TOP)/include/sys/linux
-   USR_INCLUDES += -I$(TOP)/include/net/linux
-   USR_INCLUDES += -I$(TOP)/include/msg
-   USR_INCLUDES += -I$(TOP)/include/thread/linux
-   USR_INCLUDES += -I$(TOP)/include/iprpc/osf
-   USR_INCLUDES += -I$(TOP)/include/avl
-   USR_INCLUDES += -I$(TOP)/include/crc
-   
+   USR_INCLUDES = -I../
+   USR_INCLUDES += -I$(TOP)/include/edm -I../../util -I../../pvlib -I../../lib
+
    LIB_SRCS   += textupdate.cc
    LIB_SRCS   += SciPlot.cc
    LIB_SRCS   += strip_data.cc

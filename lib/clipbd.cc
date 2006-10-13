@@ -1,4 +1,4 @@
-/* $Id: clipbd.cc,v 1.3 2003/05/27 20:44:21 sinclair Exp $ */
+/* $Id: clipbd.cc,v 1.4 2005/10/17 21:40:57 williams Exp $ */
 
 /* AUTHOR: Till Straumann (PTB/1999) */
 
@@ -48,7 +48,7 @@ void clipBdClass::clipbdInit (
    XtNwidth, 1,
    XtNheight, 1,
    XmNuserData, (XtPointer) this,
-   0 );
+   NULL );
 
 }
 

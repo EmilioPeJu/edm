@@ -260,6 +260,11 @@ public:
 
 char *charDest;
 int maxLen;
+char lastGoodNumeric[31+1];
+double *destPtrD;
+int *destPtrI;
+efDouble *destPtrEfD;
+efInt *destPtrEfI;
 
 textEntry ( void );
 
@@ -594,6 +599,11 @@ int addTextField (
   efInt *dest );
 
 int addTextField (
+  char *label,
+  int length,
+  double *dest );
+
+class textEntry* addTextFieldAccessible (
   char *label,
   int length,
   double *dest );

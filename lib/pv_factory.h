@@ -10,6 +10,7 @@
 #include<time.h>
 #include"hashtable.h"
 #include"dl_list.h"
+#include <unistd.h>
 void setReadOnly ( void );
 void setReadWrite ( void );
 int isReadOnly ( void );
@@ -271,6 +272,7 @@ protected:
     PVCallbackInfoHash conn_state_callbacks;
     void do_value_callbacks();
     void do_conn_state_callbacks();
+    virtual void recalc();
 
 private:
     char *name;            // PV name
