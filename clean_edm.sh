@@ -48,7 +48,7 @@ RenameLib () {
     done
 
     # Change all the occurences of the first library name to the second
-    for file in `grep -rl $2 $1 | egrep -v 'CVS|\.svn'`; do
+    for file in `grep -rl $2 $1 | egrep -v 'CVS|\.svn|clean_edm.sh'`; do
 	ed -s $file <<EOF
 ,s/$2/$3/g
 w
@@ -110,6 +110,7 @@ $RM ${new}'/util/net/vms/.$fdl$knob.vdb'
 
 # Clear the execution bit off of all files
 find $new -name .svn -prune -o -name CVS -prune -o -type f -perm -111 -exec chmod 664 '{}' \;
+if [ -f $new/clean_edm.sh ] ; then chmod 775 $new/clean_edm.sh; fi
 
 if [ $distribution -eq 1 ] ; then
     exit;
@@ -150,9 +151,9 @@ w
 EOF
 
 # Move edmObjects, edmPrintDef  and edmObjects from edmMain to setup
-$MV $new/edmMain/edmObjects   $new/setup/edmObjects
-$MV $new/edmMain/edmPvObjects $new/setup/edmPvObjects
-$MV $new/edmMain/edmPrintDef  $new/setup/edmPrintDef
+if [ -f $new/edmMain/edmObjects   ] ; then $MV $new/edmMain/edmObjects   $new/setup/edmObjects ; fi
+if [ -f $new/edmMain/edmPvObjects ] ; then $MV $new/edmMain/edmPvObjects $new/setup/edmPvObjects ; fi
+if [ -f $new/edmMain/edmPrintDef  ] ; then $MV $new/edmMain/edmPrintDef  $new/setup/edmPrintDef ; fi
 
 # Remove duplicate copies of fonts.list and colors.list 
 $RM $new/edmMain/fonts.list
