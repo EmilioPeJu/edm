@@ -1,4 +1,4 @@
-39
+40
 activeArcClass              $(EDMLIBS)/libEdmBase.so Graphics Arc
 activeBarClass              $(EDMLIBS)/libEdmBase.so Monitors Bar
 activeButtonClass           $(EDMLIBS)/libEdmBase.so Controls Button
@@ -38,3 +38,4 @@ TwoDProfileMonitorClass     $(EDMLIBS)/libTwoDProfileMonitor.so Monitors TwoDPro
 wheelSwitchClass            $(EDMLIBS)/libEdmWheelswitch.so Controls Wheelswitch
 xyGraphClass                $(EDMLIBS)/libEdmBase.so Monitors X-Y Graph
 menuMuxPVClass              $(EDMLIBS)/libmenu_muxPV.so Controls Menu Mux PV
+activeLogMeterClass         $(EDMLIBS)/liblogMeter.so Monitors Logarithmic Meter
