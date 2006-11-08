@@ -1,0 +1,107 @@
+# DO NOT EDIT: This file created by mkmf.pl,v 1.5 2002/03/25 21:33:24 jba Exp $ 
+
+logMeter.o : ../logMeter.h ../../../lib/app_pkg.h ../../../lib/act_win.h \
+  ../../../../../include/edm/thread.h ../../../lib/act_grf.h \
+  ../../../lib/entry_form.h ../../../lib/pv_factory.h ../logMeter.str \
+  ../../../lib/color_pkg.h ../../../lib/color_button.h \
+  ../../../lib/font_pkg.h ../../../lib/font_menu.h ../../../lib/gc_pkg.h \
+  ../../../lib/confirm_dialog.h ../../../lib/scrolled_text.h \
+  ../../../lib/scrolled_list.h ../../../lib/msg_dialog.h \
+  ../../../lib/bindings.h ../../../lib/ulBindings.h ../../../lib/scheme.h \
+  ../../../lib/process.h ../../../lib/edmPrint.h ../../../lib/clipbd.h \
+  ../../../lib/path_list.h ../../../../../include/edm/avl.h \
+  ../../../lib/app_pkg.str ../../../lib/environment.str \
+  ../../../lib/utility.h ../../../lib/pvBindings.h ../../../lib/cursor.h \
+  ../../../lib/undo.h ../../../lib/pv_action.h ../../../lib/tag_pkg.h \
+  ../../../../../include/edm/sys_types.h ../../../lib/act_win.str \
+  ../../../lib/btnActionListType.h ../../../util/thr.msh \
+  ../../../lib/pvColor.h ../../../lib/expString.h \
+  ../../../lib/pvConnection.h ../../../lib/act_grf.str \
+  ../../../lib/hashtable.h ../../../lib/dl_list.h \
+  ../../../lib/color_pkg.str ../../../lib/color_list.h \
+  ../../../lib/color_button.str ../../../lib/font_pkg.str \
+  ../../../lib/gc_pkg.str ../../../lib/confirm_dialog.str \
+  ../../../lib/scrolled_text.str ../../../lib/scrolled_list.str \
+  ../../../lib/msg_dialog.str ../../../lib/group.h ../../../lib/symbol.h \
+  ../../../lib/dynSymbol.h ../../../lib/bindings.str \
+  ../../../lib/ulBindings.str ../../../lib/scheme.str \
+  ../../../lib/edmPrint.str ../../../lib/path_list.str \
+  ../../../util/avl.msh ../../../lib/remFileOpen.h ../../../pvlib/pv.h \
+  ../../../lib/pvBindings.str ../../../lib/undo.str \
+  ../../../lib/tag_pkg.str ../../../util/unix.msh ../../../util/sys.msh \
+  ../../../lib/color_list.str ../../../lib/group.str \
+  ../../../lib/symbol.str ../../../lib/dynSymbol.str
+
+#Depend files must be targets to avoid 'No rule to make target ...' errors
+../logMeter.h :
+../../../lib/app_pkg.h :
+../../../lib/act_win.h :
+../../../../../include/edm/thread.h :
+../../../lib/act_grf.h :
+../../../lib/entry_form.h :
+../../../lib/pv_factory.h :
+../logMeter.str :
+../../../lib/color_pkg.h :
+../../../lib/color_button.h :
+../../../lib/font_pkg.h :
+../../../lib/font_menu.h :
+../../../lib/gc_pkg.h :
+../../../lib/confirm_dialog.h :
+../../../lib/scrolled_text.h :
+../../../lib/scrolled_list.h :
+../../../lib/msg_dialog.h :
+../../../lib/bindings.h :
+../../../lib/ulBindings.h :
+../../../lib/scheme.h :
+../../../lib/process.h :
+../../../lib/edmPrint.h :
+../../../lib/clipbd.h :
+../../../lib/path_list.h :
+../../../../../include/edm/avl.h :
+../../../lib/app_pkg.str :
+../../../lib/environment.str :
+../../../lib/utility.h :
+../../../lib/pvBindings.h :
+../../../lib/cursor.h :
+../../../lib/undo.h :
+../../../lib/pv_action.h :
+../../../lib/tag_pkg.h :
+../../../../../include/edm/sys_types.h :
+../../../lib/act_win.str :
+../../../lib/btnActionListType.h :
+../../../util/thr.msh :
+../../../lib/pvColor.h :
+../../../lib/expString.h :
+../../../lib/pvConnection.h :
+../../../lib/act_grf.str :
+../../../lib/hashtable.h :
+../../../lib/dl_list.h :
+../../../lib/color_pkg.str :
+../../../lib/color_list.h :
+../../../lib/color_button.str :
+../../../lib/font_pkg.str :
+../../../lib/gc_pkg.str :
+../../../lib/confirm_dialog.str :
+../../../lib/scrolled_text.str :
+../../../lib/scrolled_list.str :
+../../../lib/msg_dialog.str :
+../../../lib/group.h :
+../../../lib/symbol.h :
+../../../lib/dynSymbol.h :
+../../../lib/bindings.str :
+../../../lib/ulBindings.str :
+../../../lib/scheme.str :
+../../../lib/edmPrint.str :
+../../../lib/path_list.str :
+../../../util/avl.msh :
+../../../lib/remFileOpen.h :
+../../../pvlib/pv.h :
+../../../lib/pvBindings.str :
+../../../lib/undo.str :
+../../../lib/tag_pkg.str :
+../../../util/unix.msh :
+../../../util/sys.msh :
+../../../lib/color_list.str :
+../../../lib/group.str :
+../../../lib/symbol.str :
+../../../lib/dynSymbol.str :
