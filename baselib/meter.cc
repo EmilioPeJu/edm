@@ -248,7 +248,7 @@ int st, sev;
 
   metero->curReadV = pv->get_double() - metero->baseV;
 
-/ ****** SJS 09/11/06 make meter show invalid status ******
+/****** SJS 09/11/06 make meter show invalid status ******
 ******** Following line moved from here ******
   if ( metero->active ) {
 ******/
@@ -263,7 +263,7 @@ int st, sev;
     metero->bufInvalidate();
   }
 
-/ ****** SJS 09/11/06 make meter show invalid status ******
+/****** SJS 09/11/06 make meter show invalid status ******
 ******** Following line moved to here ******/
   if ( metero->active ) {
 /******/
