@@ -248,19 +248,25 @@ int st, sev;
 
   metero->curReadV = pv->get_double() - metero->baseV;
 
+/ ****** SJS 09/11/06 make meter show invalid status ******
+******** Following line moved from here ******
   if ( metero->active ) {
+******/
+  st = pv->get_status();
+  sev = pv->get_severity();
+  if ( ( st != metero->oldStat ) || ( sev != metero->oldSev ) ) {
+    metero->oldStat = st;
+    metero->oldSev = sev;
+    metero->fgColor.setStatus( st, sev );
+    metero->scaleColor.setStatus( st, sev );
+    metero->meterColor.setStatus( st, sev );
+    metero->bufInvalidate();
+  }
 
-    st = pv->get_status();
-    sev = pv->get_severity();
-    if ( ( st != metero->oldStat ) || ( sev != metero->oldSev ) ) {
-      metero->oldStat = st;
-      metero->oldSev = sev;
-      metero->fgColor.setStatus( st, sev );
-      metero->scaleColor.setStatus( st, sev );
-      metero->meterColor.setStatus( st, sev );
-      metero->bufInvalidate();
-    }
-
+/ ****** SJS 09/11/06 make meter show invalid status ******
+******** Following line moved to here ******/
+  if ( metero->active ) {
+/******/
     metero->curReadV = pv->get_double() - metero->baseV;
     metero->needErase = 1;
     metero->needDraw = 1;
