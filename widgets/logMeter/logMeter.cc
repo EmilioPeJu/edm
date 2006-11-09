@@ -61,21 +61,24 @@ static void logMeterc_edit_update (
     metero->fgColor.setAlarmSensitive ();
   else
     metero->fgColor.setAlarmInsensitive ();
-  metero->fgColor.setColorIndex ( metero->eBuf->bufFgColor, metero->actWin->ci );
+  metero->fgColor.setColorIndex ( metero->eBuf->bufFgColor,
+                                  metero->actWin->ci );
 
   metero->meterColorMode = metero->eBuf->bufMeterColorMode;
   if ( metero->meterColorMode == METERC_K_COLORMODE_ALARM )
     metero->meterColor.setAlarmSensitive ();
   else
     metero->meterColor.setAlarmInsensitive ();
-  metero->meterColor.setColorIndex ( metero->eBuf->bufMeterColor, metero->actWin->ci );
+  metero->meterColor.setColorIndex ( metero->eBuf->bufMeterColor,
+                                     metero->actWin->ci );
 
   metero->scaleColorMode = metero->eBuf->bufScaleColorMode;
   if ( metero->scaleColorMode == METERC_K_COLORMODE_ALARM )
     metero->scaleColor.setAlarmSensitive ();
   else
     metero->scaleColor.setAlarmInsensitive ();
-  metero->scaleColor.setColorIndex ( metero->eBuf->bufScaleColor, metero->actWin->ci );
+  metero->scaleColor.setColorIndex ( metero->eBuf->bufScaleColor,
+                                     metero->actWin->ci );
 
   metero->shadowMode = metero->eBuf->bufShadowMode;
 
@@ -105,13 +108,18 @@ static void logMeterc_edit_update (
   //metero->minorIntervals = metero->eBuf->bufMinorIntervals;
   metero->minorIntExpStr.setRaw ( metero->eBuf->bufMinorIntervals );
 
-  metero->bgColor.setColorIndex ( metero->eBuf->bufBgColor, metero->actWin->ci );
+  metero->bgColor.setColorIndex ( metero->eBuf->bufBgColor,
+                                  metero->actWin->ci );
 
-  metero->tsColor.setColorIndex ( metero->eBuf->bufTsColor, metero->actWin->ci );
-  metero->bsColor.setColorIndex ( metero->eBuf->bufBsColor, metero->actWin->ci );
+  metero->tsColor.setColorIndex ( metero->eBuf->bufTsColor,
+                                  metero->actWin->ci );
+  metero->bsColor.setColorIndex ( metero->eBuf->bufBsColor,
+                                  metero->actWin->ci );
 
-  metero->scaleColor.setColorIndex ( metero->eBuf->bufScaleColor, metero->actWin->ci );
-  metero->labelColor.setColorIndex ( metero->eBuf->bufLabelColor, metero->actWin->ci );
+  metero->scaleColor.setColorIndex ( metero->eBuf->bufScaleColor,
+                                     metero->actWin->ci );
+  metero->labelColor.setColorIndex ( metero->eBuf->bufLabelColor,
+                                     metero->actWin->ci );
 
   metero->controlPvExpStr.setRaw ( metero->eBuf->bufControlPvName );
   metero->readPvExpStr.setRaw ( metero->eBuf->bufReadPvName );
@@ -1068,13 +1076,15 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
   readStringFromFile ( labelFontTag, 63 + 1, f ); actWin->incLine ();
   actWin->fi->loadFontTag ( labelFontTag );
   labelFs = actWin->fi->getXFontStruct ( labelFontTag );
-  updateFont ( labelFontTag, &labelFs, &labelFontAscent, &labelFontDescent, &labelFontHeight );
+  updateFont ( labelFontTag, &labelFs, &labelFontAscent, &labelFontDescent,
+               &labelFontHeight );
 
 
   readStringFromFile ( scaleFontTag, 63 + 1, f ); actWin->incLine ();
   actWin->fi->loadFontTag ( scaleFontTag );
   scaleFs = actWin->fi->getXFontStruct ( scaleFontTag );
-  updateFont ( scaleFontTag, &scaleFs, &scaleFontAscent, &scaleFontDescent, &scaleFontHeight );
+  updateFont ( scaleFontTag, &scaleFs, &scaleFontAscent, &scaleFontDescent,
+               &scaleFontHeight );
 
   if ( major > 1 || minor > 0 ) 
   {
@@ -1207,9 +1217,11 @@ int activeLogMeterClass::genericEdit ( void )
   //    PV_Factory::MAX_PV_NAME );
   ef.addTextField ( activeLogMeterClass_str9, 35, eBuf->bufReadPvName,
    PV_Factory::MAX_PV_NAME );
-  ef.addOption ( activeLogMeterClass_str10, activeLogMeterClass_str11, &eBuf->bufLabelType );
+  ef.addOption ( activeLogMeterClass_str10, activeLogMeterClass_str11,
+                 &eBuf->bufLabelType );
   ef.addTextField ( activeLogMeterClass_str12, 35, eBuf->bufLiteralLabel, 39 );
-  ef.addColorButton ( activeLogMeterClass_str14, actWin->ci, &eBuf->labelCb, &eBuf->bufLabelColor);
+  ef.addColorButton ( activeLogMeterClass_str14, actWin->ci, &eBuf->labelCb,
+                      &eBuf->bufLabelColor);
   ef.addTextField (activeLogMeterClass_str15, 35, &eBuf->bufMeterAngle);
   ef.addToggle ( activeLogMeterClass_str45, &eBuf->bufTrackDelta );
   ef.addToggle ( activeLogMeterClass_str16, &eBuf->bufShowScale );
@@ -1222,23 +1234,31 @@ int activeLogMeterClass::genericEdit ( void )
   ef.addTextField (activeLogMeterClass_str21, 35, eBuf->bufScaleMin, 15 );
   //ef.addTextField (activeLogMeterClass_str22, 35, &eBuf->bufScaleMax );
   ef.addTextField (activeLogMeterClass_str22, 35, eBuf->bufScaleMax, 15 );
-  ef.addColorButton ( activeLogMeterClass_str24, actWin->ci, &eBuf->scaleCb, &eBuf->bufScaleColor);
+  ef.addColorButton ( activeLogMeterClass_str24, actWin->ci, &eBuf->scaleCb,
+                      &eBuf->bufScaleColor);
   ef.addToggle ( activeLogMeterClass_str25, &eBuf->bufScaleColorMode );
   ef.addTextField (activeLogMeterClass_str44, 35, eBuf->bufLabelIntervals, 15 );
   ef.addTextField (activeLogMeterClass_str26, 35, eBuf->bufMajorIntervals, 15 );
   ef.addTextField (activeLogMeterClass_str27, 35, eBuf->bufMinorIntervals, 15 );
   ef.addToggle (activeLogMeterClass_str28, &eBuf->bufNeedleType);  
-  ef.addColorButton ( activeLogMeterClass_str29, actWin->ci, &eBuf->fgCb, &eBuf->bufFgColor );
+  ef.addColorButton ( activeLogMeterClass_str29, actWin->ci, &eBuf->fgCb,
+                      &eBuf->bufFgColor );
   ef.addToggle ( activeLogMeterClass_str30, &eBuf->bufFgColorMode );
-  ef.addColorButton ( activeLogMeterClass_str31, actWin->ci, &eBuf->meterCb, &eBuf->bufMeterColor );
+  ef.addColorButton ( activeLogMeterClass_str31, actWin->ci, &eBuf->meterCb,
+                      &eBuf->bufMeterColor );
   ef.addToggle ( activeLogMeterClass_str32, &eBuf->bufMeterColorMode );
-  ef.addColorButton ( activeLogMeterClass_str33, actWin->ci, &eBuf->bgCb, &eBuf->bufBgColor );
+  ef.addColorButton ( activeLogMeterClass_str33, actWin->ci, &eBuf->bgCb,
+                      &eBuf->bufBgColor );
   ef.addToggle (activeLogMeterClass_str34, &eBuf->bufShadowMode);
-  ef.addColorButton (activeLogMeterClass_str35, actWin->ci, &eBuf->tsCb, &eBuf->bufTsColor);
-  ef.addColorButton (activeLogMeterClass_str36, actWin->ci, &eBuf->bsCb, &eBuf->bufBsColor);
+  ef.addColorButton (activeLogMeterClass_str35, actWin->ci, &eBuf->tsCb,
+                     &eBuf->bufTsColor);
+  ef.addColorButton (activeLogMeterClass_str36, actWin->ci, &eBuf->bsCb,
+                     &eBuf->bufBsColor);
 
-  ef.addFontMenu ( activeLogMeterClass_str13, actWin->fi, &labelFm, labelFontTag );
-  ef.addFontMenu ( activeLogMeterClass_str23, actWin->fi, &scaleFm, scaleFontTag );
+  ef.addFontMenu ( activeLogMeterClass_str13, actWin->fi, &labelFm,
+                   labelFontTag );
+  ef.addFontMenu ( activeLogMeterClass_str23, actWin->fi, &scaleFm,
+                   scaleFontTag );
 
   XtUnmanageChild ( scaleFm.alignWidget () ); // no alignment info
   XtUnmanageChild ( labelFm.alignWidget () ); // no alignment info
@@ -1251,7 +1271,8 @@ int activeLogMeterClass::editCreate ( void )
 {
 
   this->genericEdit ();
-  ef.finished ( logMeterc_edit_ok, logMeterc_edit_apply, logMeterc_edit_cancel_delete, this );
+  ef.finished ( logMeterc_edit_ok, logMeterc_edit_apply,
+                logMeterc_edit_cancel_delete, this );
   actWin->currentEf = NULL;
   ef.popup ();
 
@@ -1262,7 +1283,8 @@ int activeLogMeterClass::editCreate ( void )
 int activeLogMeterClass::edit ( void ) 
 {
   this->genericEdit ();
-  ef.finished ( logMeterc_edit_ok, logMeterc_edit_apply, logMeterc_edit_cancel, this );
+  ef.finished ( logMeterc_edit_ok, logMeterc_edit_apply,
+                logMeterc_edit_cancel, this );
   actWin->currentEf = &ef;
   ef.popup ();
 
@@ -1398,8 +1420,10 @@ int activeLogMeterClass::draw ( void )
 
   if ( scaleFs )
   { 
-    scaleMinWidth = XTextWidth (scaleFs, scaleMinString, strlen (scaleMinString));
-    scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString, strlen (scaleMaxString));
+    scaleMinWidth = XTextWidth (scaleFs, scaleMinString,
+                                strlen (scaleMinString));
+    scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString,
+                                strlen (scaleMaxString));
   }
   else
   {
@@ -1420,7 +1444,8 @@ int activeLogMeterClass::draw ( void )
 
   if ( scaleFs )
   {
-    if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) > scaleFontWidth)
+    if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) >
+         scaleFontWidth)
       scaleFontWidth = XTextWidth (scaleFs, scaleString, strlen (scaleString));
   }
 
@@ -1429,7 +1454,8 @@ int activeLogMeterClass::draw ( void )
 
   if ( scaleFs )
   {
-    if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) > scaleFontWidth)
+    if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) >
+         scaleFontWidth)
       scaleFontWidth = XTextWidth (scaleFs, scaleString, strlen (scaleString));
   }
 
@@ -1793,8 +1819,10 @@ int activeLogMeterClass::drawActive ( void )
 
   if ( scaleFs )
   {  
-    scaleMinWidth = XTextWidth (scaleFs, scaleMinString, strlen (scaleMinString));
-    scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString, strlen (scaleMaxString));
+    scaleMinWidth = XTextWidth (scaleFs, scaleMinString,
+                                strlen (scaleMinString));
+    scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString,
+                                strlen (scaleMaxString));
   }
   else
   {
@@ -1813,13 +1841,15 @@ int activeLogMeterClass::drawActive ( void )
   scaleLogValue = scaleLogMax - scaleLogTextIncr;
   sprintf (scaleString, fmt, pow (10, scaleLogValue));
 
-  if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) > scaleFontWidth)
+  if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) >
+       scaleFontWidth)
     scaleFontWidth = XTextWidth (scaleFs, scaleString, strlen (scaleString));
     
   scaleLogValue = scaleLogMin + scaleLogTextIncr;
   sprintf (scaleString, fmt, pow (10, scaleLogValue));
 
-  if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) > scaleFontWidth)
+  if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) >
+       scaleFontWidth)
     scaleFontWidth = XTextWidth (scaleFs, scaleString, strlen (scaleString));
 
   descentAngle = 3.1415926535898 / 2 - meterTotalAngle / 2;
@@ -1888,8 +1918,10 @@ int activeLogMeterClass::drawActive ( void )
 
   if ( needleAngle > endAngle )  needleAngle = endAngle;
 
-  meterNeedleXend = (int) (meterNeedleXorigin + needleLength * cos (needleAngle));
-  meterNeedleYend = (int) (meterNeedleYorigin - needleLength * sin (needleAngle));
+  meterNeedleXend = (int) (meterNeedleXorigin + needleLength *
+                                                cos (needleAngle));
+  meterNeedleYend = (int) (meterNeedleYorigin - needleLength *
+                                                sin (needleAngle));
  
   meterNeedleXorigin += faceX;
   meterNeedleYorigin += faceY;
@@ -1983,8 +2015,10 @@ int activeLogMeterClass::drawActive ( void )
            labelAngle += labelAngleIncr, scaleLogValue -= scaleLogTextIncr)
       {
        
-        farEndX = (int) (meterNeedleXorigin + (insideArc + labelTickSize) * cos (labelAngle));
-        farEndY = (int) (meterNeedleYorigin - (insideArc + labelTickSize) * sin (labelAngle));
+        farEndX = (int) (meterNeedleXorigin + (insideArc + labelTickSize) *
+                                              cos (labelAngle));
+        farEndY = (int) (meterNeedleYorigin - (insideArc + labelTickSize) *
+                                              sin (labelAngle));
         nearEndX = (int) (meterNeedleXorigin + insideArc * cos (labelAngle));
         nearEndY = (int) (meterNeedleYorigin - insideArc * sin (labelAngle));
        
@@ -2060,10 +2094,12 @@ int activeLogMeterClass::drawActive ( void )
                              sin (ii * minorAngleIncr + labelAngle +
                                   i * majorAngleIncr));
             nearEndX = (int) (meterNeedleXorigin +
-                              insideArc * cos (ii * minorAngleIncr + labelAngle +
+                              insideArc * cos (ii * minorAngleIncr +
+                                               labelAngle +
                                                i * majorAngleIncr));
             nearEndY = (int) (meterNeedleYorigin -
-                              insideArc * sin (ii * minorAngleIncr + labelAngle +
+                              insideArc * sin (ii * minorAngleIncr +
+                                               labelAngle +
                                                i * majorAngleIncr));
             XDrawLine (actWin->d, XtWindow (actWin->executeWidget),
                        actWin->executeGc.normGC (), farEndX, farEndY,
@@ -2378,8 +2414,8 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
         readPvId = the_PV_Factory->create ( readPvExpStr.getExpanded () );
         if ( readPvId )
         {
-          readPvId->add_conn_state_callback ( logMeter_monitor_read_connect_state,
-                                              this );
+          readPvId->add_conn_state_callback (
+              logMeter_monitor_read_connect_state, this );
         }
         else
         {
@@ -2427,8 +2463,8 @@ int activeLogMeterClass::deactivate (
     {
       if ( readPvId ) 
       {
-        readPvId->remove_conn_state_callback ( logMeter_monitor_read_connect_state,
-                                               this );
+        readPvId->remove_conn_state_callback (
+            logMeter_monitor_read_connect_state, this );
         readPvId->remove_value_callback ( logMeter_readUpdate, this );
         readPvId->release ();
         readPvId = NULL;
