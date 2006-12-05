@@ -1358,6 +1358,14 @@ int edmTextentryClass::deactivate(int pass)
 
 int edmTextentryClass::drawActive()
 {
+    // ****** SJS Addition 05_12_06 - do not show if widget is part of a ******
+    // ****** disabled group.  Note that "enabled" is not correctly set ******
+    // ****** in the function activate *******
+    if ( !enabled ) 
+    {
+       if ( widget ) XtUnmapWidget( widget );
+    }
+    // ****** End of SJS addition ******
     if ( !enabled || !is_executing )
         return 1;
     if (editing)
