@@ -89,18 +89,20 @@ extern "C"
         return (void *) obj;
     }
 
-  //    void *create_StripClassPtr (void)
-  //    {
-  //        edmStripClass *obj = new edmStripClass;
-  //        return (void *) obj;
-  //    }
-  //    
-  //    void *clone_StripClassPtr (void *rhs)
-  //    {
-  //        edmStripClass *src = (edmStripClass *) rhs;
-  //        edmStripClass *obj = new edmStripClass(src);
-  //        return (void *) obj;
-  //    }
+    // ****** Functions re-introduced by SJS 14/12/06 ******
+    void *create_StripClassPtr (void)
+    {
+        edmStripClass *obj = new edmStripClass;
+        return (void *) obj;
+    }
+    
+    void *clone_StripClassPtr (void *rhs)
+    {
+        edmStripClass *src = (edmStripClass *) rhs;
+        edmStripClass *obj = new edmStripClass(src);
+        return (void *) obj;
+    }
+    // ****** End of functions re-introduced by SJS ******
 
     void *create_ByteClassPtr (void)
     {
