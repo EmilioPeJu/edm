@@ -2,7 +2,7 @@
 TOP = ../../..
 ifdef EPICS_HOST_ARCH
  include $(TOP)/configure/CONFIG
- DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter
+ DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter multiLineTextUpdate
  include $(TOP)/configure/RULES_DIRS
 
 else
