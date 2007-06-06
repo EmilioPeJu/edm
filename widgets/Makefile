@@ -10,7 +10,7 @@ else
     ifneq ($(wildcard $(TOP)/config)x,x)
       # New Makefile.Host config file location
       include $(TOP)/config/CONFIG_EXTENSIONS
-      DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter
+      DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter multiLineTextUpdate
       include $(TOP)/config/RULES_DIRS
     else
       # Old Makefile.Unix config file location
