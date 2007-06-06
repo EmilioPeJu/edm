@@ -1,0 +1,874 @@
+make -C O.linux-x86 -f ../Makefile TOP=../../../../.. T_A=linux-x86 install
+make[1]: Entering directory `/home/sjs/epics/R3.14.8.2/extensions/src/edm/widgets/multiLineTextUpdate/O.linux-x86'
+/usr/bin/g++ -c   -D_POSIX_C_SOURCE=199506L -D_POSIX_THREADS -D_XOPEN_SOURCE=500        -D_X86_  -DUNIX  -D_BSD_SOURCE -Dlinux  -D_REENTRANT -ansi  -O3  -Wall          -g -fPIC -I. -I.. -I../../../../../include/os/Linux -I../../../../../include -I/home/sjs/epics/R3.14.8.2/base/include/os/Linux -I/home/sjs/epics/R3.14.8.2/base/include -I../../../../../include/os/Linux -I../../../../../include    -I../../../lib -I../../../util -I../../../pvlib -I../../../../../include/edm    ../multiLineTextUpdate.cc 
+../multiLineTextUpdate.cc:113: error: `edmmultiLineTextUpdateClass' has not been declared
+../multiLineTextUpdate.cc:114: error: ISO C++ forbids declaration of `edmmultiLineTextUpdateClass' with no type
+../multiLineTextUpdate.cc: In function `int edmmultiLineTextUpdateClass()':
+../multiLineTextUpdate.cc:115: error: `MULTILINE_TEXTUPDATE_CLASSNAME' was not declared in this scope
+../multiLineTextUpdate.cc:115: error: `init' was not declared in this scope
+../multiLineTextUpdate.cc:115: warning: unused variable 'MULTILINE_TEXTUPDATE_CLASSNAME'
+../multiLineTextUpdate.cc:115: warning: unused variable 'init'
+../multiLineTextUpdate.cc:116: warning: no return statement in function returning non-void
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:118: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void init(const char*)':
+../multiLineTextUpdate.cc:120: error: `name' was not declared in this scope
+../multiLineTextUpdate.cc:121: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:122: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:124: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:125: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:126: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:127: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:128: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:129: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:120: warning: unused variable 'name'
+../multiLineTextUpdate.cc:121: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:122: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:124: warning: unused variable 'color_pv'
+../multiLineTextUpdate.cc:125: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:126: warning: unused variable 'fontTag'
+../multiLineTextUpdate.cc:127: warning: unused variable 'fs'
+../multiLineTextUpdate.cc:128: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:129: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:132: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc:132: error: expected constructor, destructor, or type conversion before '(' token
+../multiLineTextUpdate.cc:137: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc:137: error: expected `,' or `...' before '*' token
+../multiLineTextUpdate.cc:139: error: ISO C++ forbids declaration of `edmmultiLineTextUpdateClass' with no type
+../multiLineTextUpdate.cc: In function `void clone(int)':
+../multiLineTextUpdate.cc:141: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:142: error: `rhs' was not declared in this scope
+../multiLineTextUpdate.cc:144: error: `name' was not declared in this scope
+../multiLineTextUpdate.cc:144: error: `classname' was not declared in this scope
+../multiLineTextUpdate.cc:146: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:147: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:148: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:149: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:150: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:151: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:152: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:153: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:154: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:155: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:156: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:158: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:158: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:159: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:160: error: `fontDescent' was not declared in this scope
+../multiLineTextUpdate.cc:161: error: `fontHeight' was not declared in this scope
+../multiLineTextUpdate.cc:162: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:163: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:164: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:165: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:144: warning: unused variable 'name'
+../multiLineTextUpdate.cc:144: warning: unused variable 'classname'
+../multiLineTextUpdate.cc:146: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:147: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:148: warning: unused variable 'color_pv'
+../multiLineTextUpdate.cc:149: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:150: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:151: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:152: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:153: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:154: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:155: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:158: warning: unused variable 'fs'
+../multiLineTextUpdate.cc:158: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc:159: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:160: warning: unused variable 'fontDescent'
+../multiLineTextUpdate.cc:161: warning: unused variable 'fontHeight'
+../multiLineTextUpdate.cc:162: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:163: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:164: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:165: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:168: error: expected constructor, destructor, or type conversion before '::' token
+../multiLineTextUpdate.cc:187: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* objName()':
+../multiLineTextUpdate.cc:188: error: `name' was not declared in this scope
+../multiLineTextUpdate.cc:188: warning: unused variable 'name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:193: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int save(FILE*)':
+../multiLineTextUpdate.cc:236: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:238: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:240: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:241: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:248: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:249: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:250: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:251: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:252: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:255: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:259: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:260: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:261: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:262: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:263: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:264: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:238: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:241: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:248: warning: unused variable 'x'
+../multiLineTextUpdate.cc:249: warning: unused variable 'y'
+../multiLineTextUpdate.cc:250: warning: unused variable 'w'
+../multiLineTextUpdate.cc:251: warning: unused variable 'h'
+../multiLineTextUpdate.cc:252: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:255: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:259: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:260: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:261: warning: unused variable 'fontTag'
+../multiLineTextUpdate.cc:262: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:263: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:264: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:277: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int old_save(FILE*)':
+../multiLineTextUpdate.cc:282: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:283: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:284: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:285: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:287: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:289: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:290: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:292: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:292: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:294: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:295: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:297: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:298: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:299: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:301: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:302: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:282: warning: unused variable 'x'
+../multiLineTextUpdate.cc:283: warning: unused variable 'y'
+../multiLineTextUpdate.cc:284: warning: unused variable 'w'
+../multiLineTextUpdate.cc:285: warning: unused variable 'h'
+../multiLineTextUpdate.cc:287: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:289: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:290: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:294: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:295: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:297: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:298: warning: unused variable 'fontTag'
+../multiLineTextUpdate.cc:299: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:301: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:302: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:307: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int createFromFile(FILE*, char*, activeWindowClass*)':
+../multiLineTextUpdate.cc:347: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:354: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:355: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:356: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:357: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:358: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:361: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:365: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:366: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:367: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:368: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:369: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:370: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:380: error: `postIncompatable' was not declared in this scope
+../multiLineTextUpdate.cc:380: warning: unused variable 'postIncompatable'
+../multiLineTextUpdate.cc:385: error: `postIncompatable' was not declared in this scope
+../multiLineTextUpdate.cc:385: warning: unused variable 'postIncompatable'
+../multiLineTextUpdate.cc:389: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:391: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:391: error: `DisplayMode' was not declared in this scope
+../multiLineTextUpdate.cc:391: error: expected `;' before "oneDspMode"
+../multiLineTextUpdate.cc:393: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:394: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:398: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:401: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:403: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:403: error: `fontDescent' was not declared in this scope
+../multiLineTextUpdate.cc:403: error: `fontHeight' was not declared in this scope
+../multiLineTextUpdate.cc:403: error: `updateFont' was not declared in this scope
+../multiLineTextUpdate.cc:354: warning: unused variable 'x'
+../multiLineTextUpdate.cc:355: warning: unused variable 'y'
+../multiLineTextUpdate.cc:356: warning: unused variable 'w'
+../multiLineTextUpdate.cc:357: warning: unused variable 'h'
+../multiLineTextUpdate.cc:358: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:361: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:365: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:366: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:368: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:391: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:391: warning: unused variable 'DisplayMode'
+../multiLineTextUpdate.cc:398: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:403: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:403: warning: unused variable 'fontDescent'
+../multiLineTextUpdate.cc:403: warning: unused variable 'fontHeight'
+../multiLineTextUpdate.cc:403: warning: unused variable 'updateFont'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:414: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int old_createFromFile(FILE*, char*, activeWindowClass*)':
+../multiLineTextUpdate.cc:421: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:426: error: `postIncompatable' was not declared in this scope
+../multiLineTextUpdate.cc:426: warning: unused variable 'postIncompatable'
+../multiLineTextUpdate.cc:430: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:431: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:432: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:433: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:434: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:437: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:441: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:441: error: `dm_default' was not declared in this scope
+../multiLineTextUpdate.cc:442: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:441: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:441: warning: unused variable 'dm_default'
+../multiLineTextUpdate.cc:442: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:447: error: `dm_exp' was not declared in this scope
+../multiLineTextUpdate.cc:448: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:448: error: `DisplayMode' was not declared in this scope
+../multiLineTextUpdate.cc:448: error: expected `;' before "index"
+../multiLineTextUpdate.cc:448: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:448: warning: unused variable 'DisplayMode'
+../multiLineTextUpdate.cc:450: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:450: error: `dm_default' was not declared in this scope
+../multiLineTextUpdate.cc:450: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:450: warning: unused variable 'dm_default'
+../multiLineTextUpdate.cc:447: warning: unused variable 'dm_exp'
+../multiLineTextUpdate.cc:452: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:452: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:459: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:460: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:459: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:460: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:465: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:465: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:470: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:470: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:476: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:476: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:482: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:482: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:487: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:487: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:492: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:492: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:496: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:496: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:500: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:500: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:503: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:504: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:505: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:507: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:509: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:509: error: `fontDescent' was not declared in this scope
+../multiLineTextUpdate.cc:509: error: `fontHeight' was not declared in this scope
+../multiLineTextUpdate.cc:509: error: `updateFont' was not declared in this scope
+../multiLineTextUpdate.cc:512: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:512: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:516: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:516: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:522: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:523: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:525: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:525: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:528: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:528: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc:430: warning: unused variable 'x'
+../multiLineTextUpdate.cc:431: warning: unused variable 'y'
+../multiLineTextUpdate.cc:432: warning: unused variable 'w'
+../multiLineTextUpdate.cc:433: warning: unused variable 'h'
+../multiLineTextUpdate.cc:437: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:503: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:505: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:509: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:509: warning: unused variable 'fontDescent'
+../multiLineTextUpdate.cc:509: warning: unused variable 'fontHeight'
+../multiLineTextUpdate.cc:509: warning: unused variable 'updateFont'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:540: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int createInteractive(activeWindowClass*, int, int, int, int)':
+../multiLineTextUpdate.cc:543: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:544: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:544: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:544: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:544: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:546: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:546: error: `dm_default' was not declared in this scope
+../multiLineTextUpdate.cc:547: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:548: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:549: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:550: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:551: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:552: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:553: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:554: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:555: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:555: error: `fontDescent' was not declared in this scope
+../multiLineTextUpdate.cc:555: error: `fontHeight' was not declared in this scope
+../multiLineTextUpdate.cc:555: error: `updateFont' was not declared in this scope
+../multiLineTextUpdate.cc:558: error: `draw' was not declared in this scope
+../multiLineTextUpdate.cc:559: error: `editCreate' was not declared in this scope
+../multiLineTextUpdate.cc:544: warning: unused variable 'x'
+../multiLineTextUpdate.cc:544: warning: unused variable 'y'
+../multiLineTextUpdate.cc:544: warning: unused variable 'w'
+../multiLineTextUpdate.cc:544: warning: unused variable 'h'
+../multiLineTextUpdate.cc:546: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:546: warning: unused variable 'dm_default'
+../multiLineTextUpdate.cc:547: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:548: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:549: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:550: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:551: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:553: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:555: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:555: warning: unused variable 'fontDescent'
+../multiLineTextUpdate.cc:555: warning: unused variable 'fontHeight'
+../multiLineTextUpdate.cc:555: warning: unused variable 'updateFont'
+../multiLineTextUpdate.cc:558: warning: unused variable 'draw'
+../multiLineTextUpdate.cc:559: warning: unused variable 'editCreate'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:563: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int edit()':
+../multiLineTextUpdate.cc:565: error: `genericEdit' was not declared in this scope
+../multiLineTextUpdate.cc:566: error: `ef' was not declared in this scope
+../multiLineTextUpdate.cc:566: error: `edit_ok' was not declared in this scope
+../multiLineTextUpdate.cc:566: error: `edit_apply' was not declared in this scope
+../multiLineTextUpdate.cc:566: error: `edit_cancel' was not declared in this scope
+../multiLineTextUpdate.cc:566: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:567: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:565: warning: unused variable 'genericEdit'
+../multiLineTextUpdate.cc:566: warning: unused variable 'edit_ok'
+../multiLineTextUpdate.cc:566: warning: unused variable 'edit_apply'
+../multiLineTextUpdate.cc:566: warning: unused variable 'edit_cancel'
+../multiLineTextUpdate.cc:567: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:572: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int editCreate()':
+../multiLineTextUpdate.cc:575: error: `genericEdit' was not declared in this scope
+../multiLineTextUpdate.cc:576: error: `ef' was not declared in this scope
+../multiLineTextUpdate.cc:576: error: `edit_ok' was not declared in this scope
+../multiLineTextUpdate.cc:576: error: `edit_apply' was not declared in this scope
+../multiLineTextUpdate.cc:576: error: `edit_cancel_delete' was not declared in this scope
+../multiLineTextUpdate.cc:576: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:577: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:575: warning: unused variable 'genericEdit'
+../multiLineTextUpdate.cc:576: warning: unused variable 'edit_ok'
+../multiLineTextUpdate.cc:576: warning: unused variable 'edit_apply'
+../multiLineTextUpdate.cc:576: warning: unused variable 'edit_cancel_delete'
+../multiLineTextUpdate.cc:577: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:582: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int genericEdit()':
+../multiLineTextUpdate.cc:586: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:586: error: `name' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `bufX' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `bufY' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `bufW' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `bufH' was not declared in this scope
+../multiLineTextUpdate.cc:597: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:598: error: `bufPvName' was not declared in this scope
+../multiLineTextUpdate.cc:598: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:599: error: `bufColorPvName' was not declared in this scope
+../multiLineTextUpdate.cc:599: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:600: error: `buf_displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:600: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:601: error: `buf_precision' was not declared in this scope
+../multiLineTextUpdate.cc:601: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:602: error: `buf_line_width' was not declared in this scope
+../multiLineTextUpdate.cc:602: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:603: error: `bufTextColor' was not declared in this scope
+../multiLineTextUpdate.cc:603: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:604: error: `buf_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:605: error: `bufFillColor' was not declared in this scope
+../multiLineTextUpdate.cc:605: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:606: error: `bufIsFilled' was not declared in this scope
+../multiLineTextUpdate.cc:606: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:607: error: `buf_alarm_sensitive_line' was not declared in this scope
+../multiLineTextUpdate.cc:607: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:610: error: `ef' was not declared in this scope
+../multiLineTextUpdate.cc:626: error: `textCb' was not declared in this scope
+../multiLineTextUpdate.cc:629: error: `fillCb' was not declared in this scope
+../multiLineTextUpdate.cc:631: error: `fm' was not declared in this scope
+../multiLineTextUpdate.cc:631: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:632: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:586: warning: unused variable 'name'
+../multiLineTextUpdate.cc:597: warning: unused variable 'x'
+../multiLineTextUpdate.cc:597: warning: unused variable 'y'
+../multiLineTextUpdate.cc:597: warning: unused variable 'w'
+../multiLineTextUpdate.cc:597: warning: unused variable 'h'
+../multiLineTextUpdate.cc:598: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:599: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:600: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:601: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:602: warning: unused variable 'line_width'
+../multiLineTextUpdate.cc:605: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:606: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:607: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc:626: warning: unused variable 'textCb'
+../multiLineTextUpdate.cc:629: warning: unused variable 'fillCb'
+../multiLineTextUpdate.cc:631: warning: unused variable 'fontTag'
+../multiLineTextUpdate.cc:632: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:637: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void redraw_text(Display*, Drawable, gcClass&, _XGC*, const char*, size_t)':
+../multiLineTextUpdate.cc:644: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:644: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:647: error: `is_filled' was not declared in this scope
+../multiLineTextUpdate.cc:649: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:650: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:650: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:650: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:650: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:649: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:650: warning: unused variable 'x'
+../multiLineTextUpdate.cc:650: warning: unused variable 'y'
+../multiLineTextUpdate.cc:650: warning: unused variable 'w'
+../multiLineTextUpdate.cc:650: warning: unused variable 'h'
+../multiLineTextUpdate.cc:647: warning: unused variable 'is_filled'
+../multiLineTextUpdate.cc:654: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc:655: error: `is_line_alarm_sensitive' was not declared in this scope
+../multiLineTextUpdate.cc:656: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:658: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:661: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:661: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:661: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:661: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:658: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:661: warning: unused variable 'x'
+../multiLineTextUpdate.cc:661: warning: unused variable 'y'
+../multiLineTextUpdate.cc:661: warning: unused variable 'w'
+../multiLineTextUpdate.cc:661: warning: unused variable 'h'
+../multiLineTextUpdate.cc:655: warning: unused variable 'is_line_alarm_sensitive'
+../multiLineTextUpdate.cc:675: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:676: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:677: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:678: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:680: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:681: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:683: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:683: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:694: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:680: warning: unused variable 'fontTag'
+../multiLineTextUpdate.cc:694: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:644: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:700: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void remove_text(Display*, Drawable, gcClass&, _XGC*)':
+../multiLineTextUpdate.cc:705: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:705: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:705: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:705: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:706: error: `line_width' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:714: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int draw()':
+../multiLineTextUpdate.cc:717: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:717: error: `deleteRequest' was not declared in this scope
+../multiLineTextUpdate.cc:717: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:717: warning: unused variable 'deleteRequest'
+../multiLineTextUpdate.cc:719: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:721: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:723: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:724: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:721: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:723: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:724: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:735: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int erase()':
+../multiLineTextUpdate.cc:738: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:738: error: `deleteRequest' was not declared in this scope
+../multiLineTextUpdate.cc:738: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:738: warning: unused variable 'deleteRequest'
+../multiLineTextUpdate.cc:740: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:747: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int checkResizeSelectBox(int, int, int, int)':
+../multiLineTextUpdate.cc:749: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:749: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:749: error: `checkResizeSelectBoxAbs' was not declared in this scope
+../multiLineTextUpdate.cc:749: warning: unused variable 'w'
+../multiLineTextUpdate.cc:749: warning: unused variable 'h'
+../multiLineTextUpdate.cc:749: warning: unused variable 'checkResizeSelectBoxAbs'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:752: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc:762: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void edit_update(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:764: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:764: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:764: error: expected `;' before "client"
+../multiLineTextUpdate.cc:781: error: `DisplayMode' was not declared in this scope
+../multiLineTextUpdate.cc:781: error: expected `;' before "me"
+../multiLineTextUpdate.cc:781: warning: unused variable 'DisplayMode'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:802: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void edit_ok(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:804: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:804: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:804: error: expected `;' before "client"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:811: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void edit_apply(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:813: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:813: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:813: error: expected `;' before "client"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:819: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void edit_cancel(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:821: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:821: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:821: error: expected `;' before "client"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:827: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void edit_cancel_delete(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:830: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:830: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:830: error: expected `;' before "client"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:843: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void changeDisplayParams(unsigned int, char*, int, char*, int, char*, int, int, int, int, int, int, int, int)':
+../multiLineTextUpdate.cc:860: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:861: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:860: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:861: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:864: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:864: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:867: error: `fontTag' was not declared in this scope
+../multiLineTextUpdate.cc:868: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:869: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:869: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:871: error: `fontAscent' was not declared in this scope
+../multiLineTextUpdate.cc:871: error: `fontDescent' was not declared in this scope
+../multiLineTextUpdate.cc:871: error: `fontHeight' was not declared in this scope
+../multiLineTextUpdate.cc:871: error: `updateFont' was not declared in this scope
+../multiLineTextUpdate.cc:868: warning: unused variable 'alignment'
+../multiLineTextUpdate.cc:869: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc:871: warning: unused variable 'fontAscent'
+../multiLineTextUpdate.cc:871: warning: unused variable 'fontDescent'
+../multiLineTextUpdate.cc:871: warning: unused variable 'fontHeight'
+../multiLineTextUpdate.cc:871: warning: unused variable 'updateFont'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:875: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void changePvNames(int, int, char**, int, char**, int, char**, int, char**, int, char**)':
+../multiLineTextUpdate.cc:890: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:890: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:897: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:897: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:901: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void getPvs(int, ProcessVariable**, int*)':
+../multiLineTextUpdate.cc:911: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:912: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:911: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:912: warning: unused variable 'color_pv'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:919: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int containsMacros()':
+../multiLineTextUpdate.cc:921: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:922: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:921: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:922: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:925: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int expand1st(int, char**, char**)':
+../multiLineTextUpdate.cc:928: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:929: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:928: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:929: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:932: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int expand2nd(int, char**, char**)':
+../multiLineTextUpdate.cc:935: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:936: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:935: warning: unused variable 'color_pv_name'
+../multiLineTextUpdate.cc:936: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:942: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int activate(int, void*)':
+../multiLineTextUpdate.cc:947: error: `aglPtr' was not declared in this scope
+../multiLineTextUpdate.cc:948: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:951: error: `is_pv_valid' was not declared in this scope
+../multiLineTextUpdate.cc:952: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:955: error: `is_color_pv_valid' was not declared in this scope
+../multiLineTextUpdate.cc:956: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:957: error: `initEnable' was not declared in this scope
+../multiLineTextUpdate.cc:960: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:960: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:967: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:970: error: `pv_conn_state_callback' was not declared in this scope
+../multiLineTextUpdate.cc:970: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:971: error: `pv_value_callback' was not declared in this scope
+../multiLineTextUpdate.cc:971: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:970: warning: unused variable 'pv_conn_state_callback'
+../multiLineTextUpdate.cc:971: warning: unused variable 'pv_value_callback'
+../multiLineTextUpdate.cc:976: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:979: error: `pv_conn_state_callback' was not declared in this scope
+../multiLineTextUpdate.cc:980: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:981: error: `pv_value_callback' was not declared in this scope
+../multiLineTextUpdate.cc:981: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:979: warning: unused variable 'pv_conn_state_callback'
+../multiLineTextUpdate.cc:981: warning: unused variable 'pv_value_callback'
+../multiLineTextUpdate.cc:984: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:985: error: `drawActive' was not declared in this scope
+../multiLineTextUpdate.cc:985: warning: unused variable 'drawActive'
+../multiLineTextUpdate.cc:984: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:947: warning: unused variable 'aglPtr'
+../multiLineTextUpdate.cc:948: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:957: warning: unused variable 'initEnable'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:991: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int deactivate(int)':
+../multiLineTextUpdate.cc:993: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:997: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:999: error: `pv_conn_state_callback' was not declared in this scope
+../multiLineTextUpdate.cc:999: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1000: error: `pv_value_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1000: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:999: warning: unused variable 'pv_conn_state_callback'
+../multiLineTextUpdate.cc:1000: warning: unused variable 'pv_value_callback'
+../multiLineTextUpdate.cc:1004: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:1006: error: `pv_conn_state_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1006: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1007: error: `pv_value_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1007: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1006: warning: unused variable 'pv_conn_state_callback'
+../multiLineTextUpdate.cc:1007: warning: unused variable 'pv_value_callback'
+../multiLineTextUpdate.cc:993: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1021: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `bool get_current_values(char*, size_t&)':
+../multiLineTextUpdate.cc:1023: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:1023: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:1024: error: `lineColor' was not declared in this scope
+../multiLineTextUpdate.cc:1027: error: `color_pv' was not declared in this scope
+../multiLineTextUpdate.cc:1031: error: `displayMode' was not declared in this scope
+../multiLineTextUpdate.cc:1033: error: `dm_exp' was not declared in this scope
+../multiLineTextUpdate.cc:1037: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:1037: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:1040: error: `dm_eng' was not declared in this scope
+../multiLineTextUpdate.cc:1045: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:1045: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:1049: error: `dm_hex' was not declared in this scope
+../multiLineTextUpdate.cc:1056: error: `dm_decimal' was not declared in this scope
+../multiLineTextUpdate.cc:1060: error: `precision' was not declared in this scope
+../multiLineTextUpdate.cc:1060: warning: unused variable 'precision'
+../multiLineTextUpdate.cc:1033: warning: unused variable 'dm_exp'
+../multiLineTextUpdate.cc:1040: warning: unused variable 'dm_eng'
+../multiLineTextUpdate.cc:1049: warning: unused variable 'dm_hex'
+../multiLineTextUpdate.cc:1056: warning: unused variable 'dm_decimal'
+../multiLineTextUpdate.cc:1031: warning: unused variable 'displayMode'
+../multiLineTextUpdate.cc:1071: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:1024: warning: unused variable 'lineColor'
+../multiLineTextUpdate.cc:1071: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1078: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int drawActive()':
+../multiLineTextUpdate.cc:1080: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1080: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:1080: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1080: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:1082: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1097: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int eraseActive()':
+../multiLineTextUpdate.cc:1099: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1099: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:1099: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1099: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:1101: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1108: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void pv_conn_state_callback(ProcessVariable*, void*)':
+../multiLineTextUpdate.cc:1111: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:1111: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:1111: error: expected `;' before "userarg"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1121: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void pv_value_callback(ProcessVariable*, void*)':
+../multiLineTextUpdate.cc:1148: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:1148: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:1148: error: expected `;' before "userarg"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1158: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void executeDeferred()':
+../multiLineTextUpdate.cc:1160: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1160: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc:1162: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1163: error: `aglPtr' was not declared in this scope
+../multiLineTextUpdate.cc:1165: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:1166: error: `smartDrawAllActive' was not declared in this scope
+../multiLineTextUpdate.cc:1166: warning: unused variable 'smartDrawAllActive'
+../multiLineTextUpdate.cc:1165: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:1163: warning: unused variable 'aglPtr'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1170: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* firstDragName()':
+../multiLineTextUpdate.cc:1173: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1173: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1179: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* nextDragName()':
+../multiLineTextUpdate.cc:1182: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1182: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1188: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* dragValue(int)':
+../multiLineTextUpdate.cc:1191: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1191: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1193: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1195: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:1195: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:1200: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:1200: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc:1193: warning: unused variable 'actWin'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1210: error: `edmmultiLineTextEntryClass' has not been declared
+../multiLineTextUpdate.cc:1211: error: ISO C++ forbids declaration of `edmmultiLineTextEntryClass' with no type
+../multiLineTextUpdate.cc: In function `int edmmultiLineTextEntryClass()':
+../multiLineTextUpdate.cc:1212: error: `MULTILINE_TEXTENTRY_CLASSNAME' was not declared in this scope
+../multiLineTextUpdate.cc:1213: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1214: error: `editing' was not declared in this scope
+../multiLineTextUpdate.cc:1212: warning: unused variable 'MULTILINE_TEXTENTRY_CLASSNAME'
+../multiLineTextUpdate.cc:1213: warning: unused variable 'widget'
+../multiLineTextUpdate.cc:1214: warning: unused variable 'editing'
+../multiLineTextUpdate.cc:1215: warning: no return statement in function returning non-void
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1217: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc:1217: error: expected `,' or `...' before '*' token
+../multiLineTextUpdate.cc:1218: error: ISO C++ forbids declaration of `edmmultiLineTextEntryClass' with no type
+../multiLineTextUpdate.cc:1218: error: ISO C++ forbids declaration of `edmmultiLineTextEntryClass' with no type
+../multiLineTextUpdate.cc: In function `int edmmultiLineTextEntryClass(int)':
+../multiLineTextUpdate.cc:1219: error: `rhs' was not declared in this scope
+../multiLineTextUpdate.cc:1219: error: `MULTILINE_TEXTENTRY_CLASSNAME' was not declared in this scope
+../multiLineTextUpdate.cc:1220: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1221: error: `editing' was not declared in this scope
+../multiLineTextUpdate.cc:1219: warning: unused variable 'rhs'
+../multiLineTextUpdate.cc:1219: warning: unused variable 'MULTILINE_TEXTENTRY_CLASSNAME'
+../multiLineTextUpdate.cc:1220: warning: unused variable 'widget'
+../multiLineTextUpdate.cc:1221: warning: unused variable 'editing'
+../multiLineTextUpdate.cc:1222: warning: no return statement in function returning non-void
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1275: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int activate(int, void*)':
+../multiLineTextUpdate.cc:1276: error: redefinition of `int activate(int, void*)'
+../multiLineTextUpdate.cc:943: error: `int activate(int, void*)' previously defined here
+../multiLineTextUpdate.cc:1278: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc:1285: error: `initEnable' was not declared in this scope
+../multiLineTextUpdate.cc:1286: error: `fs' was not declared in this scope
+../multiLineTextUpdate.cc:1291: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1294: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1297: error: `x' was not declared in this scope
+../multiLineTextUpdate.cc:1298: error: `y' was not declared in this scope
+../multiLineTextUpdate.cc:1299: error: `h' was not declared in this scope
+../multiLineTextUpdate.cc:1300: error: `w' was not declared in this scope
+../multiLineTextUpdate.cc:1303: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:1305: error: `fillColor' was not declared in this scope
+../multiLineTextUpdate.cc:1309: error: `alignment' was not declared in this scope
+../multiLineTextUpdate.cc:1314: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1320: error: `text_entered_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1321: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1327: error: `text_edit_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1328: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1331: error: invalid use of `this' in non-member function
+../multiLineTextUpdate.cc:1333: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1333: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1285: warning: unused variable 'initEnable'
+../multiLineTextUpdate.cc:1286: warning: unused variable 'fs'
+../multiLineTextUpdate.cc:1297: warning: unused variable 'x'
+../multiLineTextUpdate.cc:1298: warning: unused variable 'y'
+../multiLineTextUpdate.cc:1299: warning: unused variable 'h'
+../multiLineTextUpdate.cc:1300: warning: unused variable 'w'
+../multiLineTextUpdate.cc:1303: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:1305: warning: unused variable 'fillColor'
+../multiLineTextUpdate.cc:1320: warning: unused variable 'text_entered_callback'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1342: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int deactivate(int)':
+../multiLineTextUpdate.cc:1343: error: redefinition of `int deactivate(int)'
+../multiLineTextUpdate.cc:992: error: `int deactivate(int)' previously defined here
+../multiLineTextUpdate.cc:1344: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:1348: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1356: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc:1344: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1359: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int drawActive()':
+../multiLineTextUpdate.cc:1360: error: redefinition of `int drawActive()'
+../multiLineTextUpdate.cc:1079: error: `int drawActive()' previously defined here
+../multiLineTextUpdate.cc:1364: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1366: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1364: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1369: error: `enabled' was not declared in this scope
+../multiLineTextUpdate.cc:1369: error: `is_executing' was not declared in this scope
+../multiLineTextUpdate.cc:1369: warning: unused variable 'enabled'
+../multiLineTextUpdate.cc:1369: warning: unused variable 'is_executing'
+../multiLineTextUpdate.cc:1371: error: `editing' was not declared in this scope
+../multiLineTextUpdate.cc:1371: warning: unused variable 'editing'
+../multiLineTextUpdate.cc:1378: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1380: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:1380: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1382: error: `pv' was not declared in this scope
+../multiLineTextUpdate.cc:1382: warning: unused variable 'pv'
+../multiLineTextUpdate.cc:1380: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:1389: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1391: error: `textColor' was not declared in this scope
+../multiLineTextUpdate.cc:1391: error: `actWin' was not declared in this scope
+../multiLineTextUpdate.cc:1391: warning: unused variable 'textColor'
+../multiLineTextUpdate.cc:1395: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc:1395: warning: unused variable 'widget'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1400: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `int eraseActive()':
+../multiLineTextUpdate.cc:1401: error: redefinition of `int eraseActive()'
+../multiLineTextUpdate.cc:1098: error: `int eraseActive()' previously defined here
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1408: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void text_edit_callback(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:1412: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:1412: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:1412: error: expected `;' before "clientData"
+../multiLineTextUpdate.cc:1428: error: `text_noedit_callback' was not declared in this scope
+../multiLineTextUpdate.cc:1428: warning: unused variable 'text_noedit_callback'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1447: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void text_entered_callback(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:1451: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:1451: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:1451: error: expected `;' before "clientData"
+../multiLineTextUpdate.cc:1467: error: `dm_default' was not declared in this scope
+../multiLineTextUpdate.cc:1479: error: `dm_hex' was not declared in this scope
+../multiLineTextUpdate.cc:1467: warning: unused variable 'dm_default'
+../multiLineTextUpdate.cc:1479: warning: unused variable 'dm_hex'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1496: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void text_noedit_callback(_WidgetRec*, void*, void*)':
+../multiLineTextUpdate.cc:1500: error: `me' was not declared in this scope
+../multiLineTextUpdate.cc:1500: error: expected primary-expression before ')' token
+../multiLineTextUpdate.cc:1500: error: expected `;' before "clientData"
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1511: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void map()':
+../multiLineTextUpdate.cc:1513: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1517: error: `edmmultiLineTextEntryClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `void unmap()':
+../multiLineTextUpdate.cc:1519: error: `widget' was not declared in this scope
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1524: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* crawlerGetFirstPv()':
+../multiLineTextUpdate.cc:1526: error: `crawlerPvIndex' was not declared in this scope
+../multiLineTextUpdate.cc:1527: error: `pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:1526: warning: unused variable 'crawlerPvIndex'
+../multiLineTextUpdate.cc:1527: warning: unused variable 'pv_name'
+../multiLineTextUpdate.cc: At global scope:
+../multiLineTextUpdate.cc:1531: error: `edmmultiLineTextUpdateClass' is not a class or namespace
+../multiLineTextUpdate.cc: In function `char* crawlerGetNextPv()':
+../multiLineTextUpdate.cc:1533: error: `crawlerPvIndex' was not declared in this scope
+../multiLineTextUpdate.cc:1533: warning: unused variable 'crawlerPvIndex'
+../multiLineTextUpdate.cc:1535: error: `crawlerPvIndex' was not declared in this scope
+../multiLineTextUpdate.cc:1538: error: `color_pv_name' was not declared in this scope
+../multiLineTextUpdate.cc:1538: warning: unused variable 'color_pv_name'
+make[1]: *** [multiLineTextUpdate.o] Error 1
+make[1]: Leaving directory `/home/sjs/epics/R3.14.8.2/extensions/src/edm/widgets/multiLineTextUpdate/O.linux-x86'
+make: *** [install.linux-x86] Error 2

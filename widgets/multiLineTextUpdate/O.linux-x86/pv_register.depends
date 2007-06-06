@@ -1,0 +1,57 @@
+# DO NOT EDIT: This file created by mkmf.pl,v 1.5 2002/03/25 21:33:24 jba Exp $ 
+
+pv_register.o : ../../../lib/epics_pv_factory.h ../multiLineTextUpdate.h \
+  ../../../lib/pv_factory.h ../../../lib/act_grf.h \
+  ../../../lib/entry_form.h ../../../lib/color_helper.h \
+  ../../../lib/hashtable.h ../../../lib/dl_list.h ../../../lib/color_pkg.h \
+  ../../../lib/pvColor.h ../../../lib/expString.h \
+  ../../../lib/color_button.h ../../../lib/font_pkg.h \
+  ../../../lib/font_menu.h ../../../lib/gc_pkg.h \
+  ../../../lib/pvConnection.h ../../../lib/tag_pkg.h \
+  ../../../lib/act_grf.str ../../../lib/utility.h \
+  ../../../../../include/edm/sys_types.h ../../../../../include/edm/avl.h \
+  ../../../../../include/edm/thread.h ../../../lib/color_pkg.str \
+  ../../../lib/color_list.h ../../../lib/msg_dialog.h \
+  ../../../lib/color_button.str ../../../lib/font_pkg.str \
+  ../../../lib/gc_pkg.str ../../../lib/tag_pkg.str \
+  ../../../lib/remFileOpen.h ../../../util/unix.msh ../../../util/sys.msh \
+  ../../../util/avl.msh ../../../util/thr.msh ../../../lib/color_list.str \
+  ../../../lib/msg_dialog.str
+
+#Depend files must be targets to avoid 'No rule to make target ...' errors
+../../../lib/epics_pv_factory.h :
+../multiLineTextUpdate.h :
+../../../lib/pv_factory.h :
+../../../lib/act_grf.h :
+../../../lib/entry_form.h :
+../../../lib/color_helper.h :
+../../../lib/hashtable.h :
+../../../lib/dl_list.h :
+../../../lib/color_pkg.h :
+../../../lib/pvColor.h :
+../../../lib/expString.h :
+../../../lib/color_button.h :
+../../../lib/font_pkg.h :
+../../../lib/font_menu.h :
+../../../lib/gc_pkg.h :
+../../../lib/pvConnection.h :
+../../../lib/tag_pkg.h :
+../../../lib/act_grf.str :
+../../../lib/utility.h :
+../../../../../include/edm/sys_types.h :
+../../../../../include/edm/avl.h :
+../../../../../include/edm/thread.h :
+../../../lib/color_pkg.str :
+../../../lib/color_list.h :
+../../../lib/msg_dialog.h :
+../../../lib/color_button.str :
+../../../lib/font_pkg.str :
+../../../lib/gc_pkg.str :
+../../../lib/tag_pkg.str :
+../../../lib/remFileOpen.h :
+../../../util/unix.msh :
+../../../util/sys.msh :
+../../../util/avl.msh :
+../../../util/thr.msh :
+../../../lib/color_list.str :
+../../../lib/msg_dialog.str :
