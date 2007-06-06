@@ -1067,6 +1067,7 @@ int edmmultiLineTextUpdateClass::activate (int pass, void *ptr)
                                           (XtArgVal) 0,
                                           XmNeditMode, XmMULTI_LINE_EDIT,
                                           XmNwordWrap, True,
+                                          XmNcursorPositionVisible, False,
                                           NULL);
         if ( !enabled ) 
         {
@@ -1214,10 +1215,6 @@ int edmmultiLineTextUpdateClass::drawActive ()
                        XmNforeground,
                        (XtArgVal)textColour.getPixel (actWin->ci),
                        NULL);
-        if (data_pv->have_write_access ())
-            actWin->cursor.set (XtWindow (widget), CURSOR_K_DEFAULT);
-        else
-            actWin->cursor.set (XtWindow (widget), CURSOR_K_NO);
     }
     else
     {
@@ -1226,7 +1223,6 @@ int edmmultiLineTextUpdateClass::drawActive ()
                        XmNforeground,
                        (XtArgVal)textColour.getPixel (actWin->ci),
                        NULL);
-        actWin->cursor.set (XtWindow (widget), CURSOR_K_WAIT);
     }
     XmTextSetString (widget, text);
 
