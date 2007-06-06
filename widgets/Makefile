@@ -16,7 +16,7 @@ else
       # Old Makefile.Unix config file location
       EPICS=../../..
       include $(EPICS)/config/CONFIG_EXTENSIONS
-      DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter
+      DIRS = FE-widgets videowidget vsbar wheelswitch menu_muxPV logMeter multiLineTextUpdate
       include $(EPICS)/config/RULES_DIRS
     endif
 endif
