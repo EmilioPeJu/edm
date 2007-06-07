@@ -4117,7 +4117,7 @@ int appContextClass::getParams(
   char **argv )
 {
 
-char buf[1023+1], mac[1023+1], exp[1023+1];
+char buf[2047+1], mac[2047+1], exp[2047+1];
 int state = SWITCHES;
 int i, n = 1;
 char *tk;
@@ -4232,10 +4232,10 @@ fileListPtr curFile;
         else if ( strcmp( argv[n], global_str19 ) == 0 ) {
           n++;
           if ( n >= argc ) return 2; // missing macro arg
-          strncpy( buf, argv[n], 1023 );
+          strncpy( buf, argv[n], 2047 );
           tk = strtok( buf, "=," );
           while ( tk ) {
-            strncpy( mac, tk, 1023 );
+            strncpy( mac, tk, 2047 );
             tk = strtok( NULL, "=," );
             if ( tk ) {
               if ( strcmp( tk, "\"\"" ) == 0 ) {
@@ -4248,7 +4248,7 @@ fileListPtr curFile;
                 strcpy( exp, "" );
 	      }
 	      else {
-                strncpy( exp, tk, 1023 );
+                strncpy( exp, tk, 2047 );
 	      }
             }
             else {

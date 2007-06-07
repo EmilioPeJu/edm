@@ -245,7 +245,7 @@ static int getMainCheckPointParams (
 ) {
 
 char *cptr, *tk, *buf1;
-char text[1023+1];
+char text[2047+1];
 int i, tmp;
 
   *server = 0;
@@ -254,8 +254,8 @@ int i, tmp;
   *numCheckPointMacros = 0;
   strcpy( checkPointMacros, "" );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   if ( strcmp( text, "<<<EOD>>>\n" ) == 0 ) return 3; // no more data
   tmp = atol( text );
@@ -264,28 +264,28 @@ int i, tmp;
 
   readStringFromFile( displayName, 127, f );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *noEdit = atol( text );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *numCheckPointMacros = atol( text );
 
   for ( i=0; i<*numCheckPointMacros; i++ ) {
-    cptr = fgets( text, 1023, f );
-    text[1024] = 0;
+    cptr = fgets( text, 2047, f );
+    text[2048] = 0;
     if ( !cptr ) return 2; // fail
     buf1 = NULL;
     tk = strtok_r( text, "\n \t", &buf1 );
     if ( i > 0 ) {
-      Strncat( checkPointMacros, ",", 1023 );
-      checkPointMacros[1023] = 0;
+      Strncat( checkPointMacros, ",", 2047 );
+      checkPointMacros[2047] = 0;
     }
-    Strncat( checkPointMacros, tk, 1023 );
-    checkPointMacros[1023] = 0;
+    Strncat( checkPointMacros, tk, 2047 );
+    checkPointMacros[2047] = 0;
   }
 
   return 1;
@@ -319,7 +319,7 @@ static int getScreenCheckPointParams (
 ) {
 
 char *cptr, *tk, *buf1;
-char text[1023+1];
+char text[2047+1];
 int i;
 
   strcpy( screenName, "" );
@@ -331,43 +331,43 @@ int i;
 
   readStringFromFile( screenName, 255, f );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *x = atol( text );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *y = atol( text );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *icon = atol( text );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *noEdit = atol( text );
 
-  cptr = fgets( text, 1023, f );
-  text[1024] = 0;
+  cptr = fgets( text, 2047, f );
+  text[2048] = 0;
   if ( !cptr ) return 2; // fail
   *numCheckPointMacros = atol( text );
 
   for ( i=0; i<*numCheckPointMacros; i++ ) {
-    cptr = fgets( text, 1023, f );
-    text[1024] = 0;
+    cptr = fgets( text, 2047, f );
+    text[2048] = 0;
     if ( !cptr ) return 2; // fail
     buf1 = NULL;
     tk = strtok_r( text, "\n \t", &buf1 );
     if ( i > 0 ) {
-      Strncat( checkPointMacros, ",", 1023 );
-      checkPointMacros[1023] = 0;
+      Strncat( checkPointMacros, ",", 2047 );
+      checkPointMacros[2047] = 0;
     }
-    Strncat( checkPointMacros, tk, 1023 );
-    checkPointMacros[1023] = 0;
+    Strncat( checkPointMacros, tk, 2047 );
+    checkPointMacros[2047] = 0;
   }
 
   return 1;
@@ -1224,7 +1224,7 @@ static void checkParams (
   int *verbose
 ) {
 
-char buf[1023+1], mac[1023+1], exp[1023+1];
+char buf[2047+1], mac[2047+1], exp[2047+1];
 int state = SWITCHES;
 int stat, l, nm = 0, n = 1;
 char *envPtr, *tk, *buf1;
@@ -1340,14 +1340,14 @@ Display *testDisplay;
             *local = 1;
             return;
           }
-          strncpy( buf, argv[n], 1023 );
+          strncpy( buf, argv[n], 2047 );
 	  buf1 = NULL;
           tk = strtok_r( buf, "=,", &buf1 );
           while ( tk ) {
-            strncpy( mac, tk, 1023 );
+            strncpy( mac, tk, 2047 );
             tk = strtok_r( NULL, "=,", &buf1 );
             if ( tk ) {
-              strncpy( exp, tk, 1023 );
+              strncpy( exp, tk, 2047 );
             }
             else {
               *local = 1;
@@ -1492,7 +1492,7 @@ XtAppContext oneAppCtx;
 
 FILE *f = NULL;
 int primaryServerFlag, oneInstanceFlag, numCheckPointMacros;
- char checkPointMacros[1023+1];
+ char checkPointMacros[2047+1];
 
 char *envPtr;
 int doXSync = 0;
