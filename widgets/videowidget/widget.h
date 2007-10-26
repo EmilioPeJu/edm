@@ -24,7 +24,30 @@ void widgetNewDisplayData(widgetData wd,
                           const double *data,
                           int useFalseColour,
                           int gridOn,
+                          unsigned char gridColour,
+                          int rescaleData,
+                          double dataRangeMin,
+                          double dataRangeMax,
+                          int transposeXY);
+void widgetTestDisplayData(Display *display,
+                           Window window,
+                           GC gc,
+                          unsigned long x,
+                          unsigned long y,
+                          unsigned long widgetw,
+                          unsigned long widgeth,
+                          unsigned long dataw,
+                          unsigned long datah,
+                          unsigned long maxDataW,
+                          unsigned long maxDataH,
+                          unsigned long widthOffset,
+                          unsigned long heightOffset,
+                          unsigned long gridSize,
+                          const double *data,
+                          int useFalseColour,
+                          int gridOn,
                           unsigned char gridColour);
+void widgetNewDisplayInfo(widgetData wd, bool valid, short status, short severity);
 void widgetNewDisplayInfo(widgetData wd, bool valid, short status, short severity);
 
 // free up resources associated with widget instance

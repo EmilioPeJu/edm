@@ -11326,6 +11326,11 @@ char tmp[10];
      XmNheight, h,
      XmNmappedWhenManaged, False,
      XmNresizePolicy, XmRESIZE_GROW,
+     // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
+     // *****  pixels from the window edge.                             *****
+     XmNmarginHeight, 0,
+     XmNmarginWidth, 0,
+     // *****  End of SJS addition.                                     *****
      NULL );
 
   }
@@ -11350,6 +11355,11 @@ char tmp[10];
      XmNmappedWhenManaged, False,
      XmNresizePolicy, XmRESIZE_GROW,
      XmNbackground, embBg,
+     // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
+     // *****  pixels from the window edge.                             *****
+     XmNmarginHeight, 0,
+     XmNmarginWidth, 0,
+     // *****  End of SJS addition.                                     *****
      NULL );
 
   }
@@ -11410,6 +11420,11 @@ char tmp[10];
        XmNheight, h,
        XmNmappedWhenManaged, False,
        XmNbackground, embBg,
+       // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
+       // *****  pixels from the window edge.                             *****
+       XmNmarginHeight, 0,
+       XmNmarginWidth, 0,
+       // *****  End of SJS addition.                                     *****
        NULL );
 
     }
@@ -11432,6 +11447,11 @@ char tmp[10];
        XmNheight, h,
        XmNmappedWhenManaged, False,
        XmNresizePolicy, XmRESIZE_GROW,
+       // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
+       // *****  pixels from the window edge.                             *****
+       XmNmarginHeight, 0,
+       XmNmarginWidth, 0,
+       // *****  End of SJS addition.                                     *****
        NULL );
 
     }
@@ -11456,6 +11476,11 @@ char tmp[10];
        XmNmappedWhenManaged, False,
        XmNresizePolicy, XmRESIZE_GROW,
        XmNbackground, embBg,
+       // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
+       // *****  pixels from the window edge.                             *****
+       XmNmarginHeight, 0,
+       XmNmarginWidth, 0,
+       // *****  End of SJS addition.                                     *****
        NULL );
 
     }

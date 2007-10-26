@@ -11,8 +11,8 @@
 #define VIDEO_MAX_LOAD_FACTOR 4
 #define VIDEO_MAX_DATA_WIDTH 10000
 #define VIDEO_MAX_DATA_HEIGHT 10000
-#define VIDEO_MAJOR_VERSION 4
-#define VIDEO_MINOR_VERSION 2
+#define VIDEO_MAJOR_VERSION 4 
+#define VIDEO_MINOR_VERSION 3 
 #define VIDEO_RELEASE 1
 
 #include <time.h>
@@ -44,6 +44,9 @@ class TwoDProfileMonitor : public activeGraphicClass
     int useFalseColour, pvBasedUseFalseColour;
     int showGrid, pvBasedShowGrid;
     int gridColour, pvBasedGridColour;
+    int rescaleData, pvBasedDataRange;
+    double dataRangeMin, dataRangeMax;
+    int transposeXY;
     // globals for the edit popup
     int xBuf;
     int yBuf;
@@ -60,15 +63,20 @@ class TwoDProfileMonitor : public activeGraphicClass
     char useFalseColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
     char showGridPvBuf[activeGraphicClass::MAX_PV_NAME+1];
     char gridColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
+    char dataRangeMinPvBuf[activeGraphicClass::MAX_PV_NAME+1];
+    char dataRangeMaxPvBuf[activeGraphicClass::MAX_PV_NAME+1];
 
     expStringClass dataPvStr, widthPvStr, heightPvStr, useFalseColourPvStr;
     expStringClass widthOffsetPvStr, heightOffsetPvStr, gridSizePvStr;
     expStringClass showGridPvStr;
     expStringClass gridColourPvStr;
+    expStringClass dataRangeMinPvStr, dataRangeMaxPvStr;
     ProcessVariable *dataPv, *widthPv, *heightPv, *useFalseColourPv;
     ProcessVariable *widthOffsetPv, *heightOffsetPv, *gridSizePv;
     ProcessVariable *showGridPv;
     ProcessVariable *gridColourPv;
+    ProcessVariable *dataRangeMinPv;
+    ProcessVariable *dataRangeMaxPv;
 
     // text stuff (for edit mode drawing)
     char *textFontTag;
@@ -80,15 +88,22 @@ class TwoDProfileMonitor : public activeGraphicClass
     int initialGridSizeConnection;
     int initialUseFalseColourConnection, initialShowGridConnection;
     int initialGridColourConnection;
+    int initialDataRangeMinConnection, initialDataRangeMaxConnection;
     int needConnectInit, needInfoInit, needDraw, needRefresh;
     unsigned int  pvNotConnectedMask;
     int dataPvExists, widthPvExists, heightPvExists, useFalseColourPvExists;
     int widthOffsetPvExists, heightOffsetPvExists, gridSizePvExists;
     int showGridPvExists;
     int gridColourPvExists;
+    int dataRangeMinPvExists;
+    int dataRangeMaxPvExists;
     int init, active, activeMode;
     struct timeval lasttv;
     unsigned long average_time_usec;
+#ifdef DEBUG
+    unsigned long totalElapsedUsec, maxElapsedUsec;
+    int counter;
+#endif
 
     // widget-specific stuff
     widgetData wd;
@@ -122,6 +137,12 @@ public:
     // Called when the grid colour process variable connects or disconnects
     static void monitorGridColourConnectState (ProcessVariable *pv,
                                                void *userarg );
+    // Called when the data range minimum process variable connects or disconnects
+    static void monitorDataRangeMinConnectState (ProcessVariable *pv,
+                                                 void *userarg );
+    // Called when the data range maximum process variable connects or disconnects
+    static void monitorDataRangeMaxConnectState (ProcessVariable *pv,
+                                                 void *userarg );
     // Called when the width offset process variable connects or disconnects
     static void monitorWidthOffsetConnectState (ProcessVariable *pv,
                                                 void *userarg );
@@ -248,6 +269,12 @@ public:
         if (stat)
             stat = gridColourPvStr.expand1st (numMacros, macros,
                                             expansions);
+        if (stat)
+            stat = dataRangeMinPvStr.expand1st (numMacros, macros,
+                                                expansions);
+        if (stat)
+            stat = dataRangeMaxPvStr.expand1st (numMacros, macros,
+                                                expansions);
         return stat;
     
     }
@@ -278,6 +305,12 @@ public:
         if (stat)
             stat = gridColourPvStr.expand2nd (numMacros, macros,
                                             expansions);
+        if (stat)
+            stat = dataRangeMinPvStr.expand2nd (numMacros, macros,
+                                                expansions);
+        if (stat)
+            stat = dataRangeMaxPvStr.expand2nd (numMacros, macros,
+                                                expansions);
         return stat;
     
     }
@@ -348,6 +381,21 @@ public:
 #endif
             return;
         }
+#ifdef DEBUG
+        totalElapsedUsec += elapsedusec;
+        if (elapsedusec > maxElapsedUsec)
+            maxElapsedUsec = elapsedusec;
+        #define PRINT_COUNT 100
+        if (++counter == PRINT_COUNT)
+        {
+            counter = 0;
+            
+            printf ("TwoDPrfMon - time between refreshes - average %lu max %lu\n",
+                    totalElapsedUsec / PRINT_COUNT, maxElapsedUsec);
+            totalElapsedUsec = 0;
+            maxElapsedUsec = 0;
+        }
+#endif
         lasttv.tv_sec = tv.tv_sec;
         lasttv.tv_usec = tv.tv_usec;
 
@@ -470,15 +518,38 @@ public:
                 gridColourPv->add_value_callback ( dataUpdate,
                                                    this );
             }
+            if (initialDataRangeMinConnection)
+            {
+                initialDataRangeMinConnection = 0;
+#ifdef DEBUG
+                printf (
+                    "TwoDProfMon::execDeferred - add data range min value"
+                    " callback\n");
+#endif
+                dataRangeMinPv->add_value_callback ( dataUpdate,
+                                                   this );
+            }
+            if (initialDataRangeMaxConnection)
+            {
+                initialDataRangeMaxConnection = 0;
+#ifdef DEBUG
+                printf (
+                    "TwoDProfMon::execDeferred - add data range max value"
+                    " callback\n");
+#endif
+                dataRangeMaxPv->add_value_callback ( dataUpdate,
+                                                   this );
+            }
         }
         
         // need to check if we're being updated because of width change
 #ifdef DEBUG
-        printf ("executeDeferred (TwoDMon.cc) - pvBasedDataWidth = %d\n",
-                 pvBasedDataWidth);
+        printf ("executeDeferred (TwoDMon.cc) - pvBasedDataSize = %d\n",
+                 pvBasedDataSize);
         printf ("executeDeferred (TwoDMon.cc) - widthPv = %x\n", widthPv);
-        printf ("executeDeferred (TwoDMon.cc) - is_valid = %d\n",
-                 widthPv->is_valid ());
+        if (widthPv)
+            printf ("executeDeferred (TwoDMon.cc) - is_valid = %d\n",
+                     widthPv->is_valid ());
 #endif
         if (pvBasedDataSize && widthPv && widthPv->is_valid ())
         {
@@ -638,11 +709,48 @@ public:
                 gridColour = 0;
             }
         }
+        if (dataRangeMinPv && dataRangeMinPv->is_valid ())
+        {
+            switch (dataRangeMinPv->get_type ().type)
+            {
+            case ProcessVariable::Type::real:
+                dataRangeMin = dataRangeMinPv->get_double ();
+                break;
+            case ProcessVariable::Type::integer:
+                dataRangeMin = (double) dataRangeMinPv->get_int ();
+                break;
+            case ProcessVariable::Type::enumerated:
+                dataRangeMin = (double) dataRangeMinPv->get_int ();
+                break;
+            default:
+                dataRangeMin = 0;
+            }
+        }
+        if (dataRangeMaxPv && dataRangeMaxPv->is_valid ())
+        {
+            switch (dataRangeMaxPv->get_type ().type)
+            {
+            case ProcessVariable::Type::real:
+                dataRangeMax = dataRangeMaxPv->get_double ();
+                break;
+            case ProcessVariable::Type::integer:
+                dataRangeMax = (double) dataRangeMaxPv->get_int ();
+                break;
+            case ProcessVariable::Type::enumerated:
+                dataRangeMax = (double) dataRangeMaxPv->get_int ();
+                break;
+            default:
+                dataRangeMax = 0;
+            }
+        }
+    
     
         if (dataWidth <= 0 || dataWidth > VIDEO_MAX_DATA_WIDTH ||
             dataHeight < 0 || dataHeight > VIDEO_MAX_DATA_HEIGHT ||
-            widthOffset < 0 || widthOffset > VIDEO_MAX_DATA_WIDTH ||
-            heightOffset < 0 || heightOffset > VIDEO_MAX_DATA_WIDTH ||
+            widthOffset < -VIDEO_MAX_DATA_WIDTH ||
+            widthOffset > VIDEO_MAX_DATA_WIDTH ||
+            heightOffset < -VIDEO_MAX_DATA_HEIGHT ||
+            heightOffset > VIDEO_MAX_DATA_HEIGHT ||
             gridSize < 2 || // 0 would crash, 1 would obliterate image.
             useFalseColour < 0 || useFalseColour > 1 ||
             showGrid < 0 || showGrid > 1 ||
@@ -691,6 +799,9 @@ public:
             {
         
             case ProcessVariable::Type::real:
+#ifdef DEBUG
+                printf ("TwoDProfMon::execDef case real - calling widgetNewDispData\n");
+#endif
                 // printf ("real\n");
                 widgetNewDisplayData (
                     wd, dataPv->get_time_t (), dataPv->get_nano (),
@@ -705,7 +816,11 @@ public:
                     (const double *) dataPv->get_double_array (),
                     useFalseColour,
                     showGrid,
-                    gridColour
+                    gridColour,
+                    rescaleData,
+                    dataRangeMin,
+                    dataRangeMax,
+                    transposeXY
                     );
                 break;
 
@@ -715,7 +830,7 @@ public:
                                         dataPv->get_dimension (),
                                         dataPv->get_char_array ());
 #ifdef DEBUG
-                    printf ("TwoDProfMon::execDef calling widgetNewDispData\n");
+                    printf ("TwoDProfMon::execDef case text - calling widgetNewDispData\n");
 #endif
                     widgetNewDisplayData (
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
@@ -730,7 +845,11 @@ public:
                         temp,
                         useFalseColour,
                         showGrid,
-                        gridColour
+                        gridColour,
+                        rescaleData,
+                        dataRangeMin,
+                        dataRangeMax,
+                        transposeXY
                         );
                    free (temp);
                 }
@@ -741,6 +860,9 @@ public:
                 {
                     double* temp = int_to_double (dataPv->get_dimension (),
                                                   dataPv->get_int_array ());
+#ifdef DEBUG
+                    printf ("TwoDProfMon::execDef case int - calling widgetNewDispData\n");
+#endif
                     widgetNewDisplayData (
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
                         (unsigned long) w, (unsigned long) h, dataWidth,
@@ -754,7 +876,11 @@ public:
                         temp,
                         useFalseColour,
                         showGrid,
-                        gridColour
+                        gridColour,
+                        rescaleData,
+                        dataRangeMin,
+                        dataRangeMax,
+                        transposeXY
                         );
                     free (temp);
                 }
@@ -764,6 +890,9 @@ public:
                 // nothing to do!
                 break;
             }
+#ifdef DEBUG
+            printf ("TwoDProfMon::execDef after widgetNewDispData call switch\n");
+#endif
             widgetNewDisplayInfo (wd, true, dataPv->get_status (),
                                   dataPv->get_severity ());
         }
@@ -898,6 +1027,8 @@ public:
               expStringClass *useFalseColourPvStr,
               expStringClass *showGridPvStr,
               expStringClass *gridColourPvStr,
+              expStringClass *dataRangeMinPvStr,
+              expStringClass *dataRangeMaxPvStr,
               int *pvBasedDataSize,
               int *maxDataWidth,
               int *maxDataHeight,
@@ -905,7 +1036,12 @@ public:
               int *pvBasedGridSize,
               int *pvBasedUseFalseColour,
               int *pvBasedShowGrid,
-              int *pvBasedGridColour)
+              int *pvBasedGridColour,
+              int *rescaleData,
+              int *pvBasedDataRange,
+              int *transposeXY,
+              double* dataRangeMin,
+              double* dataRangeMax)
     {
         int major, minor, release;
         int stat;
@@ -926,6 +1062,8 @@ public:
         loadR ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
         loadR ( "showGridPvStr", showGridPvStr, (char *) "" ); 
         loadR ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
+        loadR ( "dataRangeMinPvStr", dataRangeMinPvStr, (char *) "" );
+        loadR ( "dataRangeMaxPvStr", dataRangeMaxPvStr, (char *) "" );
         loadR ( "pvBasedDataSize", pvBasedDataSize);
         loadR ( "maxDataWidth", maxDataWidth);
         loadR ( "maxDataHeight", maxDataHeight);
@@ -934,6 +1072,11 @@ public:
         loadR ( "pvBasedUseFalseColour", pvBasedUseFalseColour);
         loadR ( "pvBasedShowGrid", pvBasedShowGrid);
         loadR ( "pvBasedGridColour", pvBasedGridColour);
+        loadR ( "rescaleData", rescaleData);
+        loadR ( "pvBasedDataRange", pvBasedDataRange);
+        loadR ( "dataRangeMin", dataRangeMin);
+        loadR ( "dataRangeMax", dataRangeMax);
+        loadR ( "transposeXY", transposeXY);
         stat = readTags ( fptr, "endObjectProperties" );
         if (major > VIDEO_MAJOR_VERSION ||
             (major == VIDEO_MAJOR_VERSION && minor > VIDEO_MINOR_VERSION))
@@ -962,6 +1105,8 @@ public:
                expStringClass *useFalseColourPvStr,
                expStringClass *showGridPvStr,
                expStringClass *gridColourPvStr,
+               expStringClass *dataRangeMinPvStr,
+               expStringClass *dataRangeMaxPvStr,
                int *pvBasedDataSize,
                int *maxDataWidth,
                int *maxDataHeight,
@@ -969,7 +1114,12 @@ public:
                int *pvBasedGridSize,
                int *pvBasedUseFalseColour,
                int *pvBasedShowGrid,
-               int *pvBasedGridColour)
+               int *pvBasedGridColour,
+               int *rescaleData,
+               int *pvBasedDataRange,
+               int *transposeXY,
+               double* dataRangeMin,
+               double* dataRangeMax)
     {
         int major, minor, release;
         major = VIDEO_MAJOR_VERSION;
@@ -992,6 +1142,8 @@ public:
         loadW ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
         loadW ( "showGridPvStr", showGridPvStr, (char *) "" ); 
         loadW ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
+        loadW ( "dataRangeMinPvStr", dataRangeMinPvStr, (char *) "" ); 
+        loadW ( "dataRangeMaxPvStr", dataRangeMaxPvStr, (char *) "" ); 
         loadW ( "pvBasedDataSize", pvBasedDataSize);
         loadW ( "maxDataWidth", maxDataWidth);
         loadW ( "maxDataHeight", maxDataHeight);
@@ -1000,6 +1152,11 @@ public:
         loadW ( "pvBasedUseFalseColour", pvBasedUseFalseColour);
         loadW ( "pvBasedShowGrid", pvBasedShowGrid);
         loadW ( "pvBasedGridColour", pvBasedGridColour);
+        loadW ( "rescaleData", rescaleData);
+        loadW ( "pvBasedDataRange", pvBasedDataRange);
+        loadW ( "dataRangeMin", dataRangeMin);
+        loadW ( "dataRangeMax", dataRangeMax);
+        loadW ( "transposeXY", transposeXY);
         loadW ( "endObjectProperties" );
         loadW ( "" );
   
@@ -1113,6 +1270,11 @@ void TwoDProfileMonitor::constructCommon (void)
     gridSize = 100; // Safe default - 0 would crash if grid turned on.
     pvBasedGridSize = 0;
     activeMode = 0;
+    rescaleData = 0;
+    pvBasedDataRange = 0;
+    dataRangeMin = 0.0;
+    dataRangeMax = 0.0;
+    transposeXY = 0;
 
     wd = widgetCreate ();
     twoDWidget = NULL;
@@ -1128,6 +1290,8 @@ void TwoDProfileMonitor::constructCommon (void)
     useFalseColourPvStr.setRaw ("");
     showGridPvStr.setRaw ("");
     gridColourPvStr.setRaw ("");
+    dataRangeMinPvStr.setRaw ("");
+    dataRangeMaxPvStr.setRaw ("");
   
     dataPv = NULL;
     widthPv = NULL;
@@ -1138,6 +1302,8 @@ void TwoDProfileMonitor::constructCommon (void)
     useFalseColourPv = NULL;
     showGridPv = NULL;
     gridColourPv = NULL;
+    dataRangeMinPv = NULL;
+    dataRangeMaxPv = NULL;
 
     strcpy (dataPvBuf, ""); // just to be safe
     strcpy (widthPvBuf, ""); // just to be safe
@@ -1148,9 +1314,17 @@ void TwoDProfileMonitor::constructCommon (void)
     strcpy (useFalseColourPvBuf, ""); // just to be safe
     strcpy (showGridPvBuf, ""); // just to be safe
     strcpy (gridColourPvBuf, ""); // just to be safe
+    strcpy (dataRangeMinPvBuf, "");
+    strcpy (dataRangeMaxPvBuf, "");
     twoDWidget = NULL;
 
     average_time_usec = 0;
+
+#ifdef DEBUG
+    totalElapsedUsec = 0;
+    maxElapsedUsec = 0;
+    counter = 0;
+#endif
 
 #if (0)
     // text stuff (for edit mode drawing)
@@ -1189,6 +1363,8 @@ TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
     useFalseColourPvStr.setRaw (s.useFalseColourPvStr.rawString);
     showGridPvStr.setRaw (s.showGridPvStr.rawString);
     gridColourPvStr.setRaw (s.gridColourPvStr.rawString);
+    dataRangeMinPvStr.setRaw (s.dataRangeMinPvStr.rawString);
+    dataRangeMaxPvStr.setRaw (s.dataRangeMaxPvStr.rawString);
 
     pvBasedDataSize = s.pvBasedDataSize;
     maxDataWidth = s.maxDataWidth;
@@ -1205,6 +1381,12 @@ TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
     pvBasedOffsets = s.pvBasedOffsets;
     gridSize = s.gridSize;
     pvBasedGridSize = s.pvBasedGridSize;
+    rescaleData = s.rescaleData;
+    pvBasedDataRange = s.pvBasedDataRange;
+    dataRangeMin = s.dataRangeMin;
+    dataRangeMax = s.dataRangeMax;
+    transposeXY = s.transposeXY;
+
 }
 
 TwoDProfileMonitor::~TwoDProfileMonitor (void) {widgetDestroy (wd);}
@@ -1229,6 +1411,8 @@ int TwoDProfileMonitor::activate ( int pass )
         initialUseFalseColourConnection = 0;
         initialShowGridConnection = 0;
         initialGridColourConnection = 0;
+        initialDataRangeMinConnection = 0;
+        initialDataRangeMaxConnection = 0;
         needConnectInit = needInfoInit = needRefresh = 0;
         pvNotConnectedMask = active = init = 0;
         activeMode = 1;
@@ -1386,6 +1570,39 @@ int TwoDProfileMonitor::activate ( int pass )
                 gridColourPvExists = 1;
                 initialGridColourConnection = 1;
                 pvNotConnectedMask |= 256;
+            }
+        }
+
+        if (!pvBasedDataRange)
+        {
+            dataRangeMinPvExists = 0;
+            dataRangeMaxPvExists = 0;
+            dataRangeMin = atof (dataRangeMinPvStr.getRaw ());
+            dataRangeMax = atof (dataRangeMaxPvStr.getRaw ());
+        }
+        else
+        {
+            if (!dataRangeMinPvStr.getExpanded () ||
+                blankOrComment (dataRangeMinPvStr.getExpanded ()))
+            {
+                dataRangeMinPvExists = 0;
+            }
+            else
+            {
+                dataRangeMinPvExists = 1;
+                initialDataRangeMinConnection = 1;
+                pvNotConnectedMask |= 512;
+            }
+            if (!dataRangeMaxPvStr.getExpanded () ||
+                blankOrComment (dataRangeMaxPvStr.getExpanded ()))
+            {
+                dataRangeMaxPvExists = 0;
+            }
+            else
+            {
+                dataRangeMaxPvExists = 1;
+                initialDataRangeMaxConnection = 1;
+                pvNotConnectedMask |= 1024;
             }
         }
 
@@ -1596,6 +1813,36 @@ int TwoDProfileMonitor::activate ( int pass )
                     //gridColourPv->add_value_callback ( pvUpdate, this );
                 }
             }
+            if (dataRangeMinPvExists)
+            {
+                dataRangeMinPv = the_PV_Factory->create (
+                                                 dataRangeMinPvStr.getExpanded ());
+                if ( dataRangeMinPv )
+                {
+#ifdef DEBUG
+                    printf ( "TwoDProfMon::activate pass 2 - adding data range min"
+                             " connect cb\n");
+#endif
+                    dataRangeMinPv->add_conn_state_callback (
+                                              monitorDataRangeMinConnectState,
+                                              this);
+                }
+            }
+            if (dataRangeMaxPvExists)
+            {
+                dataRangeMaxPv = the_PV_Factory->create (
+                                                 dataRangeMaxPvStr.getExpanded ());
+                if ( dataRangeMaxPv )
+                {
+#ifdef DEBUG
+                    printf ( "TwoDProfMon::activate pass 2 - adding data range max"
+                             " connect cb\n");
+#endif
+                    dataRangeMaxPv->add_conn_state_callback (
+                                              monitorDataRangeMaxConnectState,
+                                              this);
+                }
+            }
 #ifdef DEBUG
             printf ("activate (TwoDMon.cc) - dataPv->is_valid = %d\n",
                     dataPv->is_valid ());
@@ -1615,6 +1862,10 @@ int TwoDProfileMonitor::activate ( int pass )
                     gridSizePv->is_valid ());
             printf ("activate (TwoDMon.cc) - gridColourPv->is_valid = %d\n",
                     gridColourPv->is_valid ());
+            printf ("activate (TwoDMon.cc) - dataRangeMinPv->is_valid = %d\n",
+                    dataRangeMinPv->is_valid ());
+            printf ("activate (TwoDMon.cc) - dataRangeMaxPv->is_valid = %d\n",
+                    dataRangeMaxPv->is_valid ());
 #endif
         }
         break;
@@ -1748,6 +1999,20 @@ void TwoDProfileMonitor::editApply (Widget w,
     else
          me->gridColour = 0; // just to be safe
 
+    // now the data range minimum: if fixed is indicated, interpret PV string as double
+    me->dataRangeMinPvStr.setRaw ( me->dataRangeMinPvBuf );
+    if (!me->pvBasedDataRange)
+         me->dataRangeMin = atof ( me->dataRangeMinPvBuf );
+    else
+         me->dataRangeMin = 0; // just to be safe
+
+    // now the data range maximum: if fixed is indicated, interpret PV string as double
+    me->dataRangeMaxPvStr.setRaw ( me->dataRangeMaxPvBuf );
+    if (!me->pvBasedDataRange)
+         me->dataRangeMax = atof ( me->dataRangeMaxPvBuf );
+    else
+         me->dataRangeMax = 0; // just to be safe
+
     // support auto-save
     me->actWin->setChanged ();
 
@@ -1851,6 +2116,14 @@ void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
              sizeof (gridColourPvBuf) - 1);
     ef.addTextField ("Grid Colour (0/1/PV)", 30, gridColourPvBuf,
                      sizeof (gridColourPvBuf) - 1);
+    strncpy (dataRangeMinPvBuf, dataRangeMinPvStr.getRaw (),
+             sizeof (dataRangeMinPvBuf) - 1);
+    ef.addTextField ("Data Range Minimum (0/1/PV)", 30, dataRangeMinPvBuf,
+                     sizeof (dataRangeMinPvBuf) - 1);
+    strncpy (dataRangeMaxPvBuf, dataRangeMaxPvStr.getRaw (),
+             sizeof (dataRangeMaxPvBuf) - 1);
+    ef.addTextField ("Data Range Maximum (0/1/PV)", 30, dataRangeMaxPvBuf,
+                     sizeof (dataRangeMaxPvBuf) - 1);
     ef.addOption ("Data Size Type", "Fixed|PV-based", &pvBasedDataSize);
     ef.addOption ("Width/Height Offset Type", "Fixed|PV-based",
                                                       &pvBasedOffsets);
@@ -1862,6 +2135,10 @@ void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
                   &pvBasedGridSize);
     ef.addOption ("Grid Colour Type", "Fixed|PV-based",
                   &pvBasedGridColour);
+    ef.addOption ("Rescale Data to range", "No|Yes", &rescaleData);
+    ef.addOption ("Data Range Type", "Fixed|PV-based",
+                  &pvBasedDataRange);
+    ef.addOption ("Transpose X and Y axes", "No|Yes", &transposeXY);
     // ef.addToggle ("PV-based Width", &height);
 
     // Map dialog box form buttons to callbacks
@@ -1924,13 +2201,20 @@ int TwoDProfileMonitor::createFromFile (FILE *fptr,
                           &useFalseColourPvStr,
                           &showGridPvStr,
                           &gridColourPvStr,
+                          &dataRangeMinPvStr,
+                          &dataRangeMaxPvStr,
                           &pvBasedDataSize,
                           &maxDataWidth, &maxDataHeight,
                           &pvBasedOffsets,
                           &pvBasedGridSize,
                           &pvBasedUseFalseColour,
                           &pvBasedShowGrid,
-                          &pvBasedGridColour ) ) )
+                          &pvBasedGridColour,
+                          &rescaleData,
+                          &pvBasedDataRange,
+                          &transposeXY,
+                          &dataRangeMin,
+                          &dataRangeMax ) ) )
     {
         actWin->appCtx->postMessage ( tag.errMsg () );
     }
@@ -1963,13 +2247,20 @@ int TwoDProfileMonitor::save ( FILE *fptr )
                        &useFalseColourPvStr,
                        &showGridPvStr,
                        &gridColourPvStr,
+                       &dataRangeMinPvStr,
+                       &dataRangeMaxPvStr,
                        &pvBasedDataSize,
                        &maxDataWidth, &maxDataHeight,
                        &pvBasedOffsets,
                        &pvBasedGridSize,
                        &pvBasedUseFalseColour,
                        &pvBasedShowGrid,
-                       &pvBasedGridColour );
+                       &pvBasedGridColour,
+                       &rescaleData,
+                       &pvBasedDataRange,
+                       &transposeXY,
+                       &dataRangeMin,
+                       &dataRangeMax );
   
 }
 
@@ -2111,6 +2402,28 @@ int TwoDProfileMonitor::deactivate ( int pass )
         gridColourPv->remove_value_callback ( dataUpdate, this );
         gridColourPv->release ();
         gridColourPv = NULL;
+        actWin->appCtx->proc->unlock ();
+    }
+    if ( dataRangeMinPv != NULL )
+    {
+
+        actWin->appCtx->proc->lock ();
+        dataRangeMinPv->remove_conn_state_callback (
+                               monitorDataRangeMinConnectState, this );
+        dataRangeMinPv->remove_value_callback ( dataUpdate, this );
+        dataRangeMinPv->release ();
+        dataRangeMinPv = NULL;
+        actWin->appCtx->proc->unlock ();
+    }
+    if ( dataRangeMaxPv != NULL )
+    {
+
+        actWin->appCtx->proc->lock ();
+        dataRangeMaxPv->remove_conn_state_callback (
+                               monitorDataRangeMaxConnectState, this );
+        dataRangeMaxPv->remove_value_callback ( dataUpdate, this );
+        dataRangeMaxPv->release ();
+        dataRangeMaxPv = NULL;
         actWin->appCtx->proc->unlock ();
     }
     // disconnect PV timeout on pass 1
@@ -2346,6 +2659,80 @@ void TwoDProfileMonitor::monitorGridColourConnectState (
         else
         {
             me->pvNotConnectedMask |= 256;
+            me->active = 0;
+            me->bufInvalidate ();
+            me->needDraw = 1;
+            me->actWin->addDefExeNode (me->aglPtr);
+        }
+    }
+    me->actWin->appCtx->proc->unlock ();
+}
+
+void TwoDProfileMonitor::monitorDataRangeMinConnectState (
+                                                   ProcessVariable *pv,
+                                                   void *userarg )
+{
+
+    TwoDProfileMonitor *me = ( TwoDProfileMonitor *) userarg;
+
+    me->actWin->appCtx->proc->lock ();
+    if (me->activeMode)
+    {
+        if (pv->is_valid ())
+        {
+            me->pvNotConnectedMask &= ~((unsigned int) 512); 
+#ifdef DEBUG
+            printf (
+               "TwoDProfMon::monDataRangeMinConState - set pvNotConMask to %d\n",
+               me->pvNotConnectedMask);
+#endif
+            if (!me->pvNotConnectedMask)
+            {
+                // All PVs connected
+                me->needConnectInit = 1;
+                me->actWin->addDefExeNode (me->aglPtr);
+            }
+        }
+        else
+        {
+            me->pvNotConnectedMask |= 512;
+            me->active = 0;
+            me->bufInvalidate ();
+            me->needDraw = 1;
+            me->actWin->addDefExeNode (me->aglPtr);
+        }
+    }
+    me->actWin->appCtx->proc->unlock ();
+}
+
+void TwoDProfileMonitor::monitorDataRangeMaxConnectState (
+                                                   ProcessVariable *pv,
+                                                   void *userarg )
+{
+
+    TwoDProfileMonitor *me = ( TwoDProfileMonitor *) userarg;
+
+    me->actWin->appCtx->proc->lock ();
+    if (me->activeMode)
+    {
+        if (pv->is_valid ())
+        {
+            me->pvNotConnectedMask &= ~((unsigned int) 1024); 
+#ifdef DEBUG
+            printf (
+               "TwoDProfMon::monDataRangeMaxConState - set pvNotConMask to %d\n",
+               me->pvNotConnectedMask);
+#endif
+            if (!me->pvNotConnectedMask)
+            {
+                // All PVs connected
+                me->needConnectInit = 1;
+                me->actWin->addDefExeNode (me->aglPtr);
+            }
+        }
+        else
+        {
+            me->pvNotConnectedMask |= 1024;
             me->active = 0;
             me->bufInvalidate ();
             me->needDraw = 1;

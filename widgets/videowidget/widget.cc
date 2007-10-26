@@ -41,8 +41,11 @@ static Pixmap makePixmap (Display *d, Colormap cm, Widget w, char **data)
 
    /* tell XPM to allocate fairly close (not exact) colors from the window's
       colormap */
+    // ***** SJS 25/10/07 Add XpmReturnAllocPixels to valuemask to allow *****
+    // ***** colour map to be freed                                      *****
     attr.valuemask = XpmSize | XpmCloseness | XpmAllocCloseColors |
-                     XpmExactColors | XpmColormap | XpmDepth | XpmVisual;
+                     XpmExactColors | XpmColormap | XpmDepth | XpmVisual |
+                     XpmReturnAllocPixels;
     attr.closeness = 30000;
     attr.alloc_close_colors = True;
     attr.exactColors = False;
@@ -54,7 +57,11 @@ static Pixmap makePixmap (Display *d, Colormap cm, Widget w, char **data)
     if (XpmCreatePixmapFromData (d, XtWindow (w), data, &p, NULL, &attr) !=
         XpmSuccess)
         return 0;
-  
+    // ***** SJS 25/10/11 Free colour map and attributes to fix memory   *****
+    // ***** leakage in X                                                *****
+    XFreeColors (d, cm, attr.alloc_pixels, attr.nalloc_pixels, NULL);
+    XpmFreeAttributes (&attr);
+    // ***** End SJS 25/10/11 addition *****
     return p;
 }
 
@@ -75,8 +82,10 @@ Widget widgetCreateWidget (widgetData wd, XtAppContext app, Display *d,
     md->parent = parent;
     if (md->p == 0)
         md->p = makePixmap (d, cm, parent, twoD);
-  
+ 
+ 
     /* Here's our picture, no border around our nice pixmap */
+//  XtVaSetValues (parent, XmNmarginHeight, 0,  XmNmarginWidth, 0, NULL);
     widget = XtVaCreateManagedWidget ("2D widget", xmLabelWidgetClass, parent, 
                                      XmNshadowThickness, 0,
                                      XmNhighlightThickness, 0,
@@ -118,10 +127,15 @@ void widgetNewDisplayData (widgetData wd,
                            const double *data,
                            int useFalseColour,
                            int gridOn,
-                           unsigned char gridColour)
+                           unsigned char gridColour,
+                           int rescaleData,
+                           double dataRangeMin,
+                           double dataRangeMax,
+                           int transposeXY
+)
 {
 #ifdef DEBUG
-    printf ("Start of widgetNewDisplayData - grid size = %d\n", (int)gridSize);
+    printf ("Start of widgetNewDisplayData - transposeXY = %d\n", transposeXY);
 #endif
     unsigned long gridSizeWidget;
     long gridXStart, gridY, gridXZero, gridYZero;
@@ -135,11 +149,22 @@ void widgetNewDisplayData (widgetData wd,
 
     /****** The following code block fixes the aspect ratio of the ******
      ****** pixmap to that of the image data                       ******/
-    if (widgeth * dataw > widgetw * datah)
-        widgeth = widgetw * datah / dataw;
+    if (transposeXY)
+    {
+        if (widgeth * datah > widgetw * dataw)
+            widgeth = widgetw * dataw / datah;
+        else
+        if (widgetw * dataw > widgeth * datah) 
+            widgetw = widgeth * datah / dataw; 
+    }
     else
-    if (widgetw * datah > widgeth * dataw) 
-        widgetw = widgeth * dataw / datah; 
+    {
+        if (widgeth * dataw > widgetw * datah)
+            widgeth = widgetw * datah / dataw;
+        else
+        if (widgetw * datah > widgeth * dataw) 
+            widgetw = widgeth * dataw / datah; 
+    }
     /* else if ratios are equal do nothing */
 
     char ** pixmapData =
@@ -169,25 +194,63 @@ void widgetNewDisplayData (widgetData wd,
     // gettimeofday (&tv, 0);
     // printf ("widgetNDD after mallocs - time %ld %ld\n", tv.tv_sec,
     //         tv.tv_usec);
-    for (unsigned long j = 0; j < widgeth; j++)
+    if (transposeXY)
     {
-        pixmapLine = pixmapData[257 + j];
-        unsigned long dataj = (j * datah / widgeth);
-        dataLine = &data[dataj * dataw];
-        for (unsigned long i = 0; i < widgetw; i++)
+        for (unsigned long j = 0; j < widgeth; j++)
         {
-            unsigned long datai = i * dataw / widgetw;
-            pixmapLine[i * 2] = (((unsigned char)dataLine[datai]) / 16) + 'a';
-            pixmapLine[1 + i * 2] =
-                                (((unsigned char)dataLine[datai]) % 16) + 'a';
+            pixmapLine = pixmapData[257 + j];
+            for (unsigned long i = 0; i < widgetw; i++)
+            {
+                unsigned long dataj = i * datah / widgetw;
+                dataLine = &data[dataj * dataw];
+                unsigned long datai = j * dataw / widgeth;
+                double the_data = dataLine[datai];
+                if (rescaleData)
+                {
+                    the_data = (the_data - dataRangeMin) * 256 /
+                               (dataRangeMax - dataRangeMin);
+                    if (the_data > 255)
+                        the_data = 255;
+                    if (the_data < 0)
+                        the_data = 0;
+                }
+                pixmapLine[i * 2] = (((unsigned char)the_data) / 16) + 'a';
+                pixmapLine[1 + i * 2] =
+                                (((unsigned char)the_data) % 16) + 'a';
+            }
         }
-        
-    } 
+    }
+    else
+    {
+        for (unsigned long j = 0; j < widgeth; j++)
+        {
+            pixmapLine = pixmapData[257 + j];
+            unsigned long dataj = (j * datah / widgeth);
+            dataLine = &data[dataj * dataw];
+            for (unsigned long i = 0; i < widgetw; i++)
+            {
+                unsigned long datai = i * dataw / widgetw;
+                double the_data = dataLine[datai];
+                if (rescaleData)
+                {
+                    the_data = (the_data - dataRangeMin) * 256 /
+                               (dataRangeMax - dataRangeMin);
+                    if (the_data > 255)
+                        the_data = 255;
+                    if (the_data < 0)
+                        the_data = 0;
+                }
+                pixmapLine[i * 2] = (((unsigned char)the_data) / 16) + 'a';
+                pixmapLine[1 + i * 2] =
+                                (((unsigned char)the_data) % 16) + 'a';
+            }
+        }
+    }
 
     // Add grid if required
     if (gridOn)
     {
-        gridSizeWidget = gridSize * widgetw /dataw;
+        gridSizeWidget = gridSize * widgetw / dataw;
         gridXZero = gridXStart =
                            ((maxDataW / 2) - widthOffset) * widgetw / dataw;
 #ifdef DEBUG
@@ -236,7 +299,7 @@ void widgetNewDisplayData (widgetData wd,
             else
             {
                 for (unsigned long i = gridXStart; i < widgetw;
-                     i+= gridSizeWidget)
+                     i += gridSizeWidget)
                 {
                     if ((j % dotSpacing == 0) ||
                         (i == (unsigned long)gridXZero)) 
