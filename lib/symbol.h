@@ -33,7 +33,11 @@
 #define ASC_MINOR_VERSION 0
 #define ASC_RELEASE 0
 
-#define SYMBOL_K_NUM_STATES 64
+// ***** SJS Change requested by Austen Rose 23/04/08 - replace *****
+// #define SYMBOL_K_NUM_STATES 64
+// ***** by *****
+#define SYMBOL_K_NUM_STATES 128
+// ***** End of SJS change *****
 #define SYMBOL_K_MAX_PVS 5
 
 #define OR_ORIG 0
