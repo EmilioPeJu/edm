@@ -25,7 +25,7 @@
 #define TEXT_MINOR 0
 #define TEXT_RELEASE 0
 
-#define MAX_TEXT_LENGTH 1000
+#define MAX_TEXT_LENGTH 10000
 
 static void drag (Widget w, XEvent *e, String *params, Cardinal numParams);
 static void selectDrag (Widget w, XEvent *e, String *params,
