@@ -6,7 +6,7 @@
 #include "strip.h"
 #include "app_pkg.h"
 #include "act_win.h"
-#include "epics_pv_factory.h"
+#include "pv_factory.h"
 #ifdef SCIPLOT
 #include "SciPlot.h"
 #endif
@@ -171,6 +171,7 @@ int edmStripClass::save(FILE *f)
 
     tag.loadW( "updateMs", &update_ms );
 
+    tag.loadW( unknownTags );
     tag.loadW( "endObjectProperties" );
     tag.loadW( "" );
     
@@ -244,6 +245,7 @@ int edmStripClass::createFromFile(FILE *f, char *filename,
 
     tag.init();
     tag.loadR( "beginObjectProperties" );
+    tag.loadR( unknownTags );
     tag.loadR( "major", &major );
     tag.loadR( "minor", &minor );
     tag.loadR( "release", &release );
@@ -1057,7 +1059,7 @@ int edmStripClass::drawActive()
     }
     strip_data->unlock();
     XCopyArea(actWin->display(), pixmap,
-              XtWindow(actWin->executeWidget),
+              drawable(actWin->executeWidget),
               actWin->executeGc.normGC(),
               0, 0, w, h, x, y);
     // --------------------------------------------------
@@ -1199,7 +1201,7 @@ void edmStripClass::button_callback(Widget w, XtPointer call, XButtonEvent *even
     XtVaSetValues(me->plot_widget,
                   XtNxLabel, xlabel,
                   XtNyLabel, ylabel,
-                  0);
+                  NULL);
     
 }
 

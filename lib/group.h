@@ -377,6 +377,10 @@ void setNextSelectedToEdit (
 
 void clearNextSelectedToEdit ( void );
 
+int activateBeforePreReexecuteComplete ( void );
+
+int activateComplete ( void );
+
 void changeDisplayParams (
   unsigned int flag,
   char *fontTag,

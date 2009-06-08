@@ -21,6 +21,8 @@
 #define SMALL_SYM_ARRAY_SIZE 10
 #define SMALL_SYM_ARRAY_LEN 31
 
+#define MAX_CONSECUTIVE_DEACTIVATE_ERRORS 100
+
 #include "pip.h"
 #include <sys/stat.h>
 #include <unistd.h>
@@ -37,12 +39,78 @@ static void unconnectedTimeout (
 activePipClass *pipo = (activePipClass *) client;
 
   if ( !pipo->init ) {
+    pipo->actWin->appCtx->proc->lock();
     pipo->needToDrawUnconnected = 1;
     pipo->needConnectTimeout = 1;
     pipo->actWin->addDefExeNode( pipo->aglPtr );
+    pipo->actWin->appCtx->proc->unlock();
   }
 
   pipo->unconnectedTimer = 0;
+
+}
+
+static void needUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id )
+{
+
+activePipClass *pipo = (activePipClass *) client;
+
+  pipo->actWin->appCtx->proc->lock();
+  pipo->needUpdate = 1;
+  pipo->actWin->addDefExeNode( pipo->aglPtr );
+  pipo->actWin->appCtx->proc->unlock();
+
+  pipo->retryTimerNU = 0;
+
+}
+
+static void needMenuUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id )
+{
+
+activePipClass *pipo = (activePipClass *) client;
+
+  pipo->actWin->appCtx->proc->lock();
+  pipo->needMenuUpdate = 1;
+  pipo->actWin->addDefExeNode( pipo->aglPtr );
+  pipo->actWin->appCtx->proc->unlock();
+
+  pipo->retryTimerNMU = 0;
+
+}
+
+static void needUnmapTimeout (
+  XtPointer client,
+  XtIntervalId *id )
+{
+
+activePipClass *pipo = (activePipClass *) client;
+
+  pipo->actWin->appCtx->proc->lock();
+  pipo->needUnmap = 1;
+  pipo->actWin->addDefExeNode( pipo->aglPtr );
+  pipo->actWin->appCtx->proc->unlock();
+
+  pipo->retryTimerNUM = 0;
+
+}
+
+static void needMapTimeout (
+  XtPointer client,
+  XtIntervalId *id )
+{
+
+activePipClass *pipo = (activePipClass *) client;
+
+  pipo->actWin->appCtx->proc->lock();
+  pipo->needMap = 1;
+  pipo->actWin->addDefExeNode( pipo->aglPtr );
+  pipo->actWin->appCtx->proc->unlock();
+
+  pipo->retryTimerNM = 0;
 
 }
 
@@ -83,7 +151,7 @@ static void pipc_edit_update (
 {
 
 activePipClass *pipo = (activePipClass *) client;
-int i, more;
+int i, ii;
 
   pipo->actWin->setChanged();
 
@@ -97,6 +165,7 @@ int i, more;
     pipo->symbolsExpStr[0].setRaw( "" );
     pipo->replaceSymbols[0] = 0;
     pipo->numDsps = 0;
+    ii = 0;
   }
   else {
     pipo->propagateMacros[0] = pipo->buf->bufPropagateMacros[0];
@@ -104,26 +173,18 @@ int i, more;
     pipo->symbolsExpStr[0].setRaw( pipo->buf->bufSymbols[0] );
     pipo->replaceSymbols[0] = pipo->buf->bufReplaceSymbols[0];
     pipo->numDsps = 1;
+    ii = 1;
   }
 
-  if ( pipo->numDsps ) {
-    more = 1;
-    for ( i=1; (i<pipo->maxDsps) && more; i++ ) {
-      pipo->displayFileName[i].setRaw( pipo->buf->bufDisplayFileName[i] );
-      if ( blank( pipo->displayFileName[i].getRaw() ) ) {
-        pipo->propagateMacros[i] = 1;
-        pipo->label[i].setRaw( "" );
-        pipo->symbolsExpStr[i].setRaw( "" );
-        pipo->replaceSymbols[i] = 0;
-        more = 0;
-      }
-      else {
-        pipo->propagateMacros[i] = pipo->buf->bufPropagateMacros[i];
-        pipo->label[i].setRaw( pipo->buf->bufLabel[i] );
-        pipo->symbolsExpStr[i].setRaw( pipo->buf->bufSymbols[i] );
-        pipo->replaceSymbols[i] = pipo->buf->bufReplaceSymbols[i];
-        (pipo->numDsps)++;
-      }
+  for ( i=ii; i<pipo->maxDsps; i++ ) {
+    if ( !blank( pipo->buf->bufDisplayFileName[i] ) ) {
+      pipo->displayFileName[ii].setRaw( pipo->buf->bufDisplayFileName[i] );
+      pipo->propagateMacros[ii] = pipo->buf->bufPropagateMacros[i];
+      pipo->label[ii].setRaw( pipo->buf->bufLabel[i] );
+      pipo->symbolsExpStr[ii].setRaw( pipo->buf->bufSymbols[i] );
+      pipo->replaceSymbols[ii] = pipo->buf->bufReplaceSymbols[i];
+      (pipo->numDsps)++;
+      ii++;
     }
   }
 
@@ -158,6 +219,7 @@ int i, more;
   pipo->setSize = pipo->buf->bufSetSize;
   pipo->sizeOfs = pipo->buf->bufSizeOfs;
   pipo->noScroll = pipo->buf->bufNoScroll;
+  pipo->ignoreMultiplexors = pipo->buf->bufIgnoreMultiplexors;
 
   pipo->x = pipo->buf->bufX;
   pipo->sboxX = pipo->buf->bufX;
@@ -368,6 +430,7 @@ int i;
   setSize = 0;
   sizeOfs = 5;
   noScroll = 0;
+  ignoreMultiplexors = 0;
   activeMode = 0;
   frameWidget = NULL;
   clipWidget = NULL;
@@ -385,8 +448,11 @@ int i;
 
   numDsps = 0;
   popUpMenu = NULL;
-  unconnectedTimer = 0;
+  unconnectedTimer = retryTimerNU = retryTimerNMU = retryTimerNUM =
+   retryTimerNM = 0;
   buf = NULL;
+
+  consecutiveDeactivateErrors = 0;
 
 }
 
@@ -422,6 +488,7 @@ int i;
   setSize = source->setSize;
   sizeOfs = source->sizeOfs;
   noScroll = source->noScroll;
+  ignoreMultiplexors = source->ignoreMultiplexors;
   frameWidget = NULL;
   clipWidget = NULL;
   aw = NULL;
@@ -441,8 +508,11 @@ int i;
 
   numDsps = source->numDsps;
   popUpMenu = NULL;
-  unconnectedTimer = 0;
+  unconnectedTimer = retryTimerNU = retryTimerNMU = retryTimerNUM =
+   retryTimerNM = 0;
   buf = NULL;
+
+  consecutiveDeactivateErrors = 0;
 
 }
 
@@ -460,8 +530,27 @@ activePipClass::~activePipClass ( void ) {
     unconnectedTimer = 0;
   }
 
-}
+  if ( retryTimerNU ) {
+    XtRemoveTimeOut( retryTimerNU );
+    retryTimerNU = 0;
+  }
 
+  if ( retryTimerNMU ) {
+    XtRemoveTimeOut( retryTimerNMU );
+    retryTimerNMU = 0;
+  }
+
+  if ( retryTimerNUM ) {
+    XtRemoveTimeOut( retryTimerNUM );
+    retryTimerNUM = 0;
+  }
+
+  if ( retryTimerNM ) {
+    XtRemoveTimeOut( retryTimerNM );
+    retryTimerNM = 0;
+  }
+
+}
 
 int activePipClass::createInteractive (
   activeWindowClass *aw_obj,
@@ -554,6 +643,8 @@ static int displaySourceEnum[3] = {
   tag.loadW( "replaceSymbols", replaceSymbols, numDsps, &zero );
   tag.loadW( "propagateMacros", propagateMacros, numDsps, &one );
   tag.loadBoolW( "noScroll", &noScroll, &zero );
+  tag.loadBoolW( "ignoreMultiplexors", &ignoreMultiplexors, &zero );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -634,6 +725,7 @@ static int displaySourceEnum[3] = {
   // read file and process each "object" tag
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -660,6 +752,7 @@ static int displaySourceEnum[3] = {
   tag.loadR( "replaceSymbols", maxDsps, replaceSymbols, &n, &zero );
   tag.loadR( "propagateMacros", maxDsps, propagateMacros, &n, &one );
   tag.loadR( "noScroll", &noScroll, &zero );
+  tag.loadR( "ignoreMultiplexors", &ignoreMultiplexors, &zero );
   tag.loadR( "endObjectProperties" );
 
   stat = tag.readTags( f, "endObjectProperties" );
@@ -744,10 +837,14 @@ int i;
   buf = new bufType;
 
   ptr = actWin->obj.getNameFromClass( "activePipClass" );
-  if ( ptr )
+  if ( ptr ) {
     strncpy( title, ptr, 31 );
-  else
+    title[31] = 0;
+  }
+  else {
     strncpy( title, activePipClass_str4, 31 );
+    title[31] = 0;
+  }
 
   Strncat( title, activePipClass_str5, 31 );
 
@@ -761,22 +858,32 @@ int i;
   buf->bufTopShadowColor = topShadowColor.pixelIndex();
   buf->bufBotShadowColor = botShadowColor.pixelIndex();
 
-  if ( readPvExpStr.getRaw() )
+  if ( readPvExpStr.getRaw() ) {
     strncpy( buf->bufReadPvName, readPvExpStr.getRaw(),
      PV_Factory::MAX_PV_NAME );
-  else
+    buf->bufReadPvName[PV_Factory::MAX_PV_NAME] = 0;
+  }
+  else {
     strcpy( buf->bufReadPvName, "" );
+    buf->bufReadPvName[PV_Factory::MAX_PV_NAME] = 0;
+  }
 
-  if ( labelPvExpStr.getRaw() )
+  if ( labelPvExpStr.getRaw() ) {
     strncpy( buf->bufLabelPvName, labelPvExpStr.getRaw(),
      PV_Factory::MAX_PV_NAME );
-  else
+    buf->bufLabelPvName[PV_Factory::MAX_PV_NAME] = 0;
+  }
+  else {
     strcpy( buf->bufLabelPvName, "" );
+  }
 
-  if ( fileNameExpStr.getRaw() )
+  if ( fileNameExpStr.getRaw() ) {
     strncpy( buf->bufFileName, fileNameExpStr.getRaw(), 127 );
-  else
+    buf->bufFileName[127] = 0;
+  }
+  else {
     strcpy( buf->bufFileName, "" );
+  }
 
   buf->bufDisplaySource = displaySource;
 
@@ -784,24 +891,32 @@ int i;
   buf->bufSetSize = setSize;
   buf->bufSizeOfs = sizeOfs;
   buf->bufNoScroll = noScroll;
+  buf->bufIgnoreMultiplexors = ignoreMultiplexors;
 
   for ( i=0; i<maxDsps; i++ ) {
 
-    if ( displayFileName[i].getRaw() )
+    if ( displayFileName[i].getRaw() ) {
       strncpy( buf->bufDisplayFileName[i], displayFileName[i].getRaw(), 127 );
-    else
-      strncpy( buf->bufDisplayFileName[i], "", 127 );
-
-    if ( label[i].getRaw() )
-      strncpy( buf->bufLabel[i], label[i].getRaw(), 127 );
-    else
-      strncpy( buf->bufLabel[i], "", 127 );
-
-    if ( symbolsExpStr[i].getRaw() ) {
-      strncpy( buf->bufSymbols[i], symbolsExpStr[i].getRaw(), 255 );
+      buf->bufDisplayFileName[i][127] = 0;
     }
     else {
-      strncpy( buf->bufSymbols[i], "", 255 );
+      strncpy( buf->bufDisplayFileName[i], "", 127 );
+    }
+
+    if ( label[i].getRaw() ) {
+      strncpy( buf->bufLabel[i], label[i].getRaw(), 127 );
+      buf->bufLabel[i][127] = 0;
+    }
+    else {
+      strncpy( buf->bufLabel[i], "", 127 );
+    }
+
+    if ( symbolsExpStr[i].getRaw() ) {
+      strncpy( buf->bufSymbols[i], symbolsExpStr[i].getRaw(), maxSymbolLen );
+      buf->bufSymbols[i][maxSymbolLen] = 0;
+    }
+    else {
+      strncpy( buf->bufSymbols[i], "", maxSymbolLen );
     }
 
     buf->bufPropagateMacros[i] = propagateMacros[i];
@@ -831,6 +946,7 @@ int i;
   ef.addToggle( "Set Size", &buf->bufSetSize );
   ef.addTextField( "Size Ofs", 35, &buf->bufSizeOfs );
   ef.addToggle( "Disable Scroll Bars", &buf->bufNoScroll );
+  ef.addToggle( "Ignore Multiplexors", &buf->bufIgnoreMultiplexors );
 
   ef.addEmbeddedEf( "Menu Info", "...", &ef1 );
 
@@ -847,7 +963,7 @@ int i;
     ef1->addLabel( "  File" );
     ef1->addTextField( "", 35, buf->bufDisplayFileName[i], 127 );
     ef1->addLabel( "  Macros" );
-    ef1->addTextField( "", 35, buf->bufSymbols[i], 255 );
+    ef1->addTextField( "", 35, buf->bufSymbols[i], maxSymbolLen );
     ef1->endSubForm();
 
     ef1->beginLeftSubForm();
@@ -946,7 +1062,7 @@ int activePipClass::drawActive ( void ) {
       actWin->executeGc.setFG( bgColor.getDisconnected() );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -955,7 +1071,7 @@ int activePipClass::drawActive ( void ) {
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -975,6 +1091,31 @@ int activePipClass::drawActive ( void ) {
   }
 
   return 1;
+
+}
+
+int activePipClass::reactivate (
+  int pass,
+  void *ptr ) {
+
+  if ( ignoreMultiplexors ) {
+    return 1;
+  }
+
+  return activate( pass, ptr );
+
+}
+
+int activePipClass::reactivate (
+  int pass,
+  void *ptr,
+  int *numSubObjects ) {
+
+  if ( ignoreMultiplexors ) {
+    return 1;
+  }
+
+  return activate( pass, ptr );
 
 }
 
@@ -1008,7 +1149,8 @@ XmString str;
        needDraw = needFileOpen = needInitMenuFileOpen = needUnmap =
        needMap = needToEraseUnconnected = needToDrawUnconnected =
        needConnectTimeout = 0;
-      unconnectedTimer = 0;
+      unconnectedTimer = retryTimerNU = retryTimerNMU = retryTimerNUM =
+       retryTimerNM = 0;
       activateIsComplete = 0;
       curReadIV = 0;
       strcpy( curReadV, "" );
@@ -1054,7 +1196,7 @@ XmString str;
 
           if ( !unconnectedTimer ) {
             unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
-             10000, unconnectedTimeout, this );
+             5000, unconnectedTimeout, this );
           }
 
 	  readPvId = the_PV_Factory->create( readPvExpStr.getExpanded() );
@@ -1186,11 +1328,33 @@ XmString str;
 
 }
 
+int activePipClass::preReactivate ( int pass ) {
+
+  if ( ignoreMultiplexors ) {
+    return 1;
+  }
+
+  return deactivate( pass );
+
+}
+
+int activePipClass::preReactivate (
+  int pass,
+  int *numSubObjects ) {
+
+  if ( ignoreMultiplexors ) {
+    return 1;
+  }
+
+  return deactivate( pass );
+
+}
+
 int activePipClass::deactivate (
   int pass
 ) {
 
-int okToClose;
+int okToClose, stat;
 activeWindowListPtr cur;
 
   if ( pass == 1 ) {
@@ -1203,6 +1367,26 @@ activeWindowListPtr cur;
       unconnectedTimer = 0;
     }
 
+    if ( retryTimerNU ) {
+      XtRemoveTimeOut( retryTimerNU );
+      retryTimerNU = 0;
+    }
+
+    if ( retryTimerNMU ) {
+      XtRemoveTimeOut( retryTimerNMU );
+      retryTimerNMU = 0;
+    }
+
+    if ( retryTimerNUM ) {
+      XtRemoveTimeOut( retryTimerNUM );
+      retryTimerNUM = 0;
+    }
+
+    if ( retryTimerNM ) {
+      XtRemoveTimeOut( retryTimerNM );
+      retryTimerNM = 0;
+    }
+
     if ( aw ) {
       if ( aw->loadFailure ) {
         aw = NULL;
@@ -1228,7 +1412,7 @@ activeWindowListPtr cur;
       }
 
       if ( okToClose ) {
-        aw->returnToEdit( 1 );
+        stat = aw->returnToEdit( 1 );
       }
 
       aw = NULL;
@@ -1263,276 +1447,6 @@ activeWindowListPtr cur;
       XtDestroyWidget( popUpMenu );
       popUpMenu = NULL;
     }
-
-  }
-
-  return 1;
-
-}
-
-int activePipClass::preReactivate (
-  int pass ) {
-
-int okToClose;
-activeWindowListPtr cur;
-
-  if ( pass == 1 ) {
-
-    active = 0;
-    activeMode = 0;
-
-    if ( aw ) {
-      if ( aw->loadFailure ) {
-        aw = NULL;
-        frameWidget = NULL;
-      }
-    }
-
-    if ( frameWidget ) {
-      if ( *frameWidget ) XtUnmapWidget( *frameWidget );
-    }
-
-    if ( aw ) {
-
-      okToClose = 0;
-      // make sure the window was successfully opened
-      cur = actWin->appCtx->head->flink;
-      while ( cur != actWin->appCtx->head ) {
-        if ( &cur->node == aw ) {
-          okToClose = 1;
-          break;
-        }
-        cur = cur->flink;
-      }
-
-      if ( okToClose ) {
-        aw->returnToEdit( 1 );
-      }
-
-      aw = NULL;
-
-    }
-
-    if ( frameWidget ) {
-      frameWidget = NULL;
-    }
-
-    if ( readPvId ) {
-      readPvId->remove_conn_state_callback( pip_monitor_read_connect_state,
-       this );
-      if ( !initialReadConnection ) {
-        readPvId->remove_value_callback( pip_readUpdate, this );
-      }
-      if ( !initialMenuConnection ) {
-        readPvId->remove_value_callback( pip_menuUpdate, this );
-      }
-      readPvId->release();
-      readPvId = NULL;
-    }
-
-    if ( labelPvId ) {
-      labelPvId->remove_conn_state_callback( pip_monitor_label_connect_state,
-       this );
-      labelPvId->release();
-      labelPvId = NULL;
-    }
-
-    if ( popUpMenu ) {
-      XtDestroyWidget( popUpMenu );
-      popUpMenu = NULL;
-    }
-
-  }
-
-  return 1;
-
-}
-
-int activePipClass::reactivate (
-  int pass,
-  void *ptr ) {
-
-int i, n;
-Arg args[5];
-XmString str;
-
-  switch ( pass ) {
-
-  case 1:
-
-    opComplete = 0;
-
-    break;
-
-  case 2:
-
-    if ( !opComplete ) {
-
-      opComplete = 1;
-
-      //initEnable();
-
-      aglPtr = ptr;
-      needConnectInit = needUpdate = needMenuConnectInit = needMenuUpdate =
-       needDraw = needFileOpen = needInitMenuFileOpen = needUnmap =
-       needMap = 0;
-      activateIsComplete = 0;
-      curReadIV = 0;
-      strcpy( curReadV, "" );
-
-      readPvId = labelPvId = NULL;
-
-      readPvConnected = active = init = 0;
-      activeMode = 1;
-
-      if ( !readPvExpStr.getExpanded() ||
-            blankOrComment( readPvExpStr.getExpanded() ) ) {
-        readExists = 0;
-      }
-      else {
-        readExists = 1;
-        fgColor.setConnectSensitive();
-      }
-
-      if ( !labelPvExpStr.getExpanded() ||
-            blankOrComment( labelPvExpStr.getExpanded() ) ) {
-        labelExists = 0;
-      }
-      else {
-        labelExists = 1;
-      }
-
-      if ( !fileNameExpStr.getExpanded() ||
-            blank( fileNameExpStr.getExpanded() ) ) {
-        fileExists = 0;
-      }
-      else {
-        fileExists = 1;
-      }
-
-      switch ( displaySource ) {
-
-      case displayFromPV:
-
-        if ( readExists ) {
-
-          if ( !unconnectedTimer ) {
-            unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
-             5000, unconnectedTimeout, this );
-          }
-
- 	  readPvId = the_PV_Factory->create( readPvExpStr.getExpanded() );
-	  if ( readPvId ) {
-	    readPvId->add_conn_state_callback( pip_monitor_read_connect_state,
-             this );
-	  }
-	  else {
-            fprintf( stderr, activePipClass_str22 );
-          }
-
-        }
-
-        activateIsComplete = 1;
-
-        break;
-
-      case displayFromForm:
-
-        if ( fileExists ) {
-          needFileOpen = 1;
-          actWin->addDefExeNode( aglPtr );
-        }
-        else {
-          activateIsComplete = 1;
-        }
-
-        break;
-
-      case displayFromMenu:
-
-        if ( readExists && ( numDsps > 0 ) ) {
-
-          if ( !unconnectedTimer ) {
-            unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
-             5000, unconnectedTimeout, this );
-          }
-
-	  readPvId = the_PV_Factory->create( readPvExpStr.getExpanded() );
-	  if ( readPvId ) {
-	    readPvId->add_conn_state_callback( pip_monitor_menu_connect_state,
-             this );
-	  }
-	  else {
-            fprintf( stderr, activePipClass_str22 );
-          }
-
-          if ( labelExists ) {
-	    labelPvId = the_PV_Factory->create( labelPvExpStr.getExpanded() );
-	    if ( labelPvId ) {
-	      labelPvId->add_conn_state_callback(
-               pip_monitor_label_connect_state, this );
-	    }
-	    else {
-              fprintf( stderr, activePipClass_str22 );
-            }
-	  }
-
-          if ( !popUpMenu ) {
-
-            n = 0;
-            XtSetArg( args[n], XmNpopupEnabled, (XtArgVal) False ); n++;
-            popUpMenu = XmCreatePopupMenu( actWin->topWidgetId(), "", args,
-             n );
-
-            pullDownMenu = XmCreatePulldownMenu( popUpMenu, "", NULL, 0 );
-
-            for ( i=0; i<numDsps; i++ ) {
-
-              if ( label[i].getExpanded() ) {
-                str = XmStringCreateLocalized( label[i].getExpanded() );
-              }
-              else {
-                str = XmStringCreateLocalized( " " );
-              }
-              pb[i] = XtVaCreateManagedWidget( "", xmPushButtonWidgetClass,
-               popUpMenu,
-               XmNlabelString, str,
-               NULL );
-              XmStringFree( str );
-
-              XtAddCallback( pb[i], XmNactivateCallback, menu_cb,
-               (XtPointer) this );
-
-            }
-
-          }
-
-	}
-	else {
-
-          activateIsComplete = 1;
-
-        }
-
-        break;
-
-      default:
-
-        activateIsComplete = 1;
-        break;
-
-      }
-
-    }
-
-    break;
-
-  case 3:
-  case 4:
-  case 5:
-  case 6:
-
-    break;
 
   }
 
@@ -1889,7 +1803,7 @@ void activePipClass::openEmbeddedByIndex (
 
 activeWindowListPtr cur;
 int i, l, stat;
-char symbolsWithSubs[255+1];
+char symbolsWithSubs[maxSymbolLen+1];
 int useSmallArrays, symbolCount, maxSymbolLength;
 char smallNewMacros[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
 char smallNewValues[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
@@ -1897,8 +1811,8 @@ char *newMacros[100];
 char *newValues[100];
 int numNewMacros, max, numFound;
 
-char *formTk, *formContext, formBuf[255+1], *fileTk, *fileContext, fileBuf[255+1],
- *result, msg[79+1], macDefFileName[127+1];
+char *formTk, *formContext, formBuf[maxSymbolLen+1], *fileTk, *fileContext,
+ fileBuf[maxSymbolLen+1], *result, msg[79+1], macDefFileName[127+1];
 FILE *f;
 expStringClass symbolsFromFile;
 int gotSymbolsFromFile;
@@ -1906,8 +1820,8 @@ int gotSymbolsFromFile;
   // allow the syntax: @filename s1=v1,s2=v2,...
   // which means read symbols from file and append list
   gotSymbolsFromFile = 0;
-  strncpy( formBuf, symbolsExpStr[index].getExpanded(), 255 );
-  formBuf[255] = 0;
+  strncpy( formBuf, symbolsExpStr[index].getExpanded(), maxSymbolLen );
+  formBuf[maxSymbolLen] = 0;
   formContext = NULL;
   formTk = strtok_r( formBuf, " \t\n", &formContext );
   if ( formTk ) {
@@ -1921,7 +1835,7 @@ int gotSymbolsFromFile;
           symbolsFromFile.setRaw( "" );
 	}
 	else {
-	  result = fgets( fileBuf, 255, f );
+	  result = fgets( fileBuf, maxSymbolLen, f );
 	  if ( result ) {
             fileContext = NULL;
             fileTk = strtok_r( fileBuf, "\n", &fileContext );
@@ -1952,19 +1866,19 @@ int gotSymbolsFromFile;
       // append inline list to file contents
       formTk = strtok_r( NULL, "\n", &formContext );
       if ( formTk ) {
-        strncpy( fileBuf, symbolsFromFile.getRaw(), 255 );
-        fileBuf[255] = 0;
+        strncpy( fileBuf, symbolsFromFile.getRaw(), maxSymbolLen );
+        fileBuf[maxSymbolLen] = 0;
         if ( blank(fileBuf) ) {
           strcpy( fileBuf, "" );
 	}
         else {
-          Strncat( fileBuf, ",", 255 );
+          Strncat( fileBuf, ",", maxSymbolLen );
 	}
-	Strncat( fileBuf, formTk, 255 );
+	Strncat( fileBuf, formTk, maxSymbolLen );
         symbolsFromFile.setRaw( fileBuf );
       }
       // do special substitutions
-      actWin->substituteSpecial( 255, symbolsFromFile.getExpanded(),
+      actWin->substituteSpecial( maxSymbolLen, symbolsFromFile.getExpanded(),
        symbolsWithSubs );
       gotSymbolsFromFile = 1;
     }
@@ -1972,7 +1886,7 @@ int gotSymbolsFromFile;
 
   if ( !gotSymbolsFromFile ) {
     // do special substitutions
-    actWin->substituteSpecial( 255, symbolsExpStr[index].getExpanded(),
+    actWin->substituteSpecial( maxSymbolLen, symbolsExpStr[index].getExpanded(),
      symbolsWithSubs );
   }
 
@@ -2154,7 +2068,7 @@ void activePipClass::executeDeferred ( void ) {
 
 int iv;
 char v[39+1];
-int i, nc, nu, nmc, nmu, nd, nfo, nimfo, ncto, nmap, nunmap, okToClose;
+int i, nc, nu, nmc, nmu, nd, nfo, nimfo, ncto, nmap, nunmap, okToClose, stat;
 activeWindowListPtr cur;
 Window root, child;
 int rootX, rootY, winX, winY;
@@ -2175,6 +2089,7 @@ XButtonEvent be;
   nmap = needMap; needMap = 0;
   nunmap = needUnmap; needUnmap = 0;
   strncpy( v, curReadV, 39 );
+  v[39] = 0;
   iv = curReadIV;
   actWin->remDefExeNode( aglPtr );
   actWin->appCtx->proc->unlock();
@@ -2184,6 +2099,8 @@ XButtonEvent be;
 //----------------------------------------------------------------------------
 
   if ( nc ) {
+
+    consecutiveDeactivateErrors = 0;
 
     readPvConnected = 1;
     active = 1;
@@ -2204,6 +2121,8 @@ XButtonEvent be;
 
   if ( nmc ) {
 
+    consecutiveDeactivateErrors = 0;
+
     readPvConnected = 1;
     active = 1;
     init = 1;
@@ -2215,6 +2134,11 @@ XButtonEvent be;
       readPvId->add_value_callback( pip_menuUpdate, this );
 
     }
+    else {
+
+      activateIsComplete = 1;
+
+    }
 
     fgColor.setConnected();
     drawActive();
@@ -2224,11 +2148,60 @@ XButtonEvent be;
   if ( nu ) {
 
     strncpy( readV, v, 39 );
+    readV[39] = 0;
     //fprintf( stderr, "readV = [%s]\n", readV );
 
     if ( enabled && !blank( readV ) ) {
 
       // close old
+
+      if ( aw ) {
+        if ( aw->loadFailure ) {
+	  aw = NULL;
+	  frameWidget = NULL;
+	}
+      }
+
+      if ( aw ) {
+
+        okToClose = 0;
+        cur = actWin->appCtx->head->flink;
+        while ( cur != actWin->appCtx->head ) {
+          if ( &cur->node == aw ) {
+            okToClose = 1;
+            break;
+          }
+          cur = cur->flink;
+        }
+
+        if ( okToClose ) {
+          if ( !aw->okToDeactivate() ) {
+            consecutiveDeactivateErrors++;
+            if ( consecutiveDeactivateErrors < MAX_CONSECUTIVE_DEACTIVATE_ERRORS ) {
+              if ( !retryTimerNU ) {
+                retryTimerNU = appAddTimeOut( actWin->appCtx->appContext(),
+                 50, needUpdateTimeout, this );
+              }
+              return;
+            }
+            else {
+	      //printf( "1\n" );
+              actWin->appCtx->postMessage( activePipClass_str30 );
+              consecutiveDeactivateErrors = 0;
+              return;
+            }
+          }
+          else {
+            if ( retryTimerNU ) {
+              XtRemoveTimeOut( retryTimerNU );
+              retryTimerNU = 0;
+            }
+          }
+	}
+
+      }
+
+      consecutiveDeactivateErrors = 0;
 
       if ( frameWidget ) {
         if ( *frameWidget ) XtUnmapWidget( *frameWidget );
@@ -2248,7 +2221,7 @@ XButtonEvent be;
         }
 
         if ( okToClose ) {
-          aw->returnToEdit( 1 ); // this frees frameWidget
+          stat = aw->returnToEdit( 1 ); // this frees frameWidget
         }
 
         aw = NULL;
@@ -2278,8 +2251,8 @@ XButtonEvent be;
 
           //fprintf( stderr, "Open file %s\n", readV );
 
-          strncpy( curFileName, readV, 127 );
-          curFileName[127] = 0;
+          strncpy( curFileName, readV, 39 );
+          curFileName[39] = 0;
 
           cur = new activeWindowListType;
           actWin->appCtx->addActiveWindow( cur );
@@ -2318,9 +2291,11 @@ XButtonEvent be;
     }
 
     if ( !enabled ) { // copy filename to be used when enabled becomes true
-      strncpy( curFileName, readV, 127 );
-      curFileName[127] = 0;
+      strncpy( curFileName, readV, 39 );
+      curFileName[39] = 0;
     }
+
+    activateIsComplete = 1;
 
   }
 
@@ -2352,6 +2327,54 @@ XButtonEvent be;
 
             // close old
 
+            if ( aw ) {
+	      if ( aw->loadFailure ) {
+                aw = NULL;
+                frameWidget = NULL;
+	      }
+	    }
+
+            if ( aw ) {
+
+              okToClose = 0;
+              cur = actWin->appCtx->head->flink;
+              while ( cur != actWin->appCtx->head ) {
+                if ( &cur->node == aw ) {
+                  okToClose = 1;
+                  break;
+                }
+                cur = cur->flink;
+              }
+
+              if ( okToClose ) {
+                if ( !aw->okToDeactivate() ) {
+                  consecutiveDeactivateErrors++;
+                  if ( consecutiveDeactivateErrors < MAX_CONSECUTIVE_DEACTIVATE_ERRORS ) {
+                    if ( !retryTimerNMU ) {
+                      retryTimerNMU = appAddTimeOut( actWin->appCtx->appContext(),
+                       50, needMenuUpdateTimeout, this );
+                    }
+                    return;
+                  }
+                  else {
+	            // printf( "2\n" );
+                    actWin->appCtx->postMessage( activePipClass_str30 );
+                    consecutiveDeactivateErrors = 0;
+                    return;
+                  }
+                }
+                else {
+                  if ( retryTimerNMU ) {
+                    XtRemoveTimeOut( retryTimerNMU );
+                    retryTimerNMU = 0;
+                  }
+                }
+	      }
+
+	    }
+
+            consecutiveDeactivateErrors = 0;
+
             if ( frameWidget ) {
               if ( *frameWidget ) XtUnmapWidget( *frameWidget );
             }
@@ -2370,7 +2393,7 @@ XButtonEvent be;
               }
 
               if ( okToClose ) {
-                aw->returnToEdit( 1 ); // this frees frameWidget
+                stat = aw->returnToEdit( 1 ); // this frees frameWidget
               }
 
               aw = NULL;
@@ -2443,21 +2466,27 @@ XButtonEvent be;
       curFileName[127] = 0;
     }
 
+    activateIsComplete = 1;
+
   }
 
 //----------------------------------------------------------------------------
 
   if ( nd ) {
+
+    consecutiveDeactivateErrors = 0;
+
     drawActive();
+
   }
 
 //----------------------------------------------------------------------------
 
   if ( nfo ) {
 
-    if ( enabled && fileExists ) {
+    consecutiveDeactivateErrors = 0;
 
-      //fprintf( stderr, "Open file %s\n", fileNameExpStr.getExpanded() );
+    if ( enabled && fileExists ) {
 
       strncpy( curFileName, fileNameExpStr.getExpanded(), 127 );
       curFileName[127] = 0;
@@ -2511,11 +2540,15 @@ XButtonEvent be;
       curFileName[127] = 0;
     }
 
+    activateIsComplete = 1;
+
   }
 
 //----------------------------------------------------------------------------
 
   if ( nimfo ) {
+
+    consecutiveDeactivateErrors = 0;
 
     if ( enabled ) {
 
@@ -2553,11 +2586,15 @@ XButtonEvent be;
       curFileName[127] = 0;
     }
 
+    activateIsComplete = 1;
+
   }
 
 //----------------------------------------------------------------------------
 
   if ( ncto ) {
+
+    consecutiveDeactivateErrors = 0;
 
     activateIsComplete = 1;
 
@@ -2568,6 +2605,52 @@ XButtonEvent be;
 //----------------------------------------------------------------------------
 
   if ( nunmap ) {
+
+    if ( frameWidget ) {
+      if ( *frameWidget ) XtUnmapWidget( *frameWidget );
+    }
+
+#if 0
+    if ( aw ) {
+
+      okToClose = 0;
+      cur = actWin->appCtx->head->flink;
+      while ( cur != actWin->appCtx->head ) {
+        if ( &cur->node == aw ) {
+          okToClose = 1;
+          break;
+        }
+        cur = cur->flink;
+      }
+
+      if ( okToClose ) {
+        if ( !aw->okToDeactivate() ) {
+          consecutiveDeactivateErrors++;
+          if ( consecutiveDeactivateErrors < MAX_CONSECUTIVE_DEACTIVATE_ERRORS ) {
+            if ( !retryTimerNUM ) {
+              retryTimerNUM = appAddTimeOut( actWin->appCtx->appContext(),
+               50, needUnmapTimeout, this );
+            }
+            return;
+          }
+          else {
+	    // printf( "3\n" );
+            actWin->appCtx->postMessage( activePipClass_str30 );
+            consecutiveDeactivateErrors = 0;
+            return;
+          }
+        }
+        else {
+          if ( retryTimerNUM ) {
+            XtRemoveTimeOut( retryTimerNUM );
+            retryTimerNUM = 0;
+          }
+        }
+      }
+
+    }
+
+    consecutiveDeactivateErrors = 0;
 
     if ( frameWidget ) {
       if ( *frameWidget ) XtUnmapWidget( *frameWidget );
@@ -2587,7 +2670,7 @@ XButtonEvent be;
       }
 
       if ( okToClose ) {
-        aw->returnToEdit( 1 ); // this frees frameWidget
+        stat = aw->returnToEdit( 1 ); // this frees frameWidget
       }
 
       aw = NULL;
@@ -2597,6 +2680,7 @@ XButtonEvent be;
     if ( frameWidget ) {
       frameWidget = NULL;
     }
+#endif
 
   }
 
@@ -2604,86 +2688,154 @@ XButtonEvent be;
 
   if ( nmap ) {
 
-    // curFileName should contain the file to open
+    if ( frameWidget ) {
+      if ( *frameWidget ) XtMapWidget( *frameWidget );
+    }
+    else {
 
-    if ( !blank( curFileName ) ) {
+      // curFileName should contain the file to open
 
-      // close old ( however, one should not be open )
+      if ( !blank( curFileName ) ) {
 
-      if ( frameWidget ) {
-        if ( *frameWidget ) XtUnmapWidget( *frameWidget );
-      }
+        // close old ( however, one should not be open )
 
-      if ( aw ) {
-
-        okToClose = 0;
-        // make sure the window was successfully opened
-        cur = actWin->appCtx->head->flink;
-        while ( cur != actWin->appCtx->head ) {
-          if ( &cur->node == aw ) {
-            okToClose = 1;
-            break;
+        if ( aw ) {
+          if ( aw->loadFailure ) {
+            aw = NULL;
+            frameWidget = NULL;
           }
-          cur = cur->flink;
         }
 
-        if ( okToClose ) {
-          aw->returnToEdit( 1 ); // this frees frameWidget
+        if ( aw ) {
+
+          okToClose = 0;
+          cur = actWin->appCtx->head->flink;
+          while ( cur != actWin->appCtx->head ) {
+            if ( &cur->node == aw ) {
+              okToClose = 1;
+              break;
+            }
+            cur = cur->flink;
+          }
+
+          if ( okToClose ) {
+            if ( !aw->okToDeactivate() ) {
+              consecutiveDeactivateErrors++;
+              if ( consecutiveDeactivateErrors < MAX_CONSECUTIVE_DEACTIVATE_ERRORS ) {
+                if ( !retryTimerNM ) {
+                  retryTimerNM = appAddTimeOut( actWin->appCtx->appContext(),
+                   50, needMapTimeout, this );
+                }
+                return;
+              }
+              else {
+                //printf( "4\n" );
+                actWin->appCtx->postMessage( activePipClass_str30 );
+                consecutiveDeactivateErrors = 0;
+                return;
+              }
+            }
+	    else {
+	      if ( retryTimerNM ) {
+                XtRemoveTimeOut( retryTimerNM );
+                retryTimerNM = 0;
+              }
+            }
+          }
+
         }
 
-        aw = NULL;
+        consecutiveDeactivateErrors = 0;
 
-      }
-
-      if ( frameWidget ) {
-        frameWidget = NULL;
-      }
-
-      // prevent possible mutual recursion
-      if ( actWin->sameAncestorName( curFileName ) ) {
-
-        actWin->appCtx->postMessage( activePipClass_str26 );
-        activateIsComplete = 1;
-
-      }
-      else {
-
-        // open new
-
-        if ( !frameWidget ) {
-          createPipWidgets();
+        if ( frameWidget ) {
+          if ( *frameWidget ) XtUnmapWidget( *frameWidget );
         }
 
-        if ( !aw ) {
+        if ( aw ) {
 
-          cur = new activeWindowListType;
-          actWin->appCtx->addActiveWindow( cur );
+          okToClose = 0;
+          // make sure the window was successfully opened
+          cur = actWin->appCtx->head->flink;
+          while ( cur != actWin->appCtx->head ) {
+            if ( &cur->node == aw ) {
+              okToClose = 1;
+              break;
+            }
+            cur = cur->flink;
+          }
 
-          cur->node.createEmbedded( actWin->appCtx, frameWidget, 0, 0, w, h,
-           x, y, center, setSize, sizeOfs, noScroll, actWin->numMacros,
-           actWin->macros, actWin->expansions );
+          if ( okToClose ) {
+            stat = aw->returnToEdit( 1 ); // this frees frameWidget
+          }
 
-          cur->node.realize();
+          aw = NULL;
 
-          cur->node.setGraphicEnvironment( &cur->node.appCtx->ci,
-           &cur->node.appCtx->fi );
+        }
 
-          cur->node.storeFileName( curFileName );
+        if ( frameWidget ) {
+          frameWidget = NULL;
+        }
 
-          actWin->appCtx->openActivateActiveWindow( &cur->node, 0, 0 );
+        // prevent possible mutual recursion
+        if ( actWin->sameAncestorName( curFileName ) ) {
 
-          aw = &cur->node;
+          actWin->appCtx->postMessage( activePipClass_str26 );
+          activateIsComplete = 1;
 
-          aw->parent = actWin;
-          (actWin->numChildren)++;
+        }
+        else {
 
-          drawActive();
+          // open new
+
+          if ( !frameWidget ) {
+            createPipWidgets();
+          }
+
+          if ( !aw ) {
+
+            if ( displaySource == 2 ) { // menu
+
+              if ( iv < 0 ) iv = 0;
+              if ( iv > numDsps ) iv = 0;
+              openEmbeddedByIndex( iv );
+
+            }
+            else {
+
+              cur = new activeWindowListType;
+              actWin->appCtx->addActiveWindow( cur );
+
+              cur->node.createEmbedded( actWin->appCtx, frameWidget, 0, 0, w, h,
+               x, y, center, setSize, sizeOfs, noScroll, actWin->numMacros,
+               actWin->macros, actWin->expansions );
+
+              cur->node.realize();
+
+              cur->node.setGraphicEnvironment( &cur->node.appCtx->ci,
+               &cur->node.appCtx->fi );
+
+              cur->node.storeFileName( curFileName );
+
+              actWin->appCtx->openActivateActiveWindow( &cur->node, 0, 0 );
+
+              aw = &cur->node;
+
+              aw->parent = actWin;
+              (actWin->numChildren)++;
+
+            }
+
+            drawActive();
+
+          }
 
         }
 
       }
 
     }
+
+    activateIsComplete = 1;
 
   }
 
@@ -2750,25 +2902,33 @@ int activePipClass::isWindowContainer ( void ) {
 
 }
 
+int activePipClass::activateBeforePreReexecuteComplete ( void ) {
+
+  if ( ignoreMultiplexors ) {
+    return 1;
+  }
+
+  return activateComplete();
+
+}
+
 int activePipClass::activateComplete ( void ) {
 
 int flag;
 
   if ( aw ) {
+
     if ( aw->loadFailure ) {
       activateIsComplete = 1;
     }
+
   }
 
   if ( !activateIsComplete ) return 0;
 
+  // this fails when I return to edit while things are updating
   if ( aw ) {
-    if ( aw->isExecuteMode() || aw->loadFailure ) {
-      flag = aw->okToDeactivate();
-    }
-    else {
-      flag = 0;
-    }
+    flag = aw->okToDeactivate();
   }
   else {
     flag = 1;

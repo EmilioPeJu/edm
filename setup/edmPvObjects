@@ -1,2 +1,4 @@
-1
-epicsPv $(EDMLIBS)/libEpics.so epics
+3
+EPICS $(EDMLIBS)/libEpics.so EPICS PV
+LOC $(EDMLIBS)/libLoc.so Local PV
+CALC $(EDMLIBS)/libCalc.so Calculation PV

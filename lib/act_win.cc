@@ -26,6 +26,7 @@
 #include <math.h>
 #include "app_pkg.h"
 #include "act_win.h"
+#include "lookup.h"
 
 #include "thread.h"
 #include "crc.h"
@@ -68,7 +69,7 @@ static void extractName(
   char *fileName, 
   char *name ) {
 
-int i, l;
+int i, l, more;
 char *gotOne;
 
   gotOne = strstr( fileName, "/" );
@@ -76,14 +77,24 @@ char *gotOne;
 
     strncpy( name, fileName, 255 );
 
-    // remove extension
+    // remove extension if .edl
     l = strlen( name );
 
-    for ( i=0; i<l; i++ ) {
+    more = 1;
+    for ( i=l-1; (i>=0) && more; i-- ) {
+
       if ( name[i] == '.' ) {
-        name[i] = 0;
-        return;
+
+	more = 0;
+
+        if ( l-i >= 4 ) {
+          if ( strcmp( &name[i], ".edl" ) == 0 ) {
+	    name[i] = 0;
+	  }
+	}
+
       }
+
     }
 
     return;
@@ -104,15 +115,25 @@ char *gotOne;
 
   }
 
-  // remove extension
+  // remove extension if .edl
   l = strlen( name );
 
-  for ( i=0; i<l; i++ ) {
-    if ( name[i] == '.' ) {
-      name[i] = 0;
-      return;
+    more = 1;
+    for ( i=l-1; (i>=0) && more; i-- ) {
+
+      if ( name[i] == '.' ) {
+
+	more = 0;
+
+        if ( l-i >= 3 ) {
+          if ( strcmp( &name[i], ".edl" ) == 0 ) {
+	    name[i] = 0;
+	  }
+	}
+
+      }
+
     }
-  }
 
 }
 
@@ -607,6 +628,8 @@ Arg args[4];
 #else
   awo->disableScroll = 0;
 #endif
+
+  awo->bgPixmapFlag = awo->bufBgPixmapFlag;
 
   awo->activateCallbackFlag = awo->bufActivateCallbackFlag;
   awo->deactivateCallbackFlag = awo->bufDeactivateCallbackFlag;
@@ -3910,6 +3933,7 @@ Atom wm_delete_window;
       awo->bufDefaultTopShadowColor = awo->defaultTopShadowColor;
       awo->bufDefaultBotShadowColor = awo->defaultBotShadowColor;
       awo->bufDefaultOffsetColor = awo->defaultOffsetColor;
+      awo->bufBgPixmapFlag = awo->bgPixmapFlag;
 
       awo->ef.create( awo->top, awo->appCtx->ci.getColorMap(),
        &awo->appCtx->entryFormX,
@@ -3944,6 +3968,9 @@ Atom wm_delete_window;
         awo->ef.addToggle( activeWindowClass_str203, &awo->bufDisableScroll );
       }
 #endif
+      awo->ef.addOption( activeWindowClass_str212, activeWindowClass_str213,
+       &awo->bufBgPixmapFlag );
+
       awo->ef.addColorButton( activeWindowClass_str33, awo->ci, &awo->defaultTextFgCb,
        &awo->bufDefaultTextFgColor );
       awo->ef.addColorButton( activeWindowClass_str34, awo->ci, &awo->defaultFg1Cb,
@@ -5837,19 +5864,19 @@ activeWindowClass *awo;
           XtVaSetValues(awo->drawWidget,
            XmNwidth, (Dimension)ce->width,
            XmNheight, (Dimension)ce->height,
-           0);
+	   NULL);
 
           if ( awo->scroll ) {
             XtVaSetValues(awo->scroll,
              XmNwidth, (Dimension)ce->width,
              XmNheight, (Dimension)ce->height,
-             0);
+             NULL);
           }
 
           XtVaSetValues(awo->top,
            XmNwidth, (Dimension)ce->width,
            XmNheight, (Dimension)ce->height,
-           0);
+           NULL);
 
         }
 
@@ -5889,7 +5916,7 @@ activeWindowClass *awo;
         XtVaSetValues(awo->drawWidget,
          XmNwidth, (Dimension)awo->w,
          XmNheight, (Dimension)awo->h,
-         0);
+         NULL);
 
       }
       else {
@@ -5898,13 +5925,13 @@ activeWindowClass *awo;
           XtVaSetValues(awo->scroll,
            XmNwidth, (Dimension)awo->w,
            XmNheight, (Dimension)awo->h,
-           0);
+           NULL);
 	}
 
         XtVaSetValues(awo->drawWidget,
          XmNwidth, (Dimension)awo->w,
          XmNheight, (Dimension)awo->h,
-         0);
+         NULL);
 
       }
 
@@ -10241,7 +10268,26 @@ done:
 
 }
 
-activeWindowClass::activeWindowClass ( void ) {
+activeWindowClass::activeWindowClass ( void ) : unknownTags() {
+
+char *str;
+
+  usePixmap = -1; // -1 means unknown, will be determined on execute
+  bgPixmap = (Pixmap) NULL;
+  pixmapW = pixmapH = -1;
+  needCopy = 0;
+  pixmapX0 = pixmapX1 = pixmapY0 = pixmapY1 = 0;
+  bgPixmapFlag = 0;
+
+  windowState = AWC_INIT;
+
+  str = getenv( environment_str20 );
+  if ( str ) {
+    clearEpicsPvTypeDefault = 1;
+  }
+  else {
+    clearEpicsPvTypeDefault = 0;
+  }
 
   strcpy( startSignature, "edmActiveWindow" );
   strcpy( endSignature, "wodniWevitcAmde" );
@@ -10456,20 +10502,165 @@ activeWindowClass::activeWindowClass ( void ) {
 
 }
 
+void activeWindowClass::initCopy ( void ) {
+
+  pixmapX0 = w;
+  pixmapY0 = h;
+  pixmapX1 = 0;
+  pixmapY1 = 0;
+
+}
+
+void activeWindowClass::updateCopyRegion (
+  int _x0,
+  int _y0,
+  int _w,
+  int _h
+) {
+
+int _x1, _y1;
+
+  _x1 = _x0 + _w;
+  _y1 = _y0 + _h;
+
+  if ( pixmapX0 > _x0 ) pixmapX0 = _x0;
+  if ( pixmapX1 < _x1 ) pixmapX1 = _x1;
+  if ( pixmapY0 > _y0 ) pixmapY0 = _y0;
+  if ( pixmapY1 < _y1 ) pixmapY1 = _y1;
+
+}
+
+void activeWindowClass::doCopy ( void ) {
+
+  if ( mode == AWC_EDIT ) {
+    needCopy = 0;
+    return;
+  }
+
+  if ( needCopy ) {
+
+    //printf( "full copy\n" );
+    //printf( "[ %-d, %-d, %-d, %-d ]\n",
+    // pixmapX0, pixmapX1, pixmapY0, pixmapY1 );
+
+    needCopy = 0;
+    needFullCopy = 0;
+
+    if ( bgPixmap ) {
+      //printf( "do copy\n" );
+      XCopyArea( d, bgPixmap,
+       XtWindow(executeWidget), executeGc.normGC(),
+       0, 0, w, h, 0, 0 );
+      initCopy();
+    }
+
+  }
+
+}
+
+void activeWindowClass::doMinCopy ( void ) {
+
+  if ( mode == AWC_EDIT ) {
+    needCopy = 0;
+    needFullCopy = 0;
+    return;
+  }
+
+  if ( needFullCopy ) {
+    doCopy();
+    return;
+  }
+
+  pixmapX0 -= 10;
+  if ( pixmapX0 < 0 ) pixmapX0 = 0;
+
+  pixmapX1 += 10;
+  if ( pixmapX1 > w ) pixmapX1 = w;
+
+  pixmapY0 -= 10;
+  if ( pixmapY0 < 0 ) pixmapY0 = 0;
+
+  pixmapY1 += 10;
+  if ( pixmapY1 > h ) pixmapY1 = h;
+
+  int pixW = pixmapX1 - pixmapX0 + 1;
+  int pixH = pixmapY1 - pixmapY0 + 1;
+
+  if ( pixW < 1 ) return;
+  if ( pixH < 1 ) return;
+
+  if ( needCopy ) {
+
+    needCopy = 0;
+
+    if ( bgPixmap ) {
+      //printf( "do copy\n" );
+      XCopyArea( d, bgPixmap,
+       XtWindow(executeWidget), executeGc.normGC(),
+       pixmapX0, pixmapY0, pixW, pixH, pixmapX0, pixmapY0 );
+      initCopy();
+    }
+
+  }
+
+}
+
+Drawable activeWindowClass::drawable (
+  Widget w
+) {
+
+  if ( bgPixmap ) {
+    return (Drawable) bgPixmap;
+  }
+  else {
+    return (Drawable) XtWindow(executeWidget);
+  }
+
+}
+
 int activeWindowClass::okToDeactivate ( void ) {
 
 activeGraphicListPtr cur, next;
 
-  if ( mode != AWC_EXECUTE ) return 1;
+  if ( loadFailure ) return 1;
 
   cur = head->flink;
   while ( cur != head ) {
     next = cur->flink;
-    if ( !cur->node->activateComplete() ) return 0;
+    if ( cur->node ) {
+      if ( !cur->node->activateComplete() ) return 0;
+    }
     cur = next;
   }
 
-  return 1;
+  if ( windowState == AWC_COMPLETE_EXECUTE ) {
+    return 1;
+  }
+
+  return 0;
+
+}
+
+int activeWindowClass::okToPreReexecute ( void ) {
+
+activeGraphicListPtr cur, next;
+
+  if ( loadFailure ) return 1;
+
+  cur = head->flink;
+  while ( cur != head ) {
+    next = cur->flink;
+    if ( cur->node ) {
+      if ( !cur->node->activateBeforePreReexecuteComplete() ) return 0;
+    }
+    cur = next;
+  }
+
+  if ( windowState == AWC_COMPLETE_EXECUTE ) {
+    return 1;
+  }
+
+  return 0;
 
 }
 
@@ -10563,6 +10754,10 @@ commentLinesPtr commentCur, commentNext;
 pvDefPtr pvDefCur, pvDefNext;
 
   //if ( !isEmbedded ) fprintf( stderr, "Destroy - [%s]\n", fileNameForSym );
+
+  windowState = AWC_TERMINATED;
+
+  if ( top ) XtUnmapWidget( top );  //??????? XtUnmapWidget
 
   if ( dragPopup ) {
     XtDestroyWidget( dragPopup );
@@ -10743,7 +10938,9 @@ pvDefPtr pvDefCur, pvDefNext;
 
   if ( objNameDialogCreated ) objNameDialog.destroy();
 
+#if 1
   if ( top ) XtDestroyWidget( top );
+#endif
 
   // need to deallocate widget address used for top if this was an
   // embedded window
@@ -10753,6 +10950,12 @@ pvDefPtr pvDefCur, pvDefNext;
   }
 
   delete pvAction;
+
+  if ( bgPixmap ) {
+    XFreePixmap( d, bgPixmap );
+    bgPixmap = (Pixmap) NULL;
+    pixmapW = pixmapH = -1;
+  }
 
 }
 
@@ -11313,11 +11516,11 @@ char tmp[10];
 #ifndef ADD_SCROLLED_WIN
   if ( !parent ) {
 
-    top = XtVaAppCreateShell( "edm", "edm", topLevelShellWidgetClass,
-     d,
+    top = XtVaCreatePopupShell( "edm", topLevelShellWidgetClass,
+     appCtx->apptop(),
      XmNmappedWhenManaged, False,
      XmNmwmDecorations, windowDecorations,
-     XmNresizePolicy, XmRESIZE_GROW,
+     XmNresizePolicy, XmRESIZE_NONE,
      NULL );
 
     drawWidget = XtVaCreateManagedWidget( "screen", xmDrawingAreaWidgetClass,
@@ -11325,7 +11528,7 @@ char tmp[10];
      XmNwidth, w,
      XmNheight, h,
      XmNmappedWhenManaged, False,
-     XmNresizePolicy, XmRESIZE_GROW,
+     XmNresizePolicy, XmRESIZE_NONE,
      // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
      // *****  pixels from the window edge.                             *****
      XmNmarginHeight, 0,
@@ -11353,7 +11556,7 @@ char tmp[10];
      XmNwidth, w,
      XmNheight, h,
      XmNmappedWhenManaged, False,
-     XmNresizePolicy, XmRESIZE_GROW,
+     XmNresizePolicy, XmRESIZE_NONE,
      XmNbackground, embBg,
      // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
      // *****  pixels from the window edge.                             *****
@@ -11371,8 +11574,14 @@ char tmp[10];
 
     if ( !parent ) {
 
-      top = XtVaAppCreateShell( "edm", "edm", topLevelShellWidgetClass,
-       d,
+      //top = XtVaAppCreateShell( "edm", "edm", topLevelShellWidgetClass,
+      // d,
+      // XmNmappedWhenManaged, False,
+      // XmNmwmDecorations, windowDecorations,
+      // NULL );
+
+      top = XtVaCreatePopupShell( "edm", topLevelShellWidgetClass,
+       appCtx->apptop(),
        XmNmappedWhenManaged, False,
        XmNmwmDecorations, windowDecorations,
        NULL );
@@ -11413,7 +11622,7 @@ char tmp[10];
 
       drawWidget = XtVaCreateManagedWidget( "screen", xmDrawingAreaWidgetClass,
        scroll ? scroll : top,
-       XmNresizePolicy, XmRESIZE_GROW,
+       XmNresizePolicy, XmRESIZE_NONE,
        XmNx, parent ? x : 0,
        XmNy, parent ? y : 0,
        XmNwidth, w,
@@ -11434,11 +11643,11 @@ char tmp[10];
 
     if ( !parent ) {
 
-      top = XtVaAppCreateShell( "edm", "edm", topLevelShellWidgetClass,
-       d,
+      top = XtVaCreatePopupShell( "edm", topLevelShellWidgetClass,
+       appCtx->apptop(),
        XmNmappedWhenManaged, False,
        XmNmwmDecorations, windowDecorations,
-       XmNresizePolicy, XmRESIZE_GROW,
+       XmNresizePolicy, XmRESIZE_NONE,
        NULL );
 
       drawWidget = XtVaCreateManagedWidget( "screen", xmDrawingAreaWidgetClass,
@@ -11446,7 +11655,7 @@ char tmp[10];
        XmNwidth, w,
        XmNheight, h,
        XmNmappedWhenManaged, False,
-       XmNresizePolicy, XmRESIZE_GROW,
+       XmNresizePolicy, XmRESIZE_NONE,
        // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
        // *****  pixels from the window edge.                             *****
        XmNmarginHeight, 0,
@@ -11474,7 +11683,7 @@ char tmp[10];
        XmNwidth, w,
        XmNheight, h,
        XmNmappedWhenManaged, False,
-       XmNresizePolicy, XmRESIZE_GROW,
+       XmNresizePolicy, XmRESIZE_NONE,
        XmNbackground, embBg,
        // *****  SJS addition 26/10/07 - allow Motif widgets less than 10 *****
        // *****  pixels from the window edge.                             *****
@@ -11515,6 +11724,8 @@ char tmp[10];
    ButtonReleaseMask|Button1MotionMask|
    Button2MotionMask|Button3MotionMask|ExposureMask, False,
    drawWinEventHandler, (XtPointer) this );
+
+  windowState = AWC_COMPLETE_DEACTIVATE;
 
   return 1;
 
@@ -14548,19 +14759,101 @@ int activeWindowClass::renameToBackupFile (
   char *fname )
 {
 
-int stat;
-char tmp[511+1];
+int stat, found, min, max, num, count;
+char tmp[530+1], spec[520+1], name[511+1], ext[511+1], verstr[10+1],
+ *tk, *ctx, *nonInt;
 
-  strncpy( tmp, fname, 510 ); // leave room for ~
-  Strncat( tmp, "~", 511 );
+char *envPtr;
+int maxver = 1;
 
-  if ( fileExists( tmp ) ) {
-    stat = unlink( tmp );
-    if ( stat ) return 2; // error
+  envPtr = getenv( environment_str18 );
+
+  if ( envPtr ) {
+
+    if ( !strcasecmp( envPtr, activeWindowClass_str211 ) ) {
+      maxver = -1;
+    }
+    else {
+
+      strncpy( tmp, envPtr, 511 );
+      tmp[511] = 0;
+      num = strtol( tmp, &nonInt, 10 );
+      if ( !nonInt || !strcmp( nonInt, "" ) ) {
+	maxver = num;
+      }
+
+      if ( maxver < 1 ) maxver = 1;
+
+    }
+
   }
-  if ( fileExists( fname ) ) {
-    stat = rename( fname, tmp );
-    if ( stat ) return 4; // error
+
+  strncpy( spec, fname, 511 );
+  Strncat( spec, "-*", 520 );
+  min = max = count = 0;
+  getFirstFileNameExt( spec, 511, name, 511, ext, &found );
+  while ( found ) {
+    ctx = NULL;
+    tk = strtok_r( ext, "-", &ctx );
+    tk = strtok_r( NULL, "-", &ctx );
+    if ( tk ) {
+      num = strtol( tk, &nonInt, 10 );
+      if ( !nonInt || !strcmp( nonInt, "" ) ) {
+        count++;
+        if ( min ) {
+          if ( min > num ) min = num;
+	}
+	else {
+	  min = num;
+	}
+	if ( max < num ) max = num;
+      }
+    }
+    getNextFileNameExt( spec, 511, name, 511, ext, &found );
+  }
+
+  if ( maxver != 1 ) {
+
+    if ( ( maxver != -1 ) && count >= maxver ) {
+
+      strncpy( tmp, fname, 510 ); // leave room for version info
+      tmp[510] = 0;
+      snprintf( verstr, 10, "-%-d", min ); 
+      Strncat( tmp, verstr, 530 );
+
+      if ( fileExists( tmp ) ) {
+        stat = unlink( tmp );
+        if ( stat ) return 2; // error
+      }
+
+    }
+
+    num = max+1;
+    strncpy( tmp, fname, 510 ); // leave room for version info
+    tmp[510] = 0;
+    snprintf( verstr, 10, "-%-d", num ); 
+    Strncat( tmp, verstr, 530 );
+
+    if ( fileExists( fname ) ) {
+      stat = rename( fname, tmp );
+      if ( stat ) return 4; // error
+    }
+
+  }
+  else {
+
+    strncpy( tmp, fname, 510 ); // leave room for ~
+    Strncat( tmp, "~", 511 );
+
+    if ( fileExists( tmp ) ) {
+      stat = unlink( tmp );
+      if ( stat ) return 2; // error
+    }
+    if ( fileExists( fname ) ) {
+      stat = rename( fname, tmp );
+      if ( stat ) return 4; // error
+    }
+
   }
 
   return 1; // success
@@ -14990,6 +15283,121 @@ int activeWindowClass::old_load (
 
 }
 
+int activeWindowClass::loadDummy (
+  int x,
+  int y,
+  int setPosition ) {
+
+FILE *f = NULL;
+activeGraphicListPtr cur, next;
+int stat;
+Widget clipWidget, hsbWidget, vsbWidget;
+
+tagClass tag;
+
+  loadFailure = 1;
+
+  tag.initLine();
+
+  // empty main list
+  cur = head->flink;
+  while ( cur != head ) {
+    next = cur->flink;
+    delete cur->node;
+    delete cur;
+    cur = next;
+  }
+
+  head->flink = head;
+  head->blink = head;
+
+  // empty cut list
+  cur = cutHead->flink;
+  while ( cur != cutHead ) {
+    next = cur->flink;
+    delete cur->node;
+    delete cur;
+    cur = next;
+  }
+
+  cutHead->flink = cutHead;
+  cutHead->blink = cutHead;
+
+  // set select list empty
+
+  selectedHead->selFlink = selectedHead;
+  selectedHead->selBlink = selectedHead;
+
+  stat = this->loadWinDummy( f, x, y, setPosition );
+
+  this->setUnchanged();
+
+  if ( scroll ) {
+
+    XtVaSetValues( scroll,
+     XmNtopShadowColor, ci->pix(defaultTopShadowColor),
+     XmNbottomShadowColor, ci->pix(defaultBotShadowColor),
+     XmNborderColor, ci->pix(bgColor),
+     XmNhighlightColor, ci->pix(bgColor),
+     XmNforeground, ci->pix(bgColor),
+     XmNbackground, ci->pix(bgColor),
+     NULL );
+
+    XtVaGetValues( scroll,
+     XmNclipWindow, &clipWidget,
+     XmNhorizontalScrollBar, &hsbWidget,
+     XmNverticalScrollBar, &vsbWidget,
+     NULL );
+
+    if ( clipWidget ) {
+      XtVaSetValues( clipWidget,
+        XmNtopShadowColor, ci->pix(defaultTopShadowColor),
+        XmNbottomShadowColor, ci->pix(defaultBotShadowColor),
+        XmNborderColor, ci->pix(bgColor),
+        XmNhighlightColor, ci->pix(bgColor),
+        XmNforeground, ci->pix(bgColor),
+        XmNbackground, ci->pix(bgColor),
+       NULL );
+    }
+
+    if ( hsbWidget ) {
+      XtVaSetValues( hsbWidget,
+        XmNtopShadowColor, ci->pix(defaultTopShadowColor),
+        XmNbottomShadowColor, ci->pix(defaultBotShadowColor),
+        XmNborderColor, ci->pix(bgColor),
+        XmNhighlightColor, ci->pix(bgColor),
+        XmNforeground, ci->pix(bgColor),
+        XmNbackground, ci->pix(bgColor),
+        XmNtroughColor, ci->pix(bgColor),
+        NULL );
+    }
+
+    if ( vsbWidget ) {
+      XtVaSetValues( vsbWidget,
+        XmNtopShadowColor, ci->pix(defaultTopShadowColor),
+        XmNbottomShadowColor, ci->pix(defaultBotShadowColor),
+        XmNborderColor, ci->pix(bgColor),
+        XmNhighlightColor, ci->pix(bgColor),
+        XmNforeground, ci->pix(bgColor),
+        XmNbackground, ci->pix(bgColor),
+        XmNtroughColor, ci->pix(bgColor),
+        NULL );
+    }
+
+  }
+
+  showName = 0;
+
+  setTitle();
+
+  exit_after_save = 0;
+
+  loadFailure = 0;
+
+  return 1;
+
+}
+
 int activeWindowClass::loadGeneric (
   int x,
   int y,
@@ -15045,6 +15453,9 @@ tagClass tag;
   if ( !f ) {
     sprintf( msg, activeWindowClass_str156, this->fileName );
     appCtx->postMessage( msg );
+    if ( isEmbedded ) {
+      return loadDummy( x, y, setPosition );
+    }
     return 0;
   }
 
@@ -15054,6 +15465,9 @@ tagClass tag;
 
   if ( major > AWC_MAJOR_VERSION ) {
     appCtx->postMessage( activeWindowClass_str191 );
+    if ( isEmbedded ) {
+      return loadDummy( x, y, setPosition );
+    }
     return 0;
   }
 
@@ -15065,10 +15479,20 @@ tagClass tag;
     else {
       stat = this->old_loadWin( f );
     }
-    if ( !( stat & 1 ) ) return stat; // memory leak here
+    if ( !( stat & 1 ) ) {
+      if ( isEmbedded ) {
+        return loadDummy( x, y, setPosition );
+      }
+      return stat; // memory leak here
+    }
 
     stat = readUntilEndOfData( f ); // for forward compatibility
-    if ( !( stat & 1 ) ) return stat; // memory leak here
+    if ( !( stat & 1 ) ) {
+      if ( isEmbedded ) {
+        return loadDummy( x, y, setPosition );
+      }
+      return stat; // memory leak here
+    }
 
     while ( !feof(f) ) {
 
@@ -15084,6 +15508,9 @@ tagClass tag;
         if ( !cur ) {
           fileClose( f );
           appCtx->postMessage( activeWindowClass_str157 );
+          if ( isEmbedded ) {
+            return loadDummy( x, y, setPosition );
+          }
           return 0;
         }
         cur->defExeFlink = NULL;
@@ -15094,10 +15521,20 @@ tagClass tag;
         if ( cur->node ) {
 
           stat = cur->node->old_createFromFile( f, name, this );
-          if ( !( stat & 1 ) ) return stat; // memory leak here
+          if ( !( stat & 1 ) ) {
+            if ( isEmbedded ) {
+              return loadDummy( x, y, setPosition );
+            }
+            return stat; // memory leak here
+	  }
 
           stat = readUntilEndOfData( f ); // for forward compatibility
-          if ( !( stat & 1 ) ) return stat; // memory leak here
+          if ( !( stat & 1 ) ) {
+            if ( isEmbedded ) {
+              return loadDummy( x, y, setPosition );
+            }
+            return stat; // memory leak here
+	  }
 
           cur->blink = head->blink;
           head->blink->flink = cur;
@@ -15110,6 +15547,9 @@ tagClass tag;
           sprintf( msg, activeWindowClass_str158, line(),
            name );
           appCtx->postMessage( msg );
+          if ( isEmbedded ) {
+            return loadDummy( x, y, setPosition );
+          }
           return 0;
         }
 
@@ -15126,8 +15566,12 @@ tagClass tag;
     else {
       stat = this->loadWin( f );
     }
-    if ( !( stat & 1 ) ) return stat; // memory leak here
-
+    if ( !( stat & 1 ) ) {
+      if ( isEmbedded ) {
+        return loadDummy( x, y, setPosition );
+      }
+      return stat; // memory leak here
+    }
 
     if ( isEmbedded ) {
 
@@ -15142,6 +15586,9 @@ tagClass tag;
         fileClose( f );
         appCtx->postMessage(
          activeWindowClass_str157 );
+        if ( isEmbedded ) {
+          return loadDummy( x, y, setPosition );
+        }
         return 0;
       }
       cur->defExeFlink = NULL;
@@ -15196,6 +15643,9 @@ tagClass tag;
           fileClose( f );
           appCtx->postMessage(
            activeWindowClass_str157 );
+          if ( isEmbedded ) {
+            return loadDummy( x, y, setPosition );
+          }
           return 0;
         }
         cur->defExeFlink = NULL;
@@ -15206,7 +15656,12 @@ tagClass tag;
         if ( cur->node ) {
 
           stat = cur->node->createFromFile( f, objName, this );
-          if ( !( stat & 1 ) ) return stat; // memory leak here
+          if ( !( stat & 1 ) ) {
+            if ( isEmbedded ) {
+              return loadDummy( x, y, setPosition );
+            }
+            return stat; // memory leak here
+	  }
 
           cur->blink = head->blink;
           head->blink->flink = cur;
@@ -15731,6 +16186,81 @@ int numMuxMacros;
 char **muxMacro, **muxExpansion;
 char callbackName[63+1];
 pvDefPtr pvDefCur;
+char *envPtr;
+
+  initCopy();
+
+  windowState = AWC_START_EXECUTE;
+
+  if ( bgPixmapFlag == AWC_BGPIXMAP_NEVER ) {
+    usePixmap = 0;
+  }
+  else if ( bgPixmapFlag == AWC_BGPIXMAP_ALWAYS ) {
+    usePixmap = 1;
+  }
+  else {
+    usePixmap = -1;
+  }
+
+  if ( usePixmap == -1 ) {
+    envPtr = getenv( environment_str23 );
+    if ( envPtr ) {
+      usePixmap = 1;
+    }
+    else {
+      usePixmap = 0;
+    }
+  }
+
+  if ( usePixmap ) {
+
+    needFullCopy = 0;
+
+    if ( bgPixmap ) {
+      if ( ( w != pixmapW ) || ( h != pixmapH ) ) {
+        XFreePixmap( d, bgPixmap );
+        bgPixmap = (Pixmap) NULL;
+        pixmapW = pixmapH = -1;
+      }
+    }
+
+    if ( !bgPixmap ) {
+      if ( ( w > 0 ) && ( h > 0 ) ) {
+        int screen_num, depth;
+        Display *d = appCtx->getDisplay();
+        screen_num = DefaultScreen( d );
+        depth = DefaultDepth( d, screen_num );
+        bgPixmap = XCreatePixmap( d, XtWindow(executeWidget),
+        w, h, depth );
+        pixmapW = w;
+        pixmapH = h;
+      }
+    }
+
+    if ( bgPixmap ) {
+      executeGc.saveFg();
+      executeGc.setFG( ci->pix(bgColor) );
+      executeGc.setLineWidth(1);
+      executeGc.setLineStyle( LineSolid );
+      XDrawRectangle( d, bgPixmap,
+       executeGc.normGC(), 0, 0,
+       w, h );
+      XFillRectangle( d, bgPixmap,
+       executeGc.normGC(), 0, 0,
+       w, h );
+      executeGc.restoreFg();
+    }
+
+  }
+  else {
+
+    if ( bgPixmap ) {
+      XFreePixmap( d, bgPixmap );
+      bgPixmap = (Pixmap) NULL;
+      pixmapW = pixmapH = -1;
+    }
+
+  }
 
   if ( diagnosticMode() ) {
     char diagBuf[255+1];
@@ -15746,7 +16276,9 @@ pvDefPtr pvDefCur;
     pvDefCur = pvDefCur->flink;
   }
 
-  if ( blank(defaultPvType) ) {
+  if ( blank(defaultPvType) ||
+       ( clearEpicsPvTypeDefault &&
+         ( strcmp( defaultPvType, "EPICS" ) == 0 ) ) ) {
     the_PV_Factory->clear_default_pv_type();
   }
   else {
@@ -15957,6 +16489,8 @@ pvDefPtr pvDefCur;
 
   refreshActive();
 
+  windowState = AWC_COMPLETE_EXECUTE;
+
   return 1;
 
 }
@@ -15969,6 +16503,8 @@ pvDefPtr pvDefCur;
 
 int numMuxMacros;
 char **muxMacro, **muxExpansion;
+
+  windowState = AWC_START_EXECUTE;
 
   if ( diagnosticMode() ) {
     char diagBuf[255+1];
@@ -15983,7 +16519,9 @@ char **muxMacro, **muxExpansion;
     pvDefCur = pvDefCur->flink;
   }
 
-  if ( blank(defaultPvType) ) {
+  if ( blank(defaultPvType) ||
+       ( clearEpicsPvTypeDefault &&
+         ( strcmp( defaultPvType, "EPICS" ) == 0 ) ) ) {
     the_PV_Factory->clear_default_pv_type();
   }
   else {
@@ -16091,6 +16629,8 @@ char **muxMacro, **muxExpansion;
 
   refreshActive();
 
+  windowState = AWC_COMPLETE_EXECUTE;
+
   return 1;
 
 }
@@ -16111,6 +16651,8 @@ pvDefPtr pvDefCur;
     appCtx->postMessage( activeWindowClass_str193 );
     return 0;
   }
+
+  windowState = AWC_START_DEACTIVATE;
 
   if ( diagnosticMode() ) {
     char diagBuf[255+1];
@@ -16311,6 +16853,8 @@ pvDefPtr pvDefCur;
         }
       }
 
+      windowState = AWC_COMPLETE_DEACTIVATE;
+
       return 1;
 
     }
@@ -16343,6 +16887,8 @@ pvDefPtr pvDefCur;
     }
   }
 
+  windowState = AWC_COMPLETE_DEACTIVATE;
+
   return 1;
 
 }
@@ -16354,6 +16900,13 @@ activeGraphicListPtr cur;
 int numSubObjects, cnt;
 
   if ( mode == AWC_EDIT ) return 1;
+
+  if ( !okToPreReexecute() ) {
+    appCtx->postMessage( activeWindowClass_str193 );
+    return 0;
+  }
+
+  windowState = AWC_START_DEACTIVATE;
 
   if ( diagnosticMode() ) {
     char diagBuf[255+1];
@@ -16385,19 +16938,49 @@ int numSubObjects, cnt;
 
   }
 
+  windowState = AWC_COMPLETE_DEACTIVATE;
+
   return 1;
 
 }
 
 int activeWindowClass::clearActive ( void ) {
 
-  XClearWindow( d, XtWindow(executeWidget) );
+  if ( bgPixmap ) {
+
+    executeGc.setLineWidth(1);
+    executeGc.setLineStyle( LineSolid );
+
+    XDrawRectangle( d, bgPixmap,
+     executeGc.eraseGC(), 0, 0,
+     w, h );
+
+    XFillRectangle( d, bgPixmap,
+     executeGc.eraseGC(), 0, 0,
+     w, h );
+
+    needCopy = 1;
+    needFullCopy = 1;
+    doCopy();
+
+  }
+  else {
+
+    XClearWindow( d, XtWindow(executeWidget) );
+
+  }
 
   return 1;
 
 }
 
 int activeWindowClass::requestSmartDrawAllActive ( void ) {
+
+  if ( bgPixmap ) {
+    needCopy = 1;
+    smartDrawAllActive();
+    return 1;
+  }
 
   appCtx->smartDrawAllActive( this );
 
@@ -16412,7 +16995,7 @@ int n = 0;
 char *envPtr;
 
   if ( gFastRefresh == -1 ) {
-    envPtr = getenv( "EDMFASTREFRESH" );
+    envPtr = getenv( environment_str21 );
     if ( envPtr ) {
       gFastRefresh = 1;
     }
@@ -16453,11 +17036,18 @@ char *envPtr;
     cur = cur->flink;
   }
 
+  needCopy = 1;
+
   return 1;
 
 }
 
 int activeWindowClass::requestActiveRefresh ( void ) {
+
+  if ( bgPixmap ) {
+    refreshActive();
+    return 1;
+  }
 
   appCtx->refreshActiveWindow( this );
 
@@ -16474,12 +17064,18 @@ int activeWindowClass::refreshActive (
 
 activeGraphicListPtr cur;
 
-  if ( noRefresh ) return 1;
+  if ( noRefresh ) {
+    needCopy = 1;
+    return 1;
+  }
 
   cur = head->flink;
   if ( cur != head ) {
     cur->node->refreshActive( _x, _y, _w, _h );
   }
+
+  needFullCopy = 1;
+  needCopy = 1;
 
   return 1;
 
@@ -16489,12 +17085,18 @@ int activeWindowClass::refreshActive ( void ) {
 
 activeGraphicListPtr cur;
 
-  if ( noRefresh ) return 1;
+  if ( noRefresh ) {
+    needCopy = 1;
+    return 1;
+  }
 
   cur = head->flink;
   if ( cur != head ) {
     cur->node->refreshActive();
   }
+
+  needFullCopy = 1;
+  needCopy = 1;
 
   return 1;
 
@@ -16648,12 +17250,24 @@ static int alignEnum[3] = {
   XmALIGNMENT_END
 };
 
+static int perEnvVar = 0;
+static char *pixmapEnumStr[3] = {
+  "perEnvVar",
+  "never",
+  "always"
+};
+static int pixmapEnum[3] = {
+  0,
+  1,
+  2
+};
+
 char *commentFile;
 FILE *cf;
 char str[255+1], *strPtr;
 
   if ( !haveComments ) {
-    commentFile = getenv( "EDMCOMMENTS" );
+    commentFile = getenv( environment_str22 );
     if ( commentFile ) {
       cf = fopen( commentFile, "r" );
       if ( cf ) {
@@ -16717,6 +17331,9 @@ char str[255+1], *strPtr;
   tag.loadBoolW( "orthoLineDraw", &orthogonal, &zero );
   tag.loadW( "pvType", defaultPvType, emptyStr );
   tag.loadBoolW( "disableScroll", &disableScroll, &zero );
+  tag.loadW( "pixmapFlag", 3, pixmapEnumStr, pixmapEnum,
+   &bgPixmapFlag, &perEnvVar );
+  tag.loadW( unknownTags );
   tag.loadW( "endScreenProperties" );
   tag.loadW( "" );
 
@@ -16890,6 +17507,218 @@ int moreComments = 1;
 
 }
 
+int activeWindowClass::loadWinDummy (
+  FILE *f,
+  int _x,
+  int _y,
+  int setPosition ) {
+
+  // if this is changed then activeWindowClass::discardWinLoadData
+  // must be likewise changed
+
+int stat, retStat = 1;
+int fileX, fileY, n, tmpVal;
+Arg args[5];
+
+tagClass tag;
+
+  x = 0;
+  y = 0;
+  strcpy( defaultFontTag, "" );
+  strcpy( defaultCtlFontTag, "" );
+  strcpy( defaultBtnFontTag, "" );
+
+  strcpy( this->id, "" );
+  activateCallbackFlag = 0;
+  deactivateCallbackFlag = 0;
+
+  major = 4;
+  minor = 0;
+  release = 0;
+  fileX = 0;
+  fileY = 0;
+  w = 50;
+  h = 50;
+  defaultAlignment = 0;
+  defaultCtlAlignment = 0;
+  defaultBtnAlignment = 0;
+  fgColor = 0;
+  bgColor = 0;
+  defaultTextFgColor = 0;
+  defaultFg1Color = 0;
+  defaultFg2Color = 0;
+  defaultBgColor = 0;
+  defaultOffsetColor = 0;
+  defaultTopShadowColor = 0;
+  defaultBotShadowColor = 0;
+  strcpy( title, "" );
+  gridShow = 0;
+  gridActive = 0;
+  gridSpacing = 0;
+  orthogonal = 0;
+  strcpy( defaultPvType, "" );
+
+  if ( setPosition ) {
+    x = _x;
+    y = _y;
+  }
+  else {
+    x = fileX;
+    y = fileY;
+  }
+
+  if ( !intersects( x, y, x+w, y+h, 0, 0,
+   XDisplayWidth( d, DefaultScreen(d) ),
+   XDisplayHeight( d, DefaultScreen(d) ) ) ) {
+
+//    appCtx->postMessage(
+//    "Screen location is out of display bounds - setting location to (50,50)" );
+
+    x = y = 50;
+
+  }
+
+#ifdef ADD_SCROLLED_WIN
+  if ( isEmbedded ) {
+
+      n = 0;
+      XtSetArg( args[n], XmNwidth, (XtArgVal) w ); n++;
+      XtSetValues( drawWidget, args, n );
+
+      n = 0;
+      XtSetArg( args[n], XmNheight, (XtArgVal) h ); n++;
+      XtSetValues( drawWidget, args, n );
+
+  }
+#else
+  n = 0;
+  XtSetArg( args[n], XmNwidth, (XtArgVal) w ); n++;
+  XtSetValues( drawWidget, args, n );
+
+  n = 0;
+  XtSetArg( args[n], XmNheight, (XtArgVal) h ); n++;
+  XtSetValues( drawWidget, args, n );
+#endif
+
+  if ( isEmbedded ) {
+
+    if ( embCenter && !embSetSize ) {
+
+      if ( embeddedH > h ) {
+
+        tmpVal = y + ( embeddedH - h ) / 2;
+        n = 0;
+        XtSetArg( args[n], XmNy, (XtArgVal) tmpVal ); n++;
+        XtSetValues( drawWidget, args, n );
+
+      }
+
+      if ( embeddedW > w ) {
+
+        tmpVal = x + ( embeddedW - w ) / 2;
+        n = 0;
+        XtSetArg( args[n], XmNx, (XtArgVal) tmpVal ); n++;
+        XtSetValues( drawWidget, args, n );
+
+      }
+
+    }
+
+  }
+  else {
+
+    n = 0;
+    XtSetArg( args[n], XmNx, (XtArgVal) x ); n++;
+    XtSetValues( drawWidget, args, n );
+
+    n = 0;
+    XtSetArg( args[n], XmNy, (XtArgVal) y ); n++;
+    XtSetValues( drawWidget, args, n );
+
+  }
+
+  if ( isEmbedded ) {
+
+    if ( embSetSize ) {
+
+      if ( w+embSizeOfs <= embeddedW ) {
+
+         n = 0;
+         XtSetArg( args[n], XmNwidth, (XtArgVal) w+embSizeOfs ); n++;
+         XtSetValues( top, args, n );
+
+      }
+
+      if ( h+embSizeOfs <= embeddedH ) {
+
+         n = 0;
+         XtSetArg( args[n], XmNheight, (XtArgVal) h+embSizeOfs ); n++;
+         XtSetValues( top, args, n );
+
+      }
+
+    }
+
+  }
+  else {
+
+#ifndef ADD_SCROLLED_WIN
+    n = 0;
+    XtSetArg( args[n], XmNwidth, (XtArgVal) w ); n++;
+    XtSetValues( top, args, n );
+
+    n = 0;
+    XtSetArg( args[n], XmNheight, (XtArgVal) h ); n++;
+    XtSetValues( top, args, n );
+#else
+    if ( !appCtx->useScrollBars ) {
+
+      n = 0;
+      XtSetArg( args[n], XmNwidth, (XtArgVal) w ); n++;
+      XtSetValues( top, args, n );
+
+      n = 0;
+      XtSetArg( args[n], XmNheight, (XtArgVal) h ); n++;
+      XtSetValues( top, args, n );
+
+    }
+    else {
+
+      reconfig();
+
+    }
+#endif
+
+  }
+
+  if ( strcmp( defaultFontTag, "" ) != 0 ) {
+    stat = defaultFm.setFontTag( defaultFontTag );
+  }
+
+  stat = defaultFm.setFontAlignment( defaultAlignment );
+
+  if ( strcmp( defaultCtlFontTag, "" ) != 0 ) {
+    stat = defaultCtlFm.setFontTag( defaultCtlFontTag );
+  }
+
+  stat = defaultCtlFm.setFontAlignment( defaultCtlAlignment );
+
+  if ( strcmp( defaultBtnFontTag, "" ) != 0 ) {
+    stat = defaultBtnFm.setFontTag( defaultBtnFontTag );
+  }
+
+  stat = defaultBtnFm.setFontAlignment( defaultBtnAlignment );
+
+  drawGc.setBaseBG( ci->pix(bgColor) );
+
+  expStrTitle.setRaw( title );
+
+  updateAllSelectedDisplayInfo();
+
+  return retStat;
+
+}
+
 int activeWindowClass::loadWinGeneric (
   FILE *f,
   int _x,
@@ -16921,6 +17750,18 @@ static int alignEnum[3] = {
   XmALIGNMENT_END
 };
 
+static int perEnvVar = 0;
+static char *pixmapEnumStr[3] = {
+  "perEnvVar",
+  "never",
+  "always"
+};
+static int pixmapEnum[3] = {
+  0,
+  1,
+  2
+};
+
 #if 0
   readCommentsAndVersion( f );
 
@@ -16949,6 +17790,7 @@ static int alignEnum[3] = {
 
   tag.init();
   tag.loadR( "beginScreenProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -16981,6 +17823,8 @@ static int alignEnum[3] = {
   tag.loadR( "orthoLineDraw", &orthogonal, &zero );
   tag.loadR( "pvType", 15, defaultPvType, emptyStr );
   tag.loadR( "disableScroll", &disableScroll, &zero );
+  tag.loadR( "pixmapFlag", 3, pixmapEnumStr, pixmapEnum,
+   &bgPixmapFlag, &perEnvVar );
   tag.loadR( "endScreenProperties" );
 
   stat = tag.readTags( f, "endScreenProperties" );
@@ -16988,6 +17832,9 @@ static int alignEnum[3] = {
   if ( !( stat & 1 ) ) {
     retStat = stat;
     appCtx->postMessage( tag.errMsg() );
+  }
+
+  if ( disableScroll ) {
   }
 
   if ( strcmp( defaultPvType, "epics" ) == 0 ) {
@@ -17902,6 +18749,7 @@ int stat;
 tagClass tag;
 int i, r, g, b, index;
 char s[127+1];
+unknownTagList junkTags;
 
   // don't inc line here
 
@@ -18056,6 +18904,7 @@ char s[127+1];
 
   tag.init();
   tag.loadR( "beginScreenProperties" );
+  tag.loadR( junkTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -18408,7 +19257,7 @@ void activeWindowClass::showSelectionObject ( void ) {
 // !!!!!! notice coupling with activeWindowClass::updateMasterSelection()
 
 activeGraphicListPtr cur;
-int x1, y1;
+int x1=0, y1=0;
 char buf[31+1];
 int num_selected;
 
@@ -18458,18 +19307,31 @@ int num_selected;
 
 }
 
-void activeWindowClass::processObjects ( void )
+int activeWindowClass::processObjects ( void )
 {
 
 activeGraphicListPtr cur, next;
+int workToDo = 0;
 
   appCtx->proc->lock();
   cur = defExeHead->defExeFlink;
   appCtx->proc->unlock();
 
-  if ( !cur ) return;
+  if ( !cur ) {
+    return 0;
+  }
+
+  if ( cur != defExeHead ) {
+    needCopy = 1;
+    workToDo = 1;
+  }
 
   while ( cur != defExeHead ) {
+
+    if ( pixmapX0 > cur->node->getX0() ) pixmapX0 = cur->node->getX0();
+    if ( pixmapX1 < cur->node->getX1() ) pixmapX1 = cur->node->getX1();
+    if ( pixmapY0 > cur->node->getY0() ) pixmapY0 = cur->node->getY0();
+    if ( pixmapY1 < cur->node->getY1() ) pixmapY1 = cur->node->getY1();
 
     appCtx->proc->lock();
     next = cur->defExeFlink;
@@ -18480,6 +19342,8 @@ activeGraphicListPtr cur, next;
     cur = next;
 
   }
+
+  return workToDo;
 
 }
 
@@ -19232,6 +20096,8 @@ int i, len, iIn, iOut, p0, p1, more, state, winid, isEnvVar;
 
   }
 
+  bufOut[max] = 0;
+
 }
 
 static void dragMenuCb (
@@ -19395,7 +20261,7 @@ void activeWindowClass::closeDeferred (
   int cycles )
 {
 
-  waiting = 1;
+  waiting = cycles;
   doActiveClose = 1;
   appCtx->postDeferredExecutionQueue( this );
 
@@ -19831,7 +20697,7 @@ Widget scroll = awc->scrollWidgetId();
   awc->setChanged();
 
   if ( scroll )
-    XtVaGetValues( scroll, XmNclipWindow, &clip, 0 );
+    XtVaGetValues( scroll, XmNclipWindow, &clip, NULL );
 
   if ( !clip ) {
     XtWarning("b2ReleaseClip_cb(): no clipWindow found");
@@ -19842,11 +20708,11 @@ Widget scroll = awc->scrollWidgetId();
    clip,
    XmNwidth, &newW,
    XmNheight, &newH,
-   0 );
+   NULL );
 
-  XtVaSetValues( awc->drawWidget, XmNwidth, newW, XmNheight, newH, 0 );
+  XtVaSetValues( awc->drawWidget, XmNwidth, newW, XmNheight, newH, NULL );
 
-  XtVaSetValues( awc->top,XmNwidth, newW, XmNheight, newH, 0 );
+  XtVaSetValues( awc->top,XmNwidth, newW, XmNheight, newH, NULL );
 
   awc->w = newW;
   awc->h = newH;

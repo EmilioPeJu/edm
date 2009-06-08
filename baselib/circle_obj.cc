@@ -530,6 +530,7 @@ static int styleEnum[2] = {
   // read file and process each "object" tag
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -977,6 +978,7 @@ static int styleEnum[2] = {
   tag.loadBoolW( "visInvert", &visInverted, &zero );
   tag.loadW( "visMin", minVisString, emptyStr );
   tag.loadW( "visMax", maxVisString, emptyStr );
+  tag.loadW( unknownTags );
 
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
@@ -1048,7 +1050,7 @@ int blink = 0;
       actWin->executeGc.setFG( lineColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1058,7 +1060,7 @@ int blink = 0;
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -1074,14 +1076,14 @@ int blink = 0;
   if ( fill && fillVisibility ) {
     //actWin->executeGc.setFG( fillColor.getColor() );
     actWin->executeGc.setFG( fillColor.getIndex(), &blink );
-    XFillArc( actWin->d, XtWindow(actWin->executeWidget),
+    XFillArc( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h, 0, 23040 );
   }
 
   if ( lineVisibility ) {
     //actWin->executeGc.setFG( lineColor.getColor() );
     actWin->executeGc.setFG( lineColor.getIndex(), &blink );
-    XDrawArc( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawArc( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h, 0, 23040 );
   }
 
@@ -1104,14 +1106,14 @@ int activeCircleClass::eraseUnconditional ( void )
   actWin->executeGc.setLineWidth( lineWidth );
 
   if ( fill ) {
-    XFillArc( actWin->d, XtWindow(actWin->executeWidget),
+    XFillArc( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
   }
 
-  XDrawArc( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawArc( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
 
-  XFillArc( actWin->d, XtWindow(actWin->executeWidget),
+  XFillArc( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
 
   actWin->executeGc.setLineStyle( LineSolid );
@@ -1137,14 +1139,14 @@ int activeCircleClass::eraseActive ( void )
   actWin->executeGc.setLineWidth( lineWidth );
 
   if ( fill ) {
-    XFillArc( actWin->d, XtWindow(actWin->executeWidget),
+    XFillArc( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
   }
 
-  XDrawArc( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawArc( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
 
-  XFillArc( actWin->d, XtWindow(actWin->executeWidget),
+  XFillArc( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h, 0, 23040 );
 
   actWin->executeGc.setLineStyle( LineSolid );

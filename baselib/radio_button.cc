@@ -112,7 +112,8 @@ int i;
     if ( w == rbto->pb[i] ) {
       if ( rbto->curValue != i ) {
         rbto->curValue = i;
-        rbto->controlPvId->put( rbto->curValue );
+        rbto->controlPvId->put(
+         XDisplayName(rbto->actWin->appCtx->displayName), rbto->curValue );
       }
       break;
     }
@@ -463,6 +464,7 @@ char *emptyStr = "";
   tag.loadW( "botShadowColor", actWin->ci, &botShadowColor );
   tag.loadW( "controlPv", &controlPvExpStr, emptyStr );
   tag.loadW( "font", fontTag );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -542,6 +544,7 @@ char *emptyStr = "";
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -891,7 +894,7 @@ int activeRadioButtonClass::drawActive ( void ) {
       actWin->executeGc.setFG( fgColor.getDisconnected() );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -900,7 +903,7 @@ int activeRadioButtonClass::drawActive ( void ) {
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -1080,10 +1083,10 @@ int activeRadioButtonClass::deactivate (
     if ( widgetsCreated ) {
       if ( bulBrd ) {
         XtUnmapWidget( bulBrd );
-        XtDestroyWidget( bulBrd );
-        bulBrd = NULL;
         XtDestroyWidget( radioBox );
         radioBox = NULL;
+        XtDestroyWidget( bulBrd );
+        bulBrd = NULL;
       }
       widgetsCreated = 0;
     }
@@ -1162,7 +1165,6 @@ static void selectActions (
 {
 
 activeRadioButtonClass *rbto;
-int stat;
 XButtonEvent *be = (XButtonEvent *) e;
 
   XtVaGetValues( w, XmNuserData, &rbto, NULL );
@@ -1237,10 +1239,10 @@ char msg[79+1];
     if ( widgetsCreated ) {
       if ( bulBrd ) {
         XtUnmapWidget( bulBrd );
-        XtDestroyWidget( bulBrd );
-        bulBrd = NULL;
         XtDestroyWidget( radioBox );
         radioBox = NULL;
+        XtDestroyWidget( bulBrd );
+        bulBrd = NULL;
       }
       widgetsCreated = 0;
     }

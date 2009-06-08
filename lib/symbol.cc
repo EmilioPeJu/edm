@@ -1269,6 +1269,7 @@ int visInverted;
       // read in group properties
       tag.init();
       tag.loadR( "beginObjectProperties" );
+      tag.loadR( unknownTags );
       tag.loadR( "major", &major );
       tag.loadR( "minor", &minor );
       tag.loadR( "release", &release );
@@ -1724,6 +1725,7 @@ int i, saveX, saveY, origX, origY, origW, origH;
   tag.loadBoolW( "useOriginalColors", &useOriginalColors, &zero );
   tag.loadW( "fgColor", actWin->ci, &fgColor );
   tag.loadW( "bgColor", actWin->ci, &bgColor );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -1881,6 +1883,7 @@ int resizeStat, readSymfileStat, i, n1, n2, saveW, saveH;
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -2296,14 +2299,14 @@ pvColorClass tmpColor;
       tmpColor.setColorIndex( 0, actWin->ci );
       actWin->executeGc.saveFg();
       actWin->executeGc.setFG( tmpColor.getDisconnected() );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
     }
   }
   else if ( needToEraseUnconnected ) {
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -2473,7 +2476,8 @@ int num;
     }
     colorPvId = NULL;
 
-    notControlPvConnected = (int) pow(2,numPvs) - 1;
+    //notControlPvConnected = (int) pow(2,numPvs) - 1; <-- solaris compile prob
+    notControlPvConnected = (1 << numPvs) - 1;
 
     if ( numPvs ) {
 

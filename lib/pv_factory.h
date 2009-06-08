@@ -16,6 +16,7 @@ void setReadWrite ( void );
 int isReadOnly ( void );
 int pend_io ( double sec );
 int pend_event ( double sec );
+void task_exit ( void );
 
 // PV_Factory: Factory for ProcessVariables.
 // When e.g. a widget asks for PV by name for the first time,
@@ -154,6 +155,9 @@ public:
     int get_num_times_disconnected ( void );
     int get_num_value_change_events ( void );
     int get_num_references ( void );
+    // get number of entries in callback lists
+    int get_num_conn_state_callbacks ( void );
+    int get_num_value_callbacks ( void );
 
     // Called on change in "is_valid" status, see above
     void add_conn_state_callback(PVCallback func, void *userarg);
@@ -254,12 +258,17 @@ public:
     // A control widget might choose to indicate
     // if there is no write access to this PV
     virtual bool have_write_access() const;
-    virtual bool put(double value) = 0;
-    virtual bool put(const char *value) = 0;
+    virtual bool put(double value);
+    virtual bool put(const char *dsp, double value);
+    virtual bool put(const char *value);
+    virtual bool put(const char *dsp, const char *value);
     virtual bool put(int value);
-    virtual bool putText(char *value) = 0;
+    virtual bool put(const char *dsp, int value);
+    virtual bool putText(char *value);
+    virtual bool putText(const char *dsp, char *value);
     virtual bool putArrayText(char *value) = 0;
     virtual bool putAck(short value);
+    virtual bool putAck(const char *dsp, short value);
 
 protected:
     // hidden, use PV_Factory::create()/ProcessVariable::release()

@@ -598,6 +598,7 @@ static int orienTypeEnum[2] = {
   tag.loadW( "colorPv", &colorPvExpStr, emptyStr );
   tag.loadW( "orientation", 2, orienTypeEnumStr, orienTypeEnum,
    &orientation, &vert );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -701,6 +702,7 @@ static int orienTypeEnum[2] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1041,10 +1043,10 @@ int activeChoiceButtonClass::eraseActive ( void ) {
 
   prevVisibility = visibility;
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
   return 1;
@@ -1056,7 +1058,8 @@ int activeChoiceButtonClass::draw ( void ) {
 int tX, tY;
 XRectangle xR = { x, y, w, h };
 int blink = 0;
-int i, buttonX, buttonY, buttonH, buttonW, margin = 3;
+int i, buttonX, buttonY, buttonH, buttonW, extra, lowExtra, highExtra,
+ margin = 3;
 int buttonNumStates = 3;
 int buttonSelected = buttonNumStates-1;
 
@@ -1072,9 +1075,13 @@ char *buttonLabel[3] = { "0", "1", "2" };
     if ( buttonH < 3 ) buttonH = 3;
     if ( buttonNumStates > 0 ) {
       buttonW = ( w - (buttonNumStates-1) * margin ) / buttonNumStates;
+      extra = w -
+       ( buttonNumStates * buttonW ) -
+       ( (buttonNumStates-1) * margin );
     }
     else {
       buttonW = 5;
+      extra = 0;
     }
 
     if ( buttonW < 3 ) buttonW = 3;
@@ -1196,14 +1203,21 @@ char *buttonLabel[3] = { "0", "1", "2" };
 
     if ( buttonNumStates > 0 ) {
       buttonH = ( h - (buttonNumStates-1) * margin ) / buttonNumStates;
+      extra = h -
+       ( buttonNumStates * buttonH ) -
+       ( (buttonNumStates-1) * margin );
     }
     else {
       buttonH = 5;
+      extra = 0;
     }
 
     if ( buttonH < 3 ) buttonH = 3;
     buttonW = w;
     if ( buttonW < 3 ) buttonW = 3;
+
+    lowExtra = extra / 2;
+    highExtra = buttonNumStates - 1 - lowExtra - extra % 2;
 
     // background
     actWin->drawGc.setFG( bgColor.pixelIndex(), &blink );
@@ -1283,6 +1297,13 @@ char *buttonLabel[3] = { "0", "1", "2" };
 
       buttonY += buttonH + margin;
 
+      if ( i < lowExtra ) {
+        buttonY++;
+      }
+      else if ( i >= highExtra ) {
+        buttonY++;
+      }
+
     }
 
     if ( fs ) {
@@ -1305,6 +1326,13 @@ char *buttonLabel[3] = { "0", "1", "2" };
 
         tX = buttonX + buttonW/2;
         tY = buttonY + buttonH/2 - fontAscent/2;
+
+        if ( i < lowExtra ) {
+          buttonY++;
+        }
+        else if ( i >= highExtra ) {
+          buttonY++;
+        }
 
         drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
          XmALIGNMENT_CENTER, buttonLabel[i] );
@@ -1332,7 +1360,8 @@ int activeChoiceButtonClass::drawActive ( void ) {
 int tX, tY;
 XRectangle xR = { x, y, w, h };
 int blink = 0;
-int i, buttonX, buttonY, buttonH, buttonW, margin = 3;
+int i, buttonX, buttonY, buttonH, buttonW, extra, lowExtra, highExtra,
+ margin = 3;
 int buttonNumStates;
 int buttonSelected;
 int inconsistent;
@@ -1359,7 +1388,7 @@ int inconsistent;
       actWin->executeGc.setFG( bgColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1369,7 +1398,7 @@ int inconsistent;
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
     eraseActive();
@@ -1418,7 +1447,7 @@ int inconsistent;
   // background
   actWin->executeGc.setFG( bgColor.pixelIndex(), &blink );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
   if ( orientation == ACBC_K_ORIENTATION_HORZ ) {
@@ -1427,13 +1456,20 @@ int inconsistent;
     if ( buttonH < 3 ) buttonH = 3;
     if ( buttonNumStates > 0 ) {
       buttonW = ( w - (buttonNumStates-1) * margin ) / buttonNumStates;
+      extra = w -
+       ( buttonNumStates * buttonW ) -
+       ( (buttonNumStates-1) * margin );
     }
     else {
       buttonW = 5;
+      extra = 0;
     }
     if ( buttonW < 3 ) buttonW = 3;
 
-   buttonX = x;
+    lowExtra = extra / 2;
+    highExtra = buttonNumStates - 1 - lowExtra - extra % 2;
+
+    buttonX = x;
     buttonY = y;
 
     // buttons
@@ -1445,7 +1481,7 @@ int inconsistent;
 
           actWin->executeGc.setFG( inconsistentColor.getIndex(), &blink );
 
-          XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          XFillRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
 	}
@@ -1453,27 +1489,27 @@ int inconsistent;
 
           actWin->executeGc.setFG( selColor.getIndex(), &blink );
 
-          XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          XFillRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
 	}
 
         actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX+buttonW, buttonY );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX,
           buttonY+buttonH );
 
         actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+buttonW, buttonY, buttonX+buttonW,
          buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY+buttonH,
          buttonX+buttonW, buttonY+buttonH );
 
@@ -1482,40 +1518,47 @@ int inconsistent;
 
         actWin->executeGc.setFG( bgColor.getIndex(), &blink );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+        XFillRectangle( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
         actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX+buttonW,
          buttonY );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+1, buttonY+1, buttonX+buttonW-1,
          buttonY+1 );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX,
           buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+1, buttonY+1,
          buttonX+1, buttonY+buttonH-1 );
 
         actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+buttonW, buttonY, buttonX+buttonW,
          buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY+buttonH,
          buttonX+buttonW, buttonY+buttonH );
 
       }
 
       buttonX += buttonW + margin;
+
+      if ( i < lowExtra ) {
+        buttonX++;
+      }
+      else if ( i >= highExtra ) {
+        buttonX++;
+      }
 
     }
 
@@ -1546,7 +1589,15 @@ int inconsistent;
         tX = buttonX + buttonW/2;
         tY = buttonY + buttonH/2 - fontAscent/2;
 
-        drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+        if ( i < lowExtra ) {
+          buttonX++;
+        }
+        else if ( i >= highExtra ) {
+          buttonX++;
+        }
+
+        drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+         &actWin->executeGc, fs, tX, tY,
          XmALIGNMENT_CENTER, (char *) stateStringPvId->get_enum( i ) );
 
         actWin->executeGc.removeNormXClipRectangle();
@@ -1562,14 +1613,21 @@ int inconsistent;
 
     if ( buttonNumStates > 0 ) {
       buttonH = ( h - (buttonNumStates-1) * margin ) / buttonNumStates;
+      extra = h -
+       ( buttonNumStates * buttonH ) -
+       ( (buttonNumStates-1) * margin );
     }
     else {
       buttonH = 5;
+      extra = 0;
     }
 
     if ( buttonH < 3 ) buttonH = 3;
     buttonW = w;
     if ( buttonW < 3 ) buttonW = 3;
+
+    lowExtra = extra / 2;
+    highExtra = buttonNumStates - 1 - lowExtra - extra % 2;
 
     buttonX = x;
     buttonY = y;
@@ -1583,7 +1641,7 @@ int inconsistent;
 
           actWin->executeGc.setFG( inconsistentColor.getIndex(), &blink );
 
-          XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          XFillRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
 	}
@@ -1591,28 +1649,28 @@ int inconsistent;
 
           actWin->executeGc.setFG( selColor.getIndex(), &blink );
 
-          XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+          XFillRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
 	}
 
         actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX+buttonW,
          buttonY );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX,
           buttonY+buttonH );
 
         actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+buttonW, buttonY, buttonX+buttonW,
          buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY+buttonH,
          buttonX+buttonW, buttonY+buttonH );
 
@@ -1621,40 +1679,47 @@ int inconsistent;
 
         actWin->executeGc.setFG( bgColor.getIndex(), &blink );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+        XFillRectangle( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonW, buttonH );
 
         actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX+buttonW,
          buttonY );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+1, buttonY+1, buttonX+buttonW-1,
          buttonY+1 );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY, buttonX,
           buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+1, buttonY+1,
          buttonX+1, buttonY+buttonH-1 );
 
         actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX+buttonW, buttonY, buttonX+buttonW,
          buttonY+buttonH );
 
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLine( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), buttonX, buttonY+buttonH,
          buttonX+buttonW, buttonY+buttonH );
 
       }
 
       buttonY += buttonH + margin;
+
+      if ( i < lowExtra ) {
+        buttonY++;
+      }
+      else if ( i >= highExtra ) {
+        buttonY++;
+      }
 
     }
 
@@ -1685,7 +1750,15 @@ int inconsistent;
         tX = buttonX + buttonW/2;
         tY = buttonY + buttonH/2 - fontAscent/2;
 
-        drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+        if ( i < lowExtra ) {
+          buttonY++;
+        }
+        else if ( i >= highExtra ) {
+          buttonY++;
+        }
+
+        drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+         &actWin->executeGc, fs, tX, tY,
          XmALIGNMENT_CENTER, (char *) stateStringPvId->get_enum( i ) );
 
         actWin->executeGc.removeNormXClipRectangle();
@@ -2055,8 +2128,8 @@ void activeChoiceButtonClass::btnDown (
 {
 
 short value;
-int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
- numStates;
+int stat, i, state, buttonX, buttonY, buttonH, buttonW,
+ extra, lowExtra, highExtra,margin = 3, numStates;
 
   *action = 0;
 
@@ -2078,11 +2151,18 @@ int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
       if ( buttonH < 3 ) buttonH = 3;
       if ( numStates > 0 ) {
         buttonW = ( w - (numStates-1) * margin ) / numStates;
+        extra = w -
+         ( numStates * buttonW ) -
+         ( (numStates-1) * margin );
       }
       else {
         buttonW = 5;
+        extra = 0;
       }
       if ( buttonW < 3 ) buttonW = 3;
+
+      lowExtra = extra / 2;
+      highExtra = numStates - 1 - lowExtra - extra % 2;
 
       buttonX = x;
       buttonY = y;
@@ -2092,7 +2172,14 @@ int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
 
         buttonX += buttonW + margin;
 
-        if ( buttonX > be->x ) {
+        if ( i < lowExtra ) {
+          buttonX++;
+        }
+        else if ( i >= highExtra ) {
+          buttonX++;
+        }
+
+        if ( ( buttonX - margin ) > be->x ) {
           state = i;
           break;
 	}
@@ -2104,13 +2191,20 @@ int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
 
       if ( numStates > 0 ) {
         buttonH = ( h - (numStates-1) * margin ) / numStates;
+        extra = h -
+         ( numStates * buttonH ) -
+         ( (numStates-1) * margin );
       }
       else {
         buttonH = 5;
+        extra = 0;
       }
       if ( buttonH < 3 ) buttonH = 3;
       buttonW = w;
       if ( buttonW < 3 ) buttonW = 3;
+
+      lowExtra = extra / 2;
+      highExtra = numStates - 1 - lowExtra - extra % 2;
 
       buttonX = x;
       buttonY = y;
@@ -2120,7 +2214,14 @@ int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
 
         buttonY += buttonH + margin;
 
-        if ( buttonY > be->y ) {
+        if ( i < lowExtra ) {
+          buttonY++;
+        }
+        else if ( i >= highExtra ) {
+          buttonY++;
+        }
+
+        if ( ( buttonY - margin ) > be->y ) {
           state = i;
           break;
 	}
@@ -2131,7 +2232,9 @@ int stat, i, state, buttonX, buttonY, buttonH, buttonW, margin = 2,
 
     if ( ( state >= 0 ) && ( state < numStates ) ) {
       value = (short) state;
-      stat = controlPvId->put( value );
+      stat = controlPvId->put(
+       XDisplayName(actWin->appCtx->displayName),
+       value );
     }
 
   }

@@ -3,22 +3,22 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 392
-y 99
-w 508
+x 476
+y 87
+w 619
 h 841
 font "helvetica-medium-r-18.0"
 ctlFont "helvetica-medium-r-12.0"
 btnFont "helvetica-bold-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 51400 51400 51400
+bgColor rgb 52171 52171 52171
 textColor rgb 0 0 0
 ctlFgColor1 rgb 0 0 0
-ctlFgColor2 rgb 0 0 49344
-ctlBgColor1 rgb 48059 48059 48059
-ctlBgColor2 rgb 56026 56026 56026
-topShadowColor rgb 60652 60652 60652
-botShadowColor rgb 26985 26985 26985
+ctlFgColor2 rgb 0 0 65535
+ctlBgColor1 rgb 46517 46517 46517
+ctlBgColor2 rgb 56797 56797 56797
+topShadowColor rgb 61423 61423 61423
+botShadowColor rgb 24929 24929 24929
 title "Bar"
 endScreenProperties
 
@@ -47,7 +47,7 @@ w 39
 h 27
 font "helvetica-medium-r-24.0"
 fgColor rgb 0 0 0
-bgColor rgb 60652 60652 60652
+bgColor rgb 61423 61423 61423
 value {
   "Bar"
 }
@@ -66,7 +66,7 @@ w 75
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Border: Yes"
@@ -86,7 +86,7 @@ w 107
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Show Scale: Yes"
@@ -106,7 +106,7 @@ w 139
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Label Type: PV Name"
@@ -126,7 +126,7 @@ w 75
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Border: Yes"
@@ -146,7 +146,7 @@ w 107
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Show Scale: Yes"
@@ -166,7 +166,7 @@ w 117
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Label Type: Literal"
@@ -186,7 +186,7 @@ w 55
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Fg Color"
@@ -205,7 +205,7 @@ y 80
 w 93
 h 36
 lineColor rgb 0 0 0
-fillColor rgb 48059 48059 48059
+fillColor rgb 46517 46517 46517
 numPoints 2
 xPoints {
   0 130
@@ -228,7 +228,7 @@ y 80
 w 92
 h 82
 lineColor rgb 0 0 0
-fillColor rgb 48059 48059 48059
+fillColor rgb 46517 46517 46517
 numPoints 2
 xPoints {
   0 128
@@ -252,7 +252,7 @@ w 55
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Bg Color"
@@ -271,7 +271,7 @@ y 85
 w 69
 h 31
 lineColor rgb 0 0 0
-fillColor rgb 48059 48059 48059
+fillColor rgb 46517 46517 46517
 numPoints 2
 xPoints {
   0 218
@@ -295,7 +295,7 @@ w 60
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Bar Color"
@@ -314,7 +314,7 @@ y 82
 w 131
 h 56
 lineColor rgb 0 0 0
-fillColor rgb 48059 48059 48059
+fillColor rgb 46517 46517 46517
 numPoints 2
 xPoints {
   0 302
@@ -338,7 +338,7 @@ w 68
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Border: No"
@@ -358,7 +358,7 @@ w 100
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Show Scale: No"
@@ -378,7 +378,7 @@ w 158
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "No Label string specified"
@@ -398,7 +398,7 @@ w 43
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Border"
@@ -417,7 +417,7 @@ y 183
 w 34
 h 19
 lineColor rgb 0 0 0
-fillColor rgb 48059 48059 48059
+fillColor rgb 46517 46517 46517
 numPoints 2
 xPoints {
   0 150
@@ -441,7 +441,7 @@ w 117
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Label Type: Literal"
@@ -461,7 +461,7 @@ w 139
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Scale Format Options"
@@ -477,11 +477,11 @@ minor 1
 release 0
 x 62
 y 622
-w 331
+w 327
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "GFloat - precision gives number of significant digits"
@@ -497,11 +497,11 @@ minor 1
 release 0
 x 62
 y 640
-w 323
+w 319
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "FFloat - precision gives number of decimal places"
@@ -517,11 +517,11 @@ minor 1
 release 0
 x 62
 y 658
-w 359
+w 355
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Exponential - precision gives number of decimal places,"
@@ -541,7 +541,7 @@ w 437
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "If Scale Info From DB is checked, then scale precision, min, and max"
@@ -561,7 +561,7 @@ w 308
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "are taken from HOPR & LOPR fields in database."
@@ -581,7 +581,7 @@ w 53
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Origin: 0"
@@ -601,7 +601,7 @@ w 53
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Origin: 1"
@@ -621,7 +621,7 @@ w 53
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Origin: 0"
@@ -641,7 +641,7 @@ w 75
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Border: Yes"
@@ -661,7 +661,7 @@ w 107
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Show Scale: Yes"
@@ -681,7 +681,7 @@ w 117
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Label Type: Literal"
@@ -701,7 +701,7 @@ w 53
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Origin: 0"
@@ -721,7 +721,7 @@ w 191
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "Readback & Null PV specified"
@@ -741,7 +741,7 @@ w 258
 h 16
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
   "number is displayed in scientific notation"
@@ -757,16 +757,49 @@ minor 1
 release 0
 x 28
 y 763
-w 364
+w 406
 h 48
 font "helvetica-medium-r-14.0"
 fgColor rgb 0 0 0
-bgColor rgb 48059 48059 48059
+bgColor rgb 46517 46517 46517
 useDisplayBg
 value {
-  "Readback PV, Label Tick Intervals, Majors per Label,"
-  "Minors per Major, Scale Precision, Min Scale Value,"
-  "Max Scale Value, and Origin may include macro symbols"
+  "Readback PV, Null PV, Label Tick Intervals, Majors per Label,"
+  "Minors per Major, Scale Precision, Min Scale Value, Max Scale"
+  "Value, and Origin may include macro symbols"
+}
+autoSize
+endObjectProperties
+
+# (PNG Image)
+object activePngClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 507
+y 97
+w 75
+h 254
+file "$(help)helpBarVert"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 520
+y 359
+w 50
+h 16
+font "helvetica-medium-r-14.0"
+fgColor rgb 0 0 0
+bgColor rgb 46517 46517 46517
+useDisplayBg
+value {
+  "Vertical"
 }
 autoSize
 endObjectProperties

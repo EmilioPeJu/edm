@@ -66,6 +66,17 @@
 #define AWC_EDIT 1
 #define AWC_EXECUTE 2
 
+#define AWC_BGPIXMAP_PER_ENV_VAR 0
+#define AWC_BGPIXMAP_NEVER 1
+#define AWC_BGPIXMAP_ALWAYS 2
+
+#define AWC_INIT 1000
+#define AWC_START_EXECUTE 1001
+#define AWC_COMPLETE_EXECUTE 1002
+#define AWC_START_DEACTIVATE 1003
+#define AWC_COMPLETE_DEACTIVATE 1004
+#define AWC_TERMINATED 1005
+
 #define AWC_POPUP_RAISE 101
 #define AWC_POPUP_LOWER 102
 #define AWC_POPUP_REFRESH 103
@@ -425,7 +436,11 @@ typedef struct pvDefTag {
 
 class activeWindowClass {
 
+unknownTagList unknownTags;
+
 public:
+
+int clearEpicsPvTypeDefault;
 
 static const int NUM_PER_PENDIO = 1000;
 
@@ -722,7 +737,9 @@ int coordsShow;
 eventListPtr eventHead;
 eventListPtr limEventHead;
 pollListPtr pollHead;
-int mode; // AW_EDIT or AW_EXECUTE
+int mode; // AWC_EDIT or AWC_EXECUTE
+int windowState; // AWC_INIT, AWC_START_EXECUTE, AWC_COMPLETE_EXECUTE,
+                 // AWC_START_DEACTIVATE, AWC_COMPLETE_DEACTIVATE
 int waiting;
 int change;
 int exit_after_save;
@@ -762,7 +779,11 @@ colorButtonClass fgCb;
 
 int bgColor, bufBgColor;
 colorButtonClass bgCb;
+int usePixmap;
 Pixmap bgPixmap;
+int pixmapW, pixmapH;
+int needCopy, needFullCopy;
+int pixmapX0, pixmapX1, pixmapY0, pixmapY1;
 
 int defaultTextFgColor, bufDefaultTextFgColor;
 colorButtonClass defaultTextFgCb;
@@ -903,6 +924,8 @@ int loadFailure;
 
 int bufDisableScroll, disableScroll;
 
+int bufBgPixmapFlag, bgPixmapFlag; // 0=per env var, 1=never use, 2=always use
+
 pvActionClass *pvAction;
 
 int ctlKeyPressed;
@@ -912,6 +935,25 @@ activeWindowClass ( void );
 ~activeWindowClass ( void );
 
 int okToDeactivate ( void );
+
+void initCopy( void );
+
+void updateCopyRegion (
+  int _x0,
+  int _y0,
+  int _w,
+  int _h
+);
+
+void doCopy ( void );
+
+void doMinCopy ( void );
+
+Drawable drawable (
+  Widget w
+);
+
+int okToPreReexecute ( void );
 
 char *idName( void );
 
@@ -1138,6 +1180,11 @@ int old_load (
   int x,
   int y );
 
+int loadDummy (
+  int x,
+  int y,
+  int setPosition );
+
 int loadGeneric (
   int x,
   int y,
@@ -1251,6 +1298,12 @@ void discardCommentsAndVersion (
   int *_minor,
   int *_release );
 
+int loadWinDummy (
+  FILE *f,
+  int _x,
+  int _y,
+  int setPosition );
+
 int loadWinGeneric (
   FILE *f,
   int _x,
@@ -1336,7 +1389,7 @@ int remDefExeNode (
 /*  int remDefExeNode ( */
 /*    void **node ); */
 
-void processObjects ( void );
+int processObjects ( void );
 
 /* new new new */
 

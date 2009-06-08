@@ -290,21 +290,21 @@ int st, sev;
   if ( metero->active ) {
 ******/
 
-  st = pv->get_status();
-  sev = pv->get_severity();
-  if ( ( st != metero->oldStat ) || ( sev != metero->oldSev ) ) {
-    metero->oldStat = st;
-    metero->oldSev = sev;
-    metero->fgColor.setStatus( st, sev );
-    metero->scaleColor.setStatus( st, sev );
-    metero->meterColor.setStatus( st, sev );
-    metero->bufInvalidate();
-  }
-
+    st = pv->get_status();
+    sev = pv->get_severity();
+    if ( ( st != metero->oldStat ) || ( sev != metero->oldSev ) ) {
+      metero->oldStat = st;
+      metero->oldSev = sev;
+      metero->fgColor.setStatus( st, sev );
+      metero->scaleColor.setStatus( st, sev );
+      metero->meterColor.setStatus( st, sev );
+      metero->bufInvalidate();
+    }
 /****** SJS 10/11/06 - make meter show invalid status ******
 ******* Following line moved to here ******/
   if ( metero->active ) {
 /******/
+
     metero->curReadV = pv->get_double() - metero->baseV;
     metero->needErase = 1;
     metero->needDraw = 1;
@@ -589,6 +589,7 @@ static int labelTypeEnum[3] = {
   tag.loadW( "labelFontTag", labelFontTag );
   tag.loadW( "scaleFontTag", scaleFontTag );
   tag.loadW( "meterAngle", &meterAngle, &a180 );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -723,6 +724,7 @@ static int labelTypeEnum[3] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1316,10 +1318,10 @@ int activeMeterClass::eraseActive ( void ) {
     actWin->executeGc.setLineStyle( LineSolid );
     actWin->executeGc.setLineWidth( 1 );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
 		    actWin->executeGc.eraseGC(), x, y, w, h );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XFillRectangle( actWin->d, drawable(actWin->executeWidget),
 		    actWin->executeGc.eraseGC(), x, y, w, h );
   }
 
@@ -1710,7 +1712,7 @@ XPoint xpoints[6];
       actWin->executeGc.setFG( meterColor.getDisconnected() );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1719,7 +1721,7 @@ XPoint xpoints[6];
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -1880,13 +1882,13 @@ if (drawStaticFlag){
 
    actWin->executeGc.setFG( meterColor.getColor() );
    
-   XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+   XFillRectangle( actWin->d, drawable(actWin->executeWidget),
 		   actWin->executeGc.normGC(), x, y, w, h );
 
    
    actWin->executeGc.setFG( bgColor.getColor() );
    
-   XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+   XFillRectangle( actWin->d, drawable(actWin->executeWidget),
 		   actWin->executeGc.normGC(),
 		   faceX, faceY, faceW, faceH );
 
@@ -1902,9 +1904,9 @@ if (drawStaticFlag){
      xR.width  = faceW;
      xR.height = h - faceH;
      actWin->executeGc.addNormXClipRectangle( xR );
-     drawText (actWin->executeWidget, &actWin->executeGc,
-	       labelFs, x+w/2, faceY + faceH + 2,
-	       XmALIGNMENT_CENTER, label);
+     drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+      &actWin->executeGc, labelFs, x+w/2, faceY + faceH + 2,
+      XmALIGNMENT_CENTER, label);
      actWin->executeGc.removeNormXClipRectangle();
    }
 
@@ -1912,31 +1914,31 @@ if (drawStaticFlag){
 
      actWin->executeGc.setFG( tsColor.getColor() );
 
-     XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
 		   actWin->executeGc.normGC(), x, y, w, h );
 
-     XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
 		   actWin->executeGc.normGC(),
 		     faceX, faceY, faceW, faceH );
 
     actWin->executeGc.setFG( bsColor.getColor() );
 
-    XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine (actWin->d, drawable(actWin->executeWidget),
 	       actWin->executeGc.normGC(),
 	       x,y+h,
 	       x+w,y+h);
 
-    XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine (actWin->d, drawable(actWin->executeWidget),
 	       actWin->executeGc.normGC(),
 	       x+w, y,
 	       x+w,y+h);
 
-    XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine (actWin->d, drawable(actWin->executeWidget),
 	       actWin->executeGc.normGC(),
 	       faceX, faceY,
 	       faceX, faceY + faceH);
 
-    XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine (actWin->d, drawable(actWin->executeWidget),
 	       actWin->executeGc.normGC(),
 	       faceX, faceY,
 	       faceX + faceW, faceY );
@@ -1976,7 +1978,7 @@ if (drawStaticFlag){
        nearEndY = (int) (meterNeedleYorigin - insideArc * sin(labelAngle));
        
        actWin->executeGc.setFG( scaleColor.getColor() );
-       XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+       XDrawLine (actWin->d, drawable(actWin->executeWidget),
 		  actWin->executeGc.normGC(),
 		  farEndX,farEndY,
 		  nearEndX,nearEndY);
@@ -1990,35 +1992,40 @@ if (drawStaticFlag){
        if (labelAngle < (beginAngle + 0.001)){
 	 tX = farEndX + 2;
 	 tY = farEndY - scaleFontAscent/2;
-	 drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
-		   XmALIGNMENT_BEGINNING, scaleMaxString);
+	 drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+          &actWin->executeGc, scaleFs, tX, tY,
+          XmALIGNMENT_BEGINNING, scaleMaxString);
        }
        else if (labelAngle <= 1.50){
 	 sprintf (scaleString, fmt, scaleValue);
 	 tX = farEndX + 2;
 	 tY = farEndY - scaleFontAscent;
-	 drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
-		   XmALIGNMENT_BEGINNING, scaleString);
+	 drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+          &actWin->executeGc, scaleFs, tX, tY,
+          XmALIGNMENT_BEGINNING, scaleString);
        }
        else if (labelAngle <= 1.65){
 	 sprintf (scaleString, fmt, scaleValue);
 	 tX = farEndX;
 	 tY = farEndY - scaleFontAscent - 2;
-	 drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
-		   XmALIGNMENT_CENTER, scaleString);
+	 drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+          &actWin->executeGc, scaleFs, tX, tY,
+          XmALIGNMENT_CENTER, scaleString);
        }
        else if (labelAngle <= (endAngle - 0.001)){
 	 sprintf (scaleString, fmt, scaleValue);
 	 tX = farEndX - 2;
 	 tY = farEndY - scaleFontAscent;
-	 drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
-		   XmALIGNMENT_END, scaleString);
+	 drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+          &actWin->executeGc, scaleFs, tX, tY,
+          XmALIGNMENT_END, scaleString);
        }
        else if (labelAngle > (endAngle - 0.001)){
 	 tX = farEndX -2;
 	 tY = farEndY - scaleFontAscent/2;
-	 drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
-		   XmALIGNMENT_END, scaleMinString);
+	 drawText (actWin->executeWidget, drawable(actWin->executeWidget),
+          &actWin->executeGc, scaleFs, tX, tY,
+          XmALIGNMENT_END, scaleMinString);
        }       
 
      }
@@ -2045,7 +2052,7 @@ if (drawStaticFlag){
            nearEndY = (int) (meterNeedleYorigin -
             insideArc * sin(ii * minorAngleIncr + labelAngle +
             i * majorAngleIncr));
-           XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+           XDrawLine (actWin->d, drawable(actWin->executeWidget),
             actWin->executeGc.normGC(), farEndX, farEndY, nearEndX, nearEndY );
 
          }
@@ -2062,7 +2069,7 @@ if (drawStaticFlag){
             insideArc * cos(i * majorAngleIncr + labelAngle));
            nearEndY = (int) (meterNeedleYorigin -
             insideArc * sin(i * majorAngleIncr + labelAngle));
-           XDrawLine (actWin->d, XtWindow(actWin->executeWidget),
+           XDrawLine (actWin->d, drawable(actWin->executeWidget),
             actWin->executeGc.normGC(), farEndX, farEndY, nearEndX, nearEndY );
 
          }
@@ -2092,7 +2099,7 @@ if (drawStaticFlag){
 
    if (needleType == 0){
 
-   XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+   XDrawLine( actWin->d, drawable(actWin->executeWidget),
 	      actWin->executeGc.normGC(),
 	      oldMeterNeedleXEnd, oldMeterNeedleYEnd,
 	      oldMeterNeedleXOrigin, oldMeterNeedleYOrigin);
@@ -2117,7 +2124,7 @@ if (drawStaticFlag){
      xpoints[5].x = oldMeterNeedleXOrigin;
      xpoints[5].y = oldMeterNeedleYOrigin+1;
 
-    XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLines( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), xpoints, 6, CoordModeOrigin );
 
    }
@@ -2129,7 +2136,7 @@ if (drawStaticFlag){
 
    if (needleType == 0){
 
-   XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+   XDrawLine( actWin->d, drawable(actWin->executeWidget),
 	      actWin->executeGc.normGC(),
 	      meterNeedleXend, meterNeedleYend,
 	      meterNeedleXorigin, meterNeedleYorigin);
@@ -2154,7 +2161,7 @@ if (drawStaticFlag){
      xpoints[5].x = meterNeedleXorigin;
      xpoints[5].y = meterNeedleYorigin+1;
 
-     XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawLines( actWin->d, drawable(actWin->executeWidget),
       actWin->executeGc.normGC(), xpoints, 6, CoordModeOrigin );
 
      actWin->executeGc.setFG( meterColor.getColor() );
@@ -2181,7 +2188,7 @@ if (drawStaticFlag){
 
    if (needleType == 0){
 
-     XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawLine( actWin->d, drawable(actWin->executeWidget),
 		actWin->executeGc.normGC(),
 		meterNeedleXend, meterNeedleYend,
 		meterNeedleXorigin, meterNeedleYorigin);
@@ -2206,7 +2213,7 @@ if (drawStaticFlag){
      xpoints[5].x = meterNeedleXorigin;
      xpoints[5].y = meterNeedleYorigin+1;
 
-     XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawLines( actWin->d, drawable(actWin->executeWidget),
       actWin->executeGc.normGC(), xpoints, 6, CoordModeOrigin );
 
    }

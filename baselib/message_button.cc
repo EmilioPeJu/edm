@@ -589,6 +589,7 @@ char *emptyStr = "";
   tag.loadW( "visMin", minVisString, emptyStr );
   tag.loadW( "visMax", maxVisString, emptyStr );
   tag.loadW( "colorPv", &colorPvExpString, emptyStr  );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -719,6 +720,7 @@ char *emptyStr = "";
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1013,7 +1015,7 @@ int activeMessageButtonClass::importFromXchFile (
 int fgR, fgG, fgB, bgR, bgG, bgB, more, index;
 unsigned int pixel;
 char *tk, *gotData, *context, buf[255+1];
-char tmpDestPvName[39+1], tmpSourcePressPvName[39+1];
+char tmpDestPvName[PV_Factory::MAX_PV_NAME+1], tmpSourcePressPvName[39+1];
 
   fgR = 0xffff;
   fgG = 0xffff;
@@ -1288,7 +1290,7 @@ char tmpDestPvName[39+1], tmpSourcePressPvName[39+1];
 
 int activeMessageButtonClass::genericEdit ( void ) {
 
-char title[32], *ptr, *envPtr, saveLock;
+char title[32], *ptr, *envPtr, saveLock = 0;
 
   if ( !eBuf ) {
     eBuf = new editBufType;
@@ -1541,10 +1543,10 @@ int activeMessageButtonClass::eraseActive ( void ) {
 
   prevVisibility = visibility;
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
   return 1;
@@ -1687,7 +1689,7 @@ int blink = 0;
       actWin->executeGc.setFG( onColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1697,7 +1699,7 @@ int blink = 0;
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
     if ( invisible ) {
@@ -1723,7 +1725,7 @@ int blink = 0;
     actWin->executeGc.setFG( onColor.getIndex(), &blink );
   }
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
   if ( !_3D ) {
@@ -1732,7 +1734,7 @@ int blink = 0;
 
   }
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
   if ( !buttonPressed ) {
@@ -1748,50 +1750,50 @@ int blink = 0;
 
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x+w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x, y+h );
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y+h, x+w, y+h );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w, y, x+w, y+h );
 
     // top
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+1, x+w-1, y+1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+2, x+w-2, y+2 );
 
     // left
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+1, x+1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+2, x+2, y+h-2 );
 
     // bottom
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+h-1, x+w-1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+h-2, x+w-2, y+h-2 );
 
     // right
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w-1, y+1, x+w-1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
 
     }
@@ -1810,10 +1812,10 @@ int blink = 0;
 
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x+w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x, y+h );
 
     // top
@@ -1824,14 +1826,14 @@ int blink = 0;
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y+h, x+w, y+h );
 
     //right
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w, y, x+w, y+h );
 
     }
@@ -1849,8 +1851,8 @@ int blink = 0;
     tX = x + w/2;
     tY = y + h/2 - fontAscent/2;
 
-    drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
-     XmALIGNMENT_CENTER, string );
+    drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+     &actWin->executeGc, fs, tX, tY, XmALIGNMENT_CENTER, string );
 
     actWin->executeGc.removeNormXClipRectangle();
 
@@ -2110,7 +2112,7 @@ int stat;
   if ( destIsAckS ) {
 
     destV.s = (short) atol( sourceReleasePvExpString.getExpanded() );
-    destPvId->putAck( destV.s );
+    destPvId->putAck( XDisplayName(actWin->appCtx->displayName), destV.s );
 
   }
   else {
@@ -2119,23 +2121,23 @@ int stat;
 
     case ProcessVariable::Type::real:
       destV.d = atof( sourceReleasePvExpString.getExpanded() );
-      destPvId->put( destV.d );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.d );
       break;
 
     case ProcessVariable::Type::integer:
       destV.l = atol( sourceReleasePvExpString.getExpanded() );
-      destPvId->put( destV.l );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
       break;
 
     case ProcessVariable::Type::text:
       strncpy( destV.str, sourceReleasePvExpString.getExpanded(), 39 );
-      destPvId->put( destV.str );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.str );
       break;
 
     case ProcessVariable::Type::enumerated:
       if ( useEnumNumeric ) {
         destV.l = atol( sourceReleasePvExpString.getExpanded() );
-        destPvId->put( destV.l );
+        destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
       }
       else {
         stat = getEnumNumeric( sourceReleasePvExpString.getExpanded(),
@@ -2144,7 +2146,7 @@ int stat;
           actWin->appCtx->postMessage( activeMessageButtonClass_str40 );
         }
         else {
-          destPvId->put( destV.l );
+          destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
         }
       }
       break;
@@ -2216,7 +2218,7 @@ char labelValue[39+1];
   if ( destIsAckS ) {
 
     destV.s = (short) atol( labelValue );
-    destPvId->putAck( destV.s );
+    destPvId->putAck( XDisplayName(actWin->appCtx->displayName), destV.s );
 
   }
   else {
@@ -2225,23 +2227,23 @@ char labelValue[39+1];
 
     case ProcessVariable::Type::real:
       destV.d = atof( labelValue );
-      destPvId->put( destV.d );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.d );
       break;
 
     case ProcessVariable::Type::integer:
       destV.l = atol( labelValue );
-      destPvId->put( destV.l );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
       break;
 
     case ProcessVariable::Type::text:
       strncpy( destV.str, labelValue, 39 );
-      destPvId->put( destV.str );
+      destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.str );
       break;
 
     case ProcessVariable::Type::enumerated:
       if ( useEnumNumeric ) {
         destV.l = atol( labelValue );
-        destPvId->put( destV.l );
+        destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
       }
       else {
         stat = getEnumNumeric( labelValue, &destV.l );
@@ -2249,7 +2251,7 @@ char labelValue[39+1];
           actWin->appCtx->postMessage( activeMessageButtonClass_str39 );
         }
         else {
-          destPvId->put( destV.l );
+          destPvId->put( XDisplayName(actWin->appCtx->displayName), destV.l );
         }
       }
       break;

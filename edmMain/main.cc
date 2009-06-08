@@ -105,6 +105,7 @@ typedef struct main_que_tag { /* locked queue header */
 #define CONNECT 2
 #define OPEN_INITIAL 3
 #define OPEN 4
+#define CONTROL 5
 
 typedef struct argsTag {
   int argc;
@@ -234,6 +235,144 @@ char *envPtr;
 
 }
 
+static int getServerCheckPointParams (
+  FILE *f,
+  int *server,
+  int *oneInstance,
+  char *displayName,
+  int *noEdit,
+  int *numCheckPointMacros,
+  char *checkPointMacros
+) {
+
+char *cptr, *tk, *buf1;
+char text[2047+1];
+int i, n, ii, nn, tmp, sanity;
+
+  *server = 0;
+  *oneInstance = 0;
+  strcpy( displayName, "" );
+  *numCheckPointMacros = 0;
+  strcpy( checkPointMacros, "" );
+
+  sanity = 99999;
+  do {
+
+    cptr = fgets( text, 2047, f );
+    text[2047] = 0;
+    if ( !cptr ) return 2; // fail
+    if ( strcmp( text, "<<<EOD>>>\n" ) == 0 ) return 3; // no more data
+    tmp = atol( text );
+    *server = tmp & 0xf;
+    *oneInstance = ( tmp >> 8 );
+
+    if ( !(*server) ) {
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      n = atol( text );
+
+      // skip all global macros
+      for ( i=0; i<n; i++ ) {
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+      }
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      n = atol( text );
+
+      // skip all screens
+      for ( i=0; i<n; i++ ) {
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+        nn = atol( text );
+
+        // skip all screen macros
+        for ( ii=0; ii<nn; ii++ ) {
+
+          cptr = fgets( text, 2047, f );
+          text[2047] = 0;
+          if ( !cptr ) return 2; // fail
+
+        }
+
+      }
+
+    }
+    else {
+
+      readStringFromFile( displayName, 127, f );
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      *noEdit = atol( text );
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      *numCheckPointMacros = atol( text );
+
+      for ( i=0; i<*numCheckPointMacros; i++ ) {
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+        buf1 = NULL;
+        tk = strtok_r( text, "\n \t", &buf1 );
+        if ( i > 0 ) {
+          Strncat( checkPointMacros, ",", 2047 );
+          checkPointMacros[2047] = 0;
+        }
+        Strncat( checkPointMacros, tk, 2047 );
+        checkPointMacros[2047] = 0;
+      }
+
+      return 1;
+
+    }
+
+  } while ( --sanity );
+
+  return 2;
+
+}
+
 static int getMainCheckPointParams (
   FILE *f,
   int *server,
@@ -246,7 +385,9 @@ static int getMainCheckPointParams (
 
 char *cptr, *tk, *buf1;
 char text[2047+1];
-int i, tmp;
+int i, n, ii, nn, tmp, sanity;
+
+  // get params for non-server
 
   *server = 0;
   *oneInstance = 0;
@@ -254,41 +395,121 @@ int i, tmp;
   *numCheckPointMacros = 0;
   strcpy( checkPointMacros, "" );
 
-  cptr = fgets( text, 2047, f );
-  text[2048] = 0;
-  if ( !cptr ) return 2; // fail
-  if ( strcmp( text, "<<<EOD>>>\n" ) == 0 ) return 3; // no more data
-  tmp = atol( text );
-  *server = tmp & 0xf;
-  *oneInstance = ( tmp >> 8 );
+  sanity = 99999;
+  do {
 
-  readStringFromFile( displayName, 127, f );
-
-  cptr = fgets( text, 2047, f );
-  text[2048] = 0;
-  if ( !cptr ) return 2; // fail
-  *noEdit = atol( text );
-
-  cptr = fgets( text, 2047, f );
-  text[2048] = 0;
-  if ( !cptr ) return 2; // fail
-  *numCheckPointMacros = atol( text );
-
-  for ( i=0; i<*numCheckPointMacros; i++ ) {
     cptr = fgets( text, 2047, f );
-    text[2048] = 0;
+    text[2047] = 0;
     if ( !cptr ) return 2; // fail
-    buf1 = NULL;
-    tk = strtok_r( text, "\n \t", &buf1 );
-    if ( i > 0 ) {
-      Strncat( checkPointMacros, ",", 2047 );
-      checkPointMacros[2047] = 0;
-    }
-    Strncat( checkPointMacros, tk, 2047 );
-    checkPointMacros[2047] = 0;
-  }
+    if ( strcmp( text, "<<<EOD>>>\n" ) == 0 ) return 3; // no more data
+    tmp = atol( text );
+    *server = tmp & 0xf;
+    *oneInstance = ( tmp >> 8 );
 
-  return 1;
+    if ( *server ) {
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      n = atol( text );
+
+      // skip all global macros
+      for ( i=0; i<n; i++ ) {
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+      }
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      n = atol( text );
+
+      // skip all screens
+      for ( i=0; i<n; i++ ) {
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+        nn = atol( text );
+
+        // skip all screen macros
+        for ( ii=0; ii<nn; ii++ ) {
+
+          cptr = fgets( text, 2047, f );
+          text[2047] = 0;
+          if ( !cptr ) return 2; // fail
+
+        }
+
+      }
+
+    }
+    else {
+
+      readStringFromFile( displayName, 127, f );
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      *noEdit = atol( text );
+
+      cptr = fgets( text, 2047, f );
+      text[2047] = 0;
+      if ( !cptr ) return 2; // fail
+      *numCheckPointMacros = atol( text );
+
+      for ( i=0; i<*numCheckPointMacros; i++ ) {
+        cptr = fgets( text, 2047, f );
+        text[2047] = 0;
+        if ( !cptr ) return 2; // fail
+        buf1 = NULL;
+        tk = strtok_r( text, "\n \t", &buf1 );
+        if ( i > 0 ) {
+          Strncat( checkPointMacros, ",", 2047 );
+          checkPointMacros[2047] = 0;
+        }
+        Strncat( checkPointMacros, tk, 2047 );
+        checkPointMacros[2047] = 0;
+      }
+
+      return 1;
+
+    }
+
+  } while ( --sanity );
+
+  return 2;
 
 }
 
@@ -332,33 +553,33 @@ int i;
   readStringFromFile( screenName, 255, f );
 
   cptr = fgets( text, 2047, f );
-  text[2048] = 0;
+  text[2047] = 0;
   if ( !cptr ) return 2; // fail
   *x = atol( text );
 
   cptr = fgets( text, 2047, f );
-  text[2048] = 0;
+  text[2047] = 0;
   if ( !cptr ) return 2; // fail
   *y = atol( text );
 
   cptr = fgets( text, 2047, f );
-  text[2048] = 0;
+  text[2047] = 0;
   if ( !cptr ) return 2; // fail
   *icon = atol( text );
 
   cptr = fgets( text, 2047, f );
-  text[2048] = 0;
+  text[2047] = 0;
   if ( !cptr ) return 2; // fail
   *noEdit = atol( text );
 
   cptr = fgets( text, 2047, f );
-  text[2048] = 0;
+  text[2047] = 0;
   if ( !cptr ) return 2; // fail
   *numCheckPointMacros = atol( text );
 
   for ( i=0; i<*numCheckPointMacros; i++ ) {
     cptr = fgets( text, 2047, f );
-    text[2048] = 0;
+    text[2047] = 0;
     if ( !cptr ) return 2; // fail
     buf1 = NULL;
     tk = strtok_r( text, "\n \t", &buf1 );
@@ -515,8 +736,8 @@ void checkForServer (
   int appendDisplay,
   char *displayName,
   int oneInstance,
-  int openCmd )
-{
+  int openCmd
+) {
 
 char chkHost[31+1], host[31+1], buf[511+1];
 int i, len, pos, max, argCount, stat, item, useItem;
@@ -599,6 +820,14 @@ int value, n, nIn, nOut;
       return;
     }
 
+    {
+      int flags, status;
+      flags = fcntl( sockfd, F_GETFD );
+      if ( flags >= 0 ) {
+        status = fcntl( sockfd, F_SETFD, flags | FD_CLOEXEC );
+      }
+    }
+
     value = 1;
     len = sizeof(value);
     stat = setsockopt( sockfd, SOL_SOCKET, SO_KEEPALIVE,
@@ -676,6 +905,14 @@ nextHost:
     return;
   }
 
+  {
+    int flags, status;
+    flags = fcntl( sockfd, F_GETFD );
+    if ( flags >= 0 ) {
+      status = fcntl( sockfd, F_SETFD, flags | FD_CLOEXEC );
+    }
+  }
+
   value = 1;
   len = sizeof(value);
   stat = setsockopt( sockfd, SOL_SOCKET, SO_KEEPALIVE,
@@ -703,13 +940,24 @@ nextHost:
 
   if ( oneInstance ) {
 
-    if ( openCmd ) {
+    if ( openCmd == 1 ) {
 
       msg[0] = (char) OPEN;
       pos = 1;
       max = MAX_MSG_LEN - pos;
 
       strncpy( &msg[pos], "*OPN*|", max );
+      pos = strlen(msg);
+      max = MAX_MSG_LEN - pos;
+
+    }
+    else if ( openCmd == 2 ) {
+
+      msg[0] = (char) CONTROL;
+      pos = 1;
+      max = MAX_MSG_LEN - pos;
+
+      strncpy( &msg[pos], "*CTL*|", max );
       pos = strlen(msg);
       max = MAX_MSG_LEN - pos;
 
@@ -803,7 +1051,7 @@ nextHost:
 
   Strncat( msg, "\n", MAX_MSG_LEN );
 
-  if ( strlen(msg) == MAX_MSG_LEN ) {
+  if ( strlen(msg) == (unsigned int) MAX_MSG_LEN ) {
     fprintf( stderr, "Message length exceeded - abort\n" );
     stat = shutdown( sockfd, 2 );
     stat = close( sockfd );
@@ -981,7 +1229,7 @@ int stat;
     stat = pend_event( 0.05 );
 
   } while ( 1 );
-
+  return 0;
 }
 
 #ifdef __linux__
@@ -1018,7 +1266,7 @@ int value, stat, n, n_in, q_stat_r, q_stat_i;
 THREAD_HANDLE delayH;
 MAIN_NODE_PTR node;
 SYS_TIME_TYPE timeout;
-int len, num, cmd;
+int len, num, cmd=0;
 char msg[255+1], msg1[255+1];
 struct sockaddr_in s, cli_s;
 int sockfd, newsockfd, more;
@@ -1047,6 +1295,14 @@ int *portNumPtr = (int *) thread_get_app_data( h );
     if ( sockfd == -1 ) {
       perror( "socket" );
       goto err_return;
+    }
+
+    {
+      int flags, status;
+      flags = fcntl( sockfd, F_GETFD );
+      if ( flags >= 0 ) {
+        status = fcntl( sockfd, F_SETFD, flags | FD_CLOEXEC );
+      }
     }
 
     value = 1;
@@ -1108,6 +1364,26 @@ int *portNumPtr = (int *) thread_get_app_data( h );
 
         case OPEN_INITIAL:
         case OPEN:
+
+          stat = thread_lock_master( h );
+
+          q_stat_r = REMQHI( (void *) &g_mainFreeQueue, (void **) &node, 0 );
+          if ( q_stat_r & 1 ) {
+            strncpy( node->msg, &msg[1], 254 );
+            q_stat_i = INSQTI( (void *) node, (void *) &g_mainActiveQueue, 0 );
+            if ( !( q_stat_i & 1 ) ) {
+              fprintf( stderr, main_str17 );
+            }
+          }
+          else {
+            fprintf( stderr, main_str18 );
+          }
+
+          stat = thread_unlock_master( h );
+
+          break;
+
+        case CONTROL:
 
           stat = thread_lock_master( h );
 
@@ -1240,6 +1516,7 @@ Display *testDisplay;
   *restart = 0;
   *convertOnly = 0;
   *crawl = 0;
+  *verbose = 0;
 
   // check first for component management commands
   if ( argc > 1 ) {
@@ -1295,6 +1572,42 @@ Display *testDisplay;
           *local = 0;
           *openCmd = 1;
         }
+	else if ( strcmp( argv[n], global_str128 ) == 0 ) { // close
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
+	else if ( strcmp( argv[n], global_str130 ) == 0 ) { // move
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
+	else if ( strcmp( argv[n], global_str132 ) == 0 ) { // raise
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
+	else if ( strcmp( argv[n], global_str134 ) == 0 ) { // lower
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
+	else if ( strcmp( argv[n], global_str136 ) == 0 ) { // iconify
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
+	else if ( strcmp( argv[n], global_str138 ) == 0 ) { // deiconify
+	  *oneInstance = 1;
+          *server = 1;
+          *local = 0;
+          *openCmd = 2; // control named window
+	}
         else if ( strcmp( argv[n], global_str86 ) == 0 ) {
           n++;
           if ( n >= argc ) { // missing pid num
@@ -1379,6 +1692,13 @@ Display *testDisplay;
           }
           strncpy( displayName, argv[n], 127 );
         }
+        else if ( strcmp( argv[n], global_str22 ) == 0 ) {
+          n++;
+          if ( n >= argc ) { // missing user library name
+            *local = 1;
+            return;
+          }
+        }
         else if ( strcmp( argv[n], global_str73 ) == 0 ) {
           n++;
           if ( n >= argc ) { // missing port num
@@ -1397,6 +1717,8 @@ Display *testDisplay;
           setReadOnly();
 	}
         else if ( strcmp( argv[n], global_str100 ) == 0 ) {
+	}
+        else if ( strcmp( argv[n], global_str106 ) == 0 ) { //noautomsg
 	}
         else {
           *local = 1;
@@ -1444,7 +1766,7 @@ Display *testDisplay;
       stat = gethostname( displayName, 127 );
       if ( stat ) {
         fprintf( stderr, main_str35 );
-        exit(0);
+        exit(1);
       }
 
       Strncat( displayName, ":0.0", 127 );
@@ -1456,7 +1778,7 @@ Display *testDisplay;
   testDisplay = XOpenDisplay( displayName );
   if ( !testDisplay ) {
     fprintf( stderr, main_str36 );
-    exit(0);
+    exit(1);
   }
 
   XCloseDisplay( testDisplay );
@@ -1497,10 +1819,12 @@ int primaryServerFlag, oneInstanceFlag, numCheckPointMacros;
 char *envPtr;
 int doXSync = 0;
 
-appListPtr primary;
+appListPtr primary=NULL;
 int primaryServerWantsExit;
 
 int numLocaleFailures = 0;
+
+int shutdownTry = 200; // aprox 10 seconds
 
   if ( diagnosticMode() ) {
     logDiagnostic( "edm started\n" );
@@ -1566,10 +1890,23 @@ int numLocaleFailures = 0;
     f = fopen( checkPointFileName, "r" );
     if ( f ) {
 
-      stat = getMainCheckPointParams( f, &primaryServerFlag, &oneInstanceFlag,
+      stat = getServerCheckPointParams( f, &primaryServerFlag, &oneInstanceFlag,
        displayName, &sessionNoEdit, &numCheckPointMacros, checkPointMacros );
       if ( !( stat & 1 ) ) { // couldn't read file
-        restart = 0;
+
+        fclose( f );
+        f = fopen( checkPointFileName, "r" );
+        if ( !f ) restart = 0;
+        if ( f ) {
+
+          stat = getMainCheckPointParams( f, &primaryServerFlag, &oneInstanceFlag,
+           displayName, &sessionNoEdit, &numCheckPointMacros, checkPointMacros );
+          if ( !( stat & 1 ) ) { // couldn't read file
+            restart = 0;
+          }
+
+	}
+
       }
 
       if ( primaryServerFlag == 2 ) {
@@ -1616,22 +1953,22 @@ int numLocaleFailures = 0;
 
   if ( server ) {
 
-    // If openCmd is true, we want the server to open some screens;
+    // If openCmd is > 0, we want the server to take some action;
     // if no server is running, we do not want to launch an instance of edm
     if ( openCmd ) {
       fprintf( stderr, main_str46 );
-      exit(0);
+      exit(100);
     }
 
     stat = sys_iniq( &g_mainFreeQueue );
     if ( !( stat & 1 ) ) {
       fprintf( stderr, main_str37 );
-      exit(0);
+      exit(1);
     }
     stat = sys_iniq( &g_mainActiveQueue );
     if ( !( stat & 1 ) ) {
       fprintf( stderr, main_str38 );
-      exit(0);
+      exit(1);
     }
 
     g_mainFreeQueue.flink = NULL;
@@ -1645,7 +1982,7 @@ int numLocaleFailures = 0;
        0 );
       if ( !( stat & 1 ) ) {
         fprintf( stderr, main_str39 );
-        exit(0);
+        exit(1);
       }
 
     }
@@ -1779,7 +2116,7 @@ int numLocaleFailures = 0;
     stat = args->appCtxPtr->startApplication( args->argc, args->argv, 1,
      oneInstance, convertOnly );
   }
-  if ( !( stat & 1 ) ) exit( 0 );
+  if ( !( stat & 1 ) ) exit( 1 );
 
   if ( stat & 1 ) { // success
     oneAppCtx = args->appCtxPtr->appContext();
@@ -1907,6 +2244,10 @@ int numLocaleFailures = 0;
 
     }
 
+    fclose( f );
+    f = fopen( checkPointFileName, "r" );
+    if ( !f ) restart = 0;
+
   }
 
   if ( restart ) {
@@ -1921,6 +2262,14 @@ int numLocaleFailures = 0;
       }
 
       if ( stat != 3 ) { // end of data
+
+        //fprintf( stderr, "primaryServerFlag = %-d\n", primaryServerFlag );
+        //fprintf( stderr, "oneInstanceFlag = %-d\n", oneInstanceFlag );
+        //fprintf( stderr, "server = %-d\n", server );
+        //fprintf( stderr, "displayName = [%s]\n", displayName );
+        //fprintf( stderr, "sessionNoEdit = %-d\n", sessionNoEdit );
+        //fprintf( stderr, "numCheckPointMacros = %-d\n", numCheckPointMacros );
+        //fprintf( stderr, "checkPointMacros = [%s]\n", checkPointMacros );
 
         n = 0;
         if ( !blank(displayName) ) n += 2;
@@ -2217,6 +2566,27 @@ int numLocaleFailures = 0;
 	      }
 
 	    }
+	    else if ( strcmp( tk, "*CTL*" ) == 0 ) {
+
+              needConnect = 0;
+              tk = strtok_r( NULL, "|", &buf1 ); // should contain display name
+
+	      // make 1st app ctx open/deiconify/raise initial files
+	      // and deiconify/raise main window so things look like
+	      // a new instance of edm is starting
+              first = appArgsHead->flink;
+              while ( first != appArgsHead ) {
+		if ( ( strcmp( tk, ":0.0" ) == 0 ) ||
+                     ( strcmp( tk,
+                        first->appArgs->appCtxPtr->displayName ) == 0 ) ) {
+                  tk = strtok_r( NULL, "|", &buf1 );
+                  first->appArgs->appCtxPtr->controlWinNames( "*CTL*", node->msg );
+                  break;
+		}
+                first = first->flink;
+	      }
+
+	    }
 	    else if ( strcmp( tk, "*OIS*" ) == 0 ) {
 
               needConnect = 1;
@@ -2337,38 +2707,51 @@ parse_error:
 
         cur = primary;
 
-        cur->appArgs->appCtxPtr->closeDownAppCtx();
-
-	// blank display name
-	strcpy( cur->appArgs->appCtxPtr->displayName, "" );
-
         stat = thread_lock_master( serverH );
         g_numClients--;
         stat = thread_unlock_master( serverH );
 
-        // unlink and delete
-        cur->blink->flink = cur->flink;
-        cur->flink->blink = cur->blink;
+        if ( cur ) {
 
-        oneAppCtx = cur->appArgs->appCtxPtr->appContext();
-        oneDisplay = cur->appArgs->appCtxPtr->getDisplay();
-        delete cur->appArgs->appCtxPtr;
-        for ( i=0; i<cur->appArgs->argc; i++ )
-          delete[] cur->appArgs->argv[i];
-        delete[] cur->appArgs->argv;
-        delete cur->appArgs;
+          cur->appArgs->appCtxPtr->closeDownAppCtx();
 
-        delete cur;
+	  // blank display name
+	  strcpy( cur->appArgs->appCtxPtr->displayName, "" );
+
+          // unlink and delete
+          cur->blink->flink = cur->flink;
+          cur->flink->blink = cur->blink;
+
+          oneAppCtx = cur->appArgs->appCtxPtr->appContext();
+          oneDisplay = cur->appArgs->appCtxPtr->getDisplay();
+          delete cur->appArgs->appCtxPtr;
+          for ( i=0; i<cur->appArgs->argc; i++ )
+            delete[] cur->appArgs->argv[i];
+          delete[] cur->appArgs->argv;
+          delete cur->appArgs;
+
+          delete cur;
+
+	}
 
         numAppsRemaining = 0;
 
       }
       else {
 
-        cur = primary;
-        cur->appArgs->appCtxPtr->postMessage( main_str47 );
-        cur->appArgs->appCtxPtr->exitFlag = 0;
-        primaryServerWantsExit = 0;
+        shutdownTry--;
+
+        if ( !shutdown || ( shutdownTry <= 0 ) ) {
+
+          cur = primary;
+	  if ( cur ) {
+            cur->appArgs->appCtxPtr->postMessage( main_str47 );
+            cur->appArgs->appCtxPtr->exitFlag = 0;
+	  }
+          primaryServerWantsExit = 0;
+          shutdownTry = 200;
+
+	}
 
       }
 
@@ -2377,8 +2760,6 @@ parse_error:
     if ( !numAppsRemaining ) exitProg = 1;
 
     pend_event( 0.05 );
-    //stat = thread_wait_for_timer( delayH );
-    //stat = thread_init_timer( delayH, 0.1 );
 
     proc.timeCount++;
     if ( proc.timeCount >= 100 ) { // 10 sec
@@ -2436,5 +2817,7 @@ parse_error:
     fprintf( stderr, "edm terminated\n" );
     logDiagnostic( "edm terminated\n" );
   }
+
+  return 0;
 
 }

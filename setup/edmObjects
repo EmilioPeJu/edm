@@ -1,8 +1,8 @@
-42
+45
 activeArcClass              $(EDMLIBS)/libEdmBase.so Graphics Arc
 activeBarClass              $(EDMLIBS)/libEdmBase.so Monitors Bar
 activeButtonClass           $(EDMLIBS)/libEdmBase.so Controls Button
-activeChoiceButtonClass     $(EDMLIBS)/libEdmChoiceButton.so Controls Choice Button
+activeChoiceButtonClass     $(EDMLIBS)/lib7e1b4e6f-239d-4650-95e6-a040d41ba633.so Controls Choice Button
 activeCircleClass           $(EDMLIBS)/libEdmBase.so Graphics Circle
 activeExitButtonClass       $(EDMLIBS)/libEdmBase.so Controls Exit Button
 activeLineClass             $(EDMLIBS)/libEdmBase.so Graphics Lines
@@ -12,19 +12,21 @@ activeMessageButtonClass    $(EDMLIBS)/libEdmBase.so Controls Message Button
 activeMeterClass            $(EDMLIBS)/libEdmBase.so Monitors Meter
 activeMotifSliderClass      $(EDMLIBS)/libEdmBase.so Controls Motif Slider
 activePipClass              $(EDMLIBS)/libEdmBase.so Graphics Embedded Window
-activePngClass              $(EDMLIBS)/libEdmPng.so Graphics PNG Image
+activePngClass              $(EDMLIBS)/lib57d79238-2924-420b-ba67-dfbecdf03fcd.so Graphics PNG Image
 activeRadioButtonClass      $(EDMLIBS)/libEdmBase.so Controls Radio Box
 activeRectangleClass        $(EDMLIBS)/libEdmBase.so Graphics Rectangle
 activeSliderClass           $(EDMLIBS)/libEdmBase.so Controls Slider
 activeTableClass            $(EDMLIBS)/libEdmBase.so Monitors Table
+activeCoefTableClass        $(EDMLIBS)/libEdmBase.so Monitors Coef Table
 activeUpdownButtonClass     $(EDMLIBS)/libEdmBase.so Controls Up/Down Button
+activeRampButtonClass       $(EDMLIBS)/libEdmBase.so Controls Ramp Button
 activeVsBarClass            $(EDMLIBS)/libEdmVsbar.so Monitors Variable Scale Bar
 activeXRegTextClass         $(EDMLIBS)/libEdmBase.so Graphics Text w. Reg. Exp.
 activeXTextClass            $(EDMLIBS)/libEdmBase.so Graphics Static Text
 activeXTextDspClass         $(EDMLIBS)/libEdmBase.so Controls Text Control
 activeXTextDspClass:noedit  $(EDMLIBS)/libEdmBase.so Monitors Text Monitor
 ByteClass                   $(EDMLIBS)/libPV.so Monitors Byte
-cfcf6c8a_dbeb_11d2_8a97_00104b8742df $(EDMLIBS)/libEdmGif.so Graphics GIF Image
+cfcf6c8a_dbeb_11d2_8a97_00104b8742df   $(EDMLIBS)/libcf322683-513e-4570-a44b-7cdd7cae0de5.so Graphics GIF Image
 ExtendedRelatedDisplayClass $(EDMLIBS)/libExtendedRelatedDisplay.so Controls Extended Related Display
 menuMuxClass                $(EDMLIBS)/libEdmBase.so Controls Menu Mux
 pvInspectorClass            $(EDMLIBS)/libEdmBase.so Monitors PV Inspector
@@ -41,3 +43,4 @@ menuMuxPVClass              $(EDMLIBS)/libmenu_muxPV.so Controls Menu Mux PV
 activeLogMeterClass         $(EDMLIBS)/liblogMeter.so Monitors Logarithmic Meter
 multiLineTextEntryClass     $(EDMLIBS)/libmultiLineTextUpdate.so Controls multiLineTextEntry
 multiLineTextUpdateClass    $(EDMLIBS)/libmultiLineTextUpdate.so Monitors multiLineTextUpdate
+activeIndicatorClass        $(EDMLIBS)/libIndicator.so Monitors Indicator

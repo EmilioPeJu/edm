@@ -144,6 +144,30 @@ activeButtonClass *bto = (activeButtonClass *) client;
 
   bto->colorPvExpString.setRaw( bto->eBuf->bufColorPvName );
 
+  bto->efControlBitPos = bto->eBuf->bufEfControlBitPos;
+  if ( bto->efControlBitPos.isNull() ) {
+    bto->controlIsBit = 0;
+    bto->controlBitPos = 0;
+  }
+  else {
+    bto->controlIsBit = 1;
+    bto->controlBitPos = bto->efControlBitPos.value();
+    if ( bto->controlBitPos > 31 ) bto->controlBitPos = 31;
+    if ( bto->controlBitPos < 0 ) bto->controlBitPos = 0;
+  }
+
+  bto->efReadBitPos = bto->eBuf->bufEfReadBitPos;
+  if ( bto->efReadBitPos.isNull() ) {
+    bto->readIsBit = 0;
+    bto->readBitPos = 0;
+  }
+  else {
+    bto->readIsBit = 1;
+    bto->readBitPos = bto->efReadBitPos.value();
+    if ( bto->readBitPos > 31 ) bto->readBitPos = 31;
+    if ( bto->readBitPos < 0 ) bto->readBitPos = 0;
+  }
+
   bto->x = bto->eBuf->bufX;
   bto->sboxX = bto->eBuf->bufX;
 
@@ -258,6 +282,10 @@ int st, sev;
   bto->controlValid = 1;
   bto->curControlV = (short) pv->get_int();
 
+  if ( bto->controlIsBit ) {
+    bto->controlBit = ( ( bto->curControlV & ( 1 << bto->controlBitPos ) ) > 0 );
+  }
+
   if ( !bto->readExists ) {
 
     st = pv->get_status();
@@ -320,6 +348,10 @@ int st, sev;
   bto->readValid = 1;
   bto->curReadV = (short) pv->get_int();
 
+  if ( bto->readIsBit ) {
+    bto->readBit = ( ( bto->curReadV & ( 1 << bto->readBitPos ) ) > 0 );
+  }
+
   st = pv->get_status();
   sev = pv->get_severity();
   if ( ( st != bto->oldStat ) || ( sev != bto->oldSev ) ) {
@@ -329,10 +361,22 @@ int st, sev;
     bto->bufInvalidate();
   }
 
-  bto->needReadRefresh = 1;
-  bto->actWin->appCtx->proc->lock();
-  bto->actWin->addDefExeNode( bto->aglPtr );
-  bto->actWin->appCtx->proc->unlock();
+  if ( bto->readIsBit ) {
+    if ( bto->initReadBit || ( bto->readBit != bto->prevReadBit ) ) {
+      bto->initReadBit = 0;
+      bto->prevReadBit = bto->readBit;
+      bto->needCtlRefresh = 1;
+      bto->actWin->appCtx->proc->lock();
+      bto->actWin->addDefExeNode( bto->aglPtr );
+      bto->actWin->appCtx->proc->unlock();
+    }
+  }
+  else {
+    bto->needReadRefresh = 1;
+    bto->actWin->appCtx->proc->lock();
+    bto->actWin->addDefExeNode( bto->aglPtr );
+    bto->actWin->appCtx->proc->unlock();
+  }
 
 }
 
@@ -449,6 +493,13 @@ activeButtonClass::activeButtonClass ( void ) {
   connection.setMaxPvs( 4 );
   activeMode = 0;
 
+  controlIsBit = readIsBit = 0;
+  prevControlBit = prevReadBit = 0;
+  controlBitPos = readBitPos = 0;
+  initControlBit = initReadBit = 0;
+  efControlBitPos.setNull(1);
+  efReadBitPos.setNull(1);
+
   fgColorMode = BTC_K_COLORMODE_STATIC;
 
   unconnectedTimer = 0;
@@ -524,6 +575,15 @@ activeGraphicClass *bto = (activeGraphicClass *) this;
   strncpy( minVisString, source->minVisString, 39 );
   strncpy( maxVisString, source->maxVisString, 39 );
   activeMode = 0;
+
+  prevControlBit = prevReadBit = 0;
+  initControlBit = initReadBit = 0;
+  controlIsBit = source->controlIsBit;
+  readIsBit = source->readIsBit;
+  controlBitPos = source->controlBitPos;
+  efControlBitPos = source->efControlBitPos;
+  readBitPos = source->readBitPos;
+  efReadBitPos = source->efReadBitPos;
 
   fgColorMode = source->fgColorMode;
 
@@ -695,6 +755,9 @@ static int objTypeEnum[4] = {
   tag.loadW( "visMin", minVisString, emptyStr );
   tag.loadW( "visMax", maxVisString, emptyStr );
   tag.loadW( "colorPv", &colorPvExpString, emptyStr  );
+  tag.loadW( "controlBitPos", &efControlBitPos );
+  tag.loadW( "readBitPos", &efReadBitPos );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -852,6 +915,7 @@ static int objTypeEnum[4] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -884,6 +948,8 @@ static int objTypeEnum[4] = {
   tag.loadR( "visMin", 39, minVisString, emptyStr );
   tag.loadR( "visMax", 39, maxVisString, emptyStr );
   tag.loadR( "colorPv", &colorPvExpString, emptyStr );
+  tag.loadR( "controlBitPos", &efControlBitPos );
+  tag.loadR( "readBitPos", &efReadBitPos );
   tag.loadR( "endObjectProperties" );
   tag.loadR( "" );
 
@@ -904,6 +970,28 @@ static int objTypeEnum[4] = {
   }
 
   this->initSelectBox(); // call after getting x,y,w,h
+
+  if ( efControlBitPos.isNull() ) {
+    controlIsBit = 0;
+    controlBitPos = 0;
+  }
+  else {
+    controlIsBit = 1;
+    controlBitPos = efControlBitPos.value();
+    if ( controlBitPos > 31 ) controlBitPos = 31;
+    if ( controlBitPos < 0 ) controlBitPos = 0;
+  }
+
+  if ( efReadBitPos.isNull() ) {
+    readIsBit = 0;
+    readBitPos = 0;
+  }
+  else {
+    readIsBit = 1;
+    readBitPos = efReadBitPos.value();
+    if ( readBitPos > 31 ) readBitPos = 31;
+    if ( readBitPos < 0 ) readBitPos = 0;
+  }
 
   if ( fgColorMode == BTC_K_COLORMODE_ALARM )
     fgColor.setAlarmSensitive();
@@ -1533,6 +1621,9 @@ char title[32], *ptr;
   strncpy( eBuf->bufMinVisString, minVisString, 39 );
   strncpy( eBuf->bufMaxVisString, maxVisString, 39 );
 
+  eBuf->bufEfControlBitPos = efControlBitPos;
+  eBuf->bufEfReadBitPos = efReadBitPos;
+
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
@@ -1546,8 +1637,10 @@ char title[32], *ptr;
   ef.addTextField( activeButtonClass_str21, 35, &eBuf->bufH );
   ef.addTextField( activeButtonClass_str22, 35, eBuf->controlBufPvName,
    PV_Factory::MAX_PV_NAME );
+  ef.addTextField( "Bit", 35, &eBuf->bufEfControlBitPos );
   ef.addTextField( activeButtonClass_str23, 35, eBuf->readBufPvName,
    PV_Factory::MAX_PV_NAME );
+  ef.addTextField( "Bit", 35, &eBuf->bufEfReadBitPos );
   ef.addOption( activeButtonClass_str24, activeButtonClass_str25,
    buttonTypeStr, 7 );
   ef.addOption( activeButtonClass_str26, activeButtonClass_str27, _3DString,
@@ -1642,10 +1735,10 @@ int activeButtonClass::eraseActive ( void ) {
 
   prevVisibility = visibility;
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->drawGc.eraseGC(), x, y, w, h );
 
   return 1;
@@ -1759,7 +1852,7 @@ int blink = 0;
       actWin->executeGc.setFG( onColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1769,7 +1862,7 @@ int blink = 0;
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
     if ( invisible ) {
@@ -1784,6 +1877,14 @@ int blink = 0;
 
   cV = controlV;
   rV = readV;
+
+  if ( controlIsBit ) {
+    cV = controlBit;
+  }
+
+  if ( readIsBit ) {
+    rV = readBit;
+  }
 
   actWin->executeGc.saveFg();
   actWin->executeGc.setLineWidth( 1 );
@@ -1854,10 +1955,10 @@ int blink = 0;
 
   }
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
   if ( cV == 0 ) {
@@ -1880,50 +1981,50 @@ int blink = 0;
 
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x+w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x, y+h );
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y+h, x+w, y+h );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w, y, x+w, y+h );
 
     // top
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+1, x+w-1, y+1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+2, x+w-2, y+2 );
 
     // left
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+1, x+1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+2, x+2, y+h-2 );
 
     // bottom
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+1, y+h-1, x+w-1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+2, y+h-2, x+w-2, y+h-2 );
 
     // right
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w-1, y+1, x+w-1, y+h-1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
 
     }
@@ -1948,48 +2049,48 @@ int blink = 0;
 
     actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x+w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, x, y+h );
 
     // top
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-//     XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+//     XDrawLine( actWin->d, drawable(actWin->executeWidget),
 //      actWin->executeGc.normGC(), x, y, x+w, y );
 
 //      actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-//      XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+//      XDrawLine( actWin->d, drawable(actWin->executeWidget),
 //       actWin->executeGc.normGC(), x+1, y+1, x+w-1, y+1 );
 
     //left
 
 //     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-//     XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+//     XDrawLine( actWin->d, drawable(actWin->executeWidget),
 //      actWin->executeGc.normGC(), x, y, x, y+h );
 
 //      actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-//      XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+//      XDrawLine( actWin->d, drawable(actWin->executeWidget),
 //       actWin->executeGc.normGC(), x+1, y+1, x+1, y+h-1 );
 
     // bottom
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y+h, x+w, y+h );
 
     //right
 
     actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLine( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x+w, y, x+w, y+h );
 
     }
@@ -2009,14 +2110,14 @@ int blink = 0;
 
     if ( labelType == BTC_K_LITERAL ) {
 
-      drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
-       XmALIGNMENT_CENTER, string );
+      drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+       &actWin->executeGc, fs, tX, tY, XmALIGNMENT_CENTER, string );
 
     }
     else {
 
-      drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
-       XmALIGNMENT_CENTER, string );
+      drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+       &actWin->executeGc, fs, tX, tY, XmALIGNMENT_CENTER, string );
 
     }
 
@@ -2344,6 +2445,7 @@ void activeButtonClass::btnUp (
 
 short value;
 int stat;
+unsigned int uival;
 
   if ( !enabled || !active || !visibility ) return;
 
@@ -2355,12 +2457,25 @@ int stat;
 
   if ( !controlExists ) controlV = 0;
 
+  if ( controlExists ) {
+    if ( controlIsBit ) {
+      controlBit = 0;
+    }
+  }
+
   if ( upCallback ) {
     (*upCallback)( this );
   }
 
   if ( !controlExists ) return;
-  stat = controlPvId->put( value );
+
+  if ( controlIsBit ) {
+    uival = controlV & ( ~( (unsigned int) 1 << controlBitPos ) );
+    stat = controlPvId->put( XDisplayName(actWin->appCtx->displayName), (int) uival );
+  }
+  else {
+    stat = controlPvId->put( XDisplayName(actWin->appCtx->displayName), value );
+  }
 
 }
 
@@ -2372,7 +2487,8 @@ void activeButtonClass::btnDown (
 {
 
 short value;
-int stat;
+int stat, curControlBit;
+unsigned int uival;
 
   if ( !enabled || !active || !visibility ) return;
 
@@ -2382,32 +2498,63 @@ int stat;
 
   if ( buttonNumber != 1 ) return;
 
-  if ( toggle ) {
-    if ( controlV == 0 ) {
+  if ( controlExists && controlIsBit ) {
+
+    curControlBit = ( ( controlV & ( 1 << controlBitPos ) ) > 0 );
+
+    if ( toggle ) {
+      if ( curControlBit == 0 ) {
+        controlBit = 1;
+      }
+      else {
+        controlBit = 0;
+      }
+    }
+    else {
+      controlBit = 1;
+    }
+
+    if ( controlBit ) {
+      uival = controlV | ( (unsigned int) 1 << controlBitPos );
+    }
+    else {
+      uival = controlV & ( ~( (unsigned int) 1 << controlBitPos ) );
+    }
+
+    stat = controlPvId->put( XDisplayName(actWin->appCtx->displayName), (int) uival );
+
+  }
+  else {
+
+    if ( toggle ) {
+      if ( controlV == 0 ) {
+        value = 1;
+        if ( !controlExists ) controlV = 1;
+        if ( downCallback ) {
+          (*downCallback)( this );
+        }
+      }
+      else {
+        value = 0;
+        if ( !controlExists ) controlV = 0;
+        if ( upCallback ) {
+          (*upCallback)( this );
+        }
+      }
+    }
+    else {
       value = 1;
       if ( !controlExists ) controlV = 1;
       if ( downCallback ) {
         (*downCallback)( this );
       }
     }
-    else {
-      value = 0;
-      if ( !controlExists ) controlV = 0;
-      if ( upCallback ) {
-        (*upCallback)( this );
-      }
-    }
-  }
-  else {
-    value = 1;
-    if ( !controlExists ) controlV = 1;
-    if ( downCallback ) {
-      (*downCallback)( this );
-    }
-  }
 
-  if ( !controlExists ) return;
-  stat = controlPvId->put( value );
+    if ( !controlExists ) return;
+    stat = controlPvId->put( XDisplayName(actWin->appCtx->displayName), value );
+    //stat = controlPvId->put( value );
+
+  }
 
 }
 
@@ -2546,7 +2693,13 @@ char msg[79+1];
 
   if ( ncc ) {
 
-    if ( controlPvId->get_type().type != ProcessVariable::Type::enumerated ) {
+    if ( controlIsBit &&
+         ( ( controlPvId->get_type().type == ProcessVariable::Type::integer ) ||
+           ( controlPvId->get_type().type == ProcessVariable::Type::real ) ) ) {
+      initControlBit = 1;
+    }
+    else if ( controlPvId->get_type().type !=
+     ProcessVariable::Type::enumerated ) {
       strncpy( msg, actWin->obj.getNameFromClass( "activeButtonClass" ),
        79 );
       Strncat( msg, activeButtonClass_str51, 79 );
@@ -2557,6 +2710,10 @@ char msg[79+1];
     }
 
     cv = curControlV = (short) controlPvId->get_int();
+
+    if ( controlIsBit ) {
+      prevControlBit = controlBit = ( ( cv & ( 1 << controlBitPos ) ) > 0 );
+    }
 
     nci = 1;
 
@@ -2601,7 +2758,13 @@ char msg[79+1];
 
   if ( nrc ) {
 
-    if ( readPvId->get_type().type != ProcessVariable::Type::enumerated ) {
+    if ( readIsBit &&
+         ( ( readPvId->get_type().type == ProcessVariable::Type::integer ) ||
+           ( readPvId->get_type().type == ProcessVariable::Type::real ) ) ) {
+      initReadBit = 1;
+    }
+    else if ( readPvId->get_type().type !=
+     ProcessVariable::Type::enumerated ) {
       strncpy( msg, actWin->obj.getNameFromClass( "activeButtonClass" ),
        79 );
       Strncat( msg, activeButtonClass_str54, 79 );
@@ -2612,6 +2775,10 @@ char msg[79+1];
     }
 
     rv = curReadV = (short) readPvId->get_int();
+
+    if ( readIsBit ) {
+      prevReadBit = readBit = ( ( rv & ( 1 << readBitPos ) ) > 0 );
+    }
 
     nri = 1;
 

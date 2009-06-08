@@ -59,5 +59,9 @@
 #define activeXTextDspClass_str82 (char *) "Alarm Border"
 #define activeXTextDspClass_str83 (char *) "Allow Input Focus Updates"
 #define activeXTextDspClass_str84 (char *) "Clip To LOPR/HOPR"
+#define activeXTextDspClass_str85 (char *) "Field Length"
+#define activeXTextDspClass_str86 (char *) "Password Input"
+#define activeXTextDspClass_str87 (char *) "Character Mode"
+#define activeXTextDspClass_str88 (char *) "No Execute Clip Mask"
 
 #endif

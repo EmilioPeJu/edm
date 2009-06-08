@@ -27,6 +27,9 @@
 static int g_transInit = 1;
 static XtTranslations g_parsedTrans;
 
+static int g_initTextBorderCheck = 1;
+static int g_showTextBorderAlways = 0;
+
 static char g_dragTrans[] =
   "#override\n\
    ~Ctrl~Shift<Btn2Down>: startDrag()\n\
@@ -43,15 +46,31 @@ static XtActionsRec g_dragActions[] = {
   { "selectDrag", (XtActionProc) selectDrag }
 };
 
+static void checkTextBorderAlways ( void ) {
+
+  if ( g_initTextBorderCheck ) {
+
+    g_initTextBorderCheck = 0;
+
+    char *envPtr = getenv( environment_str16 );
+    if ( envPtr ) {
+      g_showTextBorderAlways = 1;
+    }
+
+  }
+
+}
+
 static int stringPut (
   ProcessVariable *id,
+  const char *dsp,
   int size,
   char *string
 ) {
 
   if ( size == 1 ) {
 
-    id->putText( string );
+    id->putText( dsp, string );
 
   }
   else {
@@ -74,28 +93,91 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 int stat;
 char string[XTDC_K_MAX+1];
 char *buf;
+Arg args[10];
+int n, l;
 
   *continueToDispatch = True;
 
   axtdo = (activeXTextDspClass *) client;
 
-  if ( e->type == EnterNotify ) {
+  if ( !axtdo->enabled ) return;
 
-    if ( !axtdo->enabled ) return;
+  if ( e->type == FocusIn ) {
 
-    if ( !axtdo->grabUpdate ) {
+    axtdo->focusIn = 1;
+    axtdo->focusOut = 0;
 
-      XSetInputFocus( axtdo->actWin->display(),
-       XtWindow(axtdo->tf_widget), RevertToNone, CurrentTime );
+    n = 0;
+    XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) True ); n++;
+    XtSetValues( axtdo->tf_widget, args, n );
 
+    if ( !(axtdo->inputFocusUpdatesAllowed) || axtdo->cursorIn ) {
+      axtdo->grabUpdate = 1;
     }
 
-    axtdo->grabUpdate = 1;
+    if ( axtdo->autoSelect ) {
+      buf = XmTextGetString( axtdo->tf_widget );
+      l = strlen(buf);
+      XtFree( buf );
+      XmTextSetSelection( axtdo->tf_widget, 0, l,
+      XtLastTimestampProcessed( axtdo->actWin->display() ) );
+      XmTextSetInsertionPosition( axtdo->tf_widget, l );
+    }
 
     *continueToDispatch = False;
 
   }
   else if ( e->type == LeaveNotify ) {
+
+    axtdo->cursorIn = 0;
+    axtdo->cursorOut = 1;
+
+    if ( axtdo->changeValOnLoseFocus ) {
+
+      buf = XmTextGetString( axtdo->tf_widget );
+      strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
+      axtdo->entryValue[XTDC_K_MAX] = 0;
+      XtFree( buf );
+      strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+      axtdo->curValue[XTDC_K_MAX] = 0;
+      strncpy( axtdo->value, axtdo->entryValue, XTDC_K_MAX );
+      axtdo->value[XTDC_K_MAX] = 0;
+
+      axtdo->bufInvalidate();
+      axtdo->actWin->appCtx->proc->lock();
+      axtdo->needUpdate = 1;
+      axtdo->actWin->addDefExeNode( axtdo->aglPtr );
+      axtdo->actWin->appCtx->proc->unlock();
+
+    }
+
+    if ( axtdo->inputFocusUpdatesAllowed ) {
+      axtdo->grabUpdate = 0;
+    }
+
+    *continueToDispatch = False;
+
+  }
+  else if ( e->type == EnterNotify ) {
+
+    axtdo->cursorIn = 1;
+    axtdo->cursorOut = 0;
+
+    if ( axtdo->inputFocusUpdatesAllowed && axtdo->focusIn ) {
+      axtdo->grabUpdate = 1;
+    }
+
+    *continueToDispatch = False;
+
+  }
+  else if ( e->type == FocusOut ) {
+
+    axtdo->focusIn = 0;
+    axtdo->focusOut = 1;
+
+    n = 0;
+    XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) False ); n++;
+    XtSetValues( axtdo->tf_widget, args, n );
 
     if ( axtdo->changeValOnLoseFocus ) {
 
@@ -107,29 +189,52 @@ char *buf;
       axtdo->curValue[XTDC_K_MAX] = 0;
       strncpy( string, axtdo->entryValue, XTDC_K_MAX );
       string[XTDC_K_MAX] = 0;
-
+    
       if ( axtdo->pvExists ) {
-        stat = stringPut( axtdo->pvId, axtdo->pvCount, string );
+
+        if ( axtdo->isPassword ) {
+          stat = stringPut( axtdo->pvId,
+           XDisplayName(axtdo->actWin->appCtx->displayName),
+           axtdo->pwLength, axtdo->pwValue );
+        }
+        else {
+
+          stat = axtdo->putValueWithClip( string );
+
+          if ( !stat ) {
+            strncpy( axtdo->entryValue, axtdo->value, XTDC_K_MAX );
+            axtdo->entryValue[XTDC_K_MAX] = 0;
+            strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+            axtdo->curValue[XTDC_K_MAX] = 0;
+            XmTextSetString( axtdo->tf_widget, axtdo->entryValue );
+          }
+
+        }
+
       }
       else {
-        axtdo->grabUpdate = 0;
+
         axtdo->bufInvalidate();
         axtdo->actWin->appCtx->proc->lock();
         axtdo->needUpdate = 1;
         axtdo->actWin->addDefExeNode( axtdo->aglPtr );
         axtdo->actWin->appCtx->proc->unlock();
-      }
 
+      }
+    
     }
     else {
 
-      axtdo->grabUpdate = 0;
       axtdo->bufInvalidate();
       axtdo->actWin->appCtx->proc->lock();
       axtdo->needUpdate = 1;
       axtdo->actWin->addDefExeNode( axtdo->aglPtr );
       axtdo->actWin->appCtx->proc->unlock();
 
+    }
+
+    if ( !(axtdo->inputFocusUpdatesAllowed) || axtdo->cursorOut ) {
+      axtdo->grabUpdate = 0;
     }
 
     *continueToDispatch = False;
@@ -177,8 +282,8 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
             }
             Strncat( tmp, str, 15 );
             tmp[15] = 0;
-	  }
-	  else {
+          }
+          else {
             strcpy( tmp, "0x" );
             Strncat( tmp, str, 15 );
             tmp[15] = 0;
@@ -187,26 +292,29 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
             doPut = 1;
             ivalue = strtol( tmp, NULL, 0 );
             dvalue = (double) ivalue;
-	  }
-	}
-	else {
+          }
+        }
+        else {
           if ( isLegalFloat(str) ) {
             doPut = 1;
             dvalue = atof( str );
           }
-	}
+        }
 
         if ( doPut ) {
 
           if ( axtdo->pvExists ) {
-	    //axtdo->pvId->put( dvalue );
+
             axtdo->putValueWithClip( dvalue );
+
           }
           else {
+
             axtdo->needUpdate = 1;
             axtdo->actWin->appCtx->proc->lock();
             axtdo->actWin->addDefExeNode( axtdo->aglPtr );
             axtdo->actWin->appCtx->proc->unlock();
+
           }
 
         }
@@ -227,28 +335,33 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
             }
             Strncat( tmp, str, 15 );
             tmp[15] = 0;
-	  }
-	  else {
+          }
+          else {
             strcpy( tmp, "0x" );
             Strncat( tmp, str, 15 );
             tmp[15] = 0;
           }
-	}
-	else {
+        }
+        else {
           strncpy( tmp, str, XTDC_K_MAX );
           tmp[XTDC_K_MAX] = 0;
-	}
+        }
         if ( isLegalInteger(tmp) ) {
+
           ivalue = strtol( tmp, NULL, 0 );
+
           if ( axtdo->pvExists ) {
-	    //axtdo->pvId->put( ivalue );
+
             axtdo->putValueWithClip( ivalue );
+
           }
           else {
+
             axtdo->needUpdate = 1;
             axtdo->actWin->appCtx->proc->lock();
             axtdo->actWin->addDefExeNode( axtdo->aglPtr );
             axtdo->actWin->appCtx->proc->unlock();
+
           }
 
         }
@@ -258,14 +371,21 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
 
         strncpy( string, str, XTDC_K_MAX );
         string[XTDC_K_MAX] = 0;
+
         if ( axtdo->pvExists ) {
-	  stat = stringPut( axtdo->pvId, axtdo->pvCount, string );
+
+          stat = stringPut( axtdo->pvId,
+           XDisplayName(axtdo->actWin->appCtx->displayName),
+           axtdo->pvCount, string );
+
         }
         else {
+
           axtdo->needUpdate = 1;
           axtdo->actWin->appCtx->proc->lock();
           axtdo->actWin->addDefExeNode( axtdo->aglPtr );
           axtdo->actWin->appCtx->proc->unlock();
+
         }
 
         break;
@@ -371,8 +491,7 @@ static void xtdoRestoreValue (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
-Arg args[10];
-int n, l;
+int l;
 char *buf;
 
   axtdo->actWin->appCtx->proc->lock();
@@ -380,15 +499,9 @@ char *buf;
   axtdo->actWin->addDefExeNode( axtdo->aglPtr );
   axtdo->actWin->appCtx->proc->unlock();
 
-  n = 0;
-  XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) False ); n++;
-  XtSetValues( axtdo->tf_widget, args, n );
-
   buf = XmTextGetString( axtdo->tf_widget );
   l = strlen(buf);
   XtFree( buf );
-
-  axtdo->grabUpdate = 0;
 
 }
 
@@ -452,7 +565,9 @@ char tmp[XTDC_K_MAX+1];
   axtdo->editDialogIsActive = 0;
 
   if ( axtdo->pvExists ) {
-    stat = stringPut( axtdo->pvId, axtdo->pvCount, (char *) &axtdo->curValue );
+    stat = stringPut( axtdo->pvId,
+     XDisplayName(axtdo->actWin->appCtx->displayName),
+     axtdo->pvCount, (char *) &axtdo->curValue );
   }
 
   axtdo->actWin->appCtx->proc->lock();
@@ -521,7 +636,9 @@ char tmp[XTDC_K_MAX+1], name[XTDC_K_MAX+1], *tk;
   axtdo->editDialogIsActive = 0;
 
   if ( axtdo->pvExists ) {
-    stat = stringPut( axtdo->pvId, axtdo->pvCount, (char *) &axtdo->curValue );
+    stat = stringPut( axtdo->pvId,
+     XDisplayName(axtdo->actWin->appCtx->displayName),
+     axtdo->pvCount, (char *) &axtdo->curValue );
   }
 
   axtdo->actWin->appCtx->proc->lock();
@@ -552,7 +669,6 @@ static void xtdoSetKpDoubleValue (
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 
   axtdo->editDialogIsActive = 0;
-  //axtdo->pvId->put( axtdo->kpDouble );
   axtdo->putValueWithClip( axtdo->kpDouble );
 
 }
@@ -566,7 +682,6 @@ static void xtdoSetKpIntValue (
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 
   axtdo->editDialogIsActive = 0;
-  //axtdo->pvId->put( axtdo->kpInt );
   axtdo->putValueWithClip( axtdo->kpInt );
 
 }
@@ -578,11 +693,88 @@ static void xtdoSetValueChanged (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
+int result;
+char *buf;
+
+  buf = XmTextGetString( axtdo->tf_widget );
+
+  if ( !blank( buf ) && axtdo->characterMode ) {
+    if ( axtdo->pvExists ) {
+      axtdo->putValueWithClip( buf );
+    }
+  }
+
+  XtFree( buf );
 
   axtdo->widget_value_changed = 1;
 
-  if ( axtdo->changeCallback ) {
-    (*axtdo->changeCallback)( axtdo );
+  if ( axtdo->changeCallbackFlag ) {
+    if ( axtdo->changeCallback ) {
+      result = abs ( (*axtdo->changeCallback)( axtdo ) );
+      if ( result != axtdo->oldChangeResult ) {
+        axtdo->oldChangeResult = result;
+        axtdo->actWin->appCtx->proc->lock();
+        axtdo->needFgPvPut = 1;
+        axtdo->fgPvValue = result;
+        axtdo->actWin->addDefExeNode( axtdo->aglPtr );
+        axtdo->actWin->appCtx->proc->unlock();
+      }
+    }
+  }
+
+}
+
+static void xtdoModVerify (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
+XmTextVerifyPtr xmv;
+int i, l;
+
+  xmv = (XmTextVerifyPtr) call;
+
+  if ( ( xmv->startPos == 0 ) && ( !(xmv->text->ptr) ) ) {
+    xmv->doit = True;
+    return;
+  }
+
+  if ( xmv->startPos == ( xmv->endPos - 1 ) ) {
+    if ( axtdo->pwLength > 0 ) {
+      (axtdo->pwLength)--;
+      axtdo->pwValue[axtdo->pwLength] = 0;
+    }
+    xmv->doit = True;
+    return;
+  }
+
+  if ( xmv->text->ptr ) {
+
+    if ( strlen(xmv->text->ptr) == 1 ) {
+      if ( axtdo->pwLength < 255 ) {
+        axtdo->pwValue[axtdo->pwLength] = xmv->text->ptr[0];
+        (axtdo->pwLength)++;
+        axtdo->pwValue[axtdo->pwLength] = 0;
+      }
+    }
+
+    xmv->doit = True;
+    l = strlen( xmv->text->ptr );
+    for ( i=0; i<l; i++ ) {
+      if ( xmv->text->ptr[i] != '*' ) {
+        xmv->text->ptr[i] = '*';
+        xmv->doit = False;
+        xmv->doit = True;
+      }
+    }
+
+  }
+  else {
+
+    xmv->doit = False;
+
   }
 
 }
@@ -601,15 +793,7 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 
   if ( !axtdo->grabUpdate ) {
 
-    //XSetInputFocus( axtdo->actWin->display(),
-     // XtWindow(axtdo->actWin->executeWidget), RevertToNone, CurrentTime );
-
-    XSetInputFocus( axtdo->actWin->display(),
-     XtWindow(axtdo->tf_widget), RevertToNone, CurrentTime );
-
   }
-
-  axtdo->grabUpdate = 1;
 
 }
 
@@ -622,8 +806,9 @@ static void xtdoSetSelection (
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 int l;
 char *buf;
-Arg args[10];
-int n;
+
+//Arg args[10];
+//int n;
 
   axtdo->widget_value_changed = 0;
 
@@ -631,9 +816,9 @@ int n;
   l = strlen(buf);
   XtFree( buf );
 
-  n = 0;
-  XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) True ); n++;
-  XtSetValues( axtdo->tf_widget, args, n );
+  //n = 0;
+  //XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) True ); n++;
+  //XtSetValues( axtdo->tf_widget, args, n );
 
   if ( axtdo->autoSelect ) {
     XmTextSetSelection( axtdo->tf_widget, 0, l,
@@ -655,17 +840,25 @@ int stat;
 char string[XTDC_K_MAX+1];
 char *buf;
 
-  buf = XmTextGetString( axtdo->tf_widget );
-  strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
-  axtdo->entryValue[XTDC_K_MAX] = 0;
-  XtFree( buf );
+  if ( axtdo->isPassword ) {
+    strncpy( axtdo->entryValue, axtdo->pwValue, XTDC_K_MAX );
+    axtdo->entryValue[XTDC_K_MAX] = 0;
+  }
+  else {
+    buf = XmTextGetString( axtdo->tf_widget );
+    strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
+    axtdo->entryValue[XTDC_K_MAX] = 0;
+    XtFree( buf );
+  }
 
   strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
   axtdo->curValue[XTDC_K_MAX] = 0;
   strncpy( string, axtdo->entryValue, XTDC_K_MAX );
   string[XTDC_K_MAX] = 0;
   if ( axtdo->pvExists ) {
-    stat = stringPut( axtdo->pvId, axtdo->pvCount, string );
+    stat = stringPut( axtdo->pvId,
+     XDisplayName(axtdo->actWin->appCtx->displayName),
+     axtdo->pvCount, string );
   }
   else {
     axtdo->actWin->appCtx->proc->lock();
@@ -674,9 +867,21 @@ char *buf;
     axtdo->actWin->appCtx->proc->unlock();
   }
 
-  //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
-
-  if ( !axtdo->inputFocusUpdatesAllowed ) axtdo->grabUpdate = 0;
+  if ( axtdo->isPassword ) {
+    int n, l;
+    Arg args[10];
+    char v1[10];
+    strcpy( v1, "" );
+    l = 0;
+    n = 0;
+    XtSetArg( args[n], XmNvalue, (XtPointer) &v1 ); n++;
+    XtSetArg( args[n], XmNcursorPosition, (XtPointer) l ); n++;
+    XtSetValues( w, args, n );
+    strcpy( axtdo->pwValue, "" );
+    axtdo->pwLength = 0;
+    axtdo->entryValue[0] = 0;
+    axtdo->curValue[0] = 0;
+  }
 
 }
 
@@ -690,36 +895,50 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 int stat;
 char string[XTDC_K_MAX+1];
 char *buf;
-Arg args[10];
-int n;
-
-  axtdo->grabUpdate = 0;
-
-  n = 0;
-  XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) False ); n++;
-  XtSetValues( axtdo->tf_widget, args, n );
-
-  //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
 
   if ( !axtdo->widget_value_changed ) return;
  
-  buf = XmTextGetString( axtdo->tf_widget );
-  strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
-  axtdo->entryValue[XTDC_K_MAX] = 0;
-  XtFree( buf );
+  if ( axtdo->isPassword ) {
+    strncpy( axtdo->entryValue, axtdo->pwValue, XTDC_K_MAX );
+    axtdo->entryValue[XTDC_K_MAX] = 0;
+  }
+  else {
+    buf = XmTextGetString( axtdo->tf_widget );
+    strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
+    axtdo->entryValue[XTDC_K_MAX] = 0;
+    XtFree( buf );
+  }
 
   strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
   axtdo->curValue[XTDC_K_MAX] = 0;
   strncpy( string, axtdo->entryValue, XTDC_K_MAX );
   string[XTDC_K_MAX] = 0;
   if ( axtdo->pvExists ) {
-    stat = stringPut( axtdo->pvId, axtdo->pvCount, string );
+    stat = stringPut( axtdo->pvId,
+     XDisplayName(axtdo->actWin->appCtx->displayName),
+     axtdo->pvCount, string );
   }
   else {
     axtdo->needUpdate = 1;
     axtdo->actWin->appCtx->proc->lock();
     axtdo->actWin->addDefExeNode( axtdo->aglPtr );
     axtdo->actWin->appCtx->proc->unlock();
+  }
+
+  if ( axtdo->isPassword ) {
+    int n, l;
+    Arg args[10];
+    char v1[10];
+    strcpy( v1, "" );
+    l = 0;
+    n = 0;
+    XtSetArg( args[n], XmNvalue, (XtPointer) &v1 ); n++;
+    XtSetArg( args[n], XmNcursorPosition, (XtPointer) l ); n++;
+    XtSetValues( w, args, n );
+    strcpy( axtdo->pwValue, "" );
+    axtdo->pwLength = 0;
+    axtdo->entryValue[0] = 0;
+    axtdo->curValue[0] = 0;
   }
 
 }
@@ -731,7 +950,8 @@ static void xtdoTextFieldToIntA (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
-int ivalue;
+int ivalue, stat;
+unsigned int uivalue;
 char *buf, tmp[XTDC_K_MAX+1];
 
   buf = XmTextGetString( axtdo->tf_widget );
@@ -767,24 +987,32 @@ char *buf, tmp[XTDC_K_MAX+1];
     strncpy( axtdo->curValue, tmp, XTDC_K_MAX );
     axtdo->curValue[XTDC_K_MAX] = 0;
 
-    ivalue = strtol( tmp, NULL, 0 );
+    uivalue = strtoul( tmp, NULL, 0 );
+    ivalue = (int) uivalue;
+
     if ( axtdo->pvExists ) {
-      //axtdo->pvId->put( ivalue );
-      axtdo->putValueWithClip( ivalue );
+
+      stat = axtdo->putValueWithClip( ivalue );
+
+      if ( !stat ) {
+        strncpy( axtdo->entryValue, axtdo->value, XTDC_K_MAX );
+        axtdo->entryValue[XTDC_K_MAX] = 0;
+        strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+        axtdo->curValue[XTDC_K_MAX] = 0;
+        XmTextSetString( axtdo->tf_widget, axtdo->entryValue );
+      }
 
     }
     else {
+
       axtdo->needUpdate = 1;
       axtdo->actWin->appCtx->proc->lock();
       axtdo->actWin->addDefExeNode( axtdo->aglPtr );
       axtdo->actWin->appCtx->proc->unlock();
+
     }
 
-    //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
-
   }
-
-  if ( !axtdo->inputFocusUpdatesAllowed ) axtdo->grabUpdate = 0;
 
 }
 
@@ -795,19 +1023,9 @@ static void xtdoTextFieldToIntLF (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
-int ivalue;
+int ivalue, stat;
 char *buf;
-Arg args[10];
-int n;
 char tmp[XTDC_K_MAX+1];
-
-  axtdo->grabUpdate = 0;
-
-  n = 0;
-  XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) False ); n++;
-  XtSetValues( axtdo->tf_widget, args, n );
-
-  //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
 
   if ( !axtdo->widget_value_changed ) return;
 
@@ -845,15 +1063,27 @@ char tmp[XTDC_K_MAX+1];
     axtdo->curValue[XTDC_K_MAX] = 0;
 
     ivalue = strtol( tmp, NULL, 0 );
+
     if ( axtdo->pvExists ) {
-      //axtdo->pvId->put( ivalue );
-      axtdo->putValueWithClip( ivalue );
+
+      stat = axtdo->putValueWithClip( ivalue );
+
+      if ( !stat ) {
+        strncpy( axtdo->entryValue, axtdo->value, XTDC_K_MAX );
+        axtdo->entryValue[XTDC_K_MAX] = 0;
+        strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+        axtdo->curValue[XTDC_K_MAX] = 0;
+        XmTextSetString( axtdo->tf_widget, axtdo->entryValue );
+      }
+
     }
     else {
+
       axtdo->needUpdate = 1;
       axtdo->actWin->appCtx->proc->lock();
       axtdo->actWin->addDefExeNode( axtdo->aglPtr );
       axtdo->actWin->appCtx->proc->unlock();
+
     }
 
   }
@@ -867,7 +1097,7 @@ static void xtdoTextFieldToDoubleA (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
-int ivalue, doPut;
+int ivalue, doPut, stat;
 double dvalue;
 char *buf, tmp[XTDC_K_MAX+1];
 
@@ -922,21 +1152,28 @@ char *buf, tmp[XTDC_K_MAX+1];
     axtdo->curValue[XTDC_K_MAX] = 0;
 
     if ( axtdo->pvExists ) {
-      //axtdo->pvId->put( dvalue );
-      axtdo->putValueWithClip( dvalue );
+
+      stat = axtdo->putValueWithClip( dvalue );
+
+      if ( !stat ) {
+        strncpy( axtdo->entryValue, axtdo->value, XTDC_K_MAX );
+        axtdo->entryValue[XTDC_K_MAX] = 0;
+        strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+        axtdo->curValue[XTDC_K_MAX] = 0;
+        XmTextSetString( axtdo->tf_widget, axtdo->entryValue );
+      }
+
     }
     else {
+
       axtdo->needUpdate = 1;
       axtdo->actWin->appCtx->proc->lock();
       axtdo->actWin->addDefExeNode( axtdo->aglPtr );
       axtdo->actWin->appCtx->proc->unlock();
+
     }
 
-    //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
-
   }
-
-  if ( !axtdo->inputFocusUpdatesAllowed ) axtdo->grabUpdate = 0;
 
 }
 
@@ -947,19 +1184,9 @@ static void xtdoTextFieldToDoubleLF (
 {
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
-int ivalue, doPut;
+int ivalue, doPut, stat;
 double dvalue;
 char *buf, tmp[XTDC_K_MAX+1];
-Arg args[10];
-int n;
-
-  axtdo->grabUpdate = 0;
-
-  n = 0;
-  XtSetArg( args[n], XmNcursorPositionVisible, (XtArgVal) False ); n++;
-  XtSetValues( axtdo->tf_widget, args, n );
-
-  //XmTextSetInsertionPosition( axtdo->tf_widget, 0 );
 
   if ( !axtdo->widget_value_changed ) return;
 
@@ -1014,14 +1241,25 @@ int n;
     axtdo->curValue[XTDC_K_MAX] = 0;
 
     if ( axtdo->pvExists ) {
-      //axtdo->pvId->put( dvalue );
-      axtdo->putValueWithClip( dvalue );
+
+      stat = axtdo->putValueWithClip( dvalue );
+
+      if ( !stat ) {
+        strncpy( axtdo->entryValue, axtdo->value, XTDC_K_MAX );
+        axtdo->entryValue[XTDC_K_MAX] = 0;
+        strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+        axtdo->curValue[XTDC_K_MAX] = 0;
+        XmTextSetString( axtdo->tf_widget, axtdo->entryValue );
+      }
+
     }
     else {
+
       axtdo->needUpdate = 1;
       axtdo->actWin->appCtx->proc->lock();
       axtdo->actWin->addDefExeNode( axtdo->aglPtr );
       axtdo->actWin->appCtx->proc->unlock();
+
     }
 
   }
@@ -1175,7 +1413,10 @@ static void XtextDspUpdate (
 
 activeXTextDspClass *axtdo = (activeXTextDspClass *) userarg;
 int ivalue, st, sev;
+unsigned int uivalue;
 unsigned short svalue;
+
+  if ( axtdo->isPassword ) return;
 
   axtdo->actWin->appCtx->proc->lock();
 
@@ -1257,9 +1498,16 @@ unsigned short svalue;
     case ProcessVariable::specificType::shrt:
     case ProcessVariable::specificType::integer:
 
-      ivalue = pv->get_int();
+      if ( axtdo->formatType == XTDC_K_FORMAT_HEX ) {
+	uivalue = (unsigned int) pv->get_double();
+	ivalue = (int) uivalue;
+      }
+      else {
+        ivalue = pv->get_int();
+      }
       sprintf( axtdo->curValue, axtdo->format, ivalue );
-      axtdo->curDoubleValue = pv->get_int();
+
+      axtdo->curDoubleValue = (double) ivalue;
 
       if ( !axtdo->noSval ) {
         if ( axtdo->nullDetectMode == 0 ) {
@@ -1508,6 +1756,7 @@ static void axtdc_value_edit_apply (
 activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
 double dvalue;
 int ivalue, stat, doPut;
+unsigned int uivalue;
 short svalue;
 char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
 
@@ -1557,15 +1806,19 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
     }
 
     if ( doPut ) {
+
       if ( axtdo->pvExists ) {
-        //axtdo->pvId->put( dvalue );
+
         axtdo->putValueWithClip( dvalue );
+
       }
       else {
+
         axtdo->needUpdate = 1;
         axtdo->actWin->appCtx->proc->lock();
         axtdo->actWin->addDefExeNode( axtdo->aglPtr );
         axtdo->actWin->appCtx->proc->unlock();
+
       }
 
     }
@@ -1598,16 +1851,22 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
     }
 
     if ( isLegalInteger(tmp) ) {
-      ivalue = strtol( tmp, NULL, 0 );
+
+      uivalue = strtoul( tmp, NULL, 0 );
+      ivalue = (int) uivalue;
+
       if ( axtdo->pvExists ) {
-        //axtdo->pvId->put( ivalue );
+
         axtdo->putValueWithClip( ivalue );
+
       }
       else {
+
         axtdo->needUpdate = 1;
         axtdo->actWin->appCtx->proc->lock();
         axtdo->actWin->addDefExeNode( axtdo->aglPtr );
         axtdo->actWin->appCtx->proc->unlock();
+
       }
 
     }
@@ -1618,7 +1877,9 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
     strncpy( string, axtdo->entryValue, XTDC_K_MAX );
     string[XTDC_K_MAX] = 0;
     if ( axtdo->pvExists ) {
-      stat = stringPut( axtdo->pvId, axtdo->pvCount, string );
+      stat = stringPut( axtdo->pvId,
+       XDisplayName(axtdo->actWin->appCtx->displayName),
+       axtdo->pvCount, string );
     }
     else {
       axtdo->needUpdate = 1;
@@ -1633,7 +1894,8 @@ char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
 
     svalue = (short) axtdo->entryState;
     if ( axtdo->pvExists ) {
-      axtdo->pvId->put( svalue );
+      axtdo->pvId->put( XDisplayName(axtdo->actWin->appCtx->displayName),
+       svalue );
     }
     else {
       axtdo->needUpdate = 1;
@@ -1736,6 +1998,9 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
   else
     axtdo->precision = axtdo->efPrecision.value();
 
+  strncpy( axtdo->fieldLenInfo, axtdo->eBuf->bufFieldLenInfo, 7 );
+  axtdo->fieldLenInfo[7] = 0;
+
   axtdo->clipToDspLimits = axtdo->eBuf->bufClipToDspLimits;
 
   axtdo->fgColor.setConnectSensitive();
@@ -1783,6 +2048,12 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) client;
   axtdo->useAlarmBorder = axtdo->eBuf->bufUseAlarmBorder;
 
   axtdo->inputFocusUpdatesAllowed = axtdo->eBuf->bufInputFocusUpdatesAllowed;
+
+  axtdo->isPassword = axtdo->eBuf->bufIsPassword;
+
+  axtdo->characterMode = axtdo->eBuf->bufCharacterMode;
+
+  axtdo->noExecuteClipMask = axtdo->eBuf->bufNoExecuteClipMask;
 
   strncpy( axtdo->id, axtdo->bufId, 31 );
   axtdo->id[31] = 0;
@@ -1907,6 +2178,7 @@ activeXTextDspClass::activeXTextDspClass ( void ) {
 
   efPrecision.setNull(1);
   precision = 3;
+  strcpy( fieldLenInfo, "" );
 
   clipToDspLimits = 0;
   upperLim = lowerLim = 0.0;
@@ -1932,6 +2204,12 @@ activeXTextDspClass::activeXTextDspClass ( void ) {
 
   inputFocusUpdatesAllowed = 0;
 
+  isPassword = 0;
+
+  characterMode = 0;
+
+  noExecuteClipMask = 0;
+
   newPositioning = 1;
 
   prevAlarmSeverity = -1;
@@ -1944,6 +2222,8 @@ activeXTextDspClass::activeXTextDspClass ( void ) {
   eBuf = NULL;
 
   pvIndex = 0;
+
+  if ( g_initTextBorderCheck ) checkTextBorderAlways();
 
   setBlinkFunction( (void *) doBlink );
 
@@ -2027,6 +2307,8 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
   fastUpdate = source->fastUpdate;
   precision = source->precision;
   efPrecision = source->efPrecision;
+  strncpy( fieldLenInfo, source->fieldLenInfo, 7 );
+  fieldLenInfo[7] = 0;
   clipToDspLimits = source->clipToDspLimits;
   upperLim = source->upperLim;
   lowerLim = source->lowerLim;
@@ -2053,6 +2335,12 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
 
   inputFocusUpdatesAllowed = source->inputFocusUpdatesAllowed;
 
+  isPassword = source->isPassword;
+
+  characterMode = source->characterMode;
+
+  noExecuteClipMask = source->noExecuteClipMask;
+
   newPositioning = 1;
 
   prevAlarmSeverity = -1;
@@ -2063,6 +2351,8 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
   unconnectedTimer = 0;
 
   eBuf = NULL;
+
+  if ( g_initTextBorderCheck ) checkTextBorderAlways();
 
   setBlinkFunction( (void *) doBlink );
 
@@ -2083,41 +2373,188 @@ activeXTextDspClass::~activeXTextDspClass ( void ) {
 
 }
 
-void activeXTextDspClass::putValueWithClip (
+int activeXTextDspClass::putValueWithClip (
+  char *str
+) {
+
+int ivalue, doPut, putSuccess;
+double dvalue;
+char string[XTDC_K_MAX+1], tmp[XTDC_K_MAX+1];
+
+  putSuccess = 0;
+
+  if ( str ) {
+
+    switch ( pvType ) {
+
+    case ProcessVariable::specificType::real:
+    case ProcessVariable::specificType::flt:
+
+      doPut = 0;
+      if ( formatType == XTDC_K_FORMAT_HEX ) {
+        if ( strlen( str ) > 2 ) {
+          if ( ( strncmp( str, "0x", 2 ) != 0 ) &&
+               ( strncmp( str, "0X", 2 ) != 0 ) ) {
+            strcpy( tmp, "0x" );
+          }
+          else {
+            strcpy( tmp, "" );
+          }
+          Strncat( tmp, str, 15 );
+          tmp[15] = 0;
+        }
+        else {
+          strcpy( tmp, "0x" );
+          Strncat( tmp, str, 15 );
+          tmp[15] = 0;
+        }
+        if ( isLegalInteger(tmp) ) {
+          doPut = 1;
+          ivalue = strtol( tmp, NULL, 0 );
+          dvalue = (double) ivalue;
+        }
+      }
+      else {
+        if ( isLegalFloat(str) ) {
+          doPut = 1;
+          dvalue = atof( str );
+        }
+      }
+
+      if ( doPut ) {
+
+        if ( pvExists ) {
+          putSuccess = putValueWithClip( dvalue );
+        }
+        else {
+          needUpdate = 1;
+          actWin->appCtx->proc->lock();
+          actWin->addDefExeNode( aglPtr );
+          actWin->appCtx->proc->unlock();
+        }
+
+      }
+
+      break;
+
+    case ProcessVariable::specificType::shrt:
+    case ProcessVariable::specificType::integer:
+
+      doPut = 0;
+      if ( formatType == XTDC_K_FORMAT_HEX ) {
+        if ( strlen( str ) > 2 ) {
+          if ( ( strncmp( str, "0x", 2 ) != 0 ) &&
+               ( strncmp( str, "0X", 2 ) != 0 ) ) {
+            strcpy( tmp, "0x" );
+          }
+          else {
+            strcpy( tmp, "" );
+          }
+          Strncat( tmp, str, 15 );
+          tmp[15] = 0;
+        }
+        else {
+          strcpy( tmp, "0x" );
+          Strncat( tmp, str, 15 );
+          tmp[15] = 0;
+        }
+      }
+      else {
+        strncpy( tmp, str, XTDC_K_MAX );
+        tmp[XTDC_K_MAX] = 0;
+      }
+      if ( isLegalInteger(tmp) ) {
+        doPut = 1;
+        ivalue = strtol( tmp, NULL, 0 );
+      }
+
+      if ( doPut ) {
+
+        if ( pvExists ) {
+          putSuccess = putValueWithClip( ivalue );
+        }
+        else {
+          needUpdate = 1;
+          actWin->appCtx->proc->lock();
+          actWin->addDefExeNode( aglPtr );
+          actWin->appCtx->proc->unlock();
+        }
+
+      }
+      break;
+
+    case ProcessVariable::specificType::text:
+
+      strncpy( string, str, XTDC_K_MAX );
+      string[XTDC_K_MAX] = 0;
+      if ( pvExists ) {
+        putSuccess = stringPut( pvId,
+         XDisplayName(actWin->appCtx->displayName),
+         pvCount, string );
+      }
+      else {
+        needUpdate = 1;
+        actWin->appCtx->proc->lock();
+        actWin->addDefExeNode( aglPtr );
+        actWin->appCtx->proc->unlock();
+      }
+
+      break;
+
+    }
+
+  }
+
+  return putSuccess;
+
+}
+
+int activeXTextDspClass::putValueWithClip (
   double val
 ) {
+
+int putSuccess = 0;
 
   if ( clipToDspLimits ) {
 
     if ( ( val >= lowerLim ) && ( val <= upperLim ) ) {
-      pvId->put( val );
+      pvId->put( XDisplayName(actWin->appCtx->displayName), val );
+      putSuccess = 1;
     }
 
   }
   else {
 
-    pvId->put( val );
+    pvId->put( XDisplayName(actWin->appCtx->displayName), val );
+    putSuccess = 1;
 
   }
 
+  return putSuccess;
+
 }
 
-void activeXTextDspClass::putValueWithClip (
+int activeXTextDspClass::putValueWithClip (
   int val
 ) {
+
+int putSuccess = 0;
 
   if ( clipToDspLimits ) {
 
     if ( ( val >= (int) lowerLim ) && ( val <= (int) upperLim ) ) {
-      pvId->put( val );
+      pvId->put( XDisplayName(actWin->appCtx->displayName), val );
+      putSuccess = 1;
     }
 
   }
   else {
 
-    pvId->put( val );
-
+    pvId->put( XDisplayName(actWin->appCtx->displayName), val );
+    putSuccess = 1;
   }
+
+  return putSuccess;
 
 }
 
@@ -2306,6 +2743,7 @@ static int objTypeEnum[4] = {
   tag.loadBoolW( "motifWidget", &isWidget, &zero );
   tag.loadBoolW( "limitsFromDb", &limitsFromDb, &zero );
   tag.loadW( "precision", &efPrecision );
+  tag.loadW( "fieldLen", fieldLenInfo, emptyStr );
   tag.loadW( "nullPv", &svalPvExpStr, emptyStr );
   index = fgColor.nullIndex();
   tag.loadW( "nullColor", actWin->ci, &index );
@@ -2333,6 +2771,12 @@ static int objTypeEnum[4] = {
   tag.loadW( "objType", 4, objTypeEnumStr, objTypeEnum, &objType,
    &objTypeUnknown );
   tag.loadBoolW( "clipToDspLimits", &clipToDspLimits, &zero );
+  tag.loadW( "id", id, emptyStr );
+  tag.loadBoolW( "changeCallback", &changeCallbackFlag, &zero );
+  tag.loadW( unknownTags );
+  tag.loadBoolW( "isPassword", &isPassword, &zero );
+  tag.loadBoolW( "characterMode", &characterMode, &zero );
+  tag.loadBoolW( "noExecuteClipMask", &noExecuteClipMask, &zero );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -2537,6 +2981,7 @@ static int objTypeEnum[4] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -2558,6 +3003,7 @@ static int objTypeEnum[4] = {
   tag.loadR( "motifWidget", &isWidget, &zero );
   tag.loadR( "limitsFromDb", &limitsFromDb, &zero );
   tag.loadR( "precision", &efPrecision );
+  tag.loadR( "fieldLen", 7, fieldLenInfo, emptyStr );
   tag.loadR( "nullPv", &svalPvExpStr, emptyStr );
   tag.loadR( "nullColor", actWin->ci, &index );
   tag.loadR( "nullCondition", 3, nullCondEnumStr, nullCondEnum,
@@ -2584,6 +3030,11 @@ static int objTypeEnum[4] = {
   tag.loadR( "objType", 4, objTypeEnumStr, objTypeEnum, &objType,
    &objTypeUnknown );
   tag.loadR( "clipToDspLimits", &clipToDspLimits, &zero );
+  tag.loadR( "id", 31, id, emptyStr );
+  tag.loadR( "changeCallback", &changeCallbackFlag, &zero );
+  tag.loadR( "isPassword", &isPassword, &zero );
+  tag.loadR( "characterMode", &characterMode, &zero );
+  tag.loadR( "noExecuteClipMask", &noExecuteClipMask, &zero );
   tag.loadR( "endObjectProperties" );
 
   stat = tag.readTags( f, "endObjectProperties" );
@@ -2609,15 +3060,22 @@ static int objTypeEnum[4] = {
       autoHeight = 1;
     }
   }
+
+  // pre version 4.4.0 - noExecuteClipMask should be true
+  if ( major < 4 ) {
+    noExecuteClipMask = 1;
+  }
+  else if ( ( major == 4 ) && ( minor < 4 ) ) {
+    noExecuteClipMask = 1;
+  }
     
   this->initSelectBox(); // call after getting x,y,w,h
 
-
-  strcpy( this->id, "" );
-  changeCallbackFlag = 0;
   activateCallbackFlag = 0;
   deactivateCallbackFlag = 0;
-  anyCallbackFlag = 0;
+
+  anyCallbackFlag = changeCallbackFlag ||
+   activateCallbackFlag || deactivateCallbackFlag;
 
   precision = efPrecision.value();
 
@@ -3334,6 +3792,8 @@ int noedit;
   eBuf->bufChangeValOnLoseFocus = changeValOnLoseFocus;
   eBuf->bufFastUpdate = fastUpdate;
   eBuf->bufEfPrecision = efPrecision;
+  strncpy( eBuf->bufFieldLenInfo, fieldLenInfo, 7 );
+  eBuf->bufFieldLenInfo[7] = 0;
   eBuf->bufClipToDspLimits = clipToDspLimits;
   eBuf->bufChangeCallbackFlag = changeCallbackFlag;
   eBuf->bufActivateCallbackFlag = activateCallbackFlag;
@@ -3344,6 +3804,9 @@ int noedit;
   eBuf->bufShowUnits = showUnits;
   eBuf->bufUseAlarmBorder = useAlarmBorder;
   eBuf->bufInputFocusUpdatesAllowed = inputFocusUpdatesAllowed;
+  eBuf->bufIsPassword = isPassword;
+  eBuf->bufCharacterMode = characterMode;
+  eBuf->bufNoExecuteClipMask = noExecuteClipMask;
 
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
@@ -3351,7 +3814,7 @@ int noedit;
    &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
    title, NULL, NULL, NULL );
 
-  //ef.addTextField( activeXTextDspClass_str6, 35, bufId, 31 );
+  ef.addTextField( activeXTextDspClass_str6, 35, bufId, 31 );
   ef.addTextField( activeXTextDspClass_str7, 35, &eBuf->bufX );
   ef.addTextField( activeXTextDspClass_str8, 35, &eBuf->bufY );
   ef.addTextField( activeXTextDspClass_str9, 35, &eBuf->bufW );
@@ -3368,7 +3831,9 @@ int noedit;
    activeXTextDspClass_str19, &eBuf->bufFormatType );
   ef.addToggle( activeXTextDspClass_str77, &eBuf->bufUseHexPrefix );
   ef.addToggle( activeXTextDspClass_str20, &eBuf->bufLimitsFromDb );
+  ef.addTextField( activeXTextDspClass_str85, 35, eBuf->bufFieldLenInfo, 7 );
   ef.addTextField( activeXTextDspClass_str21, 35, &eBuf->bufEfPrecision );
+  ef.addToggle( activeXTextDspClass_str88, &eBuf->bufNoExecuteClipMask );
   ef.addToggle( activeXTextDspClass_str84, &eBuf->bufClipToDspLimits );
   ef.addToggle( activeXTextDspClass_str81, &eBuf->bufShowUnits );
   ef.addToggle( activeXTextDspClass_str11, &eBuf->bufAutoHeight );
@@ -3391,16 +3856,20 @@ int noedit;
   ef.addToggle( activeXTextDspClass_str29, &eBuf->bufIsWidget );
 
   if ( !noedit ) {
+    ef.addToggle( activeXTextDspClass_str87, &eBuf->bufCharacterMode );
     ef.addToggle( activeXTextDspClass_str83, &eBuf->bufInputFocusUpdatesAllowed );
     ef.addToggle( activeXTextDspClass_str68, &eBuf->bufChangeValOnLoseFocus );
     ef.addToggle( activeXTextDspClass_str75, &eBuf->bufAutoSelect );
     ef.addToggle( activeXTextDspClass_str76, &eBuf->bufUpdatePvOnDrop );
+    ef.addToggle( activeXTextDspClass_str86, &eBuf->bufIsPassword );
   }
   else {
+    eBuf->bufCharacterMode = characterMode = 0;
     eBuf->bufInputFocusUpdatesAllowed = inputFocusUpdatesAllowed = 0;
     eBuf->bufChangeValOnLoseFocus = changeValOnLoseFocus = 0;
     eBuf->bufAutoSelect = autoSelect = 0;
     eBuf->bufUpdatePvOnDrop = updatePvOnDrop = 0;
+    eBuf->bufIsPassword = isPassword = 0;
   }
 
   ef.addToggle( activeXTextDspClass_str69, &eBuf->bufFastUpdate );
@@ -3435,7 +3904,7 @@ int noedit;
 
   //ef.addToggle( activeXTextDspClass_str30, &eBuf->bufActivateCallbackFlag );
   //ef.addToggle( activeXTextDspClass_str31, &eBuf->bufDeactivateCallbackFlag );
-  //ef.addToggle( activeXTextDspClass_str32, &eBuf->bufChangeCallbackFlag );
+  ef.addToggle( activeXTextDspClass_str32, &eBuf->bufChangeCallbackFlag );
 
   return 1;
 
@@ -3467,10 +3936,13 @@ int activeXTextDspClass::edit ( void ) {
 int activeXTextDspClass::erase ( void ) {
 
 XRectangle xR = { x, y, w, h };
+int clipStat = 0;
 
   if ( activeMode || deleteRequest ) return 1;
 
-  actWin->drawGc.addEraseXClipRectangle( xR );
+  if ( !noExecuteClipMask ) {
+    clipStat = actWin->drawGc.addEraseXClipRectangle( xR );
+  }
 
   if ( strcmp( fontTag, "" ) != 0 ) {
     actWin->drawGc.setFontTag( fontTag, actWin->fi );
@@ -3497,7 +3969,9 @@ XRectangle xR = { x, y, w, h };
 
   }
 
-  actWin->drawGc.removeEraseXClipRectangle();
+  if ( !noExecuteClipMask ) {
+    if ( clipStat & 1 ) actWin->drawGc.removeEraseXClipRectangle();
+  }
 
   return 1;
 
@@ -3505,7 +3979,8 @@ XRectangle xR = { x, y, w, h };
 
 int activeXTextDspClass::eraseActive ( void ) {
 
-int len;
+XRectangle xR = { x, y, w, h };
+int clipStat = 0, len;
 
   if ( !enabled || !init || !activeMode ) return 1;
 
@@ -3513,6 +3988,10 @@ int len;
 
   if ( !bufInvalid && ( strlen(value) == strlen(bfrValue) ) ) {
     if ( strcmp( value, bfrValue ) == 0 ) return 1;
+  }
+
+  if ( !noExecuteClipMask ) {
+    clipStat = actWin->executeGc.addEraseXClipRectangle( xR );
   }
 
   if ( strcmp( fontTag, "" ) != 0 ) {
@@ -3532,7 +4011,7 @@ int len;
           actWin->executeGc.setLineWidth( 2 );
           actWin->executeGc.setLineStyle( LineSolid );
 
-          XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+          XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.eraseGC(), x, y, w, h );
 
           actWin->executeGc.setLineWidth( 1 );
@@ -3555,7 +4034,7 @@ int len;
           actWin->executeGc.setLineWidth( 2 );
           actWin->executeGc.setLineStyle( LineSolid );
 
-          XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+          XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
            actWin->executeGc.eraseGC(), x, y, w, h );
 
           actWin->executeGc.setLineWidth( 1 );
@@ -3570,7 +4049,7 @@ int len;
 
   if ( useDisplayBg ) {
 
-    XDrawString( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawString( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), stringX, stringY,
      bfrValue, len );
 
@@ -3585,22 +4064,22 @@ int len;
 
     if ( bufInvalid ) {
 
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
       actWin->executeGc.eraseGC(), x, y, w, h );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XFillRectangle( actWin->d, drawable(actWin->executeWidget),
       actWin->executeGc.eraseGC(), x, y, w, h );
 
     }
     else {
 
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XFillRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
 
-      XDrawImageString( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawImageString( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), stringX, stringY,
        bfrValue, len );
 
@@ -3611,6 +4090,10 @@ int len;
 
   }
 
+  if ( !noExecuteClipMask ) {
+    if ( clipStat & 1 ) actWin->executeGc.removeEraseXClipRectangle();
+  }
+
   return 1;
 
 }
@@ -3618,7 +4101,7 @@ int len;
 int activeXTextDspClass::draw ( void ) {
 
 XRectangle xR = { x, y, w, h };
-int clipStat;
+int clipStat = 0;
 int blink = 0;
 
   if ( activeMode || deleteRequest ) return 1;
@@ -3678,6 +4161,8 @@ Arg args[10];
 int n;
 int blink = 0;
 unsigned int color;
+XRectangle xR = { x, y, w, h };
+int clipStat = 0;
 
   if ( !init && !connection.pvsConnected() ) {
     if ( needToDrawUnconnected ) {
@@ -3702,7 +4187,7 @@ unsigned int color;
       actWin->executeGc.setFG( fgColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 2 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -3712,7 +4197,7 @@ unsigned int color;
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 2 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -3727,36 +4212,36 @@ unsigned int color;
 
     if ( tf_widget ) {
 
-      if ( !grabUpdate || updatePvOnDrop ) {
-
-        if ( bufInvalid ) {
-          n = 0;
-          XtSetArg( args[n], XmNvalue, (XtArgVal) value ); n++;
-          if ( useAlarmBorder && ( colorMode == XTDC_K_COLORMODE_ALARM ) ) {
-	    color = fgColor.pixelColor();
-            XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
-          }
-          else {
-	    color = fgColor.getColor();
-            XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
-          }
-          if ( colorMode == XTDC_K_COLORMODE_ALARM ) {
-            if ( fgColor.getSeverity() != prevAlarmSeverity ) {
-              if ( fgColor.getSeverity() && useAlarmBorder ) {
-                XtSetArg( args[n], XmNborderWidth, (XtArgVal) 2 ); n++;
-	        color = fgColor.getColor();
-                XtSetArg( args[n], XmNborderColor, (XtArgVal) color ); n++;
-              }
-              else {
-                XtSetArg( args[n], XmNborderWidth, (XtArgVal) 0 ); n++;
-              }
-            }
-          }
-          XtSetValues( tf_widget, args, n );
+      if ( bufInvalid ) {
+        n = 0;
+        if ( useAlarmBorder && ( colorMode == XTDC_K_COLORMODE_ALARM ) ) {
+          color = fgColor.pixelColor();
+          XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
         }
         else {
-          XmTextFieldSetString( tf_widget, value );
+          color = fgColor.getColor();
+          XtSetArg( args[n], XmNforeground, (XtArgVal) color ); n++;
         }
+        if ( colorMode == XTDC_K_COLORMODE_ALARM ) {
+          if ( fgColor.getSeverity() != prevAlarmSeverity ) {
+            if ( ( ( g_showTextBorderAlways && actWin->ci->shouldShowNoAlarmState() ) ||
+                   fgColor.getSeverity() ) && useAlarmBorder ) {
+              XtSetArg( args[n], XmNborderWidth, (XtArgVal) 2 ); n++;
+	      color = fgColor.getColor();
+              XtSetArg( args[n], XmNborderColor, (XtArgVal) color ); n++;
+            }
+            else {
+              XtSetArg( args[n], XmNborderWidth, (XtArgVal) 0 ); n++;
+            }
+          }
+        }
+        XtSetValues( tf_widget, args, n );
+      }
+
+      if ( !grabUpdate || updatePvOnDrop || ( needInitialValue == 2 ) ) {
+
+        XmTextFieldSetString( tf_widget, value );
+        needInitialValue = 0;
 
       }
 
@@ -3783,6 +4268,10 @@ unsigned int color;
   actWin->executeGc.saveFg();
   actWin->executeGc.saveBg();
 
+  if ( !noExecuteClipMask ) {
+    clipStat = actWin->executeGc.addNormXClipRectangle( xR );
+  }
+
   if ( strcmp( fontTag, "" ) != 0 ) {
     actWin->executeGc.setFontTag( fontTag, actWin->fi );
   }
@@ -3800,7 +4289,7 @@ unsigned int color;
 
     actWin->executeGc.setBG( actWin->ci->pix(bgColor) );
 
-    XDrawString( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawString( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), stringX, stringY,
      value, stringLength );
 
@@ -3809,10 +4298,10 @@ unsigned int color;
 
     actWin->executeGc.setFG( actWin->ci->pix(bgColor) );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
+    XFillRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h );
 
     if ( useAlarmBorder && ( colorMode == XTDC_K_COLORMODE_ALARM ) ) {
@@ -3824,7 +4313,7 @@ unsigned int color;
 
     actWin->executeGc.setBG( actWin->ci->pix(bgColor) );
 
-    XDrawImageString( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawImageString( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), stringX, stringY, 
      value, stringLength );
 
@@ -3832,19 +4321,24 @@ unsigned int color;
 
   if ( colorMode == XTDC_K_COLORMODE_ALARM ) {
 
-    if ( fgColor.getSeverity() && useAlarmBorder ) {
+    if ( ( ( g_showTextBorderAlways && actWin->ci->shouldShowNoAlarmState() ) ||
+           fgColor.getSeverity() ) && useAlarmBorder ) {
 
       actWin->executeGc.setFG( fgColor.getIndex(), &blink );
       actWin->executeGc.setLineWidth( 2 );
       actWin->executeGc.setLineStyle( LineSolid );
 
-      XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
 
       actWin->executeGc.setLineWidth( 1 );
 
     }
 
+  }
+
+  if ( !noExecuteClipMask ) {
+    if ( clipStat & 1 ) actWin->executeGc.removeNormXClipRectangle();
   }
 
   actWin->executeGc.restoreFg();
@@ -3951,7 +4445,7 @@ char callbackName[63+1];
 
       deferredCount = 0;
       needConnectInit = needInfoInit = needErase = needDraw = needRefresh =
-       needUpdate = 0;
+       needUpdate = needFgPvPut = 0;
       needToEraseUnconnected = 0;
       needToDrawUnconnected = 0;
       initialConnection = 1;
@@ -3977,6 +4471,12 @@ char callbackName[63+1];
       pvCount = svalPvCount = 1;
       oldStat = -1;
       oldSev = -1;
+      oldChangeResult = -1;
+      focusIn = focusOut = cursorIn = cursorOut = 0;
+      needInitialValue = 1;
+      handlerInstalled = 0;
+      strcpy( pwValue, "" );
+      pwLength = 0;
 
       initEnable();
 
@@ -4092,7 +4592,7 @@ char callbackName[63+1];
           Strncat( callbackName, activeXTextDspClass_str36, 63 );
           callbackName[63] = 0;
           changeCallback =
-           actWin->appCtx->userLibObject.getFunc( callbackName );
+           actWin->appCtx->userLibObject.getIntFunc( callbackName );
 	}
 
         if ( activateCallbackFlag ) {
@@ -4148,6 +4648,23 @@ int activeXTextDspClass::deactivate (
   if ( unconnectedTimer ) {
     XtRemoveTimeOut( unconnectedTimer );
     unconnectedTimer = 0;
+  }
+
+  if ( tf_widget ) {
+
+    if ( handlerInstalled ) {
+      if ( inputFocusUpdatesAllowed ) {
+        XtRemoveEventHandler( tf_widget,
+         EnterWindowMask|LeaveWindowMask|FocusChangeMask, False,
+         eventHandler, (XtPointer) this );
+      }
+      else {
+        XtRemoveEventHandler( tf_widget, FocusChangeMask, False,
+         eventHandler, (XtPointer) this );
+      }
+      handlerInstalled = 0;
+    }
+
   }
 
   //updateBlink( 0 );
@@ -4549,13 +5066,14 @@ XButtonEvent *be = (XButtonEvent *) e;
 void activeXTextDspClass::executeDeferred ( void ) {
 
 int n, numCols, width, csrPos;
-int nc, ni, nu, nr, nd, ne;
+int nc, ni, nu, nr, nd, ne, nfgpvp;
 short svalue;
 Arg args[10];
 unsigned int bg, pixel;
 XmFontList textFontList = NULL;
 Cardinal numImportTargets;
 Atom importList[2];
+char locFieldLenInfo[7+1];
 
   if ( actWin->isIconified ) return;
 
@@ -4579,12 +5097,23 @@ Atom importList[2];
   nu = needUpdate; needUpdate = 0;
   nd = needDraw; needDraw = 0;
   ne = needErase; needErase = 0;
+  nfgpvp = needFgPvPut; needFgPvPut = 0;
   strncpy( value, curValue, XTDC_K_MAX );
   value[XTDC_K_MAX] = 0;
   actWin->remDefExeNode( aglPtr );
   actWin->appCtx->proc->unlock();
 
   if ( !activeMode ) return;
+
+  if ( nfgpvp ) {
+
+    if ( fgPvExists ) {
+      if ( fgPvId->is_valid() ) {
+        fgPvId->put( fgPvValue );
+      }
+    }
+
+  }
 
   if ( nc ) {
 
@@ -4711,6 +5240,14 @@ Atom importList[2];
 
       if ( pvExists ) {
 
+        // isPassword is only valid for motif widgets and string pvs
+        if ( !isWidget ) isPassword = 0;
+        if ( pvType != ProcessVariable::specificType::text ) isPassword = 0;
+
+        // characterMode is only valid for non-password motif widgets
+        if ( !isWidget ) characterMode = 0;
+        if ( isPassword ) characterMode = 0;
+
         switch ( pvType ) {
 
         case ProcessVariable::specificType::text:
@@ -4721,15 +5258,23 @@ Atom importList[2];
 
         case ProcessVariable::specificType::flt:
 
+          if ( blank(fieldLenInfo) ) {
+            strcpy( locFieldLenInfo, "" );
+          }
+          else {
+            strncpy( locFieldLenInfo, fieldLenInfo, 7 );
+            locFieldLenInfo[7] = 0;
+          }
+
           switch( formatType ) {
           case XTDC_K_FORMAT_FLOAT:
-            sprintf( format, "%%.%-df", precision );
+            sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
             break;
           case XTDC_K_FORMAT_EXPONENTIAL:
-            sprintf( format, "%%.%-de", precision );
+            sprintf( format, "%%%s.%-de", locFieldLenInfo, precision );
             break;
           default:
-            sprintf( format, "%%.%-df", precision );
+            sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
             break;
           } // end switch( formatType )
   
@@ -4743,15 +5288,23 @@ Atom importList[2];
 
         case ProcessVariable::specificType::real:
 
+          if ( blank(fieldLenInfo) ) {
+            strcpy( locFieldLenInfo, "" );
+          }
+          else {
+            strncpy( locFieldLenInfo, fieldLenInfo, 7 );
+            locFieldLenInfo[7] = 0;
+          }
+
           switch( formatType ) {
           case XTDC_K_FORMAT_FLOAT:
-            sprintf( format, "%%.%-df", precision );
+            sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
             break;
           case XTDC_K_FORMAT_EXPONENTIAL:
-            sprintf( format, "%%.%-de", precision );
+            sprintf( format, "%%%s.%-de", locFieldLenInfo, precision );
             break;
           default:
-            sprintf( format, "%%.%-df", precision );
+            sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
             break;
           } // end switch( formatType )
 
@@ -4765,20 +5318,28 @@ Atom importList[2];
 
         case ProcessVariable::specificType::shrt:
 
+          if ( blank(fieldLenInfo) ) {
+            strcpy( locFieldLenInfo, "-" );
+          }
+          else {
+            strncpy( locFieldLenInfo, fieldLenInfo, 7 );
+            locFieldLenInfo[7] = 0;
+          }
+
           switch( formatType ) {
           case XTDC_K_FORMAT_DECIMAL:
-            sprintf( format, "%%-d" );
+            sprintf( format, "%%%sd", locFieldLenInfo );
             break;
           case XTDC_K_FORMAT_HEX:
             if ( useHexPrefix ) {
-              sprintf( format, "0x%%-X" );
+              sprintf( format, "0x%%%sX", locFieldLenInfo );
             }
             else {
-              sprintf( format, "%%-X" );
+              sprintf( format, "%%%sX", locFieldLenInfo );
             }
             break;
           default:
-            sprintf( format, "%%-d" );
+            sprintf( format, "%%%sd", locFieldLenInfo );
             break;
           } // end switch( formatType )
 
@@ -4792,20 +5353,28 @@ Atom importList[2];
 
         case ProcessVariable::specificType::integer:
 
+          if ( blank(fieldLenInfo) ) {
+            strcpy( locFieldLenInfo, "-" );
+          }
+          else {
+            strncpy( locFieldLenInfo, fieldLenInfo, 7 );
+            locFieldLenInfo[7] = 0;
+          }
+
           switch( formatType ) {
           case XTDC_K_FORMAT_DECIMAL:
-            sprintf( format, "%%-d" );
+            sprintf( format, "%%%sd", locFieldLenInfo );
             break;
           case XTDC_K_FORMAT_HEX:
             if ( useHexPrefix ) {
-              sprintf( format, "0x%%-X" );
+              sprintf( format, "0x%%%sX", locFieldLenInfo );
             }
             else {
-              sprintf( format, "%%-X" );
+              sprintf( format, "%%%sX", locFieldLenInfo );
             }
             break;
           default:
-            sprintf( format, "%%-d" );
+            sprintf( format, "%%%sd", locFieldLenInfo );
             break;
           } // end switch( formatType )
 
@@ -4980,19 +5549,29 @@ Atom importList[2];
 
         //XmTextSetInsertionPosition( tf_widget, csrPos );
 
-        XtAddCallback( tf_widget, XmNfocusCallback,
-         xtdoSetSelection, this );
+        if ( !isPassword ) {
+
+          XtAddCallback( tf_widget, XmNfocusCallback,
+           xtdoSetSelection, this );
 
 //****** SJS modification 16/06/05 ******
 //****** Comment out the following statement to allow 'Alt Tab' to work ******
 #ifdef COMMENT_OUT
-        XtAddCallback( tf_widget, XmNmotionVerifyCallback,
-         xtdoGrabUpdate, this );
+          XtAddCallback( tf_widget, XmNmotionVerifyCallback,
+           xtdoGrabUpdate, this );
 #endif
 //****** End of SJS modification ******
 
-        XtAddCallback( tf_widget, XmNvalueChangedCallback,
-         xtdoSetValueChanged, this );
+	}
+
+        if ( isPassword ) {
+          XtAddCallback( tf_widget, XmNmodifyVerifyCallback,
+           xtdoModVerify, this );
+	}
+	else {
+          XtAddCallback( tf_widget, XmNvalueChangedCallback,
+           xtdoSetValueChanged, this );
+	}
 
         if ( updatePvOnDrop ) {
 
@@ -5008,10 +5587,18 @@ Atom importList[2];
 
 	}
 
-        if ( inputFocusUpdatesAllowed ) {
-          XtAddEventHandler( tf_widget, EnterWindowMask|LeaveWindowMask, False,
-           eventHandler, (XtPointer) this );
-        }
+	if ( !handlerInstalled ) {
+          handlerInstalled = 1;
+          if ( inputFocusUpdatesAllowed ) {
+            XtAddEventHandler( tf_widget,
+             EnterWindowMask|LeaveWindowMask|FocusChangeMask, False,
+             eventHandler, (XtPointer) this );
+          }
+          else {
+            XtAddEventHandler( tf_widget, FocusChangeMask, False,
+             eventHandler, (XtPointer) this );
+          }
+	}
 
         switch ( pvType ) {
 
@@ -5023,7 +5610,7 @@ Atom importList[2];
           if ( changeValOnLoseFocus ) {
             XtAddCallback( tf_widget, XmNlosingFocusCallback,
              xtdoTextFieldToStringLF, this );
-	  }
+          }
 	  else {
             XtAddCallback( tf_widget, XmNlosingFocusCallback,
              xtdoRestoreValue, this );
@@ -5083,6 +5670,8 @@ Atom importList[2];
   }
 
   if ( nr ) {
+
+    if ( needInitialValue == 1 ) needInitialValue = 2; 
 
     bufInvalidate();
     eraseActive();

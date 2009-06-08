@@ -1492,6 +1492,7 @@ static int arrowsEnum[4] = {
   // read file and process each "object" tag
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1821,6 +1822,7 @@ static int arrowsEnum[4] = {
   tag.loadW( "xPoints", xArray, numPoints );
   tag.loadW( "yPoints", yArray, numPoints );
 
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -1904,7 +1906,7 @@ XPoint arrowXPoints[8];
       actWin->executeGc.setFG( lineColor.getDisconnectedIndex(), &blink );
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
       actWin->executeGc.restoreFg();
       needToEraseUnconnected = 1;
@@ -1914,7 +1916,7 @@ XPoint arrowXPoints[8];
   else if ( needToEraseUnconnected ) {
     actWin->executeGc.setLineWidth( 1 );
     actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
     needToEraseUnconnected = 0;
   }
@@ -1949,7 +1951,7 @@ XPoint arrowXPoints[8];
       //actWin->executeGc.setFG( fillColor.getColor() );
       actWin->executeGc.setFG( fillColor.getIndex(), &blink );
 
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), xpoints, n, Complex,
        CoordModeOrigin );
 
@@ -1960,24 +1962,24 @@ XPoint arrowXPoints[8];
       //actWin->executeGc.setFG( lineColor.getColor() );
       actWin->executeGc.setFG( lineColor.getIndex(), &blink );
 
-      XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawLines( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), xpoints, n, CoordModeOrigin );
 
       if ( ( drawArrows == ARROW_FROM ) || ( drawArrows == ARROW_BOTH ) ) {
         actWin->executeGc.setLineStyle( LineSolid );
-        XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+        XFillPolygon( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), arrowXPoints, 4, Complex,
          CoordModeOrigin );
-        XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLines( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), arrowXPoints, 4, CoordModeOrigin );
         actWin->executeGc.setLineStyle( lineStyle );
       }
       if ( ( drawArrows == ARROW_TO ) || ( drawArrows == ARROW_BOTH ) ) {
         actWin->executeGc.setLineStyle( LineSolid );
-        XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+        XFillPolygon( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), &arrowXPoints[4], 4, Complex,
          CoordModeOrigin );
-        XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawLines( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), &arrowXPoints[4], 4, CoordModeOrigin );
         actWin->executeGc.setLineStyle( lineStyle );
       }
@@ -2025,30 +2027,30 @@ XPoint arrowXPoints[8];
 
     if ( fill ) {
 
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), xpoints, n, Complex,
        CoordModeOrigin );
 
     }
 
-    XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLines( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), xpoints, n, CoordModeOrigin );
 
     if ( ( drawArrows == ARROW_FROM ) || ( drawArrows == ARROW_BOTH ) ) {
       actWin->executeGc.setLineStyle( LineSolid );
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), arrowXPoints, 4, Complex,
        CoordModeOrigin );
-      XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawLines( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), arrowXPoints, 4, CoordModeOrigin );
       actWin->executeGc.setLineStyle( lineStyle );
     }
     if ( ( drawArrows == ARROW_TO ) || ( drawArrows == ARROW_BOTH ) ) {
       actWin->executeGc.setLineStyle( LineSolid );
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), &arrowXPoints[4], 4, Complex,
        CoordModeOrigin );
-      XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawLines( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), &arrowXPoints[4], 4, CoordModeOrigin );
       actWin->executeGc.setLineStyle( lineStyle );
     }
@@ -2098,30 +2100,30 @@ XPoint arrowXPoints[8];
 
     if ( fill ) {
 
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), xpoints, n, Complex,
        CoordModeOrigin );
 
     }
 
-    XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawLines( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), xpoints, n, CoordModeOrigin );
 
     if ( ( drawArrows == ARROW_FROM ) || ( drawArrows == ARROW_BOTH ) ) {
       actWin->executeGc.setLineStyle( LineSolid );
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), arrowXPoints, 4, Complex,
        CoordModeOrigin );
-      XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawLines( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), arrowXPoints, 4, CoordModeOrigin );
       actWin->executeGc.setLineStyle( lineStyle );
     }
     if ( ( drawArrows == ARROW_TO ) || ( drawArrows == ARROW_BOTH ) ) {
       actWin->executeGc.setLineStyle( LineSolid );
-      XFillPolygon( actWin->d, XtWindow(actWin->executeWidget),
+      XFillPolygon( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), &arrowXPoints[4], 4, Complex,
        CoordModeOrigin );
-      XDrawLines( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawLines( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.eraseGC(), &arrowXPoints[4], 4, CoordModeOrigin );
       actWin->executeGc.setLineStyle( lineStyle );
     }
@@ -3260,7 +3262,7 @@ int activeLineClass::undoEdit (
 
 undoLineOpClass *opPtr = (undoLineOpClass *) _opPtr;
 int i;
-int oneW, oneH, minX, minY, maxX, maxY;
+int oneW, oneH, minX=0, minY=0, maxX=0, maxY=0;
 
   if ( xpoints ) delete[] xpoints;
   numPoints = opPtr->n;
@@ -3354,8 +3356,8 @@ void activeLineClass::getArrowCoords (
 ) {
 
 int n0, n1, i, slopeUndef, slopeUndefP;
-double x0, x1, y0, y1, slope;
-double x0P, x1P, y0P, y1P, slopeP;
+double x0, x1, y0, y1, slope=1;
+double x0P=0, x1P=0, y0P=0, y1P=0, slopeP=1;
 double ax0, ay0, ax1, ay1, ax2, ay2, theta;
 
 double len = 14.0;

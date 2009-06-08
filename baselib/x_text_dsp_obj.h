@@ -51,7 +51,7 @@
 #define XTDC_K_FILE_NAME 2
 
 #define XTDC_MAJOR_VERSION 4
-#define XTDC_MINOR_VERSION 1
+#define XTDC_MINOR_VERSION 4
 #define XTDC_RELEASE 0
 
 #ifdef __x_text_dsp_obj_cc
@@ -265,6 +265,11 @@ static void xtdoSetValueChanged (
   XtPointer client,
   XtPointer call );
 
+static void xtdoModVerify (
+  Widget w,
+  XtPointer client,
+  XtPointer call );
+
 #endif
 
 class activeXTextDspClass : public activeGraphicClass {
@@ -473,6 +478,11 @@ friend void xtdoSetValueChanged (
   XtPointer client,
   XtPointer call );
 
+friend void xtdoModVerify (
+  Widget w,
+  XtPointer client,
+  XtPointer call );
+
 static const int pvConnection = 1;
 static const int svalPvConnection = 2;
 static const int fgPvConnection = 3;
@@ -498,6 +508,7 @@ typedef struct editBufTag {
   int bufUpdatePvOnDrop;
   int bufUseHexPrefix;
   efInt bufEfPrecision;
+  char bufFieldLenInfo[7+1];
   int bufClipToDspLimits;
   int bufBgColor;
   int bufFgColor;
@@ -524,6 +535,9 @@ typedef struct editBufTag {
   int bufShowUnits;
   int bufUseAlarmBorder;
   int bufInputFocusUpdatesAllowed;
+  int bufIsPassword;
+  int bufCharacterMode;
+  int bufNoExecuteClipMask;
 } editBufType, *editBufPtr;
 
 editBufPtr eBuf;
@@ -546,6 +560,7 @@ int updatePvOnDrop;
 int useHexPrefix;
 int precision;
 efInt efPrecision;
+char fieldLenInfo[7+1];
 int clipToDspLimits;
 double upperLim, lowerLim;
 int bgColor;
@@ -555,7 +570,9 @@ XFontStruct *fs;
 int fontAscent, fontDescent, fontHeight, stringLength, stringWidth,
  stringY, stringX, bufInvalid;
 
-VPFUNC changeCallback, activateCallback, deactivateCallback;
+IPFUNC changeCallback;
+
+VPFUNC activateCallback, deactivateCallback;
 int changeCallbackFlag, activateCallbackFlag, deactivateCallbackFlag,
  anyCallbackFlag;
 
@@ -567,6 +584,9 @@ int nullDetectMode;
 
 ProcessVariable *pvId, *svalPvId, *fgPvId;
 
+int fgPvValue;
+int oldChangeResult;
+
 int pvIndex;
 expStringClass pvExpStr, svalPvExpStr, fgPvExpStr;
 char pvName[PV_Factory::MAX_PV_NAME+1];
@@ -576,6 +596,7 @@ expStringClass defDir, pattern;
 int numStates;
 
 int isWidget;
+int handlerInstalled;
 int editable;
 entryFormClass textEntry;
 int teX, teY, teW, teH, teLargestH;
@@ -591,7 +612,7 @@ int widget_value_changed;
 
 int needConnectInit, needInfoInit, needErase, needDraw, needRefresh,
  needUpdate, deferredCount, needToDrawUnconnected, needToEraseUnconnected,
- initialConnection;
+ needFgPvPut, initialConnection;
 int unconnectedTimer;
 
 keypadClass kp;
@@ -602,6 +623,8 @@ calpadClass cp;
 fselectClass fsel;
 
 int grabUpdate;
+int focusIn, focusOut, cursorIn, cursorOut;
+int needInitialValue;
 
 int showUnits;
 char units[MAX_UNITS_SIZE+1];
@@ -615,6 +638,14 @@ int newPositioning;
 int oldStat, oldSev;
 
 int inputFocusUpdatesAllowed;
+
+int isPassword;
+char pwValue[255+1];
+int pwLength;
+
+int characterMode;
+
+int noExecuteClipMask;
 
 public:
 
@@ -631,11 +662,15 @@ char *objName ( void ) {
 
 }
 
-void putValueWithClip (
+int putValueWithClip (
+  char *val
+);
+
+int putValueWithClip (
   double val
 );
 
-void putValueWithClip (
+int putValueWithClip (
   int val
 );
 

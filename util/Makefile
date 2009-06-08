@@ -2,19 +2,23 @@ TOP = ../../..
 ifdef EPICS_HOST_ARCH
 include $(TOP)/configure/CONFIG
 
+EDMTOP = $(TOP)/src/edm
+
+SHARED_LIBRARIES = YES
+
 USR_CFLAGS += -D__osf__=1
 
-ifeq ($(EPICS_HOST_ARCH),$(T_A))
-INSTALL_INCLUDE = $(TOP)/include/edm
 
-SRC_DIRS += ../sys/$(OS_CLASS)
+INSTALL_INCLUDE = $(INSTALL_LOCATION)/include/edm
+
+SRC_DIRS += $(EDMTOP)/util/sys/os/Linux
 INC += os.h
 INC += os_objs.h
 INC += sys_types.h
 INC += os_priv.h
 
 
-SRC_DIRS += ../net/$(OS_CLASS)
+SRC_DIRS += $(EDMTOP)/util/net/os/Linux
 INC += ipncl.h
 INC += ipncl_priv.h
 INC += ipnsv.h
@@ -24,17 +28,17 @@ INC += ipport_priv.h
 INC += ipnis.h
 INC += ipnis_priv.h
 
-SRC_DIRS += ../msg
+SRC_DIRS += $(EDMTOP)/util/msg
 INC += msg.h
 INC += msg_priv.h
 
 
-SRC_DIRS += ../thread/$(OS_CLASS)
+SRC_DIRS += $(EDMTOP)/util/thread/os/Linux
 INC += thread.h
 INC += thread_priv.h
 
 
-SRC_DIRS += ../iprpc/osf
+SRC_DIRS += $(EDMTOP)/util/iprpc/osf
 INC += client_iprpc.h
 INC += iprpc.h
 INC += iprpc_priv.h
@@ -42,16 +46,15 @@ INC += server_iprpc_priv.h
 INC += client_iprpc_priv.h
 INC += server_iprpc.h
 
-SRC_DIRS += ../avl
+SRC_DIRS += $(EDMTOP)/util/avl
 INC += avl.h
 INC += avl_priv.h
 
-SRC_DIRS += ../crc
-INC += crc.h
-endif
 
-LIBRARY_HOST += EdmUtil
-LIB_LIB += EdmUtil
+SRC_DIRS += $(EDMTOP)/util/crc
+INC += crc.h
+
+LIBRARY += 114135a4-6f6c-11d3-95bc-00104b8742df
 
 LIB_SRCS += ipncl_pkg.c
 LIB_SRCS += ipnsv_pkg.c

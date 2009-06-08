@@ -400,6 +400,8 @@ int i;
 
   shcmdo->includeHelpIcon = shcmdo->buf->bufIncludeHelpIcon;
 
+  shcmdo->execCursor = shcmdo->buf->bufExecCursor;
+
   shcmdo->updateDimensions();
 
 }
@@ -491,6 +493,7 @@ shellCmdClass::shellCmdClass ( void ) {
   oneShot = 0;
   swapButtons = 0;
   includeHelpIcon = 0;
+  execCursor = 0;
   numCmds = 0;
   cmdIndex = 0;
   buf = NULL;
@@ -565,6 +568,8 @@ int i;
   swapButtons = source->swapButtons;
 
   includeHelpIcon = source->includeHelpIcon;
+
+  execCursor = source->execCursor;
 
   numCmds = source->numCmds;
   cmdIndex = 0;
@@ -660,6 +665,8 @@ char *emptyStr = "";
   tag.loadW( "commandLabel", label, numCmds, emptyStr );
   tag.loadW( "command", shellCommand, numCmds, emptyStr );
   tag.loadBoolW( "includeHelpIcon", &includeHelpIcon, &zero );
+  tag.loadBoolW( "execCursor", &execCursor, &zero );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -771,6 +778,7 @@ char *emptyStr = "";
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -798,6 +806,7 @@ char *emptyStr = "";
   tag.loadR( "commandLabel", maxCmds, label, &n, emptyStr );
   tag.loadR( "command", maxCmds, shellCommand, &n, emptyStr );
   tag.loadR( "includeHelpIcon", &includeHelpIcon, &zero );
+  tag.loadR( "execCursor", &execCursor, &zero );
   tag.loadR( "endObjectProperties" );
 
   stat = tag.readTags( f, "endObjectProperties" );
@@ -872,6 +881,7 @@ float val;
 
   swapButtons = 0;
   includeHelpIcon = 0;
+  execCursor = 0;
 
   if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 2 ) ) ) {
 
@@ -980,7 +990,7 @@ float val;
   }
 
   // after v 2.3 menu label 0, numCmds, and then the array data
-  if ( ( major > 2 ) || ( major == 2 ) && ( minor > 3 ) ) {
+  if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 3 ) ) ) {
 
     readStringFromFile( oneName, 127+1, f ); actWin->incLine();
     label[0].setRaw( oneName );
@@ -1010,7 +1020,7 @@ float val;
     label[i].setRaw( "" );
   }
 
-  if ( ( major > 2 ) || ( major == 2 ) && ( minor > 4 ) ) {
+  if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 4 ) ) ) {
     readStringFromFile( requiredHostName, 15+1, f );
   }
   else {
@@ -1059,6 +1069,7 @@ char *tk, *gotData, *context, buffer[255+1];
 
   swapButtons = 0;
   includeHelpIcon = 0;
+  execCursor = 0;
 
   // continue until tag is <eod>
 
@@ -1291,7 +1302,7 @@ char *tk, *gotData, *context, buffer[255+1];
 int shellCmdClass::genericEdit ( void ) {
 
 int i;
-char title[32], *ptr, *envPtr, saveLock;
+char title[32], *ptr, *envPtr, saveLock = 0;
 
   buf = new bufType;
 
@@ -1379,6 +1390,8 @@ char title[32], *ptr, *envPtr, saveLock;
 
   buf->bufIncludeHelpIcon = includeHelpIcon;
 
+  buf->bufExecCursor = execCursor;
+
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
@@ -1446,6 +1459,7 @@ char title[32], *ptr, *envPtr, saveLock;
   ef.addToggle( shellCmdClass_str33, &buf->bufOneShot );
   ef.addToggle( shellCmdClass_str34, &buf->bufSwapButtons );
   ef.addToggle( shellCmdClass_str35, &buf->bufIncludeHelpIcon );
+  ef.addToggle( shellCmdClass_str36, &buf->bufExecCursor );
 
   ef.addColorButton( shellCmdClass_str8, actWin->ci, &fgCb, &buf->bufFgColor );
   ef.addColorButton( shellCmdClass_str9, actWin->ci, &bgCb, &buf->bufBgColor );
@@ -1509,10 +1523,10 @@ int shellCmdClass::eraseActive ( void ) {
 
   if ( !enabled || !activeMode || invisible ) return 1;
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h );
 
   return 1;
@@ -1619,10 +1633,10 @@ XRectangle xR = { x, y, w, h };
 
   actWin->executeGc.setFG( bgColor.getColor() );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, w, h );
 
   if ( buttonLabel.getExpanded() )
@@ -1632,50 +1646,50 @@ XRectangle xR = { x, y, w, h };
 
   actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, x+w, y );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y, x, y+h );
 
   actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x, y+h, x+w, y+h );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+w, y, x+w, y+h );
 
   // top
   actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+1, y+1, x+w-1, y+1 );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+2, y+2, x+w-2, y+2 );
 
   // left
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+1, y+1, x+1, y+h-1 );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+2, y+2, x+2, y+h-2 );
 
   // bottom
   actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+1, y+h-1, x+w-1, y+h-1 );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+2, y+h-2, x+w-2, y+h-2 );
 
   // right
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+w-1, y+1, x+w-1, y+h-1 );
 
-  XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawLine( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
 
   if ( fs ) {
@@ -1688,8 +1702,8 @@ XRectangle xR = { x, y, w, h };
     tX = x + w/2;
     tY = y + h/2 - fontAscent/2;
 
-    drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
-     XmALIGNMENT_CENTER, string );
+    drawText( actWin->executeWidget, drawable(actWin->executeWidget),
+     &actWin->executeGc, fs, tX, tY, XmALIGNMENT_CENTER, string );
 
     actWin->executeGc.removeNormXClipRectangle();
 
@@ -2080,13 +2094,29 @@ void shellCmdClass::pointerIn (
 
   activeGraphicClass::pointerIn( me, me->x, me->y, buttonState );
 
-  if ( includeHelpIcon ) {
-    actWin->cursor.set( XtWindow(actWin->executeWidget),
-     CURSOR_K_RUN_WITH_HELP );
+  if ( execCursor ) {
+
+    if ( includeHelpIcon ) {
+      actWin->cursor.set( XtWindow(actWin->executeWidget),
+       CURSOR_K_RUN_WITH_HELP );
+    }
+    else {
+      actWin->cursor.set( XtWindow(actWin->executeWidget),
+       CURSOR_K_RUN );
+    }
+
   }
   else {
-    actWin->cursor.set( XtWindow(actWin->executeWidget),
-     CURSOR_K_RUN );
+
+    if ( includeHelpIcon ) {
+      actWin->cursor.set( XtWindow(actWin->executeWidget),
+       CURSOR_K_PNTR_WITH_HELP );
+    }
+    else {
+      actWin->cursor.set( XtWindow(actWin->executeWidget),
+       CURSOR_K_DEFAULT );
+    }
+
   }
 
 }

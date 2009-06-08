@@ -30,7 +30,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
 
-activeGraphicClass::activeGraphicClass ( void ) {
+activeGraphicClass::activeGraphicClass ( void ) : unknownTags() {
 
   baseName = new char[strlen("base")+1];
   strcpy( baseName, "base" );
@@ -125,6 +125,14 @@ activeGraphicClass::~activeGraphicClass ( void ) {
     delete[] createParam;
     createParam = NULL;
   }
+
+}
+
+Drawable activeGraphicClass::drawable (
+  Widget w
+) {
+
+  return actWin->drawable( w );
 
 }
 
@@ -944,7 +952,7 @@ int activeGraphicClass::clear ( void ) {
 
 int activeGraphicClass::clearActive ( void ) {
 
-  XClearWindow( actWin->d, XtWindow(actWin->executeWidget) );
+  actWin->clearActive();
 
   return 1;
 
@@ -2385,12 +2393,15 @@ void activeGraphicClass::pointerIn (
   actWin->executeGc.setLineWidth( 2 );
   actWin->executeGc.setLineStyle( LineSolid );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.normGC(), x-2, y-2, w+4, h+4 );
 
   actWin->executeGc.setLineWidth( 1 );
 
   actWin->executeGc.restoreFg();
+
+  actWin->needCopy = 1;
+  actWin->updateCopyRegion( x-4, y-4, w+8, h+8 );
 
 }
 
@@ -2416,8 +2427,11 @@ void activeGraphicClass::pointerOut (
   actWin->executeGc.setLineWidth( 2 );
   actWin->executeGc.setLineStyle( LineSolid );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x-2, y-2, w+4, h+4 );
+
+  actWin->needCopy = 1;
+  actWin->updateCopyRegion( x-4, y-4, w+8, h+8 );
 
   actWin->executeGc.setLineWidth( 1 );
 
@@ -3199,7 +3213,7 @@ Widget mkDragIcon( Widget w, activeGraphicClass *agc )
   unsigned long   fg, bg;
   XGCValues       gcValues;
   unsigned long   gcValueMask;
-  char tmpStr[131+1];
+  char tmpStr[PV_Factory::MAX_PV_NAME+1];
 
   Display *display = XtDisplay(w);
   int screenNum = DefaultScreen(display);
@@ -3224,8 +3238,8 @@ Widget mkDragIcon( Widget w, activeGraphicClass *agc )
   char *str = agc->dragValue(agc->getCurrentDragIndex());
   if ( str ) {
     if ( !blank(str) ) {
-      strncpy( tmpStr, str, 131 );
-      tmpStr[131] = 0;
+      strncpy( tmpStr, str, PV_Factory::MAX_PV_NAME );
+      tmpStr[PV_Factory::MAX_PV_NAME] = 0;
     }
   }
 
@@ -3518,6 +3532,12 @@ time_t timet;
       actWin->appCtx->postMessage( msg );
       snprintf( msg, 79, "  Num references = %-d\n",
        pv->get_num_references() );
+      actWin->appCtx->postMessage( msg );
+      snprintf( msg, 79, "  Num conn state callbacks in list = %-d\n",
+       pv->get_num_conn_state_callbacks() );
+      actWin->appCtx->postMessage( msg );
+      snprintf( msg, 79, "  Num value callbacks in list = %-d\n",
+       pv->get_num_value_callbacks() );
       actWin->appCtx->postMessage( msg );
       if ( pv->is_valid() ) {
         timet = pv->get_time_t(); // - 631152000;
@@ -4011,7 +4031,7 @@ void activeGraphicClass::initEnable ( void ) {
 
 void activeGraphicClass::enable ( void ) { // smartDrawAllActive should be
                                            // called after this
-  if ( enabled ) return;
+  //if ( enabled ) return;
 
   bufInvalidate();
   enabled = 1;
@@ -4021,7 +4041,7 @@ void activeGraphicClass::enable ( void ) { // smartDrawAllActive should be
 
 void activeGraphicClass::disable ( void ) {
 
-  if ( !enabled ) return;
+  //if ( !enabled ) return;
 
   bufInvalidate();
   eraseActive();

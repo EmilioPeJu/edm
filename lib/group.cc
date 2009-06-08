@@ -26,6 +26,7 @@
 
 static char *groupDragName = "?";
 
+#if 0
 static void groupUnconnectedTimeout (
   XtPointer client,
   XtIntervalId *id )
@@ -44,6 +45,7 @@ activeGroupClass *ago = (activeGroupClass *) client;
   ago->unconnectedTimer = 0;
 
 }
+#endif
 
 void agc_edit_update (
   Widget w,
@@ -598,6 +600,7 @@ char *emptyStr = "";
   tag.loadW( "y", &y );
   tag.loadW( "w", &w );
   tag.loadW( "h", &h );
+  tag.loadW( unknownTags );
   tag.loadW( "" );
   tag.loadW( "beginGroup" );
   tag.loadW( "" );
@@ -726,6 +729,7 @@ char *emptyStr = "";
   // read file and process each "object" tag
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1117,6 +1121,33 @@ activeGraphicListPtr cur;
     cur->node->beginEdit();
     cur = cur->flink;
   }
+
+}
+
+int activeGroupClass::activateBeforePreReexecuteComplete ( void ) {
+
+  //return 1;
+
+  return activateComplete();
+
+}
+
+int activeGroupClass::activateComplete ( void ) {
+
+activeGraphicListPtr head = (activeGraphicListPtr) voidHead;
+activeGraphicListPtr cur;
+
+  cur = head->flink;
+  while ( cur != head ) {
+    if ( !(cur->node->activateComplete()) ) {
+      //printf( "%s at %-d,%-d not ready\n", cur->node->objName(),
+      // cur->node->getX0(), cur->node->getY0() );
+      return 0;
+    }
+    cur = cur->flink;
+  }
+
+  return 1;
 
 }
 
@@ -3741,9 +3772,31 @@ activeGraphicListPtr cur;
 
 void activeGroupClass::map ( void ) {
 
+#if 0
+activeGraphicListPtr head = (activeGraphicListPtr) voidHead;
+activeGraphicListPtr cur;
+
+  cur = head->flink;
+  while ( cur != head ) {
+    cur->node->map();
+    cur = cur->flink;
+  }
+#endif
+
 }
 
 void activeGroupClass::unmap ( void ) {
+
+#if 0
+activeGraphicListPtr head = (activeGraphicListPtr) voidHead;
+activeGraphicListPtr cur;
+
+  cur = head->flink;
+  while ( cur != head ) {
+    cur->node->unmap();
+    cur = cur->flink;
+  }
+#endif
 
 }
 

@@ -578,6 +578,7 @@ static int alignEnum[3] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -1137,6 +1138,7 @@ static int alignEnum[3] = {
   tag.loadComplexW( "value", &value, emptyStr );
   tag.loadBoolW( "autoSize", &autoSize, &zero );
   tag.loadW( "regExpr", regExpStr, emptyStr );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -1237,7 +1239,7 @@ int clipStat;
 
     if ( useDisplayBg ) {
 
-      XDrawStrings( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawStrings( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), stringX, stringY, fontHeight,
        text, stringLength );
 
@@ -1247,7 +1249,7 @@ int clipStat;
       actWin->executeGc.saveBg();
       actWin->executeGc.setBG( bgColor.getColor() );
 
-      XDrawImageStrings( actWin->d, XtWindow(actWin->executeWidget),
+      XDrawImageStrings( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), stringX, stringY, fontHeight,
        text, stringLength );
 
@@ -1317,7 +1319,7 @@ XRectangle xR = { x, y, w, h };
 
   if ( useDisplayBg ) {
 
-    XDrawStrings( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawStrings( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), stringX, stringY, fontHeight,
      text, stringLength );
 //    fprintf(stderr,"eraseUnconditional: useDisplayBg; text=%s\n", text);
@@ -1325,7 +1327,7 @@ XRectangle xR = { x, y, w, h };
   }
   else {
 
-    XDrawImageStrings( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawImageStrings( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), stringX, stringY, fontHeight,
      text, stringLength );
 //    fprintf(stderr,"eraseUnconditional: !useDisplayBg; text=%s\n", text);
@@ -1362,7 +1364,7 @@ XRectangle xR = { x, y, w, h };
 
     actWin->executeGc.addEraseXClipRectangle( xR );
 
-    XDrawStrings( actWin->d, XtWindow(actWin->executeWidget),
+    XDrawStrings( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), stringX, stringY, fontHeight,
      text, stringLength );
 //    fprintf(stderr,"eraseActive: useDisplayBg; text=%s\n", text);
@@ -1381,7 +1383,7 @@ XRectangle xR = { x, y, w, h };
 
       if ( bufInvalid ) {
 
-        XDrawImageStrings( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawImageStrings( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.eraseGC(), stringX, stringY, fontHeight,
          text, stringLength );
 
@@ -1391,7 +1393,7 @@ XRectangle xR = { x, y, w, h };
         actWin->executeGc.setFG( bgColor.getColor() );
         actWin->executeGc.setBG( bgColor.getColor() );
 
-        XDrawImageStrings( actWin->d, XtWindow(actWin->executeWidget),
+        XDrawImageStrings( actWin->d, drawable(actWin->executeWidget),
          actWin->executeGc.normGC(), stringX, stringY, fontHeight,
          text, stringLength );
 
@@ -1773,10 +1775,7 @@ void activeXRegTextClass::updateDimensions ( void )
   if ( activeMode ) {
     char text[80];
     getProcessedText(text);
-    if ( text )
-      stringLength = strlen( text );
-    else
-      stringLength = 0;
+    stringLength = strlen( text );
   }
   else {
     if ( value.getRaw() )

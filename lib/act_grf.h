@@ -133,6 +133,8 @@ float orientation;
 int selected; // if true, then is selected
 int editMode;
 
+unknownTagList unknownTags;
+
 activeGraphicClass *nextToEdit; // for group edits
 int inGroup;
 
@@ -186,6 +188,8 @@ activeGraphicClass ( void );
 void clone ( const activeGraphicClass *source );
 
 virtual ~activeGraphicClass ( void );
+
+Drawable drawable ( Widget w );
 
 int baseMajorVersion ( void );
 
@@ -1047,6 +1051,10 @@ virtual int isWindowContainer ( void ) {
 
 virtual int activateComplete ( void ) {
   return 1;
+}
+
+virtual int activateBeforePreReexecuteComplete ( void ) {
+  return activateComplete();
 }
 
 virtual activeGraphicClass *getTail ( void );

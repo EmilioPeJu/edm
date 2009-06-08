@@ -37,6 +37,22 @@ static void unconnectedTimeout (
   XtPointer client,
   XtIntervalId *id );
 
+static void needUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+static void needMenuUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+static void needUnmapTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+static void needMapTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
 static void menu_cb (
   Widget w,
   XtPointer client,
@@ -98,14 +114,31 @@ class activePipClass : public activeGraphicClass {
 
 public:
 
-static const int maxDsps = 64;
+static const int maxDsps = 100;
 static const int displayFromPV = 0;
 static const int displayFromForm = 1;
 static const int displayFromMenu = 2;
+static const int maxSymbolLen = 2550;
 
 private:
 
 friend void unconnectedTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+friend void needUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+friend void needMenuUpdateTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+friend void needUnmapTimeout (
+  XtPointer client,
+  XtIntervalId *id );
+
+friend void needMapTimeout (
   XtPointer client,
   XtIntervalId *id );
 
@@ -179,13 +212,14 @@ typedef struct bufTag {
   char bufFileName[127+1];
   int bufPropagateMacros[maxDsps];
   char bufDisplayFileName[maxDsps][127+1];
-  char bufSymbols[maxDsps][255+1];
+  char bufSymbols[maxDsps][maxSymbolLen+1];
   int bufReplaceSymbols[maxDsps];
   char bufLabel[maxDsps][127+1];
   int bufCenter;
   int bufSetSize;
   int bufSizeOfs;
   int bufNoScroll;
+  int bufIgnoreMultiplexors;
 } bufType, *bufPtr;
 
 int numDsps, dspIndex;
@@ -200,6 +234,7 @@ int center;
 int setSize;
 int sizeOfs;
 int noScroll;
+int ignoreMultiplexors;
 
 Widget *frameWidget, clipWidget, hsbWidget, vsbWidget, popUpMenu,
  pullDownMenu, pb[maxDsps];
@@ -207,7 +242,7 @@ Widget *frameWidget, clipWidget, hsbWidget, vsbWidget, popUpMenu,
 int propagateMacros[maxDsps];
 expStringClass displayFileName[maxDsps];
 expStringClass symbolsExpStr[maxDsps];
-char symbols[maxDsps][255+1];
+char symbols[maxDsps][maxSymbolLen+1];
 int replaceSymbols[maxDsps]; // else append
 expStringClass label[maxDsps];
 
@@ -242,6 +277,9 @@ int needConnectInit, needUpdate, needMenuConnectInit, needMenuUpdate,
  needToDrawUnconnected, needToEraseUnconnected, needConnectTimeout;
 int initialReadConnection, initialMenuConnection, initialLabelConnection,
  unconnectedTimer;
+int consecutiveDeactivateErrors;
+
+int retryTimerNU, retryTimerNMU, retryTimerNUM, retryTimerNM;
 
 activeWindowClass *aw;
 
@@ -299,16 +337,24 @@ int drawActive ( void );
 
 int eraseActive ( void );
 
-int activate ( int pass, void *ptr );
-
-int deactivate ( int pass );
-
-int preReactivate (
-  int pass );
-
 int reactivate (
   int pass,
   void *ptr );
+
+int reactivate (
+  int pass,
+  void *ptr,
+  int *numSubObjects );
+
+int activate ( int pass, void *ptr );
+
+int preReactivate ( int pass );
+
+int preReactivate (
+  int pass,
+  int *numSubObjects );
+
+int deactivate ( int pass );
 
 int isRelatedDisplay ( void );
 
@@ -390,6 +436,8 @@ void changePvNames (
 int isWindowContainer ( void );
 
 int activateComplete ( void );
+
+int activateBeforePreReexecuteComplete ( void );
 
 void map ( void );
 

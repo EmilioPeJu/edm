@@ -35,6 +35,150 @@ typedef struct libRecTag {
 
 static int g_needXtInit = 1;
 
+static int ignoreIconic ( void ) {
+
+char *envPtr;
+static int flag = -1;
+
+  if ( flag == -1 ) {
+    envPtr = getenv( environment_str19 );
+    if ( envPtr ) {
+      flag = 1;
+    }
+    else {
+      flag = 0;
+    }
+  }
+
+  return flag;
+
+}
+
+static void extractPosition (
+  char *str,
+  char *filePart,
+  int max,
+  int *gotPosition,
+  int *posx,
+  int *posy
+) {
+
+char buf[1023+1], *tk, *ctx, *err;
+int ok;
+
+  strncpy( buf, str, 1023 );
+  buf[1023] = 0;
+
+  ok = 1;
+
+  ctx = NULL;
+  tk = strtok_r( buf, "?", &ctx );
+
+  if ( tk ) {
+
+    strncpy( filePart, tk, max );
+    filePart[max] = 0;
+
+    tk = strtok_r( NULL, "?", &ctx );
+
+    if ( tk ) {
+
+      err = NULL;
+      *posx = strtol( tk, &err, 0 );
+      if ( err ) {
+	if ( strcmp( err, "" ) != 0 ) {
+	  ok = 0;
+	}
+      }
+
+      tk = strtok_r( NULL, "?", &ctx );
+
+      if ( tk ) {
+
+        err = NULL;
+        *posy = strtol( tk, &err, 0 );
+        if ( err ) {
+	  if ( strcmp( err, "" ) != 0 ) {
+	    ok = 0;
+	  }
+        }
+
+      }
+      else {
+
+        ok = 0;
+
+      }
+
+    }
+    else {
+
+      ok = 0;
+
+    }
+
+  }
+  else {
+
+    ok = 0;
+
+  }
+
+  if ( ok ) {
+    *gotPosition = 1;
+  }
+  else {
+    strncpy( filePart, str, max );
+    filePart[max] = 0;
+    *gotPosition = 0;
+    *posx = 0;
+    *posy = 0;
+  }
+
+}
+
+static void extractWinName (
+  char *str,
+  int max,
+  char *name,
+  int maxName
+) {
+
+char buf[1023+1], *tk, *ctx;
+
+  if ( strstr( str, "=" ) ) {
+
+    strncpy( buf, str, 1023 );
+    buf[1023] = 0;
+
+    ctx = NULL;
+    tk = strtok_r( buf, "= 	", &ctx ); // =, space, tab
+
+    if ( tk ) {
+
+      strncpy( name, tk, maxName );
+      name[maxName] = 0;
+
+      tk = strtok_r( NULL, "= 	", &ctx ); // =, space, tab
+
+      if ( tk ) {
+
+        strncpy( str, tk, max );
+        str[max] = 0;
+
+      }
+      else {
+
+        strcpy( str, "" );
+
+      }
+
+    }
+
+  } // else, no name given
+
+}
+
 static int httpPath (
   char *path
  ) {
@@ -359,13 +503,26 @@ libRecPtr head, tail, cur, prev, next;
 
   if ( strcmp( op, global_str8 ) == 0 ) {  // show
 
+    fprintf( stderr, "\n" );
+
+    strcpy( line, "version" );
+    cfunc = (CHARFUNC) dlsym( dllHandle, line );
+    if ((error = dlerror()) == NULL)  {
+      fprintf( stderr, "Built with edm version: %s\n", (*cfunc)() );
+    }
+    else {
+      fprintf( stderr, "edm version not registered\n" );
+    }
+
+    fprintf( stderr, "\n" );
+
     strcpy( line, "author" );
     cfunc = (CHARFUNC) dlsym( dllHandle, line );
     if ((error = dlerror()) == NULL)  {
-      fprintf( stderr, "\nAuthor: %s\n", (*cfunc)() );
+      fprintf( stderr, "Author: %s\n", (*cfunc)() );
     }
     else {
-      fprintf( stderr, "\nAuthor name not registered\n" );
+      fprintf( stderr, "Author name not registered\n" );
     }
 
     fprintf( stderr, "\n" );
@@ -400,15 +557,15 @@ libRecPtr head, tail, cur, prev, next;
         index = 42;
       else
         index = strlen(line) + 5;
-      Strncat( line, "                                        ", 255 );
-      strncpy( &line[index], typeNamePtr, 255 );
+      Strncat( line, "                                             ", 255 );
+      strncpy( &line[index], typeNamePtr, 255-index );
 
       if ( strlen(line) < 50 )
         index = 55;
       else
         index = strlen(line) + 5;
-      Strncat( line, "                                        ", 255 );
-      strncpy( &line[index], textPtr, 255 );
+      Strncat( line, "                                                       ", 255 );
+      strncpy( &line[index], textPtr, 255-index );
 
       fprintf( stderr, "%s\n", line );
 
@@ -659,6 +816,8 @@ static void managePvComponents (
 
 typedef int (*PVREGFUNC)( char **, char ** );
 PVREGFUNC func;
+typedef char *(*CHARFUNC)( void );
+CHARFUNC cfunc;
 
 int stat, index, comment, fileExists, fileEmpty, doAdd, alreadyExists;
 char *classNamePtr, *textPtr, *error;
@@ -809,6 +968,17 @@ libRecPtr head, tail, cur, prev, next;
 
     fprintf( stderr, "\n" );
 
+    strcpy( line, "version" );
+    cfunc = (CHARFUNC) dlsym( dllHandle, line );
+    if ((error = dlerror()) == NULL)  {
+      fprintf( stderr, "Built with edm version: %s\n", (*cfunc)() );
+    }
+    else {
+      fprintf( stderr, "edm version not registered\n" );
+    }
+
+    fprintf( stderr, "\n" );
+
     strcpy( line, "firstPvRegRecord" );
     func = (PVREGFUNC) dlsym( dllHandle, line );
     if ((error = dlerror()) != NULL)  {
@@ -839,8 +1009,8 @@ libRecPtr head, tail, cur, prev, next;
         index = 45;
       else
         index = strlen(line) + 5;
-      Strncat( line, "                                        ", 255 );
-      strncpy( &line[index], textPtr, 255 );
+      Strncat( line, "                                             ", 255 );
+      strncpy( &line[index], textPtr, 255-index );
 
       fprintf( stderr, "%s\n", line );
 
@@ -1149,6 +1319,7 @@ SYS_PROC_ID_TYPE procId;
   }
 
   cur = new activeWindowListType;
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -1207,14 +1378,14 @@ void selectPath_cb (
 {
 
 callbackBlockPtr cbPtr = (callbackBlockPtr) client;
-char *item = (char *) cbPtr->ptr;
+//char *item = (char *) cbPtr->ptr;
 appContextClass *apco = (appContextClass *) cbPtr->apco;
 
   apco->pathList.popup();
 
 }
 
-void app_fileSelectOk_cb (
+void app_fileSelectFromPathOk_cb (
   Widget w,
   XtPointer client,
   XtPointer call )
@@ -1237,6 +1408,7 @@ char *fName;
 
   cur = new activeWindowListType;
 
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -1277,6 +1449,80 @@ done:
 
 }
 
+void app_fileSelectOk_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+XmFileSelectionBoxCallbackStruct *cbs =
+ (XmFileSelectionBoxCallbackStruct *) call;
+appContextClass *apco = (appContextClass *) client;
+activeWindowListPtr cur;
+char *fName;
+
+  if ( !XmStringGetLtoR( cbs->value, XmFONTLIST_DEFAULT_TAG, &fName ) ) {
+    goto done;
+  }
+
+  if ( !*fName ) {
+    XtFree( fName );
+    goto done;
+  }
+
+  cur = new activeWindowListType;
+
+  //strcpy( cur->winName, "" );
+  cur->requestDelete = 0;
+  cur->requestActivate = 0;
+  cur->requestActivateClear = 0;
+  cur->requestReactivate = 0;
+  cur->requestOpen = 0;
+  cur->requestPosition = 0;
+  cur->requestImport = 0;
+  cur->requestRefresh = 0;
+  cur->requestActiveRedraw = 0;
+  cur->requestIconize = 0;
+  cur->requestConvertAndExit = 0;
+
+  cur->node.create( apco, NULL, 0, 0, 0, 0, apco->numMacros, apco->macros,
+   apco->expansions );
+  cur->node.realize();
+  cur->node.setGraphicEnvironment( &apco->ci, &apco->fi );
+
+  cur->blink = apco->head->blink;
+  apco->head->blink->flink = cur;
+  apco->head->blink = cur;
+  cur->flink = apco->head;
+
+  cur->node.storeFileName( fName );
+
+  XtFree( fName );
+
+  cur->requestOpen = 1;
+  (apco->requestFlag)++;
+
+  if ( apco->executeOnOpen ) {
+    cur->requestActivate = 1;
+    (apco->requestFlag)++;
+  }
+
+done:
+
+  XtUnmanageChild( w );
+
+}
+
+void app_fileSelectFromPathCancel_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+  XtUnmanageChild( w );
+
+}
+
 void app_fileSelectCancel_cb (
   Widget w,
   XtPointer client,
@@ -1310,6 +1556,7 @@ char *fName;
 
   cur = new activeWindowListType;
 
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -1389,6 +1636,7 @@ char oneFileName[127+1];
   }
 
   cur = new activeWindowListType;
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -1439,6 +1687,36 @@ appContextClass *apco = (appContextClass *) client;
 
 }
 
+void open_from_path_cb (
+  Widget w,
+  XtPointer client,
+  XtPointer call )
+{
+
+appContextClass *apco = (appContextClass *) client;
+int n;
+Arg args[10];
+XmString xmStr = NULL;
+char prefix[127+1];
+
+  strncpy( prefix, apco->curPath, 127 );
+
+  n = 0;
+
+  if ( strcmp( prefix, "" ) != 0 ) {
+    xmStr = XmStringCreateLocalized( prefix );
+    XtSetArg( args[n], XmNdirectory, xmStr ); n++;
+    XtSetValues( apco->fileSelectFromPathBox, args, n );
+    XmStringFree( xmStr );
+  }
+
+  XtManageChild( apco->fileSelectFromPathBox );
+
+  XSetWindowColormap( apco->display, XtWindow(XtParent(apco->fileSelectFromPathBox)),
+   apco->ci.getColorMap() );
+
+}
+
 void open_cb (
   Widget w,
   XtPointer client,
@@ -1448,53 +1726,19 @@ void open_cb (
 appContextClass *apco = (appContextClass *) client;
 int n;
 Arg args[10];
-XmString xmStr;
-char prefix[127+1];
+XmString xmStr = NULL;
 
-  strncpy( prefix, apco->curPath, 127 );
+  if ( apco->firstOpen ) {
 
-  n = 0;
+    apco->firstOpen = 0;
 
-  if ( strcmp( prefix, "" ) != 0 ) {
-    xmStr = XmStringCreateLocalized( prefix );
+    n = 0;
+    xmStr = XmStringCreateLocalized( "./" );
     XtSetArg( args[n], XmNdirectory, xmStr ); n++;
+    XtSetValues( apco->fileSelectBox, args, n );
+    XmStringFree( xmStr );
+
   }
-
-  XtSetValues( apco->fileSelectBox, args, n );
-
-  if ( strcmp( prefix, "" ) != 0 ) XmStringFree( xmStr );
-
-  XtManageChild( apco->fileSelectBox );
-
-  XSetWindowColormap( apco->display, XtWindow(XtParent(apco->fileSelectBox)),
-   apco->ci.getColorMap() );
-
-}
-
-void open_user_cb (
-  Widget w,
-  XtPointer client,
-  XtPointer call )
-{
-
-appContextClass *apco = (appContextClass *) client;
-int n;
-Arg args[10];
-XmString xmStr;
-char prefix[127+1];
-
-  strncpy( prefix, apco->curPath, 127 );
-
-  n = 0;
-
-  if ( strcmp( prefix, "" ) != 0 ) {
-    xmStr = XmStringCreateLocalized( prefix );
-    XtSetArg( args[n], XmNdirectory, xmStr ); n++;
-  }
-
-  XtSetValues( apco->fileSelectBox, args, n );
-
-  if ( strcmp( prefix, "" ) != 0 ) XmStringFree( xmStr );
 
   XtManageChild( apco->fileSelectBox );
 
@@ -1512,7 +1756,7 @@ void import_cb (
 appContextClass *apco = (appContextClass *) client;
 int n;
 Arg args[10];
-XmString xmStr;
+XmString xmStr = NULL;
 char prefix[127+1];
 
   strncpy( prefix, apco->curPath, 127 );
@@ -1522,11 +1766,9 @@ char prefix[127+1];
   if ( strcmp( prefix, "" ) != 0 ) {
     xmStr = XmStringCreateLocalized( prefix );
     XtSetArg( args[n], XmNdirectory, xmStr ); n++;
+    XtSetValues( apco->importSelectBox, args, n );
+    XmStringFree( xmStr );
   }
-
-  XtSetValues( apco->importSelectBox, args, n );
-
-  if ( strcmp( prefix, "" ) != 0 ) XmStringFree( xmStr );
 
   XtManageChild( apco->importSelectBox );
 
@@ -1942,6 +2184,7 @@ char *sysMacros[] = {
   Strncat( buf, ".edl", 255 );
 
   cur = new activeWindowListType;
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -2003,6 +2246,7 @@ appContextClass::appContextClass (
   void )
 {
 
+  firstOpen = 1;
   executeCount = 0;
   isActive = 0;
   exitFlag = 0;
@@ -2031,6 +2275,7 @@ appContextClass::appContextClass (
   largestH = 600;
 
   head = new activeWindowListType;
+  //strcpy( head->winName, "" );
   head->flink = head;
   head->blink = head;
 
@@ -2144,14 +2389,21 @@ actionsPtr curAct, nextAct;
   // delete widgets
 
   XtRemoveCallback( importSelectBox, XmNcancelCallback,
-   app_importSelectCancel_cb, (void *) this );
+   app_importSelectOk_cb, (void *) this );
   XtRemoveCallback( importSelectBox, XmNcancelCallback,
    app_importSelectCancel_cb, (void *) this );
   XtUnmanageChild( importSelectBox );
   XtDestroyWidget( importSelectBox );
 
+  XtRemoveCallback( fileSelectFromPathBox, XmNcancelCallback,
+   app_fileSelectFromPathOk_cb, (void *) this );
+  XtRemoveCallback( fileSelectFromPathBox, XmNcancelCallback,
+   app_fileSelectFromPathCancel_cb, (void *) this );
+  XtUnmanageChild( fileSelectFromPathBox );
+  XtDestroyWidget( fileSelectFromPathBox );
+
   XtRemoveCallback( fileSelectBox, XmNcancelCallback,
-   app_fileSelectCancel_cb, (void *) this );
+   app_fileSelectOk_cb, (void *) this );
   XtRemoveCallback( fileSelectBox, XmNcancelCallback,
    app_fileSelectCancel_cb, (void *) this );
   XtUnmanageChild( fileSelectBox );
@@ -2372,7 +2624,7 @@ char *envPtr, *gotIt, *buf, save[127+1], path[127+1], msg[127+1], *tk,
   curLen = -1;
   buf = NULL;
 
-  useHttp = getenv( "EDMHTTPDOCROOT" );
+  useHttp = getenv( environment_str9 ); // EDMHTTPDOCROOT
 
   // EDMFILES
   envPtr = getenv( environment_str2 );
@@ -2581,7 +2833,7 @@ void appContextClass::expandFileName (
   int maxSize )
 {
 
-unsigned int i;
+unsigned int i, l, first, more;
 int state, noPrefix;
 
   if ( index >= numPaths ) {
@@ -2639,15 +2891,23 @@ int state, noPrefix;
     Strncat( expandedName, inName, maxSize );
   }
 
-  if ( strlen(expandedName) > strlen(ext) ) {
-    if ( strcmp( &expandedName[strlen(expandedName)-strlen(ext)], ext )
-     != 0 ) {
-      Strncat( expandedName, ext, maxSize );
+
+  // if no extension specified, add ext from argument
+
+  l = strlen(expandedName);
+  more = 1;
+  first = 0;
+  for ( i=l-1; (i>=0) && more; i-- ) {
+    if ( expandedName[i] == '/' ) {
+      more = 0;
+      first = i;
     }
   }
-  else {
+  if ( !strstr( &expandedName[first], "." ) ) {
     Strncat( expandedName, ext, maxSize );
   }
+
+  return;
 
 }
 
@@ -3459,20 +3719,19 @@ int i, numVisible;
    XmNlabelString, str,
    NULL );
   XmStringFree( str );
-  XtAddCallback( newB, XmNactivateCallback, open_cb,
+  XtAddCallback( newB, XmNactivateCallback, open_from_path_cb,
    (XtPointer) this );
 
-#if 0
   str = XmStringCreateLocalized( appContextClass_str38 );
   newB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
    filePullDown,
    XmNlabelString, str,
    NULL );
   XmStringFree( str );
-  XtAddCallback( newB, XmNactivateCallback, open_user_cb,
+  XtAddCallback( newB, XmNactivateCallback, open_cb,
    (XtPointer) this );
-#endif
 
+#if 0
   str = XmStringCreateLocalized( appContextClass_str39 );
   newB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
    filePullDown,
@@ -3481,6 +3740,7 @@ int i, numVisible;
   XmStringFree( str );
   XtAddCallback( newB, XmNactivateCallback, import_cb,
    (XtPointer) this );
+#endif
 
   str = XmStringCreateLocalized( appContextClass_str40 );
   newB = XtVaCreateManagedWidget( "pb", xmPushButtonWidgetClass,
@@ -3653,9 +3913,6 @@ int i, numVisible;
     numVisible = ( numPaths > 30 ? 30 : numPaths );
     pathList.create( numPaths, mainWin, numVisible, this );
 
-    XtAddCallback( msgB, XmNactivateCallback, setPath_cb,
-     (XtPointer) curBlock );
-
     menuStr = XmStringCreateLocalized( appContextClass_str121 );
     pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
      menuBar,
@@ -3724,7 +3981,7 @@ int i, numVisible;
 
   XtVaSetValues( menuBar,
    XmNmenuHelpWidget, helpCascade,
-   0 );
+   NULL );
 
   XtManageChild( menuBar );
 
@@ -3738,6 +3995,7 @@ void appContextClass::addActiveWindow (
 
   // link in
 
+  //strcpy( node->winName, "" );
   node->requestDelete = 0;
   node->requestActivate = 0;
   node->requestActivateClear = 0;
@@ -4051,7 +4309,21 @@ static void displayParamInfo ( void ) {
 
   fprintf( stderr, global_str94 );
 
+  fprintf( stderr, global_str129 );
+
+  fprintf( stderr, global_str131 );
+
+  fprintf( stderr, global_str133 );
+
+  fprintf( stderr, global_str135 );
+
+  fprintf( stderr, global_str137 );
+
+  fprintf( stderr, global_str139 );
+
   fprintf( stderr, global_str97 );
+
+  fprintf( stderr, global_str107 );
 
   fprintf( stderr, global_str103 );
   fprintf( stderr, global_str105 );
@@ -4104,6 +4376,45 @@ static void displayParamInfo ( void ) {
   fprintf( stderr, global_str95 );
   fprintf( stderr, "\n" );
   fprintf( stderr, global_str54 );
+  fprintf( stderr, "\n" );
+
+  fprintf( stderr, global_str108 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str109 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str110 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str111 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str112 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str113 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str114 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str115 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str116 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str117 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str118 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str120 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str121 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str122 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str123 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str124 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str125 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str126 );
+  fprintf( stderr, "\n" );
+  fprintf( stderr, global_str127 );
   fprintf( stderr, "\n" );
 
 }
@@ -4222,6 +4533,18 @@ fileListPtr curFile;
         }
         else if ( strcmp( argv[n], global_str93 ) == 0 ) {
         }
+        else if ( strcmp( argv[n], global_str128 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str130 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str132 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str134 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str136 ) == 0 ) {
+        }
+        else if ( strcmp( argv[n], global_str138 ) == 0 ) {
+        }
         else if ( strcmp( argv[n], global_str86 ) == 0 ) {
           n++; // just ignore, not used here
           if ( n >= argc ) return 2;
@@ -4308,6 +4631,9 @@ fileListPtr curFile;
 	}
 	else if ( strcmp( argv[n], global_str100 ) == 0 ) { //disable scroll bars
           useScrollBars = 0;
+	}
+	else if ( strcmp( argv[n], global_str106 ) == 0 ) { //noautomsg
+          msgBox.setAutoOpen( 0 );
 	}
 
         else {
@@ -4589,6 +4915,20 @@ err_return:
   xmStr1 = XmStringCreateLocalized( "*.edl" );
   XtSetArg( args[n], XmNpattern, xmStr1 ); n++;
 
+  fileSelectFromPathBox = XmCreateFileSelectionDialog( appTop, "menuopenpathselect", args, n );
+
+  XmStringFree( xmStr1 );
+
+  XtAddCallback( fileSelectFromPathBox, XmNcancelCallback,
+   app_fileSelectFromPathCancel_cb, (void *) this );
+  XtAddCallback( fileSelectFromPathBox, XmNokCallback,
+   app_fileSelectFromPathOk_cb, (void *) this );
+
+
+  n = 0;
+  xmStr1 = XmStringCreateLocalized( "*.edl" );
+  XtSetArg( args[n], XmNpattern, xmStr1 ); n++;
+
   fileSelectBox = XmCreateFileSelectionDialog( appTop, "menuopenfileselect", args, n );
 
   XmStringFree( xmStr1 );
@@ -4698,6 +5038,7 @@ err_return:
   while ( curFile != fileHead ) {
 
     cur = new activeWindowListType;
+    //strcpy( cur->winName, "" );
     cur->requestDelete = 0;
     cur->requestActivate = 0;
     cur->requestActivateClear = 0;
@@ -4768,6 +5109,8 @@ int state;
 char *macTk, *macBuf, macTmp[255+1];
 int stat;
 char name[127+1], prefix[127+1];
+char filePart[255+1], winNam[WINNAME_MAX+1];
+int gotPosition, posx, posy;
 
   //fprintf( stderr, "list = [%s]\n", list );
 
@@ -4840,6 +5183,10 @@ char name[127+1], prefix[127+1];
 
       if ( strcmp( tk, global_str93 ) != 0 ) {
 
+        extractPosition( tk, filePart, 255, &gotPosition, &posx, &posy );
+
+        extractWinName( filePart, 255, winNam, WINNAME_MAX );
+
         doOpen = 1;
         cur = head->flink;
         while ( cur != head ) {
@@ -4850,8 +5197,8 @@ char name[127+1], prefix[127+1];
             crc = updateCRC( crc, locExpansions[i], strlen(locExpansions[i]) );
           }
 
-          stat = getFileName( name, tk, 127 );
-          stat = getFilePrefix( prefix, tk, 127 );
+          stat = getFileName( name, filePart, 127 );
+          stat = getFilePrefix( prefix, filePart, 127 );
 
           if ( ( strcmp( name, cur->node.displayName ) == 0 ) &&
                ( strcmp( prefix, cur->node.prefix ) == 0 ) &&
@@ -4861,6 +5208,7 @@ char name[127+1], prefix[127+1];
 
             XMapWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
             XRaiseWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
+            if ( gotPosition ) cur->node.move( posx, posy );
 
             break;
 
@@ -4875,6 +5223,9 @@ char name[127+1], prefix[127+1];
           //fprintf( stderr, "Do open\n" );
 
           cur = new activeWindowListType;
+          cur->setWinName( winNam );
+	  //strncpy( cur->winName, winNam, WINNAME_MAX );
+          //cur->winName[WINNAME_MAX] = 0;
           cur->requestDelete = 0;
           cur->requestActivate = 0;
           cur->requestActivateClear = 0;
@@ -4897,13 +5248,264 @@ char name[127+1], prefix[127+1];
           cur->node.realize();
           cur->node.setGraphicEnvironment( &ci, &fi );
 
-          cur->node.storeFileName( tk );
+	  if ( gotPosition ) {
+	    cur->x = posx;
+	    cur->y = posy;
+	    cur->requestPosition = 1;
+	  }
+
+          cur->node.storeFileName( filePart );
 
           cur->requestOpen = 1;
           requestFlag++;
 
           cur->requestActivate = 1;
           requestFlag++;
+
+        }
+
+      }
+
+      tk = strtok_r( NULL, "|", &buf1 );
+      if ( !tk ) return;
+
+    }
+
+    if ( state == GETTING_1ST_MACRO ) {
+
+      macBuf = NULL;
+      strcpy( macTmp, tk );
+      //fprintf( stderr, "getting 1st macro, macTmp = [%s]\n", macTmp );
+      macTk = strtok_r( macTmp, "=,", &macBuf );
+      if ( macTk ) {
+        //fprintf( stderr, "getting 1st macro, sym = [%s]\n", macTk );
+        locMacros[0] = macTk;
+      }
+
+      macTk = strtok_r( NULL, "=,", &macBuf );
+      if ( macTk ) {
+        //fprintf( stderr, "getting 1st macro, val = [%s]\n", macTk );
+        locExpansions[0] = macTk;
+        locNumMacros = 1;
+        state = GETTING_MACROS;
+      }
+      else {
+        locNumMacros = 0;
+        state = GETTING_FILES;
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+      }
+
+    }
+
+    if ( state == GETTING_MACROS ) {
+
+      macTk = strtok_r( NULL, "=,", &macBuf );
+      if ( macTk ) {
+        if ( locNumMacros >= MAX_LOC_MACROS ) {
+          postMessage( appContextClass_str142 );
+	  return;
+	}
+        //fprintf( stderr, "getting macros, sym = [%s]\n", macTk );
+        locMacros[locNumMacros] = macTk;
+      }
+      
+      macTk = strtok_r( NULL, "=,", &macBuf );
+      if ( macTk ) {
+        //fprintf( stderr, "getting macros, val = [%s]\n", macTk );
+        locExpansions[locNumMacros] = macTk;
+        locNumMacros++;
+      }
+      else {
+        state = GETTING_FILES;
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+      }
+      
+    }
+
+  }
+
+}
+
+void appContextClass::controlWinNames (
+  char *cmd,
+  char *list
+) {
+
+activeWindowListPtr cur, next;
+int i, doOpen;
+unsigned int crc;
+char *tk, *buf1, tmpMsg[255+1];
+int locNumMacros;
+char *locMacros[MAX_LOC_MACROS], *locExpansions[MAX_LOC_MACROS];
+int state;
+char *macTk, *macBuf, macTmp[255+1];
+int stat;
+char name[127+1], prefix[127+1];
+char filePart[255+1], winNam[WINNAME_MAX+1];
+int gotPosition, posx, posy;
+char controlCmd[31+1];
+
+  strcpy( controlCmd, "" );
+
+  buf1 = NULL;
+  strncpy( tmpMsg, list, 255 );
+  tmpMsg[255] = 0;
+  tk = strtok_r( tmpMsg, "|", &buf1 );
+  tk = strtok_r( NULL, "|", &buf1 );
+  tk = strtok_r( NULL, "|", &buf1 );
+  tk = strtok_r( NULL, "|", &buf1 );
+  tk = strtok_r( NULL, "|", &buf1 );
+  tk = strtok_r( NULL, "|", &buf1 );
+
+  locNumMacros = 0;
+  state = GETTING_INITIAL;
+  tk = strtok_r( NULL, "|", &buf1 );
+  while ( tk ) {
+
+    //fprintf( stderr, "state = %-d\n", state );
+    //if ( tk ) {
+    //  fprintf( stderr, "tk = [%s]\n", tk );
+    //}
+    //else {
+    //  fprintf( stderr, "tk is null\n" );
+    //}
+
+    if ( state == GETTING_INITIAL ) {
+
+      if ( strcmp( tk, global_str73 ) == 0 ) {
+        tk = strtok_r( NULL, "|", &buf1 );
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+      }
+      else if ( 
+        ( strcmp( tk, global_str128 ) == 0 ) ||
+        ( strcmp( tk, global_str130 ) == 0 ) ||
+        ( strcmp( tk, global_str132 ) == 0 ) ||
+        ( strcmp( tk, global_str134 ) == 0 ) ||
+        ( strcmp( tk, global_str136 ) == 0 ) ||
+        ( strcmp( tk, global_str138 ) == 0 )
+      ) {
+
+        state = GETTING_FILES;
+	strncpy( controlCmd, tk, 31 );
+        controlCmd[31] = 0;
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+
+      }
+      else if ( strcmp( tk, global_str19 ) == 0 ) {
+
+        state = GETTING_1ST_MACRO;
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+
+      }
+      else if ( tk[0] == '-' ) { //skip other options if present
+        tk = strtok_r( NULL, "|", &buf1 );
+        if ( !tk ) return;
+
+      }
+      else {
+
+        state = GETTING_FILES;
+        tk = strtok_r( NULL, "|", &buf1 );
+	if ( !tk ) return;
+
+      }
+
+    }
+
+    if ( state == GETTING_FILES ) {
+
+      //fprintf( stderr, "Getting files\n" );
+
+      //for ( i=0; i<locNumMacros; i++ ) {
+      //  fprintf( stderr, "%s[%-d] = %s\n", locMacros[i], i, locExpansions[i] );
+      //}
+
+      if ( 
+        ( strcmp( tk, global_str128 ) != 0 ) &&
+        ( strcmp( tk, global_str130 ) != 0 ) &&
+        ( strcmp( tk, global_str132 ) != 0 ) &&
+        ( strcmp( tk, global_str134 ) != 0 ) &&
+        ( strcmp( tk, global_str136 ) != 0 ) &&
+        ( strcmp( tk, global_str138 ) != 0 )
+      ) {
+
+        extractPosition( tk, filePart, 255, &gotPosition, &posx, &posy );
+
+        strncpy( winNam, filePart, WINNAME_MAX );
+        winNam[WINNAME_MAX] = 0;
+
+        doOpen = 1;
+        cur = head->flink;
+        while ( cur != head ) {
+
+          crc = 0;
+          for ( i=0; i<locNumMacros; i++ ) {
+            crc = updateCRC( crc, locMacros[i], strlen(locMacros[i]) );
+            crc = updateCRC( crc, locExpansions[i], strlen(locExpansions[i]) );
+          }
+
+          stat = getFileName( name, filePart, 127 );
+          stat = getFilePrefix( prefix, filePart, 127 );
+
+          next = cur->flink;
+
+          if ( cur->winName ) {
+
+            if ( strlen(winNam) > 0 ) {
+
+              if ( cur->simpleMatch( winNam ) ) {
+
+                if ( strcmp( controlCmd, global_str128 ) == 0 ) { // close
+                  cur->clearWinName();         // clear this so no other
+                                               // action may be taken
+                  cur->node.returnToEdit( 1 );
+                }
+                else if ( strcmp( controlCmd, global_str130 ) == 0 ) { // move
+                  if ( gotPosition ) {
+                    cur->node.move( posx, posy );
+                  }
+                }
+                else if ( strcmp( controlCmd, global_str132 ) == 0 ) { // raise
+                  if ( gotPosition ) {
+                    cur->node.move( posx, posy );
+                  }
+                  XRaiseWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
+                }
+                else if ( strcmp( controlCmd, global_str134 ) == 0 ) { // lower
+                  if ( gotPosition ) {
+                    cur->node.move( posx, posy );
+                  }
+                  XLowerWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
+                }
+                else if ( strcmp( controlCmd, global_str136 ) == 0 ) { // iconify
+                  XtVaSetValues( cur->node.topWidgetId(),
+                   XmNiconic, True,
+                   NULL );
+                  if ( gotPosition ) {
+                    cur->node.move( posx, posy );
+                  }
+                }
+                else if ( strcmp( controlCmd, global_str138 ) == 0 ) { // deiconify
+                  if ( gotPosition ) {
+                    cur->node.move( posx, posy );
+                  }
+                  XtVaSetValues( cur->node.topWidgetId(),
+                   XmNiconic, False,
+                   NULL );
+                }
+
+              }
+
+            }
+
+	  }
+
+          cur = next;
 
         }
 
@@ -5025,6 +5627,7 @@ char tmpName[127+1], prefix[127+1];
       //fprintf( stderr, "Do open\n" );
 
       cur = new activeWindowListType;
+      //strcpy( cur->winName, "" );
       cur->requestDelete = 0;
       cur->requestActivate = 0;
       cur->requestActivateClear = 0;
@@ -5077,6 +5680,7 @@ int appContextClass::addActWin (
 activeWindowListPtr cur;
 
   cur = new activeWindowListType;
+  //strcpy( cur->winName, "" );
   cur->requestDelete = 0;
   cur->requestActivate = 0;
   cur->requestActivateClear = 0;
@@ -5111,7 +5715,6 @@ activeWindowListPtr cur;
   return 1;
 
 }
-
 
 void appContextClass::applicationLoop ( void ) {
 
@@ -5339,6 +5942,8 @@ char msg[127+1];
         }
       }
 
+      cur->node.doMinCopy();
+
       cur = cur->flink;
 
     }
@@ -5370,19 +5975,28 @@ char msg[127+1];
   cur = head->flink;
   while ( cur != head ) {
 
+    int stuffToDo;
+
     n++;
 
     // invoke the executeDeferred function for all activeGraphicClass
     // objects (display elements) for a given activeWindowClass object
     // (display screen)
-    cur->node.processObjects();
+    stuffToDo = cur->node.processObjects();
 
-    iconTestCount++;
-    if ( iconTestCount > 10 ) { // periodically, check if iconified
-      iconTestCount = 0;
-      XtVaGetValues( cur->node.topWidgetId(),
-       XmNiconic, &cur->node.isIconified,
-       NULL );
+    if ( !ignoreIconic() ) {
+
+      if ( iconTestCount > 10 ) { // periodically, check if iconified
+        XtVaGetValues( cur->node.topWidgetId(),
+         XmNiconic, &cur->node.isIconified,
+         NULL );
+      }
+
+    }
+    else {
+
+      if ( cur->node.isIconified ) cur->node.isIconified = 0;
+
     }
 
     if ( !( n % 30 ) ) {
@@ -5395,10 +6009,20 @@ char msg[127+1];
 
   }
 
+  if ( iconTestCount++ > 10 ) {
+    iconTestCount = 0;
+  }
+
   stat = pend_io( 10.0 );
   //pend_event( 0.00001 );
 
   processAllEvents( app, display );
+
+  cur = head->flink;
+  while ( cur != head ) {
+    cur->node.doMinCopy();
+    cur = cur->flink;
+  }
 
   raiseMessageWindow();
 
@@ -5408,6 +6032,13 @@ XtAppContext appContextClass::appContext ( void )
 {
 
   return app;
+
+}
+
+Widget appContextClass::fileSelectFromPathBoxWidgetId ( void )
+{
+
+  return fileSelectFromPathBox;
 
 }
 
@@ -5770,6 +6401,7 @@ char *newValues[100+1];
   //}
 
   cur = new activeWindowListType;
+  //strcpy( cur->winName, "" );
 
   addActiveWindow( cur );
 
@@ -5823,8 +6455,10 @@ activeWindowListPtr cur;
   cur = head->flink;
   while ( cur != head ) {
 
-    if ( !cur->node.okToDeactivate() ) {
-      return 0;
+    if ( cur->node.windowState != AWC_COMPLETE_DEACTIVATE ) {
+      if ( !cur->node.okToDeactivate() ) {
+        return 0;
+      }
     }
 
     cur = cur->flink;
@@ -5878,6 +6512,16 @@ char *envPtr, text[255+1];
   snprintf( text, 255, "Environment:" );
   postMessage( text );
 
+  envPtr = getenv( environment_str1 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str1, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str1 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
   envPtr = getenv( environment_str2 );
   if ( envPtr ) {
     snprintf( text, 255, "  %s=[%s]", environment_str2, envPtr );
@@ -5914,6 +6558,16 @@ char *envPtr, text[255+1];
   }
   else {
     snprintf( text, 255, "  %s=[]", environment_str5 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str6 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str6, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str6 );
   }
   text[255] = 0;
   postMessage( text );
@@ -6008,22 +6662,112 @@ char *envPtr, text[255+1];
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMCOMMENTS" );
+  envPtr = getenv( environment_str16 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMCOMMENTS", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str16, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMCOMMENTS" );
+    snprintf( text, 255, "  %s=[]", environment_str16 );
   }
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMHTTPDOCROOT" );
+  envPtr = getenv( environment_str17 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMHTTPDOCROOT", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str17, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMHTTPDOCROOT" );
+    snprintf( text, 255, "  %s=[]", environment_str17 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str18 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str18, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str18 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str19 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str19, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str19 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str20 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str20, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str20 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str21 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str21, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str21 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str22 ); //EDMCOMMENTS
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str22, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str22 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str23 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str23, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str23 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str24 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str24, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str24 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str25 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str25, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str25 );
+  }
+  text[255] = 0;
+  postMessage( text );
+
+  envPtr = getenv( environment_str26 );
+  if ( envPtr ) {
+    snprintf( text, 255, "  %s=[%s]", environment_str26, envPtr );
+  }
+  else {
+    snprintf( text, 255, "  %s=[]", environment_str26 );
   }
   text[255] = 0;
   postMessage( text );
@@ -6038,42 +6782,11 @@ char *envPtr, text[255+1];
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMCOLORMODE" );
-  if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMCOLORMODE", envPtr );
-  }
-  else {
-    snprintf( text, 255, "  %s=[]", "EDMCOLORMODE" );
-  }
-  text[255] = 0;
-  postMessage( text );
-
-  envPtr = getenv( "EDMPRINTER" );
-  if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMPRINTER", envPtr );
-  }
-  else {
-    snprintf( text, 255, "  %s=[]", "EDMPRINTER" );
-  }
-  text[255] = 0;
-  postMessage( text );
-
-  envPtr = getenv( "EDMSERVERS" );
-  if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMSERVERS", envPtr );
-  }
-  else {
-    snprintf( text, 255, "  %s=[]", "EDMSERVERS" );
-  }
-  text[255] = 0;
-  postMessage( text );
-
-
   // site specific vars
 
   snprintf( text, 255, " " );
   postMessage( text );
-  snprintf( text, 255, "  (Site Specific)" );
+  snprintf( text, 255, "  (Site Related)" );
   postMessage( text );
 
   envPtr = getenv( "EDMRDDHS" );
@@ -6094,52 +6807,52 @@ char *envPtr, text[255+1];
   snprintf( text, 255, "  (Diagnostic)" );
   postMessage( text );
 
-  envPtr = getenv( "EDMSUPERVISORMODE" );
+  envPtr = getenv( environment_str27 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMSUPERVISORMODE", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str27, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMSUPERVISORMODE" );
+    snprintf( text, 255, "  %s=[]", environment_str27 );
   }
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMGENDOC" );
+  envPtr = getenv( environment_str28 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMGENDOC", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str28, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMGENDOC" );
+    snprintf( text, 255, "  %s=[]", environment_str28 );
   }
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMDEBUGMODE" );
+  envPtr = getenv( environment_str29 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMDEBUGMODE", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str29, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMDEBUGMODE" );
+    snprintf( text, 255, "  %s=[]", environment_str29 );
   }
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMDIAGNOSTICMODE" );
+  envPtr = getenv( environment_str30 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMDIAGNOSTICMODE", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str30, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMDIAGNOSTICMODE" );
+    snprintf( text, 255, "  %s=[]", environment_str30 );
   }
   text[255] = 0;
   postMessage( text );
 
-  envPtr = getenv( "EDMXSYNC" );
+  envPtr = getenv( environment_str31 );
   if ( envPtr ) {
-    snprintf( text, 255, "  %s=[%s]", "EDMXSYNC", envPtr );
+    snprintf( text, 255, "  %s=[%s]", environment_str31, envPtr );
   }
   else {
-    snprintf( text, 255, "  %s=[]", "EDMXSYNC" );
+    snprintf( text, 255, "  %s=[]", environment_str31 );
   }
   text[255] = 0;
   postMessage( text );
@@ -6148,3 +6861,10 @@ char *envPtr, text[255+1];
   postMessage( text );
 
 }
+
+Widget appContextClass::apptop ( void ) {
+
+  return appTop;
+
+}
+

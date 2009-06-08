@@ -152,6 +152,7 @@ static int endianEnum[2] = {
   tag.loadW( "endian", 2, endianEnumStr, endianEnum, &en, &bigEndian );
   tag.loadW( "numBits", &nobt, &sixteen );
   tag.loadW( "shift", &shft, &zero );
+  tag.loadW( unknownTags );
   tag.loadW( "endObjectProperties" );
   tag.loadW( "" );
 
@@ -232,6 +233,7 @@ static int endianEnum[2] = {
 
   tag.init();
   tag.loadR( "beginObjectProperties" );
+  tag.loadR( unknownTags );
   tag.loadR( "major", &major );
   tag.loadR( "minor", &minor );
   tag.loadR( "release", &release );
@@ -612,13 +614,13 @@ int edmByteClass::eraseUnconditional ( void ) {
 
   if ( !enabled ) return 1;
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+    XFillRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
 
   actWin->executeGc.setLineWidth( lineWidth );
   actWin->executeGc.setLineStyle( lineStyle );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h );
 
   actWin->executeGc.setLineWidth( 1 );
@@ -864,13 +866,13 @@ inline void edmByteClass::innerDrawFull(int value, int i, int mask,
      actWin->executeGc.setFG( previous?fgPixel:offPixel );
 
      if (w > h)
-        XFillRectangle(actWin->d, XtWindow(actWin->executeWidget),
+        XFillRectangle(actWin->d, drawable(actWin->executeWidget),
                     actWin->executeGc.normGC(), 
                     theOutline[lastseg].x1, 
                     theOutline[lastseg].y1,
                     theOutline[i].x1 - theOutline[lastseg].x1, h);
      else
-        XFillRectangle(actWin->d, XtWindow(actWin->executeWidget),
+        XFillRectangle(actWin->d, drawable(actWin->executeWidget),
                     actWin->executeGc.normGC(), 
                     theOutline[lastseg].x1, 
                     theOutline[lastseg].y1,
@@ -937,24 +939,24 @@ inline void edmByteClass::innerDrawBits(int value, int i, int mask)
 
     if (w > h)
     {
-       XFillRectangle(actWin->d, XtWindow(actWin->executeWidget),
+       XFillRectangle(actWin->d, drawable(actWin->executeWidget),
                    actWin->executeGc.normGC(),
                    theOutline[i].x1, theOutline[i].y1,
                    theOutline[i+1].x1 - theOutline[i].x1, h);
        actWin->executeGc.setFG(actWin->ci->getPixelByIndex(lineColor) );
-       XDrawRectangle(actWin->d, XtWindow(actWin->executeWidget),
+       XDrawRectangle(actWin->d, drawable(actWin->executeWidget),
                    actWin->executeGc.normGC(),
                    theOutline[i].x1, theOutline[i].y1,
                    theOutline[i+1].x1 - theOutline[i].x1, h);
     }
     else
     {
-       XFillRectangle(actWin->d, XtWindow(actWin->executeWidget),
+       XFillRectangle(actWin->d, drawable(actWin->executeWidget),
                    actWin->executeGc.normGC(),
                    theOutline[i].x1, theOutline[i].y1,
                    w, theOutline[i+1].y1 - theOutline[i].y1);
        actWin->executeGc.setFG(actWin->ci->getPixelByIndex(lineColor) );
-       XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+       XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
                    actWin->executeGc.normGC(), 
                    theOutline[i].x1, theOutline[i].y1,
                    w, theOutline[i+1].y1 - theOutline[i].y1);
@@ -971,10 +973,10 @@ int edmByteClass::drawActiveBits()
   if (!theOutline)
   {
      actWin->executeGc.setFG(offPixel);
-     XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XFillRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h );
      actWin->executeGc.setFG( actWin->ci->getPixelByIndex(lineColor) );
-     XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
   }
   else if (validFlag)
@@ -1018,7 +1020,7 @@ int edmByteClass::drawActiveFull()
   if (!theOutline)
   {
      actWin->executeGc.setFG(0);
-     XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XFillRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.normGC(), x, y, w, h );
      bufValidate();
   }
@@ -1053,8 +1055,8 @@ int edmByteClass::drawActiveFull()
   else // disconnected
   {
     actWin->drawGc.setFG( 0 );	// white
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-       actWin->drawGc.normGC(), x, y, w, h );
+    XFillRectangle( actWin->d, drawable(actWin->executeWidget),
+       actWin->executeGc.normGC(), x, y, w, h );
     bufValidate();
   }
  
@@ -1064,12 +1066,12 @@ int edmByteClass::drawActiveFull()
 
   if (!theOutline)
   {
-     XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+     XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
        actWin->executeGc.normGC(), x, y, w, h );
   }
   else
   {
-       XDrawSegments(actWin->d, XtWindow(actWin->executeWidget),
+       XDrawSegments(actWin->d, drawable(actWin->executeWidget),
           actWin->executeGc.normGC(), theOutline, nobt + 3);
   }
   
@@ -1085,13 +1087,13 @@ int edmByteClass::eraseActive()
 {
       if ( !enabled || !init || !is_executing ) return 1;
 
-  XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XFillRectangle( actWin->d, drawable(actWin->executeWidget),
      actWin->executeGc.eraseGC(), x, y, w, h );
 
   actWin->executeGc.setLineWidth( lineWidth );
   actWin->executeGc.setLineStyle( lineStyle );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
+  XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
    actWin->executeGc.eraseGC(), x, y, w, h );
 
   actWin->executeGc.setLineWidth( 1 );
@@ -1136,7 +1138,7 @@ void edmByteClass::executeDeferred()
        /****** End of SJS modification ******/
 
        if (!actWin->isIconified)
-           drawActive();
+	 drawActive();
 
        actWin->appCtx->proc->lock();
        actWin->remDefExeNode(aglPtr);
