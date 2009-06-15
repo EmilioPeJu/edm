@@ -1120,25 +1120,32 @@ void edmByteClass::executeDeferred()
     if (is_executing)
     {
        lastval = value;
-       /****** SJS Modification 22/06/05 to cater for input from ******
-       ******* mbbi32Direct record - replace ******
-       value = ((valuePvId->get_int() >> shft) & dmask);
-       ******* by ******/
-       switch (valuePvId->get_type().type)
+       /****** SJS Modification 15/06/09 to allow byte widgets to ******
+        ****** co-exist with menu-mux widgets ******/
+       if (valuePvId->is_valid ())
        {
-       case ProcessVariable::Type::real:
-           value = ((((unsigned int) (valuePvId->get_double()))
-                    >> shft) & dmask);
-           break;
+          /****** End of SJS Modification 15_06_09 ******/
+          /****** SJS Modification 22/06/05 to cater for input from ******
+          ******* mbbi32Direct record - replace ******
+          value = ((valuePvId->get_int() >> shft) & dmask);
+          ******* by ******/
+          switch (valuePvId->get_type().type)
+          {
+          case ProcessVariable::Type::real:
+             value = ((((unsigned int) (valuePvId->get_double()))
+                      >> shft) & dmask);
+             break;
                                                                                 
-       default:
-           value = ((valuePvId->get_int() >> shft) & dmask);
-           break;
+          default:
+             value = ((valuePvId->get_int() >> shft) & dmask);
+             break;
+          }
+          /****** End of SJS modification 22/06/05******/
+          if (!actWin->isIconified)
+             drawActive();
+       /****** SJS Modification 15_06_09 ******/
        }
-       /****** End of SJS modification ******/
-
-       if (!actWin->isIconified)
-	 drawActive();
+       /****** End of SJS modification 15/06/09******/
 
        actWin->appCtx->proc->lock();
        actWin->remDefExeNode(aglPtr);
