@@ -886,38 +886,47 @@ int edmByteClass::drawActive()
 {
    if (is_executing && enabled)
    {
-      if (valuePvId->is_valid())
+      /***** SJS addition 15/06/09 to stop widget crashing if no PV is *****
+       ***** specified ******/
+      if (valuePvId)
       {
-         unsigned int severity;
-         // logic for non-invalid alarm colors would go here.  
-         severity = valuePvId->get_severity();
-         switch(severity)
+         /***** End of SJS addition 15/06/09 ******/
+         if (valuePvId->is_valid())
          {
-             case NO_ALARM:  
-                fgPixel = onPixel;
-                break;
-             case MINOR_ALARM:
-                fgPixel = minorPixel;
-                break;
-             case MAJOR_ALARM:
-                fgPixel = majorPixel;
-                break;
-             default:
-                fgPixel = invalidPixel;
+            unsigned int severity;
+            // logic for non-invalid alarm colors would go here.  
+            severity = valuePvId->get_severity();
+            switch(severity)
+            {
+            case NO_ALARM:  
+               fgPixel = onPixel;
+               break;
+            case MINOR_ALARM:
+               fgPixel = minorPixel;
+               break;
+            case MAJOR_ALARM:
+               fgPixel = majorPixel;
+               break;
+            default:
+               fgPixel = invalidPixel;
+            }
+            if (!validFlag || lastsev != severity) 
+            {
+               validFlag = true;
+               lastsev = severity;
+               bufInvalidate();
+            }
          }
-         if (!validFlag || lastsev != severity) 
+         else if (validFlag)
          {
-            validFlag = true;
-            lastsev = severity;
+            validFlag = false;
             bufInvalidate();
+            fgPixel = invalidPixel;
          }
+         /***** SJS addition 15/06/09 to stop widget crashing if no PV is *****
+          ***** specified ******/
       }
-      else if (validFlag)
-      {
-         validFlag = false;
-         bufInvalidate();
-         fgPixel = invalidPixel;
-      }
+      /***** End of SJS addition 15/06/09 ******/
    }
    if (bufInvalid)
    {
