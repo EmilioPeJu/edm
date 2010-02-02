@@ -1079,7 +1079,7 @@ public:
         loadR ( "heightPvStr", heightPvStr, (char *) "" ); 
         loadR ( "widthOffsetPvStr", widthOffsetPvStr, (char *) "" );
         loadR ( "heightOffsetPvStr", heightOffsetPvStr, (char *) "" );
-        loadR ( "gridSizePvStr", gridSizePvStr, (char *) "" );
+        loadR ( "gridSizePvStr", gridSizePvStr, (char *) "100" );
         loadR ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
         loadR ( "showGridPvStr", showGridPvStr, (char *) "" ); 
         loadR ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
