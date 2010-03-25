@@ -14,6 +14,7 @@
 edmStripClass::edmStripClass()
 {
     name = strdup(STRIP_CLASSNAME);
+    checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
     is_executing = false;
     for (size_t i=0; i<num_pvs; ++i)
     {
@@ -748,6 +749,27 @@ int edmStripClass::containsMacros()
         if (pv_name[i].containsPrimaryMacros())
             return 1;
     return 0;
+}
+
+int edmStripClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[]
+) {
+
+int i;
+expStringClass tmpStr;
+
+  for ( size_t i=0; i<num_pvs; ++i ) {
+
+    tmpStr.setRaw( pv_name[i].getRaw() );
+    tmpStr.expand1st( numMacros, macros, expansions );
+    pv_name[i].setRaw( tmpStr.getExpanded() );
+
+  }
+
+  return 1;
+
 }
 
 int edmStripClass::expand1st(int numMacros, char *macros[],

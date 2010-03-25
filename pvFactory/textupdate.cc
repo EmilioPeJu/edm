@@ -19,9 +19,9 @@ static XtTranslations g_parsedTrans;
 static char g_dragTrans[] =
   "#override\n\
   ~Ctrl~Shift<Btn2Down>: startDrag()\n\
-  Ctrl~Shift<Btn2Down>: pvInfo()\n\
-  Shift Ctrl<Btn2Up>: selectActions()\n\
-  Shift<Btn2Up>: selectDrag()";
+  Ctrl~Shift<Btn2Up>: selectActions()\n\
+  Shift Ctrl<Btn2Down>: pvInfo()\n\
+  Shift~Ctrl<Btn2Up>: selectDrag()";
 
 static XtActionsRec g_dragActions[] =
 {
@@ -45,18 +45,18 @@ static void localCvtDoubleToExpNotationString(double value,
     absVal = fabs(value);
     minus = value < 0.0;
     newVal = absVal;
-    if (absVal < 1.)
+    if ( !finite(absVal) || absVal==0.0 ) { /* don't try to evaluate Inf, NaN, 0.0 */
+        cvtDoubleToExpString(newVal, textField ,precision);
+    }
+    else if (absVal < 1.)
     {
         exp = 0;
-        if (absVal != 0.)
-        {		/* really ought to test against some epsilon */
-            do
-            {
-                newVal *= 1000.0;
-                exp += 3;
-            }
-            while (newVal < 1.);
+        do
+        {
+            newVal *= 1000.0;
+            exp += 3;
         }
+        while (newVal < 1.);
         cvtDoubleToString(newVal, TF ,precision);
         k = 0; l = 0;
         if (minus)
@@ -118,6 +118,7 @@ edmTextupdateClass::edmTextupdateClass()
 void edmTextupdateClass::init(const char *classname)
 {
     name = strdup(classname);
+    checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
     is_executing = false;
     pv = 0;
 
@@ -624,11 +625,19 @@ int edmTextupdateClass::genericEdit() // create Property Dialog
     ef.addOption("Mode", "default|decimal|hex|engineer|exp", &buf_displayMode);
     ef.addTextField("Precision", 35, &buf_precision);
     ef.addTextField("Line Width", 35, &buf_line_width);
+    lineEntry = ef.getCurItem();
     ef.addToggle("Alarm Sensitive Line", &buf_alarm_sensitive_line);
+    alarmSensLineEntry = ef.getCurItem();
+    lineEntry->addDependency( alarmSensLineEntry );
+    lineEntry->addDependencyCallbacks();
     ef.addColorButton("Fg Color", actWin->ci, &textCb, &bufTextColor);
     ef.addToggle("Alarm Sensitive Text", &buf_alarm_sensitive);
     ef.addToggle("Filled?", &bufIsFilled);
+    fillEntry = ef.getCurItem();
     ef.addColorButton("Bg Color", actWin->ci, &fillCb, &bufFillColor);
+    fillColorEntry = ef.getCurItem();
+    fillEntry->addDependency( fillColorEntry );
+    fillEntry->addDependencyCallbacks();
     ef.addTextField("Color PV", 35, bufColorPvName, PV_Factory::MAX_PV_NAME);
     ef.addFontMenu("Font", actWin->fi, &fm, fontTag );
     fm.setFontAlignment(alignment);
@@ -922,6 +931,26 @@ int edmTextupdateClass::containsMacros()
 {
     return pv_name.containsPrimaryMacros() ||
         color_pv_name.containsPrimaryMacros();
+}
+
+int edmTextupdateClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[]
+) {
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( color_pv_name.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  color_pv_name.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( pv_name.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  pv_name.setRaw( tmpStr.getExpanded() );
+
+  return 1;
+
 }
 
 int edmTextupdateClass::expand1st(int numMacros, char *macros[],
@@ -1363,7 +1392,7 @@ int edmTextentryClass::drawActive()
     // ****** SJS Addition 05_12_06 - do not show if widget is part of a ******
     // ****** disabled group.  Note that "enabled" is not correctly set ******
     // ****** in the function activate *******
-    if ( !enabled ) 
+    if ( !enabled )
     {
        if ( widget ) XtUnmapWidget( widget );
     }

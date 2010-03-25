@@ -436,6 +436,7 @@ activeLineClass::activeLineClass ( void ) {
 
   name = new char[strlen("activeLineClass")+1];
   strcpy( name, "activeLineClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
   visibility = 0;
   prevVisibility = -1;
   visInverted = 0;
@@ -661,17 +662,34 @@ char title[32], *ptr;
   ef.addColorButton( activeLineClass_str14, actWin->ci, &eBuf->lineCb,
    &eBuf->bufLineColor );
   ef.addToggle( activeLineClass_str15, &eBuf->bufLineColorMode );
+
   ef.addToggle( activeLineClass_str16, &eBuf->bufFill );
+  fillEntry = ef.getCurItem();
   ef.addColorButton( activeLineClass_str17, actWin->ci, &eBuf->fillCb,
    &eBuf->bufFillColor );
+  fillColorEntry = ef.getCurItem();
+  fillEntry->addDependency( fillColorEntry );
   ef.addToggle( activeLineClass_str18, &eBuf->bufFillColorMode );
+  fillAlarmSensEntry = ef.getCurItem();
+  fillEntry->addDependency( fillAlarmSensEntry );
+  fillEntry->addDependencyCallbacks();
+
   ef.addTextField( activeLineClass_str19, 30, eBuf->bufAlarmPvName,
    PV_Factory::MAX_PV_NAME );
+
   ef.addTextField( activeLineClass_str20, 30, eBuf->bufVisPvName,
    PV_Factory::MAX_PV_NAME );
+  invisPvEntry = ef.getCurItem();
   ef.addOption( " ", activeLineClass_str22, &eBuf->bufVisInverted );
+  visInvEntry = ef.getCurItem();
+  invisPvEntry->addDependency( visInvEntry );
   ef.addTextField( activeLineClass_str23, 30, eBuf->bufMinVisString, 39 );
+  minVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( minVisEntry );
   ef.addTextField( activeLineClass_str24, 30, eBuf->bufMaxVisString, 39 );
+  maxVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( maxVisEntry );
+  invisPvEntry->addDependencyCallbacks();
 
   return 1;
 
@@ -781,6 +799,32 @@ pointPtr cur;
 
   lineEditBegin();
 
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
+
   return 1;
 
 }
@@ -855,6 +899,32 @@ int oneX, oneY, oneW, oneH;
      cur->flink->x, cur->flink->y );
   }
 
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
+
   return 1;
 
 }
@@ -924,6 +994,32 @@ int oneX, oneY, oneW, oneH;
 
   actWin->drawGc.restoreFg();
 
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
+
   return 1;
 
 }
@@ -980,6 +1076,32 @@ int oneW, oneH;
   actWin->drawGc.setLineStyle( LineSolid );
   actWin->drawGc.setLineWidth( 1 );
 
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
+
   return 1;
 
 }
@@ -1028,6 +1150,32 @@ int oneX, oneY, oneW, oneH;
   actWin->drawGc.setLineWidth( 1 );
 
   this->actWin->refreshGrid();
+
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
 
   return 1;
 
@@ -1087,7 +1235,7 @@ pointPtr activeLineClass::selectPoint (
   int y )
 {
 
-pointPtr cur;
+pointPtr cur, prev, next;
 int d, lw, threshold;
 
   if ( lineWidth > 0 ) {
@@ -1102,13 +1250,95 @@ int d, lw, threshold;
   while ( cur != head ) {
 
     d = ( cur->x - x ) * ( cur->x - x ) + ( cur->y - y ) * ( cur->y - y );
-    if ( 2*d <= threshold ) return cur;
+    if ( 2*d <= threshold ) {
+
+      prev = cur->blink;
+      next = cur->flink;
+      if ( prev != head ) {
+
+        if ( prev->blink != head ) {
+          strcpy( actWin->refPoint[0].label, "" );
+          actWin->refPoint[0].x = prev->blink->x;
+          actWin->refPoint[0].y = prev->blink->y;
+          strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+          actWin->refPoint[1].x = prev->x;
+          actWin->refPoint[1].y = prev->y;
+          actWin->numRefPoints = 2;
+        }
+        else {
+          strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+          actWin->refPoint[1].x = prev->x;
+          actWin->refPoint[1].y = prev->y;
+          actWin->numRefPoints = 1;
+        }
+
+      }
+      else if ( next != head ) {
+
+        if ( next->flink != head ) {
+          strcpy( actWin->refPoint[0].label, "" );
+          actWin->refPoint[0].x = next->flink->x;
+          actWin->refPoint[0].y = next->flink->y;
+          strcpy( actWin->refPoint[1].label, "Next Vertex" );
+          actWin->refPoint[1].x = next->x;
+          actWin->refPoint[1].y = next->y;
+          actWin->numRefPoints = 2;
+        }
+        else {
+          strcpy( actWin->refPoint[1].label, "Next Vertex" );
+          actWin->refPoint[1].x = next->x;
+          actWin->refPoint[1].y = next->y;
+          actWin->numRefPoints = 1;
+	}
+
+      }
+      else {
+
+        actWin->numRefPoints = 0;
+
+      }
+
+      return cur;
+
+    }
 
     cur = cur->flink;
 
   }
 
   return (pointPtr) NULL;
+
+}
+
+void activeLineClass::deselectAllPoints ( void ) {
+
+pointPtr cur;
+
+  cur = head->blink;
+  if ( cur != head ) {
+
+    if ( cur->blink != head ) {
+      strcpy( actWin->refPoint[0].label, "" );
+      actWin->refPoint[0].x = cur->blink->x;
+      actWin->refPoint[0].y = cur->blink->y;
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 2;
+    }
+    else {
+      strcpy( actWin->refPoint[1].label, "Prev Vertex" );
+      actWin->refPoint[1].x = cur->x;
+      actWin->refPoint[1].y = cur->y;
+      actWin->numRefPoints = 1;
+    }
+
+  }
+  else {
+
+    actWin->numRefPoints = 0;
+
+  }
 
 }
 
@@ -1442,6 +1672,8 @@ int n, oneX, oneY, oneW, oneH, minX, minY, maxX, maxY;
   }
 
   this->refresh();
+
+  actWin->numRefPoints = 0;
 
   return 1;
 
@@ -2132,6 +2364,26 @@ XPoint arrowXPoints[8];
     actWin->executeGc.setLineWidth( 1 );
 
   }
+
+  return 1;
+
+}
+
+int activeLineClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( alarmPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  alarmPvExpStr.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( visPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  visPvExpStr.setRaw( tmpStr.getExpanded() );
 
   return 1;
 
@@ -3172,7 +3424,7 @@ void activeLineClass::updateColors (
   double colorValue )
 {
 
-int index, change;
+int index, change=0;
 
   index = actWin->ci->evalRule( lineColor.pixelIndex(), colorValue );
 

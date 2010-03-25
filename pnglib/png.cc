@@ -267,6 +267,7 @@ int status;
 
   name = new char[strlen("activePngClass")+1];
   strcpy( name, "activePngClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
 
   strcpy( pngFileName, "" );
 
@@ -1896,9 +1897,9 @@ uch *src;
         src = image_data + row * rowbytes;
 
         // ****** SJS Modification 08/03/05 - replace ******
-        // for ( col=w; col>0; col-- ) 
+        // for ( col=w; col>0; col-- )
         // ****** by ***************************************
-        for ( col=imageWidth; col>0; col-- ) 
+        for ( col=imageWidth; col>0; col-- )
         // ****** End of modification **********************
         {
 

@@ -221,6 +221,7 @@ activeMessageBoxClass::activeMessageBoxClass ( void ) {
 
   name = new char[strlen("activeMessageBoxClass")+1];
   strcpy( name, "activeMessageBoxClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
   minW = 200;
   minH = 100;
   strcpy( fontTag, "" );
@@ -1066,6 +1067,26 @@ int activeMessageBoxClass::deactivate (
     }
 
   }
+
+  return 1;
+
+}
+
+int activeMessageBoxClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( readPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  readPvExpStr.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( logFileName.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  logFileName.setRaw( tmpStr.getExpanded() );
 
   return 1;
 

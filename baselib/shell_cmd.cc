@@ -478,6 +478,7 @@ shellCmdClass::shellCmdClass ( void ) {
 
   name = new char[strlen("shellCmdClass")+1];
   strcpy( name, "shellCmdClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
 
   activeMode = 0;
   invisible = 0;
@@ -1842,6 +1843,35 @@ void shellCmdClass::updateDimensions ( void )
     fontDescent = 5;
     fontHeight = fontAscent + fontDescent;
   }
+
+}
+
+int shellCmdClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+int i;
+expStringClass tmpStr;
+
+  for ( i=0; i<numCmds; i++ ) {
+
+    tmpStr.setRaw( shellCommand[i].getRaw() );
+    tmpStr.expand1st( numMacros, macros, expansions );
+    shellCommand[i].setRaw( tmpStr.getExpanded() );
+
+    tmpStr.setRaw( label[i].getRaw() );
+    tmpStr.expand1st( numMacros, macros, expansions );
+    label[i].setRaw( tmpStr.getExpanded() );
+
+  }
+
+  tmpStr.setRaw( buttonLabel.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  buttonLabel.setRaw( tmpStr.getExpanded() );
+
+  return 1;
 
 }
 

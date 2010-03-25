@@ -120,11 +120,19 @@ static void menu_cb (
 
 double v;
 activeUpdownButtonClass *udbto = (activeUpdownButtonClass *) client;
+Widget parent;
+
+  if ( useAppTopParent() ) {
+    parent = udbto->actWin->appCtx->apptop();
+  }
+  else {
+    parent = udbto->actWin->top;
+  }
 
   if ( w == udbto->pbCoarse ) {
 
     udbto->kpDest = udbto->kpCoarseDest;
-    udbto->kp.create( udbto->actWin->top,
+    udbto->kp.create( parent,
      udbto->rootX, udbto->rootY, "", &udbto->kpDouble,
      (void *) client,
      (XtCallbackProc) udbtoSetKpDoubleValue,
@@ -135,7 +143,7 @@ activeUpdownButtonClass *udbto = (activeUpdownButtonClass *) client;
   else if ( w == udbto->pbFine ) {
 
     udbto->kpDest = udbto->kpFineDest;
-    udbto->kp.create( udbto->actWin->top,
+    udbto->kp.create( parent,
      udbto->rootX, udbto->rootY, "", &udbto->kpDouble,
      (void *) client,
      (XtCallbackProc) udbtoSetKpDoubleValue,
@@ -146,7 +154,7 @@ activeUpdownButtonClass *udbto = (activeUpdownButtonClass *) client;
   else if ( w == udbto->pbRate ) {
 
     udbto->kpDest = udbto->kpRateDest;
-    udbto->kp.create( udbto->actWin->top,
+    udbto->kp.create( parent,
      udbto->rootX, udbto->rootY, "", &udbto->kpDouble,
      (void *) client,
      (XtCallbackProc) udbtoSetKpDoubleValue,
@@ -157,7 +165,7 @@ activeUpdownButtonClass *udbto = (activeUpdownButtonClass *) client;
   else if ( w == udbto->pbValue ) {
 
     udbto->kpDest = udbto->kpValueDest;
-    udbto->kp.create( udbto->actWin->top,
+    udbto->kp.create( parent,
      udbto->rootX, udbto->rootY, "", &udbto->kpDouble,
      (void *) client,
      (XtCallbackProc) udbtoSetKpDoubleValue,
@@ -621,8 +629,8 @@ activeUpdownButtonClass::activeUpdownButtonClass ( void ) {
 
   name = new char[strlen("activeUpdownButtonClass")+1];
   strcpy( name, "activeUpdownButtonClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
   buttonPressed = 0;
-
   _3D = 1;
   invisible = 0;
   rate = 0.1;
@@ -1499,8 +1507,15 @@ char title[32], *ptr;
    PV_Factory::MAX_PV_NAME );
 
   ef.addToggle( activeUpdownButtonClass_str26, &eBuf->bufLimitsFromDb );
+  limitsFromDbEntry = ef.getCurItem();
   ef.addTextField( activeUpdownButtonClass_str27, 35, &eBuf->bufEfScaleMin );
+  minEntry = ef.getCurItem();
+  limitsFromDbEntry->addInvDependency( minEntry );
   ef.addTextField( activeUpdownButtonClass_str28, 35, &eBuf->bufEfScaleMax );
+  maxEntry = ef.getCurItem();
+  limitsFromDbEntry->addInvDependency( maxEntry );
+  limitsFromDbEntry->addDependencyCallbacks();
+
   ef.addTextField( activeUpdownButtonClass_str9, 35, eBuf->bufCoarse, 39 );
   ef.addTextField( activeUpdownButtonClass_str10, 35, eBuf->bufFine, 39 );
   ef.addTextField( activeUpdownButtonClass_str11, 35, &eBuf->bufRate );
@@ -1521,9 +1536,17 @@ char title[32], *ptr;
 
   ef.addTextField( activeUpdownButtonClass_str29, 30, eBuf->bufVisPvName,
    PV_Factory::MAX_PV_NAME );
+  invisPvEntry = ef.getCurItem();
   ef.addOption( " ", activeUpdownButtonClass_str30, &eBuf->bufVisInverted );
+  visInvEntry = ef.getCurItem();
+  invisPvEntry->addDependency( visInvEntry );
   ef.addTextField( activeUpdownButtonClass_str31, 30, eBuf->bufMinVisString, 39 );
+  minVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( minVisEntry );
   ef.addTextField( activeUpdownButtonClass_str32, 30, eBuf->bufMaxVisString, 39 );
+  maxVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( maxVisEntry );
+  invisPvEntry->addDependencyCallbacks();
 
   return 1;
 
@@ -2395,6 +2418,46 @@ int activeUpdownButtonClass::getButtonActionRequest (
 
   *down = 1;
   *up = 1;
+
+  return 1;
+
+}
+
+int activeUpdownButtonClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( destPvExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  destPvExpString.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( savePvExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  savePvExpString.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( fineExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  fineExpString.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( coarseExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  coarseExpString.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( label.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  label.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( visPvExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  visPvExpString.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( colorPvExpString.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  colorPvExpString.setRaw( tmpStr.getExpanded() );
 
   return 1;
 

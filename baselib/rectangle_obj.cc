@@ -297,6 +297,7 @@ activeRectangleClass::activeRectangleClass ( void ) {
 
   name = new char[strlen("activeRectangleClass")+1];
   strcpy( name, "activeRectangleClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
   invisible = 0;
   visInverted = 0;
   visPvExists = alarmPvExists = 0;
@@ -465,18 +466,35 @@ char title[32], *ptr;
   ef.addColorButton( activeRectangleClass_str14, actWin->ci, &eBuf->lineCb,
    &eBuf->bufLineColor );
   ef.addToggle( activeRectangleClass_str15, &eBuf->bufLineColorMode );
+
   ef.addToggle( activeRectangleClass_str16, &eBuf->bufFill );
+  fillEntry = ef.getCurItem();
   ef.addColorButton( activeRectangleClass_str17, actWin->ci, &eBuf->fillCb,
    &eBuf->bufFillColor );
+  fillColorEntry = ef.getCurItem();
+  fillEntry->addDependency( fillColorEntry );
   ef.addToggle( activeRectangleClass_str18, &eBuf->bufFillColorMode );
+  fillAlarmSensEntry = ef.getCurItem();
+  fillEntry->addDependency( fillAlarmSensEntry );
+  fillEntry->addDependencyCallbacks();
+
   ef.addToggle( activeRectangleClass_str19, &eBuf->bufInvisible );
   ef.addTextField( activeRectangleClass_str20, 30, eBuf->bufAlarmPvName,
    PV_Factory::MAX_PV_NAME );
+
   ef.addTextField( activeRectangleClass_str21, 30, eBuf->bufVisPvName,
    PV_Factory::MAX_PV_NAME );
+  invisPvEntry = ef.getCurItem();
   ef.addOption( " ", activeRectangleClass_str22, &eBuf->bufVisInverted );
+  visInvEntry = ef.getCurItem();
+  invisPvEntry->addDependency( visInvEntry );
   ef.addTextField( activeRectangleClass_str23, 30, eBuf->bufMinVisString, 39 );
+  minVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( minVisEntry );
   ef.addTextField( activeRectangleClass_str24, 30, eBuf->bufMaxVisString, 39 );
+  maxVisEntry = ef.getCurItem();
+  invisPvEntry->addDependency( maxVisEntry );
+  invisPvEntry->addDependencyCallbacks();
 
   return 1;
 
@@ -1165,6 +1183,26 @@ int activeRectangleClass::eraseActive ( void ) {
 
 }
 
+int activeRectangleClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( alarmPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  alarmPvExpStr.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( visPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  visPvExpStr.setRaw( tmpStr.getExpanded() );
+
+  return 1;
+
+}
+
 int activeRectangleClass::expand1st (
   int numMacros,
   char *macros[],
@@ -1763,7 +1801,7 @@ void activeRectangleClass::updateColors (
   double colorValue )
 {
 
-int index, change;
+int index, change=0;
 
   index = actWin->ci->evalRule( lineColor.pixelIndex(), colorValue );
 

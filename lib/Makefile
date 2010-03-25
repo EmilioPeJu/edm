@@ -72,6 +72,7 @@ ifdef EPICS_HOST_ARCH
   INC += scrolled_list.h
   INC += scrolled_text.h
   INC += symbol.h
+  INC += asymbol.h
   INC += tableObj.h
   INC += tag_pkg.h
   INC += ulBindings.h
@@ -83,6 +84,7 @@ ifdef EPICS_HOST_ARCH
   INC += pv_action.h
   INC += pv_factory.h
   INC += pvBindings.h
+  INC += dimDialog.h
 
   USR_CXXFLAGS_hpux11_11_mt += -DHP_UX=1111 -DSINGLE_THREADED=1 -D__epics__=1
   USR_LIBS_hpux11_11_mt = Xm Xt X11 Xext pthread
@@ -141,6 +143,7 @@ ifdef EPICS_HOST_ARCH
   LIB_SRCS += pvConnection.cc
   LIB_SRCS += group.cc
   LIB_SRCS += symbol.cc
+  LIB_SRCS += asymbol.cc
   LIB_SRCS += dynSymbol.cc
   LIB_SRCS += keypad.cc
   LIB_SRCS += calpad.cc
@@ -159,6 +162,7 @@ ifdef EPICS_HOST_ARCH
   LIB_SRCS += pv_action.cc
   LIB_SRCS += pv_factory.cc
   LIB_SRCS += pvBindings.cc
+  LIB_SRCS += dimDialog.cc
 
   include $(TOP)/configure/RULES
 

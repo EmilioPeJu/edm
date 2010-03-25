@@ -202,6 +202,7 @@ activeTableClass::activeTableClass ( void ) {
 
   name = new char[strlen("activeTableClass")+1];
   strcpy( name, "activeTableClass" );
+  checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
   strcpy( fontTag, "" );
   fs = NULL;
   activeMode = 0;
@@ -809,6 +810,22 @@ int activeTableClass::deactivate (
     }
 
   }
+
+  return 1;
+
+}
+
+int activeTableClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( readPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  readPvExpStr.setRaw( tmpStr.getExpanded() );
 
   return 1;
 

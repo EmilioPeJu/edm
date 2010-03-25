@@ -18,6 +18,7 @@ edmByteClass::edmByteClass() : activeGraphicClass(), init(0),
   theOutline(0)
 {
    name = strdup(BYTE_CLASSNAME);
+   checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
 }
 
 edmByteClass::edmByteClass(edmByteClass *rhs)
@@ -787,6 +788,21 @@ void edmByteClass::getPvs(int max,
 int edmByteClass::containsMacros()
 {   return pv_exp_str.containsPrimaryMacros(); }
 
+int edmByteClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[]
+) {
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( pv_exp_str.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  pv_exp_str.setRaw( tmpStr.getExpanded() );
+
+  return 1;
+
+}
 
 int edmByteClass::expand1st(int numMacros, char *macros[],
                                   char *expansions[])
@@ -891,6 +907,7 @@ int edmByteClass::drawActive()
       if (valuePvId)
       {
          /***** End of SJS addition 15/06/09 ******/
+
          if (valuePvId->is_valid())
          {
             unsigned int severity;
@@ -927,6 +944,7 @@ int edmByteClass::drawActive()
           ***** specified ******/
       }
       /***** End of SJS addition 15/06/09 ******/
+
    }
    if (bufInvalid)
    {
@@ -1144,7 +1162,7 @@ void edmByteClass::executeDeferred()
              value = ((((unsigned int) (valuePvId->get_double()))
                       >> shft) & dmask);
              break;
-                                                                                
+
           default:
              value = ((valuePvId->get_int() >> shft) & dmask);
              break;

@@ -23,12 +23,31 @@
 
 static int g_serverSocketFd = -1;
 
+int useAppTopParent ( void ) {
+
+static int useAppTop = -1;
+char *envPtr;
+
+  if ( useAppTop == -1 ) {
+    envPtr = getenv( environment_str34 );
+    if ( envPtr ) {
+      useAppTop = 1;
+    }
+    else {
+      useAppTop = 0;
+    }
+  }
+
+  return useAppTop;
+
+}
+
 int debugMode ( void ) {
 
 int val;
 char *envPtr;
 
-  envPtr = getenv( "EDMDEBUGMODE" );
+  envPtr = getenv( environment_str29 );
   if ( envPtr ) {
     val = atol(envPtr);
     if ( !val ) val = 1; // if value is non-numeric make it 1
@@ -52,7 +71,7 @@ char *envPtr;
 
     g_needDiagModeInit = 0;
 
-    envPtr = getenv( "EDMDIAGNOSTICMODE" );
+    envPtr = getenv( environment_str30 );
     if ( envPtr ) {
       g_diagMode = atol(envPtr);
       if ( !g_diagMode ) val = 1; // if value is non-numeric make it 1
@@ -118,7 +137,7 @@ mode_t curMode;
 
     close( 2 );
     curMode = umask( 0 );
-    fd = open( g_diagFileName, O_CREAT|O_WRONLY );
+    fd = open( g_diagFileName, O_CREAT|O_WRONLY, 0777 );
     umask( curMode );
     fprintf( stderr, time_string );
     fprintf( stderr, "host %s, pid %-d - ", hostName, procPid );
@@ -3002,7 +3021,7 @@ int scaleOfs;
 char buf[31+1];
 int stringWidth;
 
-  strcpy( buf, "00:00:00" );
+  strcpy( buf, "00-00-0000" );
 
   if ( fs ) {
     stringWidth = XTextWidth( fs, buf, strlen(buf) );
@@ -3051,7 +3070,7 @@ void drawXLinearTimeScale (
 ) {
 
 int count, firstLabel, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first, ifrac;
+int label_tick_height, major_tick_height, minor_tick_height, first=0, ifrac;
 double xFactor, xOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, seconds;
 int fontAscent, fontDescent, fontHeight,
@@ -3390,7 +3409,7 @@ void drawXLinearScale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double xFactor, xOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -3801,7 +3820,7 @@ void drawXLinearScale2 (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double xFactor, xOffset, adjXOffset, labelVal, lastLabelVal, majorInc,
  majorVal, minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -4151,7 +4170,7 @@ void drawXLog10Scale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double xFactor, xOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, val, val0, val1;
 int fontAscent, fontDescent, fontHeight,
@@ -4618,7 +4637,7 @@ void drawYLinearScale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -5028,7 +5047,7 @@ void drawYLinearScale2 (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, adjYOffset, labelVal, lastLabelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -5385,7 +5404,7 @@ void drawY2LinearScale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -5727,7 +5746,7 @@ void drawY2LinearScale2 (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, adjYOffset, labelVal, lastLabelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, z;
 int fontAscent, fontDescent, fontHeight,
@@ -6084,7 +6103,7 @@ void drawYLog10Scale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, val, val0, val1;
 int fontAscent, fontDescent, fontHeight,
@@ -6395,7 +6414,7 @@ void drawY2Log10Scale (
 ) {
 
 int count, ii, iii, x0, y0, x1, y1;
-int label_tick_height, major_tick_height, minor_tick_height, first;
+int label_tick_height, major_tick_height, minor_tick_height, first=0;
 double yFactor, yOffset, labelVal, majorInc, majorVal,
  minorInc, minorVal, lastInc, labelInc, val, val0, val1;
 int fontAscent, fontDescent, fontHeight,

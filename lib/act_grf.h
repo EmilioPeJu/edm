@@ -104,7 +104,7 @@ protected:
 // will help avoid base class poisoning run-time issues for libraries built
 // at one site and utilized at another.
 //
-static const int MAJOR_VERSION = 2;
+static const int MAJOR_VERSION = 5;
 static const int MINOR_VERSION = 0;
 
 friend void dragFin (
@@ -197,7 +197,7 @@ int baseMinorVersion ( void );
 
 void checkBaseClassVersion (
   int ver,
-  char *file
+  char *name
 );
 
 virtual void setObjType (
@@ -582,6 +582,8 @@ virtual pointPtr selectPoint (
   int x,
   int y );
 
+virtual void deselectAllPoints ( void ) {}
+
 virtual int movePoint (
   pointPtr curPoint,
   int x,
@@ -712,6 +714,8 @@ virtual int intersects (
 virtual int smartDrawAllActive ( void );
 
 virtual int doSmartDrawAllActive ( void );
+
+virtual int doSmartDrawAllButMeActive ( void );
 
 virtual int drawActiveIfIntersects (
   int x0,
@@ -895,6 +899,15 @@ virtual void clearMouseOver ( void );
 
 virtual int initDefExeNode (
   void *ptr );
+
+virtual int expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] ) {
+
+  return 1;
+
+}
 
 virtual int expand1st (
   int numMacros,
@@ -1343,6 +1356,13 @@ int crawlerPvIndex; // for crawler
 // pv crawler functions
 virtual char *crawlerGetFirstPv ( void );
 virtual char *crawlerGetNextPv ( void );
+
+void getSelBoxDims (
+  int *x,
+  int *y,
+  int *w,
+  int *h
+);
 
 };
 
