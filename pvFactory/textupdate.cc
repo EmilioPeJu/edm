@@ -1306,6 +1306,7 @@ static void pvInfo (
 int edmTextentryClass::activate(int pass, void *ptr)
 {
     XmFontList fonts;
+    int margin, off;
     if (! edmTextupdateClass::activate(pass, ptr))
         return 0;
     
@@ -1321,14 +1322,19 @@ int edmTextentryClass::activate(int pass, void *ptr)
 	    }
             actWin->appCtx->addActions( g_dragActions,
 					XtNumber(g_dragActions) );
+            margin = (h - 10 - fontAscent - line_width.value())/ 2;
+            if (margin < 0) margin = 0;
+            off = (line_width.value() + 1)/2;
 
             widget = XtVaCreateManagedWidget("TextEntry",
                                              xmTextFieldWidgetClass,
                                              actWin->executeWidgetId(),
-                                             XtNx, (XtArgVal)x,
-                                             XtNy, (XtArgVal)y,
-                                             XtNheight,(XtArgVal)h,
-                                             XtNwidth, (XtArgVal)w,
+                                             XtNx, (XtArgVal)(x + off),
+                                             XtNy, (XtArgVal)(y + off),
+                                             XtNheight,(XtArgVal)(h - off*2),
+                                             XtNwidth, (XtArgVal)(w - off*2),
+                                             XmNmarginHeight, (XtArgVal) margin,
+                                             XmNmarginWidth, (XtArgVal) 5,                                             
                                              XmNforeground,
                                              (XtArgVal)
                                              textColor.getPixel(actWin->ci),
@@ -1344,7 +1350,7 @@ int edmTextentryClass::activate(int pass, void *ptr)
                                              XmNuserData,
                                                  this,// obj accessible to d&d
                                              XmNhighlightThickness,
-                                                 (XtArgVal) 3,
+                                                 (XtArgVal) 0,
                                              NULL);
             // callback: text entered ==> send it to the PV
             XtAddCallback(widget, XmNactivateCallback,
