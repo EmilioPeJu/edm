@@ -1322,7 +1322,7 @@ int edmTextentryClass::activate(int pass, void *ptr)
 	    }
             actWin->appCtx->addActions( g_dragActions,
 					XtNumber(g_dragActions) );
-            margin = (h - 10 - fontAscent - line_width.value())/ 2;
+            margin = (h - 7 - fontAscent - line_width.value())/ 2;
             if (margin < 0) margin = 0;
             off = (line_width.value() + 1)/2;
 
@@ -1334,7 +1334,7 @@ int edmTextentryClass::activate(int pass, void *ptr)
                                              XtNheight,(XtArgVal)(h - off*2),
                                              XtNwidth, (XtArgVal)(w - off*2),
                                              XmNmarginHeight, (XtArgVal) margin,
-                                             XmNmarginWidth, (XtArgVal) 5,                                             
+                                             XmNmarginWidth, (XtArgVal) 3,                                             
                                              XmNforeground,
                                              (XtArgVal)
                                              textColor.getPixel(actWin->ci),
