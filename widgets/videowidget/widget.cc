@@ -387,6 +387,10 @@ void widgetNewDisplayInfo (widgetData wd, bool valid, short status,
     // force re-draw on recovery
     if (!valid || status || severity)
     {
+#ifdef DEBUG
+    printf ("widgetNewDisplayInfo - valid = %d status = %d severity = %d\n",
+            valid, status, severity);
+#endif        
         XtVaSetValues (md->w, XmNlabelType, XmSTRING, NULL);
         md->widgetw_old = 0;
         md->widgeth_old = 0;

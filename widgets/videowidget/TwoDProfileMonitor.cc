@@ -669,7 +669,7 @@ public:
             }
 #ifdef DEBUG
             printf ("executeDeferred (TwoDMon.cc) - grid size = %d\n",
-                    grid size);
+                    gridSize);
 #endif
         }
         if (pvBasedUseFalseColour && useFalseColourPv &&
@@ -1902,25 +1902,40 @@ int TwoDProfileMonitor::activate ( int pass )
 #ifdef DEBUG
             printf ("activate (TwoDMon.cc) - dataPv->is_valid = %d\n",
                     dataPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - widthPv->is_valid = %d\n",
-                    widthPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - heightPv->is_valid = %d\n",
-                    heightPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - widthOffsetPv->is_valid = %d\n",
-                    widthOffsetPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - heightOffsetPv->is_valid = %d\n",
+            if (widthPv != NULL)
+                printf ("activate (TwoDMon.cc) - widthPv->is_valid = %d\n",
+                        widthPv->is_valid ());
+            if (heightPv != NULL)
+                printf ("activate (TwoDMon.cc) - heightPv->is_valid = %d\n",
+                        heightPv->is_valid ());
+            if (widthOffsetPv != NULL)
+                printf (
+                    "activate (TwoDMon.cc) - widthOffsetPv->is_valid = %d\n",
+                     widthOffsetPv->is_valid ());
+            if (heightOffsetPv != NULL)
+                printf (
+                    "activate (TwoDMon.cc) - heightOffsetPv->is_valid = %d\n",
                     heightOffsetPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - useFalseColourPv->is_valid = %d\n",
+            if (useFalseColourPv != NULL)
+                printf (
+                    "activate (TwoDMon.cc) - useFalseColourPv->is_valid = %d\n",
                     useFalseColourPv->is_valid ());
+            if (showGridPv != NULL)
             printf ("activate (TwoDMon.cc) - showGridPv->is_valid = %d\n",
                     showGridPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - gridSizePv->is_valid = %d\n",
-                    gridSizePv->is_valid ());
-            printf ("activate (TwoDMon.cc) - gridColourPv->is_valid = %d\n",
-                    gridColourPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - dataRangeMinPv->is_valid = %d\n",
+            if (gridSizePv != NULL)
+                printf ("activate (TwoDMon.cc) - gridSizePv->is_valid = %d\n",
+                        gridSizePv->is_valid ());
+            if (gridColourPv != NULL)
+                printf ("activate (TwoDMon.cc) - gridColourPv->is_valid = %d\n",
+                        gridColourPv->is_valid ());
+            if (dataRangeMinPv != NULL)
+                printf (
+                    "activate (TwoDMon.cc) - dataRangeMinPv->is_valid = %d\n",
                     dataRangeMinPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - dataRangeMaxPv->is_valid = %d\n",
+            if (dataRangeMaxPv != NULL)
+                printf (
+                    "activate (TwoDMon.cc) - dataRangeMaxPv->is_valid = %d\n",
                     dataRangeMaxPv->is_valid ());
             printf ("activate (TwoDMon.cc) - dtypPv->is_valid = %d\n",
                     dtypPv->is_valid ());
