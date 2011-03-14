@@ -77,7 +77,6 @@ class TwoDProfileMonitor : public activeGraphicClass
     ProcessVariable *gridColourPv;
     ProcessVariable *dataRangeMinPv;
     ProcessVariable *dataRangeMaxPv;
-    ProcessVariable *dtypPv;
 
     // text stuff (for edit mode drawing)
     char *textFontTag;
@@ -90,7 +89,6 @@ class TwoDProfileMonitor : public activeGraphicClass
     int initialUseFalseColourConnection, initialShowGridConnection;
     int initialGridColourConnection;
     int initialDataRangeMinConnection, initialDataRangeMaxConnection;
-    int initialDtypConnection;
     int needConnectInit, needInfoInit, needDraw, needRefresh;
     unsigned int  pvNotConnectedMask;
     int dataPvExists, widthPvExists, heightPvExists, useFalseColourPvExists;
@@ -99,7 +97,6 @@ class TwoDProfileMonitor : public activeGraphicClass
     int gridColourPvExists;
     int dataRangeMinPvExists;
     int dataRangeMaxPvExists;
-    int dtypPvExists;
     int init, active, activeMode;
     struct timeval lasttv;
     unsigned long average_time_usec;
@@ -155,9 +152,6 @@ public:
     // Called when the grid size process variable connects or disconnects
     static void monitorGridSizeConnectState (ProcessVariable *pv,
                                              void *userarg );
-    // Called when the dtyp process variable connects or disconnects
-    static void monitorDtypConnectState (ProcessVariable *pv,
-                                         void *userarg );
   
     // Called when the value of any of the data, use false colour, show grid,
     // width offset, height offset or grid size process variables
@@ -545,15 +539,6 @@ public:
 #endif
                 dataRangeMaxPv->add_value_callback ( dataUpdate,
                                                    this );
-            }
-            if (initialDtypConnection)
-            {
-                initialDtypConnection = 0;
-#ifdef DEBUG
-                printf (
-                    "TwoDProfMon::execDeferred - add data dtyp callback\n");
-#endif
-                dtypPv->add_value_callback ( dataUpdate, this );
             }
         }
         
@@ -1321,7 +1306,6 @@ void TwoDProfileMonitor::constructCommon (void)
     gridColourPv = NULL;
     dataRangeMinPv = NULL;
     dataRangeMaxPv = NULL;
-    dtypPv = NULL;
 
     strcpy (dataPvBuf, ""); // just to be safe
     strcpy (widthPvBuf, ""); // just to be safe
@@ -1624,17 +1608,6 @@ int TwoDProfileMonitor::activate ( int pass )
             }
         }
 
-        if (!dataPvStr.getExpanded () ||
-            blankOrComment (dataPvStr.getExpanded ()))
-        {
-            dtypPvExists = 0;
-        }
-        else
-        {
-            dtypPvExists = 1;
-            pvNotConnectedMask |= 2048;
-        }
-
 #ifdef DEBUG
         printf (
             "TwoDProfileMonitor::activate pass 1 - pvNotConnectedMask = %d\n",
@@ -1872,29 +1845,7 @@ int TwoDProfileMonitor::activate ( int pass )
                                               this);
                 }
             }
-            if (!dtypPvExists) 
-            {
-#ifdef DEBUG
-                printf (
-                    "TwoDProfileMonitor::activate pass 2 - dtypPvExists = 0\n");
-#endif
-                break; // don't bother the factory
-            }
 
-            char tempString [1024];
-            strcpy (tempString, dataPvStr.getExpanded ());
-            strcat (tempString, ".DTYP");
-            dtypPv = the_PV_Factory->create ( tempString );
-            if ( dtypPv )
-            {
-#ifdef DEBUG             
-                printf (
-                    "TwoDProfMon::activate pass 2 - add dtyp connect cb\n"); 
-#endif
-                dtypPv->add_conn_state_callback (monitorDtypConnectState,
-                                                 this);
-                //dtypPv->add_value_callback ( pvUpdate, this );
-            }
 #ifdef DEBUG
             printf ("activate (TwoDMon.cc) - dataPv->is_valid = %d\n",
                     dataPv->is_valid ());
@@ -1933,8 +1884,6 @@ int TwoDProfileMonitor::activate ( int pass )
                 printf (
                     "activate (TwoDMon.cc) - dataRangeMaxPv->is_valid = %d\n",
                     dataRangeMaxPv->is_valid ());
-            printf ("activate (TwoDMon.cc) - dtypPv->is_valid = %d\n",
-                    dtypPv->is_valid ());
 #endif
         }
         break;
@@ -2495,18 +2444,6 @@ int TwoDProfileMonitor::deactivate ( int pass )
         dataRangeMaxPv = NULL;
         actWin->appCtx->proc->unlock ();
     }
-    if ( dtypPv != NULL )
-    {
-        actWin->appCtx->proc->lock ();
-        dtypPv->remove_conn_state_callback ( monitorDtypConnectState, this );
-#ifdef DEBUG
-        printf ("TwoDProfileMonitor::deactivate - removing data callback\n");
-#endif
-        dtypPv->remove_value_callback ( dataUpdate, this );
-        dtypPv->release ();
-        dtypPv = NULL;
-        actWin->appCtx->proc->unlock ();
-    }
 
     // disconnect PV timeout on pass 1
     if ( pass == 1 )
@@ -2920,41 +2857,6 @@ void TwoDProfileMonitor::monitorGridSizeConnectState (ProcessVariable *pv,
         else
         {
             me->pvNotConnectedMask |= 128;
-            me->active = 0;
-            me->bufInvalidate ();
-            me->needDraw = 1;
-            me->actWin->addDefExeNode (me->aglPtr);
-        }
-    }
-    me->actWin->appCtx->proc->unlock ();
-}
-
-void TwoDProfileMonitor::monitorDtypConnectState (ProcessVariable *pv,
-                                                   void *userarg )
-{
-
-    TwoDProfileMonitor *me = ( TwoDProfileMonitor *) userarg;
-
-    me->actWin->appCtx->proc->lock ();
-    if (me->activeMode)
-    {
-        if (pv->is_valid ())
-        {
-            me->pvNotConnectedMask &= ~((unsigned int) 2048); 
-#ifdef DEBUG
-            printf ("TwoDProfMon::monDtypConState - set pvNotConnMask to %d\n",
-                    me->pvNotConnectedMask);
-#endif
-            if (!me->pvNotConnectedMask)
-            {
-                // All PVs connected
-                me->needConnectInit = 1;
-                me->actWin->addDefExeNode (me->aglPtr);
-            }
-        }
-        else
-        {
-            me->pvNotConnectedMask |= 2048;
             me->active = 0;
             me->bufInvalidate ();
             me->needDraw = 1;
