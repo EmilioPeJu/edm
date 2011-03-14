@@ -120,104 +120,51 @@ void PV_Factory::clear_default_pv_type ( void )
 
 }
 
-class ProcessVariable *PV_Factory::create(const char *PV_name)
+
+/* Parses a PV name into two components, class and PV. */
+void PV_Factory::parse_pv_name(
+    const char *full_pv_name, char *pv_class, char *pv_name)
 {
-
-class ProcessVariable *pv;
-char buf[255+1];
-int i, l, pos;
-
-  if ( strchr(PV_name, '\\') ) {
-
-    strcpy( buf, "" );
-    l = strlen(PV_name);
-    if ( l > 255 ) l = 255;
-    for ( i=0; i<l; i++ ) {
-      if ( PV_name[i] == '\\' ) break;
-      buf[i] = PV_name[i];
+    char *slash = strchr(full_pv_name, '\\');
+    if (slash)
+    {
+        /* Compound name: split at first \ character. */
+        snprintf(pv_class, MAX_PV_NAME, "%.*s",
+            slash - full_pv_name, full_pv_name);
+        snprintf(pv_name, MAX_PV_NAME, "%s", slash + 1);
     }
-    buf[i] = 0;
-
-    pos = i + 1;
-
-    pv = pvObj.createNew( buf, PV_name+pos );
-    if ( pv ) {
-      return pv;
+    else if (default_pv_type[0] != '\0')
+    {
+        /* If default class available use that. */
+        snprintf(pv_class, MAX_PV_NAME, "%s", default_pv_type);
+        snprintf(pv_name, MAX_PV_NAME, "%s", full_pv_name);
     }
-    else {
-      fprintf(stderr, "Unknown PV Factory for PV '%s'\n", PV_name);
-      return 0;
+    else
+    {
+        /* If no default class then use first class in pvObj. */
+        snprintf(pv_class, MAX_PV_NAME, "%s", pvObj.firstPvName());
+        snprintf(pv_name, MAX_PV_NAME, "%s", full_pv_name);
     }
-
-  }
-
-  if ( strcmp( default_pv_type, "" ) ) {
-
-    pv = pvObj.createNew( default_pv_type, PV_name );
-    if ( pv ) {
-      return pv;
-    }
-    else {
-      fprintf(stderr, "Unknown PV Factory for PV '%s'\n", PV_name);
-      return 0;
-    }
-
-  }
-
-  pv = pvObj.createNew( pvObj.firstPvName(), PV_name );
-  return pv;
-
 }
 
-class ProcessVariable *PV_Factory::createWithInitialCallbacks (
-  const char *PV_name
-) {
-
-class ProcessVariable *pv;
-char buf[255+1];
-int i, l, pos;
-
-  if ( strchr(PV_name, '\\') ) {
-
-    strcpy( buf, "" );
-    l = strlen(PV_name);
-    if ( l > 255 ) l = 255;
-    for ( i=0; i<l; i++ ) {
-      if ( PV_name[i] == '\\' ) break;
-      buf[i] = PV_name[i];
-    }
-    buf[i] = 0;
-
-    pos = i + 1;
-
-    pv = pvObj.createNew( buf, PV_name+pos );
-    if ( pv ) {
-      return pv;
-    }
-    else {
-      fprintf(stderr, "Unknown PV Factory for PV '%s'\n", PV_name);
-      return 0;
-    }
-
-  }
-
-  if ( strcmp( default_pv_type, "" ) ) {
-
-    pv = pvObj.createNew( default_pv_type, PV_name );
-    if ( pv ) {
-      return pv;
-    }
-    else {
-      fprintf(stderr, "Unknown PV Factory for PV '%s'\n", PV_name);
-      return 0;
-    }
-
-  }
-
-  pv = pvObj.createNew( pvObj.firstPvName(), PV_name );
-  return pv;
-
+class ProcessVariable *PV_Factory::create(const char *full_pv_name)
+{
+    char pv_class[MAX_PV_NAME];
+    char pv_name[MAX_PV_NAME];
+    parse_pv_name(full_pv_name, pv_class, pv_name);
+    return pvObj.createNew(pv_class, pv_name);
 }
+
+/* Creates PV connection with given fixed size. */
+class ProcessVariable *PV_Factory::create_size(
+    const char *full_pv_name, size_t size)
+{
+    char pv_class[MAX_PV_NAME];
+    char pv_name[MAX_PV_NAME];
+    parse_pv_name(full_pv_name, pv_class, pv_name);
+    return pvObj.createNew_size(pv_class, pv_name, size);
+}
+
 
 // These two should be static, but then "friend" doesn't work,
 // so the CallBackInfo would have to be public which is

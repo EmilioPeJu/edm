@@ -79,7 +79,7 @@ EPICS_PV_Factory::~EPICS_PV_Factory()
 #endif
 }
 
-ProcessVariable *EPICS_PV_Factory::create(const char *PV_name)
+ProcessVariable *EPICS_PV_Factory::create_size(const char *PV_name, size_t size)
 {
     EPICS_ProcessVariable *pv;
     HashTableItem item;
@@ -94,12 +94,17 @@ ProcessVariable *EPICS_PV_Factory::create(const char *PV_name)
     else
     {
         HashTableItem *n_item = new HashTableItem();
-        pv = new EPICS_ProcessVariable(PV_name);
+        pv = new EPICS_ProcessVariable(PV_name, size);
         n_item->name = pv->get_name();
         n_item->pv = pv;
         processvariables.insert(n_item);
     }
     return pv;
+}
+
+ProcessVariable *EPICS_PV_Factory::create(const char *PV_name)
+{
+    return create_size(PV_name, 0);
 }
 
 void EPICS_PV_Factory::forget(EPICS_ProcessVariable *pv)
@@ -120,7 +125,7 @@ void EPICS_PV_Factory::forget(EPICS_ProcessVariable *pv)
 
 // ---------------------- EPICS_ProcessVariable -------------------------
 
-EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name)
+EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name, size_t size)
         : ProcessVariable(_name)
 {
     is_connected = false;
@@ -129,6 +134,8 @@ EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name)
     pv_chid = 0;
     pv_value_evid = 0;
     value = 0;
+    forced_size = size;
+
     //fprintf( stderr,"EPICS_ProcessVariable %s created\n", get_name());
     int stat = ca_search_and_connect(get_name(), &pv_chid,
                                      ca_connect_callback, this);
@@ -354,7 +361,13 @@ size_t EPICS_ProcessVariable::get_string(char *strbuf, size_t buflen) const
 {   return value->get_string(strbuf, buflen); }
 
 size_t EPICS_ProcessVariable::get_dimension() const
-{   return ca_element_count(pv_chid); }
+{
+    size_t count = ca_element_count(pv_chid);
+    if (0 < forced_size && forced_size < count)
+       return forced_size;
+    else
+        return count;
+}
 
 const char *EPICS_ProcessVariable::get_char_array() const
 {   return value->get_char_array(); }
@@ -1064,15 +1077,15 @@ void epics_task_exit ( void ) {
 
 }
 
-ProcessVariable *create_EPICSPtr (
-  const char *PV_name
-) {
+ProcessVariable *create_EPICSPtr(const char *PV_name)
+{
+    return epics_pv_factory->create( PV_name );
+}
 
-ProcessVariable *ptr;
-
-  ptr = epics_pv_factory->create( PV_name );
-  return ptr;
-
+ProcessVariable *create_size_EPICSPtr(
+    const char *PV_name, size_t size)
+{
+    return epics_pv_factory->create_size(PV_name, size);
 }
 
 #ifdef __cplusplus

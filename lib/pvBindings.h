@@ -55,6 +55,9 @@ class pvBindingClass {
 private:
 
 int cur_index, max;
+/* Returns the function named <name>_<class>Ptr from the dynamic module
+ * associated with <class>, or NULL if not found. */
+void *lookup_function(const char *class_name, const char *name);
 
 public:
 
@@ -67,8 +70,9 @@ char *firstPvName ( void );
 char *nextPvName ( void );
 
 class ProcessVariable *createNew (
-  const char *oneName,
-  const char *PV_name );
+  const char *oneName, const char *PV_name );
+class ProcessVariable *createNew_size (
+  const char *oneName, const char *PV_name, size_t size );
 
 char *getPvName (
   int i );

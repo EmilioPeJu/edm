@@ -18,6 +18,7 @@ public:
     EPICS_PV_Factory();
     ~EPICS_PV_Factory();
     ProcessVariable *create(const char *PV_name);
+    ProcessVariable *create_size(const char *PV_name, size_t size);
 private:
     friend class EPICS_ProcessVariable;
     static void forget(EPICS_ProcessVariable *pv);
@@ -69,7 +70,7 @@ private:
     friend class EPICS_PV_Factory;
     
     // hidden, use create/release
-    EPICS_ProcessVariable(const char *_name);
+    EPICS_ProcessVariable(const char *_name, size_t size);
     EPICS_ProcessVariable(const ProcessVariable &rhs); // not impl.
     EPICS_ProcessVariable &operator = (const ProcessVariable &rhs); // not impl.
     virtual ~EPICS_ProcessVariable();
@@ -83,6 +84,7 @@ private:
     class PVValue *value;  // current value, type-dependent
     bool read_access;
     bool write_access;
+    size_t forced_size;    // Used to force subscription size
     
     static void ca_connect_callback(struct connection_handler_args arg);
     static void ca_ctrlinfo_callback(struct event_handler_args args);
@@ -237,9 +239,9 @@ int epics_pend_event (
 
 void epics_task_exit ( void );
 
-ProcessVariable *create_EPICSPtr (
-  const char *PV_name
-);
+ProcessVariable *create_EPICSPtr(const char *PV_name);
+ProcessVariable *create_size_EPICSPtr(
+    const char *PV_name, size_t size);
 
 #ifdef __cplusplus
 }

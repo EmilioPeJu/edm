@@ -781,32 +781,28 @@ public:
                 widthOffset, heightOffset, gridSize, gridColour);
             return; 
         } 
-        char tempbuf [100];
-        dtypPv->get_string (tempbuf, 100);
-//      printf ("TwoDProfMon::execDef - data PV dtyp is %s\n", tempbuf);
-        if (!strcmp (tempbuf, "Mr1394"))
+
+        if ((dataHeight != 0) &&
+            ((dataHeight * dataWidth) != (int)dataPv->get_dimension()))
         {
-            if ((dataHeight != 0) &&
-                ((dataHeight * dataWidth) != (int)dataPv->get_dimension ()))
-            {
-                // Data height or width has changed.  Ignore the current data which
-                // is the wrong size.  Cancel subscription and restart it to make
-                // IOC / Channel Access send data of the correct size.
+            // Data height or width has changed.  Ignore the current data which
+            // is the wrong size.  Cancel subscription and restart it to make
+            // IOC / Channel Access send data of the correct size.
 #ifdef DEBUG
-                printf (
-                    "TwoDProfMon::execDef - resubscribe - new dataW %d dataH %d\n",
-                    dataWidth, dataHeight);
+            printf (
+                "TwoDProfMon::execDef - resubscribe - new dataW %d dataH %d\n",
+                dataWidth, dataHeight);
 #endif
-                actWin->appCtx->proc->lock ();
-                dataPv->remove_value_callback ( dataUpdate, this );
-                dataPv->remove_conn_state_callback (monitorDataConnectState, this);
-                dataPv->release ();
-                dataPv = the_PV_Factory->create ( dataPvStr.getExpanded () );
-                dataPv->add_conn_state_callback ( monitorDataConnectState, this );
-                dataPv->add_value_callback ( dataUpdate, this );
-                actWin->appCtx->proc->unlock ();
-                return;
-            }
+            actWin->appCtx->proc->lock ();
+            dataPv->remove_value_callback ( dataUpdate, this );
+            dataPv->remove_conn_state_callback (monitorDataConnectState, this);
+            dataPv->release ();
+            dataPv = the_PV_Factory->create_size(
+                dataPvStr.getExpanded(), dataHeight * dataWidth);
+            dataPv->add_conn_state_callback ( monitorDataConnectState, this );
+            dataPv->add_value_callback ( dataUpdate, this );
+            actWin->appCtx->proc->unlock ();
+            return;
         }
         actWin->appCtx->proc->lock ();
 

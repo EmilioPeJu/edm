@@ -44,8 +44,11 @@ public:
     
     // Result is referenced once, call release() when no longer needed.
     virtual class ProcessVariable *create(const char *PV_name);
-    virtual class ProcessVariable *createWithInitialCallbacks (
-      const char *PV_name );
+    virtual class ProcessVariable *create_size(const char *PV_name, size_t size);
+
+    /* Parses a full PV name into two components, class and PV. */
+    void parse_pv_name(
+        const char *full_pv_name, char *pv_class, char *pv_name);
 
     char default_pv_type[31+1];
 
