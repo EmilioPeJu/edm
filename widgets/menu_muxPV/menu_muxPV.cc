@@ -46,6 +46,22 @@ menuMuxPVClass *mmo = (menuMuxPVClass *) ptr;
 
 }
 
+static void retryTimeout (
+  XtPointer client,
+  XtIntervalId *id )
+{
+
+menuMuxPVClass *mmo = (menuMuxPVClass *) client;
+
+  mmo->actWin->appCtx->proc->lock();
+  mmo->needUpdate = 1;
+  mmo->actWin->addDefExeNode( mmo->aglPtr );
+  mmo->actWin->appCtx->proc->unlock();
+
+  mmo->retryTimer = 0;
+
+}
+
 static void unconnectedTimeout (
   XtPointer client,
   XtIntervalId *id )
@@ -57,9 +73,11 @@ menuMuxPVClass *mmo = (menuMuxPVClass *) client;
   {
     if ( mmo->controlExists )
     {
+      mmo->actWin->appCtx->proc->lock();
       mmo->needToDrawUnconnected = 1;
       mmo->needDraw = 1;
       mmo->actWin->addDefExeNode ( mmo->aglPtr );
+      mmo->actWin->appCtx->proc->unlock();
     }
   }
 
@@ -345,7 +363,8 @@ int i, ii;
   mmuxo->eraseSelectBoxCorners ();
   mmuxo->erase ();
 
-  strncpy ( mmuxo->fontTag, mmuxo->fm.currentFontTag (), 63 + 1 );
+  strncpy ( mmuxo->fontTag, mmuxo->fm.currentFontTag (), 63 );
+  mmuxo->fontTag[63] = 0;
   mmuxo->actWin->fi->loadFontTag ( mmuxo->fontTag );
   mmuxo->actWin->drawGc.setFontTag ( mmuxo->fontTag, mmuxo->actWin->fi );
   mmuxo->actWin->fi->getTextFontList ( mmuxo->fontTag, &mmuxo->fontList );
@@ -386,8 +405,8 @@ int i, ii;
 
   for ( i = 0; i < MMUX_MAX_STATES; i++ )
   {
-    strncpy ( mmuxo->tag[i], mmuxo->eBuf->bufTag[i],
-              MMUX_MAX_STRING_SIZE + 1 );
+    strncpy ( mmuxo->tag[i], mmuxo->eBuf->bufTag[i], MMUX_MAX_STRING_SIZE );
+    mmuxo->tag[i][MMUX_MAX_STRING_SIZE] = 0;
     if ( strlen (mmuxo->tag[i]) == 0 )
     {
       strcpy ( mmuxo->tag[i], "?" );
@@ -399,9 +418,11 @@ int i, ii;
     for ( ii = 0; ii < MMUX_MAX_ENTRIES; ii++ )
     {
       strncpy ( mmuxo->macroStrings[i][ii], mmuxo->eBuf->bufM[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE );
+      mmuxo->macroStrings[i][ii][MMUX_MAX_STRING_SIZE] = 0;
       strncpy ( mmuxo->expansionPVNames[i][ii], mmuxo->eBuf->bufE[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE );
+      mmuxo->expansionPVNames[i][ii][MMUX_MAX_STRING_SIZE] = 0;
       strcpy ( mmuxo->expansionStrings[i][ii], "");
     }
   }
@@ -475,6 +496,7 @@ int i, ii;
 
   name = new char[strlen ("menuMuxPVClass") + 1];
   strcpy ( name, "menuMuxPVClass" );
+  checkBaseClassVersion ( activeGraphicClass::MAJOR_VERSION, name );
 
   numStates = 0;
 
@@ -541,16 +563,19 @@ activeGraphicClass *mmuxo = (activeGraphicClass *) this;
 
   for ( i = 0; i < MMUX_MAX_STATES; i++ )
   {
-    strncpy ( tag[i], source->tag[i], MMUX_MAX_STRING_SIZE + 1 );
+    strncpy ( tag[i], source->tag[i], MMUX_MAX_STRING_SIZE );
+    tag[i][MMUX_MAX_STRING_SIZE] = 0;
   }
   for ( i = 0; i < MMUX_MAX_STATES; i++ )
   {
     for ( ii = 0; ii < MMUX_MAX_ENTRIES; ii++ )
     {
       strncpy ( macroStrings[i][ii], source->macroStrings[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE );
+      macroStrings[i][ii][MMUX_MAX_STRING_SIZE] = 0;
       strncpy ( expansionPVNames[i][ii], source->expansionPVNames[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE );
+      expansionPVNames[i][ii][MMUX_MAX_STRING_SIZE] = 0;
       strcpy ( expansionStrings[i][ii], "");
     }
   }
@@ -559,7 +584,8 @@ activeGraphicClass *mmuxo = (activeGraphicClass *) this;
   mac = NULL;
   exp = NULL;
 
-  strncpy ( fontTag, source->fontTag, 63 + 1 );
+  strncpy ( fontTag, source->fontTag, 63 );
+  fontTag[63] = 0;
   fs = actWin->fi->getXFontStruct ( fontTag );
   actWin->fi->getTextFontList ( fontTag, &fontList );
 
@@ -583,7 +609,7 @@ activeGraphicClass *mmuxo = (activeGraphicClass *) this;
   widgetsCreated = 0;
   active = 0;
   activeMode = 0;
-  unconnectedTimer = 0;
+  unconnectedTimer = retryTimer = 0;
 
   eBuf = NULL;
 
@@ -604,6 +630,12 @@ int i;
   {
     XtRemoveTimeOut ( unconnectedTimer );
     unconnectedTimer = 0;
+  }
+
+  if ( retryTimer )
+  {
+    XtRemoveTimeOut ( retryTimer );
+    retryTimer = 0;
   }
 
   if ( mac && exp )
@@ -648,7 +680,8 @@ int menuMuxPVClass::createInteractive (
   w = _w;
   h = _h;
 
-  strncpy ( fontTag, actWin->defaultBtnFontTag, 63 + 1 );
+  strncpy ( fontTag, actWin->defaultBtnFontTag, 63 );
+  fontTag[63] = 0;
   actWin->fi->loadFontTag ( fontTag );
   fs = actWin->fi->getXFontStruct ( fontTag );
   actWin->fi->getTextFontList ( fontTag, &fontList );
@@ -725,6 +758,7 @@ char *emptyStr = "";
     itemTag.loadW ( tmpV[i], MMUX_MAX_STRING_SIZE + 1, tmpBufV[i][0], numItems,
      emptyStr );
   }
+  itemTag.loadW ( unknownTags );
   itemTag.loadW ( "endObjectProperties" );
   itemTag.loadW ( "" );
 
@@ -826,6 +860,7 @@ char *emptyStr = "";
 
   itemTag.init ();
   itemTag.loadR ( "beginObjectProperties" );
+  itemTag.loadR ( unknownTags );
   itemTag.loadR ( "major", &major );
   itemTag.loadR ( "minor", &minor );
   itemTag.loadR ( "release", &release );
@@ -1108,7 +1143,8 @@ char oneName[PV_Factory::MAX_PV_NAME + 1];
     {
       readStringFromFile ( macroStrings[i][ii], MMUX_MAX_STRING_SIZE + 1, f );
       actWin->incLine ();
-      readStringFromFile ( expansionPVNames[i][ii], MMUX_MAX_STRING_SIZE + 1, f );
+      readStringFromFile ( expansionPVNames[i][ii], MMUX_MAX_STRING_SIZE + 1,
+                           f );
       actWin->incLine ();
       strcpy (expansionStrings[i][ii], "");
     }
@@ -1138,6 +1174,10 @@ int menuMuxPVClass::genericEdit ( void )
 int i, ii;
 char title[32], *ptr;
 
+#ifdef DEBUG
+  printf ("Start of menuMuxPVClass:genericEdit\n");
+#endif
+
   if ( !eBuf )
   {
     eBuf = new editBufType;
@@ -1145,11 +1185,12 @@ char title[32], *ptr;
 
   ptr = actWin->obj.getNameFromClass ( "menuMuxPVClass" );
   if ( ptr )
-    strncpy ( title, ptr, 31 + 1 );
+    strncpy ( title, ptr, 31);
   else
-    strncpy ( title, menuMuxPVClass_str2, 31 + 1 );
+    strncpy ( title, menuMuxPVClass_str2, 31 );
+  title[31] = 0;
 
-  Strncat ( title, menuMuxPVClass_str3, 31 + 1 );
+  Strncat ( title, menuMuxPVClass_str3, 31 );
 
   eBuf->bufX = x;
   eBuf->bufY = y;
@@ -1170,27 +1211,31 @@ char title[32], *ptr;
      PV_Factory::MAX_PV_NAME );
   else
     strcpy ( eBuf->bufControlPvName, "" );
+  eBuf->bufControlPvName[PV_Factory::MAX_PV_NAME] = 0;
 
   for ( i = 0; i < MMUX_MAX_STATES; i++ )
   {
-    strncpy ( eBuf->bufTag[i], tag[i], MMUX_MAX_STRING_SIZE + 1 );
+    strncpy ( eBuf->bufTag[i], tag[i], MMUX_MAX_STRING_SIZE );
+    eBuf->bufTag[i][MMUX_MAX_STRING_SIZE] = 0;
   }
   for ( i = 0; i < MMUX_MAX_STATES; i++ )
   {
     for ( ii = 0; ii < MMUX_MAX_ENTRIES; ii++ )
     {
       strncpy ( eBuf->bufM[i][ii], macroStrings[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE );
+      eBuf->bufM[i][ii][MMUX_MAX_STRING_SIZE] = 0;
       strncpy ( eBuf->bufE[i][ii], expansionPVNames[i][ii],
-                MMUX_MAX_STRING_SIZE + 1 );
+                MMUX_MAX_STRING_SIZE);
+      eBuf->bufE[i][ii][MMUX_MAX_STRING_SIZE] = 0;
     }
   }
 
   if ( initialStateExpStr.getRaw () )
-    strncpy ( eBuf->bufInitialState, initialStateExpStr.getRaw (), 15 + 1 );
+    strncpy ( eBuf->bufInitialState, initialStateExpStr.getRaw (), 15);
   else
-    strncpy ( eBuf->bufInitialState, "0", 15 + 1 );
-
+    strncpy ( eBuf->bufInitialState, "0", 15);
+  eBuf->bufInitialState[15] = 0;
   ef.create ( actWin->top, actWin->appCtx->ci.getColorMap (),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
@@ -1202,9 +1247,14 @@ char title[32], *ptr;
   ef.addTextField ( menuMuxPVClass_str5, 35, &eBuf->bufY );
   ef.addTextField ( menuMuxPVClass_str6, 35, &eBuf->bufW );
   ef.addTextField ( menuMuxPVClass_str7, 35, &eBuf->bufH );
+
   ef.addTextField ( menuMuxPVClass_str17, 35, eBuf->bufControlPvName,
    PV_Factory::MAX_PV_NAME );
+  pvNameEntry = ef.getCurItem ();
   ef.addTextField ( menuMuxPVClass_str18, 35, eBuf->bufInitialState, 30 );
+  iniStateEntry = ef.getCurItem ();
+  pvNameEntry->addInvDependency (iniStateEntry);
+  pvNameEntry->addDependencyCallbacks ();
 
   ef.addColorButton ( menuMuxPVClass_str8, actWin->ci, &eBuf->fgCb,
                       &eBuf->bufFgColour );
@@ -1244,7 +1294,9 @@ char title[32], *ptr;
     ef.addTextFieldArray ( menuMuxPVClass_str21, 35, ePtr[i],
                            MMUX_MAX_STRING_SIZE, &elbe[i] );
   }
-
+#ifdef DEBUG
+  printf ("End of menuMuxPVClass:genericEdit\n");
+#endif
   return 1;
 
 }
@@ -1252,12 +1304,24 @@ char title[32], *ptr;
 int menuMuxPVClass::editCreate ( void )
 {
 
+#ifdef DEBUG
+  printf ("menuMuxPVClass::editCreate calling genericEdit\n");
+#endif
   this->genericEdit ();
+#ifdef DEBUG
+  printf ("menuMuxPVClass::editCreate after genericEdit\n");
+#endif
   ef.finished ( mmuxc_edit_ok, mmuxc_edit_apply, mmuxc_edit_cancel_delete,
    this );
+#ifdef DEBUG
+  printf ("menuMuxPVClass::editCreate - after ef.finished\n");
+#endif
   actWin->currentEf = NULL;
   ef.popup ();
 
+#ifdef DEBUG
+  printf ("End of menuMuxPVClass::editCreate\n");
+#endif
   return 1;
 
 }
@@ -1265,7 +1329,13 @@ int menuMuxPVClass::editCreate ( void )
 int menuMuxPVClass::edit ( void )
 {
 
+#ifdef DEBUG
+  printf ("menuMuxPVClass::edit calling genericEdit\n");
+#endif
   this->genericEdit ();
+#ifdef DEBUG
+  printf ("menuMuxPVClass::edit calling genericEdit\n");
+#endif
   ef.finished ( mmuxc_edit_ok, mmuxc_edit_apply, mmuxc_edit_cancel, this );
   actWin->currentEf = &ef;
   ef.popup ();
@@ -1435,7 +1505,7 @@ char string[MMUX_MAX_STRING_SIZE + 1];
         actWin->executeGc.setFG ( bgColour.getDisconnectedIndex (), &blink );
         actWin->executeGc.setLineWidth ( 1 );
         actWin->executeGc.setLineStyle ( LineSolid );
-        XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        XDrawRectangle ( actWin->d, drawable (actWin->executeWidget),
          actWin->executeGc.normGC (), x, y, w, h );
         actWin->executeGc.restoreFg ();
         needToEraseUnconnected = 1;
@@ -1446,7 +1516,7 @@ char string[MMUX_MAX_STRING_SIZE + 1];
     {
       actWin->executeGc.setLineWidth ( 1 );
       actWin->executeGc.setLineStyle ( LineSolid );
-      XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+      XDrawRectangle ( actWin->d, drawable (actWin->executeWidget),
        actWin->executeGc.eraseGC (), x, y, w, h );
       needToEraseUnconnected = 0;
       eraseActive ();
@@ -1555,9 +1625,10 @@ char string[MMUX_MAX_STRING_SIZE + 1];
     {
       strcpy ( string, "?" );
     }
+    string[MMUX_MAX_STRING_SIZE] = 0;
 
-    drawText ( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
-     XmALIGNMENT_CENTER, string );
+    drawText ( actWin->executeWidget, drawable (actWin->executeWidget),
+     &actWin->executeGc, fs, tX, tY, XmALIGNMENT_CENTER, string );
 
     actWin->executeGc.removeNormXClipRectangle ();
 
@@ -1570,6 +1641,27 @@ char string[MMUX_MAX_STRING_SIZE + 1];
   return 1;
 
 }
+
+int menuMuxPVClass::expandTemplate (
+  int numMacros,
+  char *macros[],
+  char *expansions[] )
+{
+
+expStringClass tmpStr;
+
+  tmpStr.setRaw( controlPvExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  controlPvExpStr.setRaw( tmpStr.getExpanded() );
+
+  tmpStr.setRaw( initialStateExpStr.getRaw() );
+  tmpStr.expand1st( numMacros, macros, expansions );
+  initialStateExpStr.setRaw( tmpStr.getExpanded() );
+
+  return 1;
+
+}
+
 
 int menuMuxPVClass::expand1st (
   int numMacros,
@@ -1597,6 +1689,91 @@ int stat;
   return stat;
 
 }
+
+int menuMuxPVClass::getNumMacroSets ( void ) {
+
+  return numItems;
+
+}
+
+int menuMuxPVClass::getMacrosSet (
+  int *numMacros,
+  char ***macro,
+  char ***expansion,
+  int n
+) {
+
+int i, ii, count;
+
+  if ( ( n < 0 ) || ( n >= numItems ) ) {
+    *numMacros = 0;
+    *macro = NULL;
+    *expansion = NULL;
+  }
+
+// count number of non-null entries
+  count = 0;
+  for ( i=0; i<MMUX_MAX_ENTRIES; i++ ) {
+    if ( ( strcmp( macroStrings[n][i], "" ) != 0 ) &&
+         ( strcmp( expansionPVNames[n][i], "" ) != 0 ) ) {
+      count++;
+    }
+  }
+
+  if ( numMac < count ) {
+
+    for ( i=0; i<numMac; i++ ) {
+      if ( mac[i] ) {
+        delete[] mac[i];
+        mac[i] = NULL;
+      }
+      if ( exp[i] ) {
+        delete[] exp[i];
+        exp[i] = NULL;
+      }
+    }
+    if ( mac ) {
+      delete[] mac;
+      mac = NULL;
+    }
+    if ( exp ) {
+      delete[] exp;
+      exp = NULL;
+    }
+
+    numMac = count;
+
+    mac = new char*[numMac];
+    exp = new char*[numMac];
+
+    for ( i=0; i<numMac; i++ ) {
+      mac[i] = new char[MMUX_MAX_STRING_SIZE+1];
+      exp[i] = new char[MMUX_MAX_STRING_SIZE+1];
+    }
+
+  }
+
+  // populate ptr arrays
+  ii = 0;
+  for ( i=0; i<MMUX_MAX_ENTRIES; i++ ) {
+    if ( ( strcmp( macroStrings[n][i], "" ) != 0 ) &&
+         ( strcmp( expansionPVNames[n][i], "" ) != 0 ) ) {
+      strncpy( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE );
+      mac[ii][MMUX_MAX_STRING_SIZE] = 0;
+      strncpy( exp[ii], expansionPVNames[n][i], MMUX_MAX_STRING_SIZE );
+      exp[ii][MMUX_MAX_STRING_SIZE] = 0;
+      ii++;
+    }
+  }
+
+  *numMacros = count;
+  *macro = mac;
+  *expansion = exp;
+
+  return 1;
+
+}
+
 
 int menuMuxPVClass::getMacros (
   int *numMacros,
@@ -1675,8 +1852,10 @@ int i, ii, n, count;
     if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
          ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
     {
-      strncpy ( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE + 1 );
-      strncpy ( exp[ii], expansionStrings[n][i], MMUX_MAX_STRING_SIZE + 1 );
+      strncpy ( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE );
+      mac[ii][MMUX_MAX_STRING_SIZE] = 0;
+      strncpy ( exp[ii], expansionStrings[n][i], MMUX_MAX_STRING_SIZE );
+      exp[ii][MMUX_MAX_STRING_SIZE] = 0;
 #ifdef DEBUG
       printf ("menuMuxPVClass::getMacros - macro %s = %s\n", mac[ii], exp[ii]);
 #endif
@@ -1721,7 +1900,7 @@ int opStat;
        needDraw = 0;
       needToEraseUnconnected = 0;
       needToDrawUnconnected = 0;
-      unconnectedTimer = 0;
+      unconnectedTimer = retryTimer = 0;
       widgetsCreated = 0;
       firstEvent = 1;
       controlV = 0;
@@ -1761,7 +1940,7 @@ int opStat;
         }
         else
         {
-          printf ( menuMuxPVClass_str23 );
+          fprintf ( stderr, menuMuxPVClass_str23 );
           opStat = 0;
         }
 
@@ -1795,7 +1974,7 @@ int opStat;
                                      expansionPvExpStr[n][i].getExpanded () );
               expansionPvNotConnectedMask[i] |= 1 << n;
               expansionPVs[n][i]->add_conn_state_callback (
-                                     mmux_monitor_expansion_connect_state, this );
+                                   mmux_monitor_expansion_connect_state, this );
           }
         }
       }
@@ -2152,7 +2331,8 @@ int n;
     {
 
       stateString[i] = new char[strlen (tag[i]) + 1];
-      strncpy ( stateString[i], tag[i], strlen (tag[i]) + 1 );
+      strncpy ( stateString[i], tag[i], strlen (tag[i]) );
+      stateString[i][strlen(tag[i])] = 0;
 
       str = XmStringCreate ( stateString[i], fontTag );
 
@@ -2233,9 +2413,28 @@ int n;
 
     if ( !firstEvent )
     {
-      actWin->preReexecute ();
-      actWin->setNoRefresh ();
-      actWin->appCtx->reactivateActiveWindow ( actWin );
+      if ( actWin->okToPreReexecute () )
+      {
+        if (retryTimer )
+        {
+          XtRemoveTimeOut ( retryTimer );
+          retryTimer = 0;
+        }
+        stat = actWin->preReexecute ();
+        if (stat & 1)
+        {
+          actWin->setNoRefresh ();
+          actWin->appCtx->reactivateActiveWindow ( actWin );
+        }
+      }
+      else
+      {
+        if ( !retryTimer )
+        {
+          retryTimer = appAddTimeOut (actWin->appCtx->appContext (),
+           50, retryTimeout, this );
+        }
+      }
     }
     firstEvent = 0;
 
@@ -2375,6 +2574,21 @@ void menuMuxPVClass::getPvs (
   pvs[0] = controlPvId;
 
 }
+
+// crawler functions may return blank pv names
+char *menuMuxPVClass::crawlerGetFirstPv ( void ) {
+
+  crawlerPvIndex = 0;
+  return controlPvExpStr.getExpanded();
+
+}
+
+char *menuMuxPVClass::crawlerGetNextPv ( void ) {
+
+  return NULL;
+
+}
+
 
 #ifdef __cplusplus
 extern "C"
