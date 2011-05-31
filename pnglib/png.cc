@@ -811,6 +811,13 @@ expStringClass expStr;
 
   fileClose(fp);
 
+  /***** SJS addition 31/05/11 ******/
+  if (imageData == NULL)
+  {
+      goto error_return;
+  }
+  /***** End of SJS addition *****/
+
   w = image_width;
   h = image_height;
 
