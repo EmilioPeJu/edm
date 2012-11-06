@@ -53,10 +53,10 @@ static void retryTimeout (
 
 menuMuxPVClass *mmo = (menuMuxPVClass *) client;
 
-  mmo->actWin->appCtx->proc->lock();
+  mmo->actWin->appCtx->proc->lock ();
   mmo->needUpdate = 1;
-  mmo->actWin->addDefExeNode( mmo->aglPtr );
-  mmo->actWin->appCtx->proc->unlock();
+  mmo->actWin->addDefExeNode ( mmo->aglPtr );
+  mmo->actWin->appCtx->proc->unlock ();
 
   mmo->retryTimer = 0;
 
@@ -73,11 +73,11 @@ menuMuxPVClass *mmo = (menuMuxPVClass *) client;
   {
     if ( mmo->controlExists )
     {
-      mmo->actWin->appCtx->proc->lock();
+      mmo->actWin->appCtx->proc->lock ();
       mmo->needToDrawUnconnected = 1;
       mmo->needDraw = 1;
       mmo->actWin->addDefExeNode ( mmo->aglPtr );
-      mmo->actWin->appCtx->proc->unlock();
+      mmo->actWin->appCtx->proc->unlock ();
     }
   }
 
@@ -312,7 +312,7 @@ static void mmux_expansionUpdate (
   void *userarg )
 {
 #ifdef DEBUG
-  printf ("Start of mmux_expansionUpdate - pv %s\n", pv->get_name());
+  printf ("Start of mmux_expansionUpdate - pv %s\n", pv->get_name ());
 #endif
   menuMuxPVClass *mmuxo = (menuMuxPVClass *) userarg;
 
@@ -1650,13 +1650,13 @@ int menuMuxPVClass::expandTemplate (
 
 expStringClass tmpStr;
 
-  tmpStr.setRaw( controlPvExpStr.getRaw() );
-  tmpStr.expand1st( numMacros, macros, expansions );
-  controlPvExpStr.setRaw( tmpStr.getExpanded() );
+  tmpStr.setRaw ( controlPvExpStr.getRaw () );
+  tmpStr.expand1st ( numMacros, macros, expansions );
+  controlPvExpStr.setRaw ( tmpStr.getExpanded () );
 
-  tmpStr.setRaw( initialStateExpStr.getRaw() );
-  tmpStr.expand1st( numMacros, macros, expansions );
-  initialStateExpStr.setRaw( tmpStr.getExpanded() );
+  tmpStr.setRaw ( initialStateExpStr.getRaw () );
+  tmpStr.expand1st ( numMacros, macros, expansions );
+  initialStateExpStr.setRaw ( tmpStr.getExpanded () );
 
   return 1;
 
@@ -1690,10 +1690,9 @@ int stat;
 
 }
 
-int menuMuxPVClass::getNumMacroSets ( void ) {
-
+int menuMuxPVClass::getNumMacroSets ( void )
+{
   return numItems;
-
 }
 
 int menuMuxPVClass::getMacrosSet (
@@ -1701,11 +1700,13 @@ int menuMuxPVClass::getMacrosSet (
   char ***macro,
   char ***expansion,
   int n
-) {
+)
+{
 
-int i, ii, count;
+  int i, ii, count;
 
-  if ( ( n < 0 ) || ( n >= numItems ) ) {
+  if ( ( n < 0 ) || ( n >= numItems ) )
+  {
     *numMacros = 0;
     *macro = NULL;
     *expansion = NULL;
@@ -1713,30 +1714,37 @@ int i, ii, count;
 
 // count number of non-null entries
   count = 0;
-  for ( i=0; i<MMUX_MAX_ENTRIES; i++ ) {
-    if ( ( strcmp( macroStrings[n][i], "" ) != 0 ) &&
-         ( strcmp( expansionPVNames[n][i], "" ) != 0 ) ) {
+  for ( i = 0; i < MMUX_MAX_ENTRIES; i++ )
+  {
+    if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
+         ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
+    {
       count++;
     }
   }
 
-  if ( numMac < count ) {
-
-    for ( i=0; i<numMac; i++ ) {
-      if ( mac[i] ) {
+  if ( numMac < count )
+  {
+    for ( i = 0; i < numMac; i++ )
+    {
+      if ( mac[i] )
+      {
         delete[] mac[i];
         mac[i] = NULL;
       }
-      if ( exp[i] ) {
+      if ( exp[i] )
+      {
         delete[] exp[i];
         exp[i] = NULL;
       }
     }
-    if ( mac ) {
+    if ( mac )
+    {
       delete[] mac;
       mac = NULL;
     }
-    if ( exp ) {
+    if ( exp )
+    {
       delete[] exp;
       exp = NULL;
     }
@@ -1746,21 +1754,24 @@ int i, ii, count;
     mac = new char*[numMac];
     exp = new char*[numMac];
 
-    for ( i=0; i<numMac; i++ ) {
-      mac[i] = new char[MMUX_MAX_STRING_SIZE+1];
-      exp[i] = new char[MMUX_MAX_STRING_SIZE+1];
+    for ( i = 0; i < numMac; i++ )
+    {
+      mac[i] = new char[MMUX_MAX_STRING_SIZE + 1];
+      exp[i] = new char[MMUX_MAX_STRING_SIZE + 1];
     }
 
   }
 
   // populate ptr arrays
   ii = 0;
-  for ( i=0; i<MMUX_MAX_ENTRIES; i++ ) {
-    if ( ( strcmp( macroStrings[n][i], "" ) != 0 ) &&
-         ( strcmp( expansionPVNames[n][i], "" ) != 0 ) ) {
-      strncpy( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE );
+  for ( i = 0; i < MMUX_MAX_ENTRIES; i++ )
+  {
+    if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
+         ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
+    {
+      strncpy ( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE );
       mac[ii][MMUX_MAX_STRING_SIZE] = 0;
-      strncpy( exp[ii], expansionPVNames[n][i], MMUX_MAX_STRING_SIZE );
+      strncpy ( exp[ii], expansionPVNames[n][i], MMUX_MAX_STRING_SIZE );
       exp[ii][MMUX_MAX_STRING_SIZE] = 0;
       ii++;
     }
@@ -2332,7 +2343,7 @@ int n;
 
       stateString[i] = new char[strlen (tag[i]) + 1];
       strncpy ( stateString[i], tag[i], strlen (tag[i]) );
-      stateString[i][strlen(tag[i])] = 0;
+      stateString[i][strlen (tag[i])] = 0;
 
       str = XmStringCreate ( stateString[i], fontTag );
 
@@ -2576,14 +2587,16 @@ void menuMuxPVClass::getPvs (
 }
 
 // crawler functions may return blank pv names
-char *menuMuxPVClass::crawlerGetFirstPv ( void ) {
+char *menuMuxPVClass::crawlerGetFirstPv ( void )
+{
 
   crawlerPvIndex = 0;
-  return controlPvExpStr.getExpanded();
+  return controlPvExpStr.getExpanded ();
 
 }
 
-char *menuMuxPVClass::crawlerGetNextPv ( void ) {
+char *menuMuxPVClass::crawlerGetNextPv ( void )
+{
 
   return NULL;
 

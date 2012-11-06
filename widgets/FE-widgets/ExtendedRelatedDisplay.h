@@ -168,16 +168,16 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
             int bufAllowDups[maxDsps];
             int bufCascade[maxDsps];
             int bufPropagateMacros[maxDsps];
-            char bufDisplayFileName[maxDsps][127+1];
-            char bufSymbols[maxDsps][255+1];
+            char bufDisplayFileName[maxDsps][127 + 1];
+            char bufSymbols[maxDsps][255 + 1];
             int bufReplaceSymbols[maxDsps];
-            char bufButtonLabel[127+1];
-            char bufLabel[maxDsps][127+1];
-            char bufFontTag[63+1];
-            char bufColorPvName[PV_Factory::MAX_PV_NAME+1];
-            char bufDestPvName[NUMPVS][PV_Factory::MAX_PV_NAME+1];
-            char bufSource[NUMPVS][39+1];
-            char bufEnabPvName[PV_Factory::MAX_PV_NAME+1];
+            char bufButtonLabel[127 + 1];
+            char bufLabel[maxDsps][127 + 1];
+            char bufFontTag[63 + 1];
+            char bufColorPvName[PV_Factory::MAX_PV_NAME + 1];
+            char bufDestPvName[NUMPVS][PV_Factory::MAX_PV_NAME + 1];
+            char bufSource[NUMPVS][39 + 1];
+            char bufEnabPvName[PV_Factory::MAX_PV_NAME + 1];
             int bufOfsX;
             int bufOfsY;
             int bufButton3Popup;
@@ -209,7 +209,7 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
         expStringClass displayFileName[maxDsps];
 
         expStringClass symbolsExpStr[maxDsps];
-        char symbols[maxDsps][255+1];
+        char symbols[maxDsps][255 + 1];
 
         int replaceSymbols[maxDsps]; // else append
 
@@ -218,7 +218,7 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
         expStringClass label[maxDsps];
 
         fontMenuClass fm;
-        char fontTag[63+1];
+        char fontTag[63 + 1];
         XmFontList fontList;
         XFontStruct *fs;
         int fontAscent, fontDescent, fontHeight;
@@ -242,7 +242,7 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
         expStringClass sourceExpString[NUMPVS];
 
         expStringClass enabPvExpString;
-        
+
         int activeMode, active, init;
 
         Widget popUpMenu, pullDownMenu, pb[maxDsps];
@@ -256,12 +256,12 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
         int button3Popup;
 
         int icon;
-        
+
     public:
 
         ExtendedRelatedDisplayClass ( void );
 
-        ExtendedRelatedDisplayClass( const ExtendedRelatedDisplayClass *source );
+        ExtendedRelatedDisplayClass ( const ExtendedRelatedDisplayClass *source );
 
         ~ExtendedRelatedDisplayClass ( void );
 
@@ -371,7 +371,7 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
 
         static void enabPvConnectStateCallback (ProcessVariable *pv, void *userarg);
         static void enabPvValueCallback (ProcessVariable *pv, void *userarg);
-        
+
     };
 
 #ifdef __cplusplus

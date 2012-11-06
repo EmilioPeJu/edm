@@ -25,7 +25,7 @@
 /*                              1. Initial release                              */
 // $Author: sjs $
 // $Date: 2005/07/22 10:23:20 $
-// $Id: ExtendedRelatedDisplay.cc,v 1.2 2005/07/22 10:23:20 sjs Exp $
+// $Id: ExtendedRelatedDisplay.cc, v 1.2 2005/07/22 10:23:20 sjs Exp $
 // $Name:  $
 // $Revision: 1.2 $
 
@@ -82,7 +82,7 @@ static void menu_cb (  Widget w,  XtPointer client,  XtPointer call )
     int i;
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
-    for ( i=0; i<rdo->maxDsps; i++ )
+    for ( i = 0; i < rdo->maxDsps; i++ )
     {
         if ( w == rdo->pb[i] )
         {
@@ -254,7 +254,7 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
     if ( rdo->numDsps )
     {
         more = 1;
-        for ( i=1; (i<rdo->maxDsps) && more; i++ )
+        for ( i = 1; (i < rdo->maxDsps) && more; i++ )
         {
             rdo->displayFileName[i].setRaw ( rdo->buf->bufDisplayFileName[i] );
             if ( blank ( rdo->displayFileName[i].getRaw () ) )
@@ -284,7 +284,7 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
         }
     }
 
-    for ( i=rdo->numDsps; i<rdo->maxDsps; i++ )
+    for ( i = rdo->numDsps; i < rdo->maxDsps; i++ )
     {
         rdo->closeAction[i] = 0;
         rdo->setPostion[i] = 0;
@@ -344,7 +344,7 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
 
     rdo->buttonLabel.setRaw ( rdo->buf->bufButtonLabel );
 
-    for ( i=0; i<rdo->NUMPVS; i++ )
+    for ( i = 0; i < rdo->NUMPVS; i++ )
     {
         rdo->destPvExpString[i].setRaw ( rdo->buf->bufDestPvName[i] );
         rdo->sourceExpString[i].setRaw ( rdo->buf->bufSource[i] );
@@ -406,7 +406,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void )
 
     int i;
 
-    name = new char[strlen ("ExtendedRelatedDisplayClass")+1];
+    name = new char[strlen ("ExtendedRelatedDisplayClass") + 1];
     strcpy ( name, "ExtendedRelatedDisplayClass" );
 
     activeMode = 0;
@@ -418,7 +418,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void )
     button3Popup = 0;
     icon = 0;
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
         closeAction[i] = 0;
         setPostion[i] = 0;
@@ -497,7 +497,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( const ExtendedRelated
 
     rdo->clone ( (activeGraphicClass *) source );
 
-    name = new char[strlen ("ExtendedRelatedDisplayClass")+1];
+    name = new char[strlen ("ExtendedRelatedDisplayClass") + 1];
     strcpy ( name, "ExtendedRelatedDisplayClass" );
 
     strncpy ( fontTag, source->fontTag, 63 );
@@ -522,7 +522,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( const ExtendedRelated
     button3Popup = source->button3Popup;
     icon = source->icon;
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
         closeAction[i] = source->closeAction[i];
         setPostion[i] = source->setPostion[i];
@@ -544,7 +544,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( const ExtendedRelated
 
     activeMode = 0;
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         destPvExpString[i].copy ( source->destPvExpString[i] );
         sourceExpString[i].copy ( source->sourceExpString[i] );
@@ -622,46 +622,46 @@ int ExtendedRelatedDisplayClass::save ( FILE *f )
     numPvs = NUMPVS;
 
     tag.init ();
-    tag.loadW( "beginObjectProperties" );
-    tag.loadW( "major", &major );
-    tag.loadW( "minor", &minor );
-    tag.loadW( "release", &release );
-    tag.loadW( "x", &x );
-    tag.loadW( "y", &y );
-    tag.loadW( "w", &w );
-    tag.loadW( "h", &h );
-    tag.loadW( "fgColor", actWin->ci, &fgColor );
-    tag.loadW( "bgColor", actWin->ci, &bgColor );
-    tag.loadW( "topShadowColor", actWin->ci, &topShadowColor );
-    tag.loadW( "botShadowColor", actWin->ci, &botShadowColor );
-    tag.loadW( "font", fontTag );
-    tag.loadW( "xPosOffset", &ofsX, &zero );
-    tag.loadW( "yPosOffset", &ofsY, &zero );
-    tag.loadBoolW( "noEdit", &noEdit, &zero );
-    tag.loadBoolW( "useFocus", &useFocus, &zero );
-    tag.loadBoolW( "button3Popup", &button3Popup, &zero );
-    tag.loadBoolW( "invisible", &invisible, &zero );
-    tag.loadW( "buttonLabel", &buttonLabel, emptyStr );
-    tag.loadW( "numPvs", &numPvs );
-    tag.loadW( "pv", destPvExpString, NUMPVS, emptyStr );
-    tag.loadW( "value", sourceExpString, NUMPVS, emptyStr );
-    tag.loadW( "numDsps", &numDsps );
-    tag.loadW( "displayFileName", displayFileName, numDsps, emptyStr );
-    tag.loadW( "menuLabel", label, numDsps, emptyStr );
-    tag.loadW( "closeAction", closeAction, numDsps, &zero );
-    tag.loadW( "setPosition", 3, setPosEnumStr, setPosEnum, setPostion,
+    tag.loadW ( "beginObjectProperties" );
+    tag.loadW ( "major", &major );
+    tag.loadW ( "minor", &minor );
+    tag.loadW ( "release", &release );
+    tag.loadW ( "x", &x );
+    tag.loadW ( "y", &y );
+    tag.loadW ( "w", &w );
+    tag.loadW ( "h", &h );
+    tag.loadW ( "fgColor", actWin->ci, &fgColor );
+    tag.loadW ( "bgColor", actWin->ci, &bgColor );
+    tag.loadW ( "topShadowColor", actWin->ci, &topShadowColor );
+    tag.loadW ( "botShadowColor", actWin->ci, &botShadowColor );
+    tag.loadW ( "font", fontTag );
+    tag.loadW ( "xPosOffset", &ofsX, &zero );
+    tag.loadW ( "yPosOffset", &ofsY, &zero );
+    tag.loadBoolW ( "noEdit", &noEdit, &zero );
+    tag.loadBoolW ( "useFocus", &useFocus, &zero );
+    tag.loadBoolW ( "button3Popup", &button3Popup, &zero );
+    tag.loadBoolW ( "invisible", &invisible, &zero );
+    tag.loadW ( "buttonLabel", &buttonLabel, emptyStr );
+    tag.loadW ( "numPvs", &numPvs );
+    tag.loadW ( "pv", destPvExpString, NUMPVS, emptyStr );
+    tag.loadW ( "value", sourceExpString, NUMPVS, emptyStr );
+    tag.loadW ( "numDsps", &numDsps );
+    tag.loadW ( "displayFileName", displayFileName, numDsps, emptyStr );
+    tag.loadW ( "menuLabel", label, numDsps, emptyStr );
+    tag.loadW ( "closeAction", closeAction, numDsps, &zero );
+    tag.loadW ( "setPosition", 3, setPosEnumStr, setPosEnum, setPostion,
         numDsps, &setPosOriginal );
-    tag.loadW( "allowDups", allowDups, numDsps, &zero );
-    //tag.loadW( "cascade", cascade, numDsps, &zero );
-    tag.loadW( "symbols", symbolsExpStr, numDsps, emptyStr );
-    tag.loadW( "replaceSymbols", replaceSymbols, numDsps, &zero );
-    tag.loadW( "propagateMacros", propagateMacros, numDsps, &one );
-    tag.loadW( "closeDisplay", closeAction, numDsps, &zero );
-    tag.loadW( "colorPv", &colorPvExpString, emptyStr );
-    tag.loadW( "enablePv", &enabPvExpString, emptyStr );
-    tag.loadBoolW( "icon", &icon, &zero );
-    tag.loadW( "endObjectProperties" );
-    tag.loadW( "" );
+    tag.loadW ( "allowDups", allowDups, numDsps, &zero );
+    //tag.loadW ( "cascade", cascade, numDsps, &zero );
+    tag.loadW ( "symbols", symbolsExpStr, numDsps, emptyStr );
+    tag.loadW ( "replaceSymbols", replaceSymbols, numDsps, &zero );
+    tag.loadW ( "propagateMacros", propagateMacros, numDsps, &one );
+    tag.loadW ( "closeDisplay", closeAction, numDsps, &zero );
+    tag.loadW ( "colorPv", &colorPvExpString, emptyStr );
+    tag.loadW ( "enablePv", &enabPvExpString, emptyStr );
+    tag.loadBoolW ( "icon", &icon, &zero );
+    tag.loadW ( "endObjectProperties" );
+    tag.loadW ( "" );
 
     stat = tag.writeTags ( f );
 
@@ -716,7 +716,7 @@ int ExtendedRelatedDisplayClass::old_save ( FILE *f )
 
     fprintf ( f, "%-d\n", NUMPVS );
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         if ( destPvExpString[i].getRaw () )
         {
@@ -757,7 +757,7 @@ int ExtendedRelatedDisplayClass::old_save ( FILE *f )
 
     fprintf ( f, "%-d\n", numDsps );
 
-    for ( i=1; i<numDsps; i++ )
+    for ( i = 1; i < numDsps; i++ )
     {
         if ( displayFileName[i].getRaw () )
             writeStringToFile ( f, displayFileName[i].getRaw () );
@@ -842,47 +842,47 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
     this->actWin = _actWin;
 
     tag.init ();
-    tag.loadR( "beginObjectProperties" );
-    tag.loadR( "major", &major );
-    tag.loadR( "minor", &minor );
-    tag.loadR( "release", &release );
-    tag.loadR( "x", &x );
-    tag.loadR( "y", &y );
-    tag.loadR( "w", &w );
-    tag.loadR( "h", &h );
-    tag.loadR( "fgColor", actWin->ci, &fgColor );
-    tag.loadR( "bgColor", actWin->ci, &bgColor );
-    tag.loadR( "topShadowColor", actWin->ci, &topShadowColor );
-    tag.loadR( "botShadowColor", actWin->ci, &botShadowColor );
-    tag.loadR( "font", 63, fontTag );
-    tag.loadR( "xPosOffset", &ofsX, &zero );
-    tag.loadR( "yPosOffset", &ofsY, &zero );
-    tag.loadR( "noEdit", &noEdit, &zero );
-    tag.loadR( "useFocus", &useFocus, &zero );
-    tag.loadR( "button3Popup", &button3Popup, &zero );
-    tag.loadR( "invisible", &invisible, &zero );
-    tag.loadR( "buttonLabel", &buttonLabel, emptyStr );
-    tag.loadR( "numPvs", &numPvs, &zero );
-    tag.loadR( "pv", NUMPVS, destPvExpString, &n1, emptyStr );
-    tag.loadR( "value", NUMPVS, sourceExpString, &n1, emptyStr );
-    tag.loadR( "numDsps", &numDsps, &zero );
-    tag.loadR( "displayFileName", maxDsps, displayFileName, &n2, emptyStr );
-    tag.loadR( "menuLabel", maxDsps, label, &n2, emptyStr );
-    tag.loadR( "closeAction", maxDsps, closeAction, &n2, &zero );
-    tag.loadR( "setPosition", 3, setPosEnumStr, setPosEnum, maxDsps, setPostion,
+    tag.loadR ( "beginObjectProperties" );
+    tag.loadR ( "major", &major );
+    tag.loadR ( "minor", &minor );
+    tag.loadR ( "release", &release );
+    tag.loadR ( "x", &x );
+    tag.loadR ( "y", &y );
+    tag.loadR ( "w", &w );
+    tag.loadR ( "h", &h );
+    tag.loadR ( "fgColor", actWin->ci, &fgColor );
+    tag.loadR ( "bgColor", actWin->ci, &bgColor );
+    tag.loadR ( "topShadowColor", actWin->ci, &topShadowColor );
+    tag.loadR ( "botShadowColor", actWin->ci, &botShadowColor );
+    tag.loadR ( "font", 63, fontTag );
+    tag.loadR ( "xPosOffset", &ofsX, &zero );
+    tag.loadR ( "yPosOffset", &ofsY, &zero );
+    tag.loadR ( "noEdit", &noEdit, &zero );
+    tag.loadR ( "useFocus", &useFocus, &zero );
+    tag.loadR ( "button3Popup", &button3Popup, &zero );
+    tag.loadR ( "invisible", &invisible, &zero );
+    tag.loadR ( "buttonLabel", &buttonLabel, emptyStr );
+    tag.loadR ( "numPvs", &numPvs, &zero );
+    tag.loadR ( "pv", NUMPVS, destPvExpString, &n1, emptyStr );
+    tag.loadR ( "value", NUMPVS, sourceExpString, &n1, emptyStr );
+    tag.loadR ( "numDsps", &numDsps, &zero );
+    tag.loadR ( "displayFileName", maxDsps, displayFileName, &n2, emptyStr );
+    tag.loadR ( "menuLabel", maxDsps, label, &n2, emptyStr );
+    tag.loadR ( "closeAction", maxDsps, closeAction, &n2, &zero );
+    tag.loadR ( "setPosition", 3, setPosEnumStr, setPosEnum, maxDsps, setPostion,
         &n2, &setPosOriginal );
-    tag.loadR( "allowDups", maxDsps, allowDups, &n2, &zero );
-    tag.loadR( "cascade", maxDsps, cascade, &n2, &zero );
-    tag.loadR( "symbols", maxDsps, symbolsExpStr, &n2, emptyStr );
-    tag.loadR( "replaceSymbols", maxDsps, replaceSymbols, &n2, &zero );
-    tag.loadR( "propagateMacros", maxDsps, propagateMacros, &n2, &one );
-    tag.loadR( "closeDisplay", maxDsps, closeAction, &n2, &zero );
-    tag.loadR( "colorPv", &colorPvExpString, emptyStr );
-    tag.loadR( "enablePv", &enabPvExpString, emptyStr );
-    tag.loadR( "icon", &icon, &zero );
-    tag.loadR( "endObjectProperties" );
+    tag.loadR ( "allowDups", maxDsps, allowDups, &n2, &zero );
+    tag.loadR ( "cascade", maxDsps, cascade, &n2, &zero );
+    tag.loadR ( "symbols", maxDsps, symbolsExpStr, &n2, emptyStr );
+    tag.loadR ( "replaceSymbols", maxDsps, replaceSymbols, &n2, &zero );
+    tag.loadR ( "propagateMacros", maxDsps, propagateMacros, &n2, &one );
+    tag.loadR ( "closeDisplay", maxDsps, closeAction, &n2, &zero );
+    tag.loadR ( "colorPv", &colorPvExpString, emptyStr );
+    tag.loadR ( "enablePv", &enabPvExpString, emptyStr );
+    tag.loadR ( "icon", &icon, &zero );
+    tag.loadR ( "endObjectProperties" );
 
-    stat = tag.loadR( "endObjectProperties" );
+    stat = tag.loadR ( "endObjectProperties" );
 
     stat = tag.readTags ( f, "endObjectProperties" );
 
@@ -903,9 +903,9 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
         return 0;
     }
 
-    this->initSelectBox (); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x, y, w, h
 
-    for ( i=numPvs; i<NUMPVS; i++ )
+    for ( i = numPvs; i < NUMPVS; i++ )
     {
         destPvExpString[i].setRaw ( "" );
         sourceExpString[i].setRaw ( "" );
@@ -927,8 +927,8 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
     int i, numPvs, r, g, b, index, more, md;
     int major, minor, release;
     unsigned int pixel;
-    char oneName[255+1];
-    char onePvName[PV_Factory::MAX_PV_NAME+1];
+    char oneName[255 + 1];
+    char onePvName[PV_Factory::MAX_PV_NAME + 1];
 
     this->actWin = _actWin;
 
@@ -945,7 +945,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
     fscanf ( f, "%d\n", &w ); actWin->incLine ();
     fscanf ( f, "%d\n", &h ); actWin->incLine ();
 
-    this->initSelectBox (); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x, y, w, h
 
     if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 4 ) ) )
     {
@@ -954,82 +954,82 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         fgColor.setColorIndex ( index, actWin->ci );
 
         actWin->ci->readColorIndex ( f, &index );
-        actWin->incLine(); actWin->incLine();
-        bgColor.setColorIndex( index, actWin->ci );
+        actWin->incLine (); actWin->incLine ();
+        bgColor.setColorIndex ( index, actWin->ci );
 
-        actWin->ci->readColorIndex( f, &index );
-        actWin->incLine(); actWin->incLine();
+        actWin->ci->readColorIndex ( f, &index );
+        actWin->incLine (); actWin->incLine ();
         topShadowColor = index;
 
-        actWin->ci->readColorIndex( f, &index );
-        actWin->incLine(); actWin->incLine();
+        actWin->ci->readColorIndex ( f, &index );
+        actWin->incLine (); actWin->incLine ();
         botShadowColor = index;
     }
     else if ( major > 1 )
     {
-        fscanf( f, "%d\n", &index ); actWin->incLine();
-        fgColor.setColorIndex( index, actWin->ci );
+        fscanf ( f, "%d\n", &index ); actWin->incLine ();
+        fgColor.setColorIndex ( index, actWin->ci );
 
-        fscanf( f, "%d\n", &index ); actWin->incLine();
-        bgColor.setColorIndex( index, actWin->ci );
+        fscanf ( f, "%d\n", &index ); actWin->incLine ();
+        bgColor.setColorIndex ( index, actWin->ci );
 
-        fscanf( f, "%d\n", &index ); actWin->incLine();
+        fscanf ( f, "%d\n", &index ); actWin->incLine ();
         topShadowColor = index;
 
-        fscanf( f, "%d\n", &index ); actWin->incLine();
+        fscanf ( f, "%d\n", &index ); actWin->incLine ();
         botShadowColor = index;
     }
     else
     {
-        fscanf( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine();
+        fscanf ( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine ();
         if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
             b *= 256;
         }
-        actWin->ci->setRGB( r, g, b, &pixel );
-        index = actWin->ci->pixIndex( pixel );
-        fgColor.setColorIndex( index, actWin->ci );
+        actWin->ci->setRGB ( r, g, b, &pixel );
+        index = actWin->ci->pixIndex ( pixel );
+        fgColor.setColorIndex ( index, actWin->ci );
 
-        fscanf( f, "%d %d %d\n", &r, &g, &b );
-        actWin->incLine();
+        fscanf ( f, "%d %d %d\n", &r, &g, &b );
+        actWin->incLine ();
         if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
             b *= 256;
         }
-        actWin->ci->setRGB( r, g, b, &pixel );
-        index = actWin->ci->pixIndex( pixel );
-        bgColor.setColorIndex( index, actWin->ci );
+        actWin->ci->setRGB ( r, g, b, &pixel );
+        index = actWin->ci->pixIndex ( pixel );
+        bgColor.setColorIndex ( index, actWin->ci );
 
-        fscanf( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine();
+        fscanf ( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine ();
         if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
             b *= 256;
         }
-        actWin->ci->setRGB( r, g, b, &pixel );
-        topShadowColor = actWin->ci->pixIndex( pixel );
+        actWin->ci->setRGB ( r, g, b, &pixel );
+        topShadowColor = actWin->ci->pixIndex ( pixel );
 
-        fscanf( f, "%d %d %d\n", &r, &g, &b );
-        actWin->incLine();
+        fscanf ( f, "%d %d %d\n", &r, &g, &b );
+        actWin->incLine ();
         if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
             b *= 256;
         }
-        actWin->ci->setRGB( r, g, b, &pixel );
-        botShadowColor = actWin->ci->pixIndex( pixel );
+        actWin->ci->setRGB ( r, g, b, &pixel );
+        botShadowColor = actWin->ci->pixIndex ( pixel );
     }
 
-    readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-    displayFileName[0].setRaw( oneName );
+    readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+    displayFileName[0].setRaw ( oneName );
 
-    if ( blank( displayFileName[0].getRaw() ) )
+    if ( blank ( displayFileName[0].getRaw () ) )
     {
         more = 0;
         numDsps = 0;
@@ -1040,17 +1040,17 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         numDsps = 1;
     }
 
-    readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-    label[0].setRaw( oneName );
+    readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+    label[0].setRaw ( oneName );
 
-    readStringFromFile( fontTag, 63+1, f ); actWin->incLine();
+    readStringFromFile ( fontTag, 63 + 1, f ); actWin->incLine ();
 
     if ( ( major > 1 ) || ( minor > 2 ) )
     {
-        fscanf( f, "%d\n", &invisible );
-        actWin->incLine();
-        fscanf( f, "%d\n", &closeAction[0] );
-        actWin->incLine();
+        fscanf ( f, "%d\n", &invisible );
+        actWin->incLine ();
+        fscanf ( f, "%d\n", &closeAction[0] );
+        actWin->incLine ();
     }
     else
     {
@@ -1060,7 +1060,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 1 ) || ( minor > 3 ) )
     {
-        fscanf( f, "%d\n", &setPostion[0] ); actWin->incLine();
+        fscanf ( f, "%d\n", &setPostion[0] ); actWin->incLine ();
     }
     else
     {
@@ -1069,34 +1069,34 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 1 ) || ( minor > 4 ) )
     {
-        fscanf( f, "%d\n", &numPvs ); actWin->incLine();
-        for ( i=0; i<numPvs; i++ )
+        fscanf ( f, "%d\n", &numPvs ); actWin->incLine ();
+        for ( i = 0; i < numPvs; i++ )
         {
             if ( i >= NUMPVS ) i = NUMPVS - 1;
-            readStringFromFile( onePvName, PV_Factory::MAX_PV_NAME+1, f );
-            actWin->incLine();
-            destPvExpString[i].setRaw( onePvName );
-            readStringFromFile( onePvName, 39+1, f ); actWin->incLine();
-            sourceExpString[i].setRaw( onePvName );
+            readStringFromFile ( onePvName, PV_Factory::MAX_PV_NAME + 1, f );
+            actWin->incLine ();
+            destPvExpString[i].setRaw ( onePvName );
+            readStringFromFile ( onePvName, 39 + 1, f ); actWin->incLine ();
+            sourceExpString[i].setRaw ( onePvName );
         }
-        for ( i=numPvs; i<NUMPVS; i++ )
+        for ( i = numPvs; i < NUMPVS; i++ )
         {
-            destPvExpString[i].setRaw( "" );
-            sourceExpString[i].setRaw( "" );
+            destPvExpString[i].setRaw ( "" );
+            sourceExpString[i].setRaw ( "" );
         }
     }
     else
     {
-        for ( i=numPvs; i<NUMPVS; i++ )
+        for ( i = numPvs; i < NUMPVS; i++ )
         {
-            destPvExpString[i].setRaw( "" );
-            sourceExpString[i].setRaw( "" );
+            destPvExpString[i].setRaw ( "" );
+            sourceExpString[i].setRaw ( "" );
         }
     }
 
     if ( ( major > 1 ) || ( minor > 6 ) )
     {
-        fscanf( f, "%d\n", &allowDups[0] ); actWin->incLine();
+        fscanf ( f, "%d\n", &allowDups[0] ); actWin->incLine ();
     }
     else
     {
@@ -1105,7 +1105,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 1 ) || ( minor > 7 ) )
     {
-        fscanf( f, "%d\n", &cascade[0] ); actWin->incLine();
+        fscanf ( f, "%d\n", &cascade[0] ); actWin->incLine ();
     }
     else
     {
@@ -1114,19 +1114,19 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 1 ) || ( minor > 8 ) )
     {
-        readStringFromFile( oneName, 255+1, f ); actWin->incLine();
-        symbolsExpStr[0].setRaw( oneName );
-        fscanf( f, "%d\n", &replaceSymbols[0] ); actWin->incLine();
+        readStringFromFile ( oneName, 255 + 1, f ); actWin->incLine ();
+        symbolsExpStr[0].setRaw ( oneName );
+        fscanf ( f, "%d\n", &replaceSymbols[0] ); actWin->incLine ();
     }
     else
     {
-        symbolsExpStr[0].setRaw( "" );
+        symbolsExpStr[0].setRaw ( "" );
         replaceSymbols[0]  = 0;
     }
 
     if ( ( major > 1 ) || ( minor > 9 ) )
     {
-        fscanf( f, "%d\n", &propagateMacros[0] ); actWin->incLine();
+        fscanf ( f, "%d\n", &propagateMacros[0] ); actWin->incLine ();
     }
     else
     {
@@ -1135,7 +1135,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 1 ) || ( minor > 10 ) )
     {
-        fscanf( f, "%d\n", &useFocus ); actWin->incLine();
+        fscanf ( f, "%d\n", &useFocus ); actWin->incLine ();
     }
     else
     {
@@ -1149,12 +1149,12 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
         if ( ( major > 2 ) || ( major == 2 ) && ( minor > 0 ) )
         {
-            for ( i=1; i<md; i++ )
+            for ( i = 1; i < md; i++ )
             { // for forward compatibility
-                readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-                displayFileName[i].setRaw( oneName );
+                readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+                displayFileName[i].setRaw ( oneName );
 
-                if ( more && !blank(displayFileName[i].getRaw() ) )
+                if ( more && !blank (displayFileName[i].getRaw () ) )
                 {
                     numDsps++;
                 }
@@ -1163,26 +1163,26 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
                     more = 0;
                 }
 
-                readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-                label[i].setRaw( oneName );
+                readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+                label[i].setRaw ( oneName );
 
-                fscanf( f, "%d\n", &closeAction[i] );
+                fscanf ( f, "%d\n", &closeAction[i] );
 
-                fscanf( f, "%d\n", &setPostion[i] );
+                fscanf ( f, "%d\n", &setPostion[i] );
 
-                fscanf( f, "%d\n", &allowDups[i] );
+                fscanf ( f, "%d\n", &allowDups[i] );
 
-                fscanf( f, "%d\n", &cascade[i] );
+                fscanf ( f, "%d\n", &cascade[i] );
 
-                readStringFromFile( oneName, 255+1, f ); actWin->incLine();
-                symbolsExpStr[i].setRaw( oneName );
+                readStringFromFile ( oneName, 255 + 1, f ); actWin->incLine ();
+                symbolsExpStr[i].setRaw ( oneName );
 
-                fscanf( f, "%d\n", &replaceSymbols[i] );
+                fscanf ( f, "%d\n", &replaceSymbols[i] );
 
-                fscanf( f, "%d\n", &propagateMacros[i] );
+                fscanf ( f, "%d\n", &propagateMacros[i] );
             }
 
-            for ( i=numDsps; i<maxDsps; i++ )
+            for ( i = numDsps; i < maxDsps; i++ )
             {
                 closeAction[i] = 0;
                 setPostion[i] = 0;
@@ -1190,24 +1190,24 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
                 cascade[i] = 0;
                 propagateMacros[i] = 1;
                 replaceSymbols[i] = 0;
-                label[i].setRaw( "" );
-                symbolsExpStr[i].setRaw( "" );
+                label[i].setRaw ( "" );
+                symbolsExpStr[i].setRaw ( "" );
             }
         }
 
         if ( ( major > 2 ) || ( major == 2 ) && ( minor > 1 ) )
         {
-            readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-            buttonLabel.setRaw( oneName );
+            readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+            buttonLabel.setRaw ( oneName );
         }
         else
         {
-            buttonLabel.setRaw( label[0].getRaw() );
+            buttonLabel.setRaw ( label[0].getRaw () );
         }
 
         if ( ( major > 2 ) || ( major == 2 ) && ( minor > 2 ) )
         {
-            fscanf( f, "%d\n", &noEdit ); actWin->incLine();
+            fscanf ( f, "%d\n", &noEdit ); actWin->incLine ();
         }
         else
         {
@@ -1216,42 +1216,42 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
     }
     else
     {
-        fscanf( f, "%d\n", &numDsps ); actWin->incLine();
+        fscanf ( f, "%d\n", &numDsps ); actWin->incLine ();
 
-        for ( i=1; i<numDsps; i++ )
+        for ( i = 1; i < numDsps; i++ )
         {
-            readStringFromFile( oneName, 127+1, f );
-            actWin->incLine();
-            displayFileName[i].setRaw( oneName );
+            readStringFromFile ( oneName, 127 + 1, f );
+            actWin->incLine ();
+            displayFileName[i].setRaw ( oneName );
 
-            if ( blank(displayFileName[i].getRaw() ) )
+            if ( blank (displayFileName[i].getRaw () ) )
             {
                 more = 0;
             }
 
-            readStringFromFile( oneName, 127+1, f );
-            actWin->incLine();
-            label[i].setRaw( oneName );
+            readStringFromFile ( oneName, 127 + 1, f );
+            actWin->incLine ();
+            label[i].setRaw ( oneName );
 
-            fscanf( f, "%d\n", &closeAction[i] );
+            fscanf ( f, "%d\n", &closeAction[i] );
 
-            fscanf( f, "%d\n", &setPostion[i] );
+            fscanf ( f, "%d\n", &setPostion[i] );
 
-            fscanf( f, "%d\n", &allowDups[i] );
+            fscanf ( f, "%d\n", &allowDups[i] );
 
-            fscanf( f, "%d\n", &cascade[i] );
+            fscanf ( f, "%d\n", &cascade[i] );
 
-            readStringFromFile( oneName, 255+1, f );
-            actWin->incLine();
-            symbolsExpStr[i].setRaw( oneName );
+            readStringFromFile ( oneName, 255 + 1, f );
+            actWin->incLine ();
+            symbolsExpStr[i].setRaw ( oneName );
 
-            fscanf( f, "%d\n", &replaceSymbols[i] );
+            fscanf ( f, "%d\n", &replaceSymbols[i] );
 
-            fscanf( f, "%d\n", &propagateMacros[i] );
+            fscanf ( f, "%d\n", &propagateMacros[i] );
 
         }
 
-        for ( i=numDsps; i<maxDsps; i++ )
+        for ( i = numDsps; i < maxDsps; i++ )
         {
             closeAction[i] = 0;
             setPostion[i] = 0;
@@ -1259,21 +1259,21 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
             cascade[i] = 0;
             propagateMacros[i] = 1;
             replaceSymbols[i] = 0;
-            label[i].setRaw( "" );
-            symbolsExpStr[i].setRaw( "" );
+            label[i].setRaw ( "" );
+            symbolsExpStr[i].setRaw ( "" );
         }
 
-        readStringFromFile( oneName, 127+1, f ); actWin->incLine();
-        buttonLabel.setRaw( oneName );
+        readStringFromFile ( oneName, 127 + 1, f ); actWin->incLine ();
+        buttonLabel.setRaw ( oneName );
 
-        fscanf( f, "%d\n", &noEdit ); actWin->incLine();
+        fscanf ( f, "%d\n", &noEdit ); actWin->incLine ();
 
     }
 
     if ( ( major > 2 ) || ( major == 2 ) && ( minor > 5 ) )
     {
-        fscanf( f, "%d\n", &ofsX ); actWin->incLine();
-        fscanf( f, "%d\n", &ofsY ); actWin->incLine();
+        fscanf ( f, "%d\n", &ofsX ); actWin->incLine ();
+        fscanf ( f, "%d\n", &ofsY ); actWin->incLine ();
     }
     else
     {
@@ -1283,7 +1283,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     if ( ( major > 2 ) || ( major == 2 ) && ( minor > 6 ) )
     {
-        fscanf( f, "%d\n", &button3Popup ); actWin->incLine();
+        fscanf ( f, "%d\n", &button3Popup ); actWin->incLine ();
     }
     else
     {
@@ -1297,13 +1297,13 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     icon = 0;
 
-    actWin->fi->loadFontTag( fontTag );
-    actWin->drawGc.setFontTag( fontTag, actWin->fi );
+    actWin->fi->loadFontTag ( fontTag );
+    actWin->drawGc.setFontTag ( fontTag, actWin->fi );
 
-    fs = actWin->fi->getXFontStruct( fontTag );
-    actWin->fi->getTextFontList( fontTag, &fontList );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    actWin->fi->getTextFontList ( fontTag, &fontList );
 
-    updateDimensions();
+    updateDimensions ();
 
     return 1;
 }
@@ -1312,7 +1312,7 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
 {
     int fgR, fgG, fgB, bgR, bgG, bgB, more, index;
     unsigned int pixel;
-    char *tk, *gotData, *context, buf[255+1];
+    char *tk, *gotData, *context, buf[255 + 1];
 
     fgR = 0xffff;
     fgG = 0xffff;
@@ -1324,36 +1324,36 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
 
     this->actWin = _actWin;
 
-    strcpy( fontTag, actWin->defaultBtnFontTag );
-    actWin->fi->loadFontTag( fontTag );
+    strcpy ( fontTag, actWin->defaultBtnFontTag );
+    actWin->fi->loadFontTag ( fontTag );
 
     topShadowColor = actWin->defaultTopShadowColor;
     botShadowColor = actWin->defaultBotShadowColor;
 
-    fgColor.setColorIndex( actWin->defaultTextFgColor, actWin->ci );
-    bgColor.setColorIndex( actWin->defaultBgColor, actWin->ci );
+    fgColor.setColorIndex ( actWin->defaultTextFgColor, actWin->ci );
+    bgColor.setColorIndex ( actWin->defaultBgColor, actWin->ci );
 
     // continue until tag is <eod>
 
     do
     {
-        gotData = getNextDataString( buf, 255, f );
+        gotData = getNextDataString ( buf, 255, f );
         if ( !gotData )
         {
-            actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+            actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
             return 0;
         }
 
         context = NULL;
 
-        tk = strtok_r( buf, " \t\n", &context );
+        tk = strtok_r ( buf, " \t\n", &context );
         if ( !tk )
         {
-            actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+            actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
             return 0;
         }
 
-        if ( strcmp( tk, "<eod>" ) == 0 )
+        if ( strcmp ( tk, "<eod>" ) == 0 )
         {
             more = 0;
         }
@@ -1361,197 +1361,197 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
         {
             more = 1;
 
-            if ( strcmp( tk, "x" ) == 0 )
+            if ( strcmp ( tk, "x" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
 
-                x = atol( tk );
+                x = atol ( tk );
             }
-            else if ( strcmp( tk, "y" ) == 0 )
+            else if ( strcmp ( tk, "y" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                y = atol( tk );
+                y = atol ( tk );
             }
-            else if ( strcmp( tk, "w" ) == 0 )
+            else if ( strcmp ( tk, "w" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
-                    return 0;
-                }
-
-                w = atol( tk );
-            }
-            else if ( strcmp( tk, "h" ) == 0 )
-            {
-                tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk )
-                {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
-                    return 0;
-                }
-                h = atol( tk );
-            }
-
-            else if ( strcmp( tk, "fgred" ) == 0 )
-            {
-                tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk )
-                {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
 
-                fgR = atol( tk );
+                w = atol ( tk );
+            }
+            else if ( strcmp ( tk, "h" ) == 0 )
+            {
+                tk = strtok_r ( NULL, "\"\n", &context );
+                if ( !tk )
+                {
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
+                    return 0;
+                }
+                h = atol ( tk );
             }
 
-            else if ( strcmp( tk, "fggreen" ) == 0 )
+            else if ( strcmp ( tk, "fgred" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                fgG = atol( tk );
+
+                fgR = atol ( tk );
             }
 
-            else if ( strcmp( tk, "fgblue" ) == 0 )
+            else if ( strcmp ( tk, "fggreen" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-
-                fgB = atol( tk );
+                fgG = atol ( tk );
             }
 
-            else if ( strcmp( tk, "bgred" ) == 0 )
+            else if ( strcmp ( tk, "fgblue" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                bgR = atol( tk );
+
+                fgB = atol ( tk );
             }
 
-            else if ( strcmp( tk, "bggreen" ) == 0 )
+            else if ( strcmp ( tk, "bgred" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                bgG = atol( tk );
+                bgR = atol ( tk );
             }
 
-            else if ( strcmp( tk, "bgblue" ) == 0 )
+            else if ( strcmp ( tk, "bggreen" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                bgB = atol( tk );
+                bgG = atol ( tk );
             }
 
-            else if ( strcmp( tk, "closecurrent" ) == 0 )
+            else if ( strcmp ( tk, "bgblue" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-                closeAction[0] = atol( tk );
+                bgB = atol ( tk );
             }
 
-            else if ( strcmp( tk, "invisible" ) == 0 )
+            else if ( strcmp ( tk, "closecurrent" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
-
-                invisible = atol( tk );
+                closeAction[0] = atol ( tk );
             }
 
-            else if ( strcmp( tk, "font" ) == 0 )
+            else if ( strcmp ( tk, "invisible" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"\n", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
 
-                strncpy( fontTag, tk, 63 );
+                invisible = atol ( tk );
             }
 
-            else if ( strcmp( tk, "displayname" ) == 0 )
+            else if ( strcmp ( tk, "font" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"", &context );
+                tk = strtok_r ( NULL, "\"\n", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
 
-                displayFileName[0].setRaw( tk );
+                strncpy ( fontTag, tk, 63 );
             }
 
-            else if ( strcmp( tk, "label" ) == 0 )
+            else if ( strcmp ( tk, "displayname" ) == 0 )
             {
-                tk = strtok_r( NULL, "\"", &context );
+                tk = strtok_r ( NULL, "\"", &context );
                 if ( !tk )
                 {
-                    actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
 
-                buttonLabel.setRaw( tk );
-                label[0].setRaw( tk );
+                displayFileName[0].setRaw ( tk );
+            }
+
+            else if ( strcmp ( tk, "label" ) == 0 )
+            {
+                tk = strtok_r ( NULL, "\"", &context );
+                if ( !tk )
+                {
+                    actWin->appCtx->postMessage ( ExtendedRelatedDisplayClass_str1 );
+                    return 0;
+                }
+
+                buttonLabel.setRaw ( tk );
+                label[0].setRaw ( tk );
             }
         }
 
     } while ( more );
 
-    this->initSelectBox(); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x, y, w, h
 
-    actWin->ci->setRGB( fgR, fgG, fgB, &pixel );
-    index = actWin->ci->pixIndex( pixel );
-    fgColor.setColorIndex( index, actWin->ci );
+    actWin->ci->setRGB ( fgR, fgG, fgB, &pixel );
+    index = actWin->ci->pixIndex ( pixel );
+    fgColor.setColorIndex ( index, actWin->ci );
 
-    actWin->ci->setRGB( bgR, bgG, bgB, &pixel );
-    index = actWin->ci->pixIndex( pixel );
-    bgColor.setColorIndex( index, actWin->ci );
+    actWin->ci->setRGB ( bgR, bgG, bgB, &pixel );
+    index = actWin->ci->pixIndex ( pixel );
+    bgColor.setColorIndex ( index, actWin->ci );
 
-    actWin->fi->loadFontTag( fontTag );
-    actWin->drawGc.setFontTag( fontTag, actWin->fi );
+    actWin->fi->loadFontTag ( fontTag );
+    actWin->drawGc.setFontTag ( fontTag, actWin->fi );
 
-    fs = actWin->fi->getXFontStruct( fontTag );
-    actWin->fi->getTextFontList( fontTag, &fontList );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    actWin->fi->getTextFontList ( fontTag, &fontList );
 
-    updateDimensions();
+    updateDimensions ();
 
     return 1;
 }
@@ -1566,7 +1566,7 @@ int ExtendedRelatedDisplayClass::createSpecial ( char *fname, activeWindowClass 
     h = 5;
 
     this->actWin = _actWin;
-    strcpy( fontTag, "" );
+    strcpy ( fontTag, "" );
     ofsX = ofsY = useFocus = button3Popup = 0;
     noEdit = invisible = numDsps = 1;
     setPostion[0] = 0;
@@ -1576,14 +1576,14 @@ int ExtendedRelatedDisplayClass::createSpecial ( char *fname, activeWindowClass 
     propagateMacros[0] = 1;
     closeAction[0] = 0;
     icon = 0;
-    displayFileName[0].setRaw( fname );
+    displayFileName[0].setRaw ( fname );
 
-    this->initSelectBox(); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x, y, w, h
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
-        destPvExpString[i].setRaw( "" );
-        sourceExpString[i].setRaw( "" );
+        destPvExpString[i].setRaw ( "" );
+        sourceExpString[i].setRaw ( "" );
     }
 
     return 1;
@@ -1593,8 +1593,8 @@ void ExtendedRelatedDisplayClass::sendMsg ( char *param )
 {
     if ( param )
     {
-        //printf( "  msg = [%s]\n", param );
-        popupDisplay( 0 );
+        //printf ( "  msg = [%s]\n", param );
+        popupDisplay ( 0 );
     }
 }
 
@@ -1608,27 +1608,27 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
         buf = new bufType;
     }
 
-    ptr = actWin->obj.getNameFromClass( "ExtendedRelatedDisplayClass" );
+    ptr = actWin->obj.getNameFromClass ( "ExtendedRelatedDisplayClass" );
     if ( ptr )
-        strncpy( title, ptr, 31 );
+        strncpy ( title, ptr, 31 );
     else
-        strncpy( title, ExtendedRelatedDisplayClass_str17, 31 );
+        strncpy ( title, ExtendedRelatedDisplayClass_str17, 31 );
 
-    Strncat( title, ExtendedRelatedDisplayClass_str3, 31 );
+    Strncat ( title, ExtendedRelatedDisplayClass_str3, 31 );
 
     buf->bufX = x;
     buf->bufY = y;
     buf->bufW = w;
     buf->bufH = h;
 
-    strncpy( buf->bufFontTag, fontTag, 63 );
+    strncpy ( buf->bufFontTag, fontTag, 63 );
 
     buf->bufTopShadowColor = topShadowColor;
     buf->bufBotShadowColor = botShadowColor;
 
-    buf->bufFgColor = fgColor.pixelIndex();
+    buf->bufFgColor = fgColor.pixelIndex ();
 
-    buf->bufBgColor = bgColor.pixelIndex();
+    buf->bufBgColor = bgColor.pixelIndex ();
 
     buf->bufInvisible = invisible;
 
@@ -1640,17 +1640,17 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
 
     buf->bufUseFocus = useFocus;
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
-        if ( displayFileName[i].getRaw() )
-            strncpy( buf->bufDisplayFileName[i], displayFileName[i].getRaw(), 127 );
+        if ( displayFileName[i].getRaw () )
+            strncpy ( buf->bufDisplayFileName[i], displayFileName[i].getRaw (), 127 );
         else
-            strncpy( buf->bufDisplayFileName[i], "", 127 );
+            strncpy ( buf->bufDisplayFileName[i], "", 127 );
 
-        if ( label[i].getRaw() )
-            strncpy( buf->bufLabel[i], label[i].getRaw(), 127 );
+        if ( label[i].getRaw () )
+            strncpy ( buf->bufLabel[i], label[i].getRaw (), 127 );
         else
-            strncpy( buf->bufLabel[i], "", 127 );
+            strncpy ( buf->bufLabel[i], "", 127 );
 
         buf->bufCloseAction[i] = closeAction[i];
 
@@ -1662,190 +1662,190 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
 
         buf->bufPropagateMacros[i] = propagateMacros[i];
 
-        if ( symbolsExpStr[i].getRaw() )
+        if ( symbolsExpStr[i].getRaw () )
         {
-            strncpy( buf->bufSymbols[i], symbolsExpStr[i].getRaw(), 255 );
+            strncpy ( buf->bufSymbols[i], symbolsExpStr[i].getRaw (), 255 );
         }
         else
         {
-            strncpy( buf->bufSymbols[i], "", 255 );
+            strncpy ( buf->bufSymbols[i], "", 255 );
         }
 
         buf->bufReplaceSymbols[i] = replaceSymbols[i];
     }
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
-        if ( destPvExpString[i].getRaw() )
+        if ( destPvExpString[i].getRaw () )
         {
-            strncpy( buf->bufDestPvName[i], destPvExpString[i].getRaw(),
+            strncpy ( buf->bufDestPvName[i], destPvExpString[i].getRaw (),
             PV_Factory::MAX_PV_NAME );
             buf->bufDestPvName[i][PV_Factory::MAX_PV_NAME] = 0;
         }
         else
         {
-            strcpy( buf->bufDestPvName[i], "" );
+            strcpy ( buf->bufDestPvName[i], "" );
         }
-        if ( sourceExpString[i].getRaw() )
+        if ( sourceExpString[i].getRaw () )
         {
-            strncpy( buf->bufSource[i], sourceExpString[i].getRaw(), 39 );
+            strncpy ( buf->bufSource[i], sourceExpString[i].getRaw (), 39 );
             buf->bufSource[i][39] = 0;
         }
         else
         {
-            strcpy( buf->bufSource[i], "" );
+            strcpy ( buf->bufSource[i], "" );
         }
     }
 
-    if ( colorPvExpString.getRaw() )
+    if ( colorPvExpString.getRaw () )
     {
-        strncpy( buf->bufColorPvName, colorPvExpString.getRaw(),
+        strncpy ( buf->bufColorPvName, colorPvExpString.getRaw (),
         PV_Factory::MAX_PV_NAME );
         buf->bufColorPvName[PV_Factory::MAX_PV_NAME] = 0;
     }
     else
     {
-        strcpy( buf->bufColorPvName, "" );
+        strcpy ( buf->bufColorPvName, "" );
     }
 
-    if ( enabPvExpString.getRaw() )
+    if ( enabPvExpString.getRaw () )
     {
-        strncpy( buf->bufEnabPvName, enabPvExpString.getRaw(),
+        strncpy ( buf->bufEnabPvName, enabPvExpString.getRaw (),
         PV_Factory::MAX_PV_NAME );
         buf->bufEnabPvName[PV_Factory::MAX_PV_NAME] = 0;
     }
     else
     {
-        strcpy( buf->bufEnabPvName, "" );
+        strcpy ( buf->bufEnabPvName, "" );
     }
 
-    if ( buttonLabel.getRaw() )
+    if ( buttonLabel.getRaw () )
     {
-        strncpy( buf->bufButtonLabel, buttonLabel.getRaw(), 127 );
+        strncpy ( buf->bufButtonLabel, buttonLabel.getRaw (), 127 );
         buf->bufButtonLabel[127] = 0;
     }
     else
     {
-        strncpy( buf->bufButtonLabel, "", 127 );
+        strncpy ( buf->bufButtonLabel, "", 127 );
     }
 
     buf->bufButton3Popup = button3Popup;
 
     buf->bufIcon = icon;
 
-    ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
+    ef.create ( actWin->top, actWin->appCtx->ci.getColorMap (),
         &actWin->appCtx->entryFormX,
         &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
         &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
         title, NULL, NULL, NULL );
 
-    ef.addTextField( ExtendedRelatedDisplayClass_str4, 35, &buf->bufX );
-    ef.addTextField( ExtendedRelatedDisplayClass_str5, 35, &buf->bufY );
-    ef.addTextField( ExtendedRelatedDisplayClass_str6, 35, &buf->bufW );
-    ef.addTextField( ExtendedRelatedDisplayClass_str7, 35, &buf->bufH );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str4, 35, &buf->bufX );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str5, 35, &buf->bufY );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str6, 35, &buf->bufW );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str7, 35, &buf->bufH );
 
-    ef.addTextField( ExtendedRelatedDisplayClass_str36, 35, buf->bufLabel[0], 127 );
-    ef.addTextField( ExtendedRelatedDisplayClass_str37, 35, buf->bufDisplayFileName[0],
+    ef.addTextField ( ExtendedRelatedDisplayClass_str36, 35, buf->bufLabel[0], 127 );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str37, 35, buf->bufDisplayFileName[0],
         127 );
-    ef.addTextField( ExtendedRelatedDisplayClass_str26, 35, buf->bufSymbols[0], 255 );
-    ef.addOption( ExtendedRelatedDisplayClass_str23, ExtendedRelatedDisplayClass_str24,
+    ef.addTextField ( ExtendedRelatedDisplayClass_str26, 35, buf->bufSymbols[0], 255 );
+    ef.addOption ( ExtendedRelatedDisplayClass_str23, ExtendedRelatedDisplayClass_str24,
         &buf->bufReplaceSymbols[0] );
-    ef.addToggle( ExtendedRelatedDisplayClass_str25, &buf->bufPropagateMacros[0] );
-    ef.addOption( ExtendedRelatedDisplayClass_str30, ExtendedRelatedDisplayClass_str31,
+    ef.addToggle ( ExtendedRelatedDisplayClass_str25, &buf->bufPropagateMacros[0] );
+    ef.addOption ( ExtendedRelatedDisplayClass_str30, ExtendedRelatedDisplayClass_str31,
         &buf->bufSetPostion[0] );
-    ef.addTextField( ExtendedRelatedDisplayClass_str32, 35, &buf->bufOfsX );
-    ef.addTextField( ExtendedRelatedDisplayClass_str33, 35, &buf->bufOfsY );
-    ef.addToggle( ExtendedRelatedDisplayClass_str20, &buf->bufCloseAction[0] );
-    ef.addToggle( ExtendedRelatedDisplayClass_str21, &buf->bufAllowDups[0] );
-    //ef.addToggle( ExtendedRelatedDisplayClass_str22, &buf->bufCascade[0] );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str32, 35, &buf->bufOfsX );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str33, 35, &buf->bufOfsY );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str20, &buf->bufCloseAction[0] );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str21, &buf->bufAllowDups[0] );
+    //ef.addToggle ( ExtendedRelatedDisplayClass_str22, &buf->bufCascade[0] );
 
-    ef.addEmbeddedEf( ExtendedRelatedDisplayClass_str14, "...", &ef1 );
+    ef.addEmbeddedEf ( ExtendedRelatedDisplayClass_str14, "...", &ef1 );
 
-    ef1->create( actWin->top, actWin->appCtx->ci.getColorMap(),
+    ef1->create ( actWin->top, actWin->appCtx->ci.getColorMap (),
         &actWin->appCtx->entryFormX,
         &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
         &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
         title, NULL, NULL, NULL );
 
-    for ( i=1; i<maxDsps; i++ )
+    for ( i = 1; i < maxDsps; i++ )
     {
-        ef1->beginSubForm();
-        ef1->addTextField( ExtendedRelatedDisplayClass_str38, 35, buf->bufLabel[i], 127 );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str39 );
-        ef1->addTextField( "", 35, buf->bufDisplayFileName[i], 127 );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str40 );
-        ef1->addTextField( "", 35, buf->bufSymbols[i], 255 );
-        ef1->endSubForm();
+        ef1->beginSubForm ();
+        ef1->addTextField ( ExtendedRelatedDisplayClass_str38, 35, buf->bufLabel[i], 127 );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str39 );
+        ef1->addTextField ( "", 35, buf->bufDisplayFileName[i], 127 );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str40 );
+        ef1->addTextField ( "", 35, buf->bufSymbols[i], 255 );
+        ef1->endSubForm ();
 
-        ef1->beginLeftSubForm();
-        ef1->addLabel( ExtendedRelatedDisplayClass_str41 );
-        ef1->addOption( "", ExtendedRelatedDisplayClass_str24,
+        ef1->beginLeftSubForm ();
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str41 );
+        ef1->addOption ( "", ExtendedRelatedDisplayClass_str24,
         &buf->bufReplaceSymbols[i] );
-        ef1->addLabel( " " );
-        ef1->addToggle( " ", &buf->bufPropagateMacros[i] );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str42 );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str30 );
-        ef1->addOption( " ", ExtendedRelatedDisplayClass_str31, &buf->bufSetPostion[i] );
-        ef1->addLabel( " " );
-        ef1->addToggle( " ", &buf->bufCloseAction[i] );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str35 );
-        ef1->addToggle( " ", &buf->bufAllowDups[i] );
-        ef1->addLabel( ExtendedRelatedDisplayClass_str43 );
-        //ef1->addToggle( " ", &buf->bufCascade[i] );
-        //ef1->addLabel( ExtendedRelatedDisplayClass_str22 );
-        ef1->endSubForm();
+        ef1->addLabel ( " " );
+        ef1->addToggle ( " ", &buf->bufPropagateMacros[i] );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str42 );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str30 );
+        ef1->addOption ( " ", ExtendedRelatedDisplayClass_str31, &buf->bufSetPostion[i] );
+        ef1->addLabel ( " " );
+        ef1->addToggle ( " ", &buf->bufCloseAction[i] );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str35 );
+        ef1->addToggle ( " ", &buf->bufAllowDups[i] );
+        ef1->addLabel ( ExtendedRelatedDisplayClass_str43 );
+        //ef1->addToggle ( " ", &buf->bufCascade[i] );
+        //ef1->addLabel ( ExtendedRelatedDisplayClass_str22 );
+        ef1->endSubForm ();
     }
 
-    //ef1->finished( rdc_edit_ok1, rdc_edit_apply1, rdc_edit_cancel1, this );
-    ef1->finished( rdc_edit_ok1, this );
+    //ef1->finished ( rdc_edit_ok1, rdc_edit_apply1, rdc_edit_cancel1, this );
+    ef1->finished ( rdc_edit_ok1, this );
 
-    ef.addTextField( ExtendedRelatedDisplayClass_str13, 35, buf->bufButtonLabel, 127 );
+    ef.addTextField ( ExtendedRelatedDisplayClass_str13, 35, buf->bufButtonLabel, 127 );
 
-    ef.addToggle( ExtendedRelatedDisplayClass_str17, &buf->bufUseFocus );
-    ef.addToggle( ExtendedRelatedDisplayClass_str19, &buf->bufInvisible );
-    ef.addToggle( ExtendedRelatedDisplayClass_str29, &buf->bufNoEdit );
-    ef.addToggle( ExtendedRelatedDisplayClass_str34, &buf->bufButton3Popup );
-    ef.addToggle( ExtendedRelatedDisplayClass_str47, &buf->bufIcon );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str17, &buf->bufUseFocus );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str19, &buf->bufInvisible );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str29, &buf->bufNoEdit );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str34, &buf->bufButton3Popup );
+    ef.addToggle ( ExtendedRelatedDisplayClass_str47, &buf->bufIcon );
 
-    ef.addTextField( "Color PV", 35, buf->bufColorPvName,   PV_Factory::MAX_PV_NAME );
-    ef.addTextField( "Enable PV", 35, buf->bufEnabPvName,   PV_Factory::MAX_PV_NAME );
+    ef.addTextField ( "Color PV", 35, buf->bufColorPvName,   PV_Factory::MAX_PV_NAME );
+    ef.addTextField ( "Enable PV", 35, buf->bufEnabPvName,   PV_Factory::MAX_PV_NAME );
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
-        ef.addTextField( ExtendedRelatedDisplayClass_str15, 35, buf->bufDestPvName[i],
+        ef.addTextField ( ExtendedRelatedDisplayClass_str15, 35, buf->bufDestPvName[i],
         PV_Factory::MAX_PV_NAME );
-        ef.addTextField( ExtendedRelatedDisplayClass_str16, 35, buf->bufSource[i], 39 );
+        ef.addTextField ( ExtendedRelatedDisplayClass_str16, 35, buf->bufSource[i], 39 );
     }
 
-    ef.addColorButton( ExtendedRelatedDisplayClass_str8, actWin->ci, &fgCb, &buf->bufFgColor );
-    ef.addColorButton( ExtendedRelatedDisplayClass_str9, actWin->ci, &bgCb, &buf->bufBgColor );
-    ef.addColorButton( ExtendedRelatedDisplayClass_str10, actWin->ci, &topShadowCb,
+    ef.addColorButton ( ExtendedRelatedDisplayClass_str8, actWin->ci, &fgCb, &buf->bufFgColor );
+    ef.addColorButton ( ExtendedRelatedDisplayClass_str9, actWin->ci, &bgCb, &buf->bufBgColor );
+    ef.addColorButton ( ExtendedRelatedDisplayClass_str10, actWin->ci, &topShadowCb,
         &buf->bufTopShadowColor );
-    ef.addColorButton( ExtendedRelatedDisplayClass_str11, actWin->ci, &botShadowCb,
+    ef.addColorButton ( ExtendedRelatedDisplayClass_str11, actWin->ci, &botShadowCb,
         &buf->bufBotShadowColor );
-    ef.addFontMenu( ExtendedRelatedDisplayClass_str12, actWin->fi, &fm, fontTag );
+    ef.addFontMenu ( ExtendedRelatedDisplayClass_str12, actWin->fi, &fm, fontTag );
 
-    XtUnmanageChild( fm.alignWidget() ); // no alignment info
+    XtUnmanageChild ( fm.alignWidget () ); // no alignment info
 
     return 1;
 }
 
 int ExtendedRelatedDisplayClass::editCreate ( void )
 {
-    this->genericEdit();
-    ef.finished( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel_delete, this );
+    this->genericEdit ();
+    ef.finished ( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel_delete, this );
     actWin->currentEf = NULL;
-    ef.popup();
+    ef.popup ();
 
     return 1;
 }
 
 int ExtendedRelatedDisplayClass::edit ( void )
 {
-    this->genericEdit();
-    ef.finished( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel, this );
+    this->genericEdit ();
+    ef.finished ( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel, this );
     actWin->currentEf = &ef;
-    ef.popup();
+    ef.popup ();
 
     return 1;
 }
@@ -1855,11 +1855,11 @@ int ExtendedRelatedDisplayClass::erase ( void )
     if ( deleteRequest )
         return 1;
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.eraseGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.eraseGC (), x, y, w, h );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.eraseGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.eraseGC (), x, y, w, h );
 
     return 1;
 }
@@ -1869,11 +1869,11 @@ int ExtendedRelatedDisplayClass::eraseActive ( void )
     if ( !enabled || !activeMode || !init || invisible )
         return 1;
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.eraseGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.eraseGC (), x, y, w, h );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.eraseGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.eraseGC (), x, y, w, h );
 
     return 1;
 }
@@ -1888,114 +1888,114 @@ int ExtendedRelatedDisplayClass::draw ( void )
     if ( deleteRequest )
         return 1;
 
-    actWin->drawGc.saveFg();
+    actWin->drawGc.saveFg ();
 
-    actWin->drawGc.setFG( bgColor.pixelIndex(), &blink );
+    actWin->drawGc.setFG ( bgColor.pixelIndex (), &blink );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x, y, w, h );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x, y, w, h );
 
-    actWin->drawGc.setFG( actWin->ci->pix(botShadowColor) );
+    actWin->drawGc.setFG ( actWin->ci->pix (botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x, y, x+w, y );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x, y, x + w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x, y, x, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x, y, x, y + h );
 
-    actWin->drawGc.setFG( actWin->ci->pix(topShadowColor) );
+    actWin->drawGc.setFG ( actWin->ci->pix (topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x, y+h, x+w, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x, y + h, x + w, y + h );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+w, y, x+w, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + w, y, x + w, y + h );
 
-    actWin->drawGc.setFG( actWin->ci->pix(topShadowColor) );
+    actWin->drawGc.setFG ( actWin->ci->pix (topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+1, y+1, x+w-1, y+1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 1, y + 1, x + w - 1, y + 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+2, y+2, x+w-2, y+2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 2, y + 2, x + w - 2, y + 2 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+1, y+1, x+1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 1, y + 1, x + 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+2, y+2, x+2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 2, y + 2, x + 2, y + h - 2 );
 
-    actWin->drawGc.setFG( actWin->ci->pix(botShadowColor) );
+    actWin->drawGc.setFG ( actWin->ci->pix (botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+1, y+h-1, x+w-1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 1, y + h - 1, x + w - 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+2, y+h-2, x+w-2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + 2, y + h - 2, x + w - 2, y + h - 2 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+w-1, y+1, x+w-1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + w - 1, y + 1, x + w - 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
-        actWin->drawGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
+        actWin->drawGc.normGC (), x + w - 2, y + 2, x + w - 2, y + h - 2 );
 
     if ( fs )
     {
-        actWin->drawGc.addNormXClipRectangle( xR );
+        actWin->drawGc.addNormXClipRectangle ( xR );
 
-        if ( buttonLabel.getRaw() && !blank( buttonLabel.getRaw() ) )
+        if ( buttonLabel.getRaw () && !blank ( buttonLabel.getRaw () ) )
         {
-            ptr = buttonLabel.getRaw();
+            ptr = buttonLabel.getRaw ();
 
             if ( !icon )
             {
                 // no icon
-                tX = x + w/2;
-                tY = y + h/2 - fontHeight/2;
+                tX = x + w / 2;
+                tY = y + h / 2 - fontHeight / 2;
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
-                actWin->drawGc.setFontTag( fontTag, actWin->fi );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
+                actWin->drawGc.setFontTag ( fontTag, actWin->fi );
 
-                drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
+                drawText ( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
                     XmALIGNMENT_CENTER, ptr );
             }
             else
             {
                 // draw icon and text
-                strW = XTextWidth( fs, ptr, strlen(ptr) ) +
-                    (int) ( 1.2*fontAscent+0.5 );
+                strW = XTextWidth ( fs, ptr, strlen (ptr) ) +
+                    (int) ( 1.2 * fontAscent + 0.5 );
 
-                tX = x + (int) ( w/2+0.5 ) - (int) ( strW/2+0.5 ) +
-                    (int) ( 1.2*fontAscent+0.5 );
-                tY = y + (int) ( h/2+0.5 ) - (int) ( fontHeight/2+0.5 );
+                tX = x + (int) ( w / 2 + 0.5 ) - (int) ( strW / 2 + 0.5 ) +
+                    (int) ( 1.2 * fontAscent + 0.5 );
+                tY = y + (int) ( h / 2 + 0.5 ) - (int) ( fontHeight / 2 + 0.5 );
 
-                cx = tX - (int) ( 1.5*fontAscent+0.5 );
-                cy = tY + (int) ( fontHeight*0.1+0.5 );
-                ofs = (int) ( fontHeight*0.2+0.5 );
-                size = (int) ( fontHeight-2.0*ofs+0.5 );
+                cx = tX - (int) ( 1.5 * fontAscent + 0.5 );
+                cy = tY + (int) ( fontHeight * 0.1 + 0.5 );
+                ofs = (int) ( fontHeight * 0.2 + 0.5 );
+                size = (int) ( fontHeight - 2.0 * ofs + 0.5 );
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx+ofs, cy+ofs, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx + ofs, cy + ofs, size, size );
 
-                actWin->drawGc.setFG( bgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( bgColor.pixelIndex (), &blink );
 
-                XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx, cy, size, size );
+                XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx, cy, size, size );
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx, cy, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx, cy, size, size );
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
-                actWin->drawGc.setFontTag( fontTag, actWin->fi );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
+                actWin->drawGc.setFontTag ( fontTag, actWin->fi );
 
-                drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
+                drawText ( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
                     XmALIGNMENT_BEGINNING, ptr );
             }
 
@@ -2005,36 +2005,36 @@ int ExtendedRelatedDisplayClass::draw ( void )
             if ( icon )
             {
                 // draw icon on button without text
-                min = (int) ( w*3/5 );
-                if ( (int) ( h*3/5 ) < min ) min = (int) ( h*3/5 );
-                cx = x + w/2;
-                cy = y + h/2;
-                ofs = (int) ( min*2/5+0.5 );
-                size = (int) ( min*3/5-0.5 );
+                min = (int) ( w * 3 / 5 );
+                if ( (int) ( h * 3 / 5 ) < min ) min = (int) ( h * 3 / 5 );
+                cx = x + w / 2;
+                cy = y + h / 2;
+                ofs = (int) ( min * 2 / 5 + 0.5 );
+                size = (int) ( min * 3 / 5 - 0.5 );
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx+ofs-size, cy+ofs-size, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx + ofs - size, cy + ofs - size, size, size );
 
-                actWin->drawGc.setFG( bgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( bgColor.pixelIndex (), &blink );
 
-                XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx-ofs, cy-ofs, size, size );
+                XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx - ofs, cy - ofs, size, size );
 
-                actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->drawGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-                    actWin->drawGc.normGC(), cx-ofs, cy-ofs, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+                    actWin->drawGc.normGC (), cx - ofs, cy - ofs, size, size );
             }
         }
 
-        actWin->drawGc.removeNormXClipRectangle();
+        actWin->drawGc.removeNormXClipRectangle ();
     }
 
-    actWin->drawGc.restoreFg();
+    actWin->drawGc.restoreFg ();
 
-    updateBlink( blink );
+    updateBlink ( blink );
 
     return 1;
 }
@@ -2042,7 +2042,7 @@ int ExtendedRelatedDisplayClass::draw ( void )
 int ExtendedRelatedDisplayClass::drawActive ( void )
 {
     int tX, tY, cx, cy, min, ofs, size, strW;
-    char string[39+1];
+    char string[39 + 1];
     XRectangle xR = { x, y, w, h };
     int blink = 0;
 
@@ -2050,28 +2050,28 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
     {
         if ( needToDrawUnconnected )
         {
-            actWin->executeGc.saveFg();
-            actWin->executeGc.setFG( fgColor.getDisconnectedIndex(), &blink );
-            actWin->executeGc.setLineWidth( 1 );
-            actWin->executeGc.setLineStyle( LineSolid );
-            XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-            actWin->executeGc.normGC(), x, y, w, h );
-            actWin->executeGc.restoreFg();
+            actWin->executeGc.saveFg ();
+            actWin->executeGc.setFG ( fgColor.getDisconnectedIndex (), &blink );
+            actWin->executeGc.setLineWidth ( 1 );
+            actWin->executeGc.setLineStyle ( LineSolid );
+            XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+            actWin->executeGc.normGC (), x, y, w, h );
+            actWin->executeGc.restoreFg ();
             needToEraseUnconnected = 1;
-            updateBlink( blink );
+            updateBlink ( blink );
         }
     }
     else if ( needToEraseUnconnected )
     {
-        actWin->executeGc.setLineWidth( 1 );
-        actWin->executeGc.setLineStyle( LineSolid );
-        XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.eraseGC(), x, y, w, h );
+        actWin->executeGc.setLineWidth ( 1 );
+        actWin->executeGc.setLineStyle ( LineSolid );
+        XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.eraseGC (), x, y, w, h );
         needToEraseUnconnected = 0;
         if ( invisible )
         {
-            eraseActive();
-            smartDrawAllActive();
+            eraseActive ();
+            smartDrawAllActive ();
         }
     }
 
@@ -2080,85 +2080,85 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
         return 1;
     }
 
-    actWin->executeGc.saveFg();
+    actWin->executeGc.saveFg ();
 
-    actWin->executeGc.setFG( bgColor.getIndex(), &blink );
+    actWin->executeGc.setFG ( bgColor.getIndex (), &blink );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x, y, w, h );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x, y, w, h );
 
-    if ( buttonLabel.getExpanded() )
-        strncpy( string, buttonLabel.getExpanded(), 39 );
+    if ( buttonLabel.getExpanded () )
+        strncpy ( string, buttonLabel.getExpanded (), 39 );
     else
-        strncpy( string, "", 39 );
+        strncpy ( string, "", 39 );
 
-    actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
+    actWin->executeGc.setFG ( actWin->ci->pix (botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x, y, x+w, y );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x, y, x + w, y );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x, y, x, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x, y, x, y + h );
 
-    actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
+    actWin->executeGc.setFG ( actWin->ci->pix (topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x, y+h, x+w, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x, y + h, x + w, y + h );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+w, y, x+w, y+h );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + w, y, x + w, y + h );
 
     // top
-    actWin->executeGc.setFG( actWin->ci->pix(topShadowColor) );
+    actWin->executeGc.setFG ( actWin->ci->pix (topShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+1, y+1, x+w-1, y+1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 1, y + 1, x + w - 1, y + 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+2, y+2, x+w-2, y+2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 2, y + 2, x + w - 2, y + 2 );
 
     // left
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+1, y+1, x+1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 1, y + 1, x + 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+2, y+2, x+2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 2, y + 2, x + 2, y + h - 2 );
 
     // bottom
-    actWin->executeGc.setFG( actWin->ci->pix(botShadowColor) );
+    actWin->executeGc.setFG ( actWin->ci->pix (botShadowColor) );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+1, y+h-1, x+w-1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 1, y + h - 1, x + w - 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+2, y+h-2, x+w-2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + 2, y + h - 2, x + w - 2, y + h - 2 );
 
     // right
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+w-1, y+1, x+w-1, y+h-1 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + w - 1, y + 1, x + w - 1, y + h - 1 );
 
-    XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-        actWin->executeGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
+    XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+        actWin->executeGc.normGC (), x + w - 2, y + 2, x + w - 2, y + h - 2 );
 
     if ( fs )
     {
-        actWin->executeGc.addNormXClipRectangle( xR );
+        actWin->executeGc.addNormXClipRectangle ( xR );
 
-        if ( !blank( string ) )
+        if ( !blank ( string ) )
         {
             if ( !icon )
             {
                 // no icon
-                tX = x + w/2;
-                tY = y + h/2 - fontHeight/2;
+                tX = x + w / 2;
+                tY = y + h / 2 - fontHeight / 2;
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
-                actWin->executeGc.setFontTag( fontTag, actWin->fi );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
+                actWin->executeGc.setFontTag ( fontTag, actWin->fi );
 
-                drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+                drawText ( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
                     XmALIGNMENT_CENTER, string );
 
             }
@@ -2166,37 +2166,37 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
             {
                 // draw icon and text
 
-                strW = XTextWidth( fs, string, strlen(string) ) +
-                    (int) ( 1.2*fontAscent+0.5 );
+                strW = XTextWidth ( fs, string, strlen (string) ) +
+                    (int) ( 1.2 * fontAscent + 0.5 );
 
-                tX = x + (int) ( w/2+0.5 ) - (int) ( strW/2+0.5 ) +
-                    (int) ( 1.2*fontAscent+0.5 );
-                tY = y + (int) ( h/2+0.5 ) - (int) ( fontHeight/2+0.5 );
+                tX = x + (int) ( w / 2 + 0.5 ) - (int) ( strW / 2 + 0.5 ) +
+                    (int) ( 1.2 * fontAscent + 0.5 );
+                tY = y + (int) ( h / 2 + 0.5 ) - (int) ( fontHeight / 2 + 0.5 );
 
-                cx = tX - (int) ( 1.5*fontAscent+0.5 );
-                cy = tY + (int) ( fontHeight*0.1+0.5 );
-                ofs = (int) ( fontHeight*0.2+0.5 );
-                size = (int) ( fontHeight-2.0*ofs+0.5 );
+                cx = tX - (int) ( 1.5 * fontAscent + 0.5 );
+                cy = tY + (int) ( fontHeight * 0.1 + 0.5 );
+                ofs = (int) ( fontHeight * 0.2 + 0.5 );
+                size = (int) ( fontHeight - 2.0 * ofs + 0.5 );
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx+ofs, cy+ofs, size, size );
+                XDrawRectangle ( actWin->d, XtWindow  (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx + ofs, cy + ofs, size, size );
 
-                actWin->executeGc.setFG( bgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( bgColor.pixelIndex (), &blink );
 
-                XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx, cy, size, size );
+                XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx, cy, size, size );
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx, cy, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx, cy, size, size );
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
-                actWin->executeGc.setFontTag( fontTag, actWin->fi );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
+                actWin->executeGc.setFontTag ( fontTag, actWin->fi );
 
-                drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+                drawText ( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
                     XmALIGNMENT_BEGINNING, string );
 
             }
@@ -2207,40 +2207,40 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
             if ( icon )
             {
                     // draw icon on button without text
-                min = (int) ( w*3/5 );
-                if ( (int) ( h*3/5 ) < min )
-                    min = (int) ( h*3/5 );
-                cx = x + w/2;
-                cy = y + h/2;
-                ofs = (int) ( min*2/5+0.5 );
-                size = (int) ( min*3/5-0.5 );
+                min = (int) ( w * 3 / 5 );
+                if ( (int) ( h * 3 / 5 ) < min )
+                    min = (int) ( h * 3 / 5 );
+                cx = x + w / 2;
+                cy = y + h / 2;
+                ofs = (int) ( min * 2 / 5 + 0.5 );
+                size = (int) ( min * 3 / 5 - 0.5 );
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx+ofs-size, cy+ofs-size, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx + ofs - size, cy + ofs - size, size, size );
 
-                actWin->executeGc.setFG( bgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( bgColor.pixelIndex (), &blink );
 
-                XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx-ofs, cy-ofs, size, size );
+                XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx - ofs, cy - ofs, size, size );
 
-                actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
+                actWin->executeGc.setFG ( fgColor.pixelIndex (), &blink );
 
-                XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-                    actWin->executeGc.normGC(), cx-ofs, cy-ofs, size, size );
+                XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+                    actWin->executeGc.normGC (), cx - ofs, cy - ofs, size, size );
 
             }
 
         }
 
-        actWin->executeGc.removeNormXClipRectangle();
+        actWin->executeGc.removeNormXClipRectangle ();
 
     }
 
-    actWin->executeGc.restoreFg();
+    actWin->executeGc.restoreFg ();
 
-    updateBlink( blink );
+    updateBlink ( blink );
 
     return 1;
 
@@ -2255,7 +2255,7 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
     switch ( pass )
     {
     case 1:
-        connection.init();
+        connection.init ();
         needToEraseUnconnected = 0;
         needToDrawUnconnected = 0;
         unconnectedTimer = 0;
@@ -2270,7 +2270,7 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
 
         singleOpComplete = 0;
 
-        if ( !colorPvExpString.getExpanded() || blankOrComment( colorPvExpString.getExpanded() ) )
+        if ( !colorPvExpString.getExpanded () || blankOrComment ( colorPvExpString.getExpanded () ) )
         {
             colorExists = 0;
         }
@@ -2278,11 +2278,11 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
         {
             colorExists = 1;
             atLeastOneExists = 1;
-            fgColor.setConnectSensitive();
-            bgColor.setConnectSensitive();
+            fgColor.setConnectSensitive ();
+            bgColor.setConnectSensitive ();
         }
 
-        if ( !enabPvExpString.getExpanded() || blankOrComment( enabPvExpString.getExpanded() ) )
+        if ( !enabPvExpString.getExpanded () || blankOrComment ( enabPvExpString.getExpanded () ) )
         {
             enabExists = 0;
         }
@@ -2293,16 +2293,16 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
 // By analogy with the arc widget we should leave the two following lines
 // in but I get the impression they're in the arc widget due to a cut-and-paste
 // error so try without them.
-//          fgColor.setConnectSensitive();
-//          bgColor.setConnectSensitive();
+//          fgColor.setConnectSensitive ();
+//          bgColor.setConnectSensitive ();
         }
 
-        for ( i=0; i<NUMPVS; i++ )
+        for ( i = 0; i < NUMPVS; i++ )
         {
             opComplete[i] = 0;
 
-            if ( !destPvExpString[i].getExpanded() ||
-                    blankOrComment( destPvExpString[i].getExpanded() ) )
+            if ( !destPvExpString[i].getExpanded () ||
+                    blankOrComment ( destPvExpString[i].getExpanded () ) )
             {
                 destExists[i] = 0;
             }
@@ -2386,7 +2386,7 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
             }
         }
 
-        for ( i=0; i<NUMPVS; i++ )
+        for ( i = 0; i < NUMPVS; i++ )
         {
             if ( !opComplete[i] )
             {
@@ -2402,7 +2402,7 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
                     popUpMenu = XmCreatePopupMenu ( actWin->topWidgetId (), "", args, n );
                     pullDownMenu = XmCreatePulldownMenu ( popUpMenu, "", NULL, 0 );
 
-                    for ( ii=0; ii<numDsps; ii++ )
+                    for ( ii = 0; ii < numDsps; ii++ )
                     {
                         if ( label[ii].getExpanded () )
                         {
@@ -2499,7 +2499,7 @@ int ExtendedRelatedDisplayClass::deactivate ( int pass )
             }
         }
 
-        for ( i=0; i<NUMPVS; i++ )
+        for ( i = 0; i < NUMPVS; i++ )
         {
             if ( destExists[i] )
             {
@@ -2539,13 +2539,13 @@ int ExtendedRelatedDisplayClass::expand1st ( int numMacros, char *macros[], char
 
     colorPvExpString.expand1st ( numMacros, macros, expansions );
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         destPvExpString[i].expand1st ( numMacros, macros, expansions );
         sourceExpString[i].expand1st ( numMacros, macros, expansions );
     }
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
         symbolsExpStr[i].expand1st ( numMacros, macros, expansions );
         label[i].expand1st ( numMacros, macros, expansions );
@@ -2563,13 +2563,13 @@ int ExtendedRelatedDisplayClass::expand2nd ( int numMacros, char *macros[], char
 
     colorPvExpString.expand2nd ( numMacros, macros, expansions );
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         destPvExpString[i].expand2nd ( numMacros, macros, expansions );
         sourceExpString[i].expand2nd ( numMacros, macros, expansions );
     }
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
         symbolsExpStr[i].expand2nd ( numMacros, macros, expansions );
         label[i].expand2nd ( numMacros, macros, expansions );
@@ -2588,7 +2588,7 @@ int ExtendedRelatedDisplayClass::containsMacros ( void )
     if ( colorPvExpString.containsPrimaryMacros () )
         return 1;
 
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         if ( destPvExpString[i].containsPrimaryMacros () )
             return 1;
@@ -2596,7 +2596,7 @@ int ExtendedRelatedDisplayClass::containsMacros ( void )
             return 1;
     }
 
-    for ( i=0; i<maxDsps; i++ )
+    for ( i = 0; i < maxDsps; i++ )
     {
         if ( symbolsExpStr[i].containsPrimaryMacros () )
             return 1;
@@ -2616,25 +2616,25 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
 {
     activeWindowListPtr cur;
     int i, l, stat, newX, newY;
-    char name[127+1], symbolsWithSubs[255+1];
+    char name[127 + 1], symbolsWithSubs[255 + 1];
     pvValType destV;
     unsigned int crc;
-    char *tk, *context, buf[255+1], *fileTk, *fileContext, fileBuf[255+1],
-    *result, msg[79+1];
+    char *tk, *context, buf[255 + 1], *fileTk, *fileContext, fileBuf[255 + 1],
+    *result, msg[79 + 1];
     FILE *f;
     expStringClass symbolsFromFile;
     int gotSymbolsFromFile;
 
     int useSmallArrays, symbolCount, maxSymbolLength, focus;
 
-    char smallNewMacros[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
-    char smallNewValues[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
+    char smallNewMacros[SMALL_SYM_ARRAY_SIZE + 1][SMALL_SYM_ARRAY_LEN + 1 + 1];
+    char smallNewValues[SMALL_SYM_ARRAY_SIZE + 1][SMALL_SYM_ARRAY_LEN + 1 + 1];
 
     char *newMacros[100];
     char *newValues[100];
     int numNewMacros, max, numFound;
 
-    char prefix[127+1];
+    char prefix[127 + 1];
 
     focus = useFocus;
     if ( numDsps > 1 )
@@ -2642,7 +2642,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         focus = 0;
     }
 
-    // allow the syntax: @filename s1=v1,s2=v2,...
+    // allow the syntax: @filename s1 = v1, s2 = v2,...
     // which means read symbols from file and append list
     gotSymbolsFromFile = 0;
     strncpy ( buf, symbolsExpStr[index].getExpanded (), 255 );
@@ -2724,7 +2724,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     }
 
     // set all existing pvs
-    for ( i=0; i<NUMPVS; i++ )
+    for ( i = 0; i < NUMPVS; i++ )
     {
         if ( destExists[i] && connection.pvsConnected () )
         {
@@ -2762,7 +2762,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     {
         if ( propagateMacros[index] )
         {
-            for ( i=0; i<actWin->numMacros; i++ )
+            for ( i = 0; i < actWin->numMacros; i++ )
             {
                 l = strlen (actWin->macros[i]);
                 if ( l > maxSymbolLength )
@@ -2776,7 +2776,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         }
         else
         {
-            for ( i=0; i<actWin->appCtx->numMacros; i++ )
+            for ( i = 0; i < actWin->appCtx->numMacros; i++ )
             {
                 l = strlen (actWin->appCtx->macros[i]);
                 if ( l > maxSymbolLength )
@@ -2799,7 +2799,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
 
     if ( useSmallArrays )
     {
-        for ( i=0; i<SMALL_SYM_ARRAY_SIZE; i++ )
+        for ( i = 0; i < SMALL_SYM_ARRAY_SIZE; i++ )
         {
             newMacros[i] = &smallNewMacros[i][0];
             newValues[i] = &smallNewValues[i][0];
@@ -2809,7 +2809,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         {
             if ( propagateMacros[index] )
             {
-                for ( i=0; i<actWin->numMacros; i++ )
+                for ( i = 0; i < actWin->numMacros; i++ )
                 {
                     strcpy ( newMacros[i], actWin->macros[i] );
                     strcpy ( newValues[i], actWin->expansions[i] );
@@ -2818,7 +2818,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
             }
             else
             {
-                for ( i=0; i<actWin->appCtx->numMacros; i++ )
+                for ( i = 0; i < actWin->appCtx->numMacros; i++ )
                 {
                     strcpy ( newMacros[i], actWin->appCtx->macros[i] );
 
@@ -2841,7 +2841,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         {
             if ( propagateMacros[index] )
             {
-                for ( i=0; i<actWin->numMacros; i++ )
+                for ( i = 0; i < actWin->numMacros; i++ )
                 {
                     l = strlen (actWin->macros[i]) + 1;
                     newMacros[i] = (char *) new char[l];
@@ -2857,7 +2857,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
             }
             else
             {
-                for ( i=0; i<actWin->appCtx->numMacros; i++ )
+                for ( i = 0; i < actWin->appCtx->numMacros; i++ )
                 {
                     l = strlen (actWin->appCtx->macros[i]) + 1;
                     newMacros[i] = (char *) new char[l];
@@ -2884,10 +2884,10 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     // calc crc
 
     crc = 0;
-    for ( i=0; i<numNewMacros; i++ )
+    for ( i = 0; i < numNewMacros; i++ )
     {
-        crc = updateCRC( crc, newMacros[i], strlen (newMacros[i]) );
-        crc = updateCRC( crc, newValues[i], strlen (newValues[i]) );
+        crc = updateCRC ( crc, newMacros[i], strlen (newMacros[i]) );
+        crc = updateCRC ( crc, newValues[i], strlen (newValues[i]) );
     }
 
     if ( !allowDups[index] )
@@ -2903,14 +2903,14 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
                 // move (maybe)
                 if ( setPostion[index] == RDC_BUTTON_POS )
                 {
-                    newX = actWin->xPos ()+posX+ofsX;
-                    newY = actWin->yPos ()+posY+ofsY;
+                    newX = actWin->xPos () + posX + ofsX;
+                    newY = actWin->yPos () + posY + ofsY;
                     cur->node.move ( newX, newY );
                 }
                 else if ( setPostion[index] == RDC_PARENT_OFS_POS )
                 {
-                    newX = actWin->xPos ()+ofsX;
-                    newY = actWin->yPos ()+ofsY;
+                    newX = actWin->xPos () + ofsX;
+                    newY = actWin->yPos () + ofsY;
                     cur->node.move ( newX, newY );
                 }
                 // deiconify
@@ -2920,7 +2920,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
             // cleanup
                 if ( !useSmallArrays )
                 {
-                    for ( i=0; i<numNewMacros; i++ )
+                    for ( i = 0; i < numNewMacros; i++ )
                     {
                         delete newMacros[i];
                         delete newValues[i];
@@ -2956,7 +2956,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
 
     if ( !useSmallArrays )
     {
-        for ( i=0; i<numNewMacros; i++ )
+        for ( i = 0; i < numNewMacros; i++ )
         {
             delete newMacros[i];
             delete newValues[i];
@@ -2971,13 +2971,13 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     if ( setPostion[index] == RDC_BUTTON_POS )
     {
         actWin->appCtx->openActivateActiveWindow ( &cur->node,
-        //actWin->xPos ()+x+ofsX, actWin->yPos ()+y+ofsY );
-        actWin->xPos ()+posX+ofsX, actWin->yPos ()+posY+ofsY );
+        //actWin->xPos () + x + ofsX, actWin->yPos () + y + ofsY );
+        actWin->xPos () + posX + ofsX, actWin->yPos () + posY + ofsY );
     }
     else if ( setPostion[index] == RDC_PARENT_OFS_POS )
     {
         actWin->appCtx->openActivateActiveWindow ( &cur->node,
-        actWin->xPos ()+ofsX, actWin->yPos ()+ofsY );
+        actWin->xPos () + ofsX, actWin->yPos () + ofsY );
     }
     else
     {

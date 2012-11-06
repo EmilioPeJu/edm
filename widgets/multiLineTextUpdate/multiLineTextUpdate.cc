@@ -18,10 +18,10 @@ static XtTranslations g_parsedTrans;
 
 static char g_dragTrans[] =
   "#override\n\
-  ~Ctrl~Shift<Btn2Down>: startDrag()\n\
-  Ctrl~Shift<Btn2Down>: pvInfo()\n\
-  Shift Ctrl<Btn2Up>: selectActions()\n\
-  Shift<Btn2Up>: selectDrag()";
+  ~Ctrl~Shift<Btn2Down>: startDrag ()\n\
+  Ctrl~Shift<Btn2Down>: pvInfo ()\n\
+  Shift Ctrl<Btn2Up>: selectActions ()\n\
+  Shift<Btn2Up>: selectDrag ()";
 
 static XtActionsRec g_dragActions[] =
 {
@@ -772,7 +772,7 @@ int edmmultiLineTextUpdateClass::erase ()  // erase edit-mode image
 int edmmultiLineTextUpdateClass::checkResizeSelectBox (int _x, int _y,
                                                        int _w, int _h)
 {   // Assert minimum size
-    return checkResizeSelectBoxAbs (_x, _y, w+_w, h+_h);
+    return checkResizeSelectBoxAbs (_x, _y, w + _w, h + _h);
 }
 
 int edmmultiLineTextUpdateClass::checkResizeSelectBoxAbs (int _x, int _y,
@@ -1047,7 +1047,7 @@ int edmmultiLineTextUpdateClass::activate (int pass, void *ptr)
                                           actWin->executeWidgetId (),
                                           XtNx, (XtArgVal)x,
                                           XtNy, (XtArgVal)y,
-                                          XtNheight,(XtArgVal)h,
+                                          XtNheight, (XtArgVal)h,
                                           XtNwidth, (XtArgVal)w,
                                           XmNforeground,
                                           (XtArgVal)
@@ -1448,7 +1448,7 @@ int edmmultiLineTextEntryClass::activate (int pass, void *ptr)
                                           actWin->executeWidgetId (),
                                           XtNx, (XtArgVal)x,
                                           XtNy, (XtArgVal)y,
-                                          XtNheight,(XtArgVal)h,
+                                          XtNheight, (XtArgVal)h,
                                           XtNwidth, (XtArgVal)w,
                                           XmNforeground,
                                           (XtArgVal)
@@ -1650,13 +1650,13 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
             {
                 num = strtod (text, 0);
                 me->data_pv->put (
-                 XDisplayName(me->actWin->appCtx->displayName),
+                 XDisplayName (me->actWin->appCtx->displayName),
                  num);
             }
             else
             {
 //              me->pv->put (
-//               XDisplayName(me->actWin->appCtx->displayName),
+//               XDisplayName (me->actWin->appCtx->displayName),
 //               text);
                 int maxlen = me->data_pv->get_dimension ();
                 // If text is longer than the size of the waveform PV to which
@@ -1672,13 +1672,13 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
             hexnum = strtol (text, 0, 16);
             // fprintf ( stderr, "Text: %s -> %d\n", text, hexnum);
             me->data_pv->put (
-             XDisplayName(me->actWin->appCtx->displayName),
+             XDisplayName (me->actWin->appCtx->displayName),
              hexnum);
             break;
 
         default:
             me->data_pv->put (
-             XDisplayName(me->actWin->appCtx->displayName),
+             XDisplayName (me->actWin->appCtx->displayName),
              text);
         }
     }

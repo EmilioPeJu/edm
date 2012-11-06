@@ -35,7 +35,7 @@ static void unconnectedTimeout (
   {
     baro->needToDrawUnconnected = 1;
     baro->needRefresh = 1;
-    baro->actWin->addDefExeNode( baro->aglPtr );
+    baro->actWin->addDefExeNode ( baro->aglPtr );
   }
 
   baro->unconnectedTimer = 0;
@@ -52,49 +52,49 @@ static void barc_edit_update (
   char fmt[31 + 1], str[31 + 1];
   int l;
 
-  baro->actWin->setChanged();
+  baro->actWin->setChanged ();
 
-  baro->eraseSelectBoxCorners();
-  baro->erase();
+  baro->eraseSelectBoxCorners ();
+  baro->erase ();
 
   baro->fgColourMode = baro->bufFgColourMode;
   if ( baro->fgColourMode == BARC_K_COLORMODE_ALARM )
-    baro->fgColour.setAlarmSensitive();
+    baro->fgColour.setAlarmSensitive ();
   else
-    baro->fgColour.setAlarmInsensitive();
-  baro->fgColour.setColorIndex( baro->bufFgColour, baro->actWin->ci );
+    baro->fgColour.setAlarmInsensitive ();
+  baro->fgColour.setColorIndex ( baro->bufFgColour, baro->actWin->ci );
 
   baro->barColourMode = baro->bufBarColourMode;
   if ( baro->barColourMode == BARC_K_COLORMODE_ALARM )
-    baro->barColour.setAlarmSensitive();
+    baro->barColour.setAlarmSensitive ();
   else
-    baro->barColour.setAlarmInsensitive();
-  baro->barColour.setColorIndex( baro->bufBarColour, baro->actWin->ci );
+    baro->barColour.setAlarmInsensitive ();
+  baro->barColour.setColorIndex ( baro->bufBarColour, baro->actWin->ci );
 
-  baro->bgColour.setColorIndex( baro->bufBgColour, baro->actWin->ci );
+  baro->bgColour.setColorIndex ( baro->bufBgColour, baro->actWin->ci );
 
-  baro->readPvExpStr.setRaw( baro->eBuf->bufReadPvName );
-  baro->nullPvExpStr.setRaw( baro->eBuf->bufNullPvName );
-  baro->maxPvExpStr.setRaw( baro->eBuf->bufMaxPvName );
-  baro->minPvExpStr.setRaw( baro->eBuf->bufMinPvName );
+  baro->readPvExpStr.setRaw ( baro->eBuf->bufReadPvName );
+  baro->nullPvExpStr.setRaw ( baro->eBuf->bufNullPvName );
+  baro->maxPvExpStr.setRaw ( baro->eBuf->bufMaxPvName );
+  baro->minPvExpStr.setRaw ( baro->eBuf->bufMinPvName );
 
-  strncpy( baro->label, baro->bufLabel, 39 );
+  strncpy ( baro->label, baro->bufLabel, 39 );
 
   baro->labelType = baro->bufLabelType;
 
-  strncpy( baro->fontTag, baro->fm.currentFontTag(), 63 );
-  baro->actWin->fi->loadFontTag( baro->fontTag );
-  baro->fs = baro->actWin->fi->getXFontStruct( baro->fontTag );
-  baro->actWin->drawGc.setFontTag( baro->fontTag, baro->actWin->fi );
+  strncpy ( baro->fontTag, baro->fm.currentFontTag (), 63 );
+  baro->actWin->fi->loadFontTag ( baro->fontTag );
+  baro->fs = baro->actWin->fi->getXFontStruct ( baro->fontTag );
+  baro->actWin->drawGc.setFontTag ( baro->fontTag, baro->actWin->fi );
 
   if ( baro->fs )
   {
-    baro->barStrLen = XTextWidth( baro->fs, "10", 2 );
+    baro->barStrLen = XTextWidth ( baro->fs, "10", 2 );
   }
 
   baro->border = baro->bufBorder;
 
-  strncpy( baro->scaleFormat, baro->bufScaleFormat, 15 );
+  strncpy ( baro->scaleFormat, baro->bufScaleFormat, 15 );
   baro->showScale = baro->bufShowScale;
   baro->labelTicks = baro->bufLabelTicks;
   baro->majorTicks = baro->bufMajorTicks;
@@ -121,57 +121,57 @@ static void barc_edit_update (
   baro->efReadMax = baro->bufEfReadMax;
   baro->efBarOriginX = baro->bufEfBarOriginX;
 
-  if ( baro->efPrecision.isNull() )
+  if ( baro->efPrecision.isNull () )
     baro->precision = 0;
   else
-    baro->precision = baro->efPrecision.value();
+    baro->precision = baro->efPrecision.value ();
 
-  if ( strcmp( baro->scaleFormat, "GFloat" ) == 0 )
+  if ( strcmp ( baro->scaleFormat, "GFloat" ) == 0 )
   {
-    sprintf( fmt, "%%.%-dg", baro->precision );
+    sprintf ( fmt, "%%.%-dg", baro->precision );
   }
-  else if ( strcmp( baro->scaleFormat, "Exponential" ) == 0 )
+  else if ( strcmp ( baro->scaleFormat, "Exponential" ) == 0 )
   {
-    sprintf( fmt, "%%.%-de", baro->precision );
+    sprintf ( fmt, "%%.%-de", baro->precision );
   }
   else
   {
-    sprintf( fmt, "%%.%-df", baro->precision );
+    sprintf ( fmt, "%%.%-df", baro->precision );
   }
 
-  if ( ( baro->efReadMin.isNull() ) && ( baro->efReadMax.isNull() ) )
+  if ( ( baro->efReadMin.isNull () ) && ( baro->efReadMax.isNull () ) )
   {
     baro->readMin = 0;
     baro->readMax = 10;
   }
   else
   {
-    baro->readMin = baro->efReadMin.value();
-    baro->readMax = baro->efReadMax.value();
+    baro->readMin = baro->efReadMin.value ();
+    baro->readMax = baro->efReadMax.value ();
   }
 
-  if ( baro->efBarOriginX.isNull() )
+  if ( baro->efBarOriginX.isNull () )
   {
     baro->barOriginX = baro->readMin;
   }
   else
   {
-    baro->barOriginX = baro->efBarOriginX.value();
+    baro->barOriginX = baro->efBarOriginX.value ();
   }
 
-  sprintf( str, fmt, baro->readMin );
+  sprintf ( str, fmt, baro->readMin );
   if ( baro->fs )
   {
-    baro->barStrLen = XTextWidth( baro->fs, str, strlen(str) );
+    baro->barStrLen = XTextWidth ( baro->fs, str, strlen (str) );
   }
-  sprintf( str, fmt, baro->readMax );
+  sprintf ( str, fmt, baro->readMax );
   if ( baro->fs )
   {
-    l = XTextWidth( baro->fs, str, strlen(str) );
+    l = XTextWidth ( baro->fs, str, strlen (str) );
     if ( l > baro->barStrLen ) baro->barStrLen = l;
   }
 
-  baro->updateDimensions();
+  baro->updateDimensions ();
 
   if ( baro->horizontal )
   {
@@ -200,7 +200,7 @@ static void barc_edit_apply (
   activeVsBarClass *baro = (activeVsBarClass *) client;
 
   barc_edit_update ( w, client, call );
-  baro->refresh( baro );
+  baro->refresh ( baro );
 
 }
 
@@ -213,8 +213,8 @@ static void barc_edit_ok (
   activeVsBarClass *baro = (activeVsBarClass *) client;
 
   barc_edit_update ( w, client, call );
-  baro->ef.popdown();
-  baro->operationComplete();
+  baro->ef.popdown ();
+  baro->operationComplete ();
 
 }
 
@@ -226,8 +226,8 @@ static void barc_edit_cancel (
 
   activeVsBarClass *baro = (activeVsBarClass *) client;
 
-  baro->ef.popdown();
-  baro->operationCancel();
+  baro->ef.popdown ();
+  baro->operationCancel ();
 
 }
 
@@ -239,11 +239,11 @@ static void barc_edit_cancel_delete (
 
   activeVsBarClass *baro = (activeVsBarClass *) client;
 
-  baro->ef.popdown();
-  baro->operationCancel();
-  baro->erase();
+  baro->ef.popdown ();
+  baro->operationCancel ();
+  baro->erase ();
   baro->deleteRequest = 1;
-  baro->drawAll();
+  baro->drawAll ();
 
 }
 
@@ -253,17 +253,17 @@ static void bar_monitor_read_connect_state (
 {
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->activeMode )
   {
-    if ( pv->is_valid() )
+    if ( pv->is_valid () )
     {
       baro->pvNotConnectedMask &= ~( (unsigned char) 1 );
       if ( !baro->pvNotConnectedMask )
       { // if all are connected
         baro->needConnectInit = 1;
-        baro->actWin->addDefExeNode( baro->aglPtr );
+        baro->actWin->addDefExeNode ( baro->aglPtr );
       }
 
     }
@@ -272,17 +272,17 @@ static void bar_monitor_read_connect_state (
 
       baro->pvNotConnectedMask |= 1; // read pv not connected
       baro->active = 0;
-      baro->barColour.setDisconnected();
-      baro->fgColour.setDisconnected();
-      baro->bufInvalidate();
+      baro->barColour.setDisconnected ();
+      baro->fgColour.setDisconnected ();
+      baro->bufInvalidate ();
       baro->needFullDraw = 1;
-      baro->actWin->addDefExeNode( baro->aglPtr );
+      baro->actWin->addDefExeNode ( baro->aglPtr );
 
     }
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -293,19 +293,19 @@ static void bar_monitor_null_connect_state (
 
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->activeMode )
   {
 
-    if ( pv->is_valid() )
+    if ( pv->is_valid () )
     {
 
       baro->pvNotConnectedMask &= ~( (unsigned char) 2 );
       if ( !baro->pvNotConnectedMask )
       { // if all are connected
         baro->needConnectInit = 1;
-        baro->actWin->addDefExeNode( baro->aglPtr );
+        baro->actWin->addDefExeNode ( baro->aglPtr );
       }
 
     }
@@ -314,17 +314,17 @@ static void bar_monitor_null_connect_state (
 
       baro->pvNotConnectedMask |= 2; // null pv not connected
       baro->active = 0;
-      baro->barColour.setDisconnected();
-      baro->fgColour.setDisconnected();
-      baro->bufInvalidate();
+      baro->barColour.setDisconnected ();
+      baro->fgColour.setDisconnected ();
+      baro->bufInvalidate ();
       baro->needDraw = 1;
-      baro->actWin->addDefExeNode( baro->aglPtr );
+      baro->actWin->addDefExeNode ( baro->aglPtr );
 
     }
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -335,19 +335,19 @@ static void bar_monitor_max_connect_state (
 
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->activeMode )
   {
 
-    if ( pv->is_valid() )
+    if ( pv->is_valid () )
     {
 
       baro->pvNotConnectedMask &= ~( (unsigned char) 4 );
       if ( !baro->pvNotConnectedMask )
       { // if all are connected
         baro->needConnectInit = 1;
-        baro->actWin->addDefExeNode( baro->aglPtr );
+        baro->actWin->addDefExeNode ( baro->aglPtr );
       }
 
     }
@@ -356,17 +356,17 @@ static void bar_monitor_max_connect_state (
 
       baro->pvNotConnectedMask |= 4; // max pv not connected
       baro->active = 0;
-      baro->barColour.setDisconnected();
-      baro->fgColour.setDisconnected();
-      baro->bufInvalidate();
+      baro->barColour.setDisconnected ();
+      baro->fgColour.setDisconnected ();
+      baro->bufInvalidate ();
       baro->needDraw = 1;
-      baro->actWin->addDefExeNode( baro->aglPtr );
+      baro->actWin->addDefExeNode ( baro->aglPtr );
 
     }
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -377,19 +377,19 @@ static void bar_monitor_min_connect_state (
 
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->activeMode )
   {
 
-    if ( pv->is_valid() )
+    if ( pv->is_valid () )
     {
 
       baro->pvNotConnectedMask &= ~( (unsigned char) 8 );
       if ( !baro->pvNotConnectedMask )
       { // if all are connected
         baro->needConnectInit = 1;
-        baro->actWin->addDefExeNode( baro->aglPtr );
+        baro->actWin->addDefExeNode  ( baro->aglPtr );
       }
 
     }
@@ -398,17 +398,17 @@ static void bar_monitor_min_connect_state (
 
       baro->pvNotConnectedMask |= 8; // null pv not connected
       baro->active = 0;
-      baro->barColour.setDisconnected();
-      baro->fgColour.setDisconnected();
-      baro->bufInvalidate();
+      baro->barColour.setDisconnected ();
+      baro->fgColour.setDisconnected ();
+      baro->bufInvalidate ();
       baro->needDraw = 1;
-      baro->actWin->addDefExeNode( baro->aglPtr );
+      baro->actWin->addDefExeNode ( baro->aglPtr );
 
     }
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 static void bar_readUpdate (
@@ -419,29 +419,29 @@ static void bar_readUpdate (
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
   int st, sev;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->active )
   {
 
-    st = pv->get_status();
-    sev = pv->get_severity();
+    st = pv->get_status ();
+    sev = pv->get_severity ();
     if ( ( st != baro->oldStat ) || ( sev != baro->oldSev ) )
     {
       baro->oldStat = st;
       baro->oldSev = sev;
-      baro->fgColour.setStatus( st, sev );
-      baro->barColour.setStatus( st, sev );
+      baro->fgColour.setStatus ( st, sev );
+      baro->barColour.setStatus ( st, sev );
       baro->needFullDraw = 1;
     }
 
-    baro->curReadV = pv->get_double();
+    baro->curReadV = pv->get_double ();
     baro->needDrawCheck = 1;
-    baro->actWin->addDefExeNode( baro->aglPtr );
+    baro->actWin->addDefExeNode ( baro->aglPtr );
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -452,19 +452,19 @@ static void bar_nullUpdate (
 
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->active )
   {
 
-    baro->curNullV = pv->get_double();
+    baro->curNullV = pv->get_double ();
 
     baro->needDrawCheck = 1;
-    baro->actWin->addDefExeNode( baro->aglPtr );
+    baro->actWin->addDefExeNode ( baro->aglPtr );
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -474,22 +474,22 @@ static void bar_maxUpdate (
 {
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->active )
   {
 
-    baro->curMaxV = pv->get_double();
+    baro->curMaxV = pv->get_double ();
     baro->readMax = baro->curMaxV;
     baro->updateScaleInfo ();
 
     baro->needFullDraw = 1;
 //    baro->needDrawCheck = 1;
-    baro->actWin->addDefExeNode( baro->aglPtr );
+    baro->actWin->addDefExeNode ( baro->aglPtr );
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
@@ -500,37 +500,37 @@ static void bar_minUpdate (
 
   activeVsBarClass *baro = (activeVsBarClass *) userarg;
 
-  baro->actWin->appCtx->proc->lock();
+  baro->actWin->appCtx->proc->lock ();
 
   if ( baro->active )
   {
 
-    baro->curMinV = pv->get_double();
+    baro->curMinV = pv->get_double ();
     baro->readMin = baro->curMinV;
     baro->updateScaleInfo ();
 
     baro->needFullDraw = 1;
 //    baro->needDrawCheck = 1;
-    baro->actWin->addDefExeNode( baro->aglPtr );
+    baro->actWin->addDefExeNode ( baro->aglPtr );
 
   }
 
-  baro->actWin->appCtx->proc->unlock();
+  baro->actWin->appCtx->proc->unlock ();
 
 }
 
 activeVsBarClass::activeVsBarClass ( void )
 {
-  name = new char[strlen("activeVsBarClass") + 1];
-  strcpy( name, "activeVsBarClass" );
+  name = new char[strlen ("activeVsBarClass") + 1];
+  strcpy ( name, "activeVsBarClass" );
   minW = 50;
   minH = 5;
   minVertW = 5;
   minVertH = 10;
   barStrLen = 10;
-  strcpy( fontTag, "" );
+  strcpy ( fontTag, "" );
   fs = NULL;
-  strcpy( label, "" );
+  strcpy ( label, "" );
   activeMode = 0;
 
   barColourMode = BARC_K_COLORMODE_STATIC;
@@ -547,11 +547,11 @@ activeVsBarClass::activeVsBarClass ( void )
 
   limitsFromDb = 1;
   limitsFromPVs = 0;
-  efReadMin.setNull(1);
-  efReadMax.setNull(1);
-  efPrecision.setNull(1);
-  efBarOriginX.setNull(1);
-  strcpy( scaleFormat, "FFloat" );
+  efReadMin.setNull (1);
+  efReadMax.setNull (1);
+  efPrecision.setNull (1);
+  efBarOriginX.setNull (1);
+  strcpy ( scaleFormat, "FFloat" );
   precision = 0;
   unconnectedTimer = 0;
   eBuf = NULL;
@@ -565,28 +565,28 @@ activeVsBarClass::activeVsBarClass
 
   activeGraphicClass *baro = (activeGraphicClass *) this;
 
-  baro->clone( (activeGraphicClass *) source );
+  baro->clone ( (activeGraphicClass *) source );
 
-  name = new char[strlen("activeVsBarClass") + 1];
-  strcpy( name, "activeVsBarClass" );
+  name = new char[strlen ("activeVsBarClass") + 1];
+  strcpy ( name, "activeVsBarClass" );
 
   barCb = source->barCb;
   fgCb = source->fgCb;
   bgCb = source->bgCb;
 
-  strncpy( fontTag, source->fontTag, 63 );
-  fs = actWin->fi->getXFontStruct( fontTag );
+  strncpy ( fontTag, source->fontTag, 63 );
+  fs = actWin->fi->getXFontStruct ( fontTag );
 
-  barColour.copy( source->barColour );
-  fgColour.copy( source->fgColour );
-  bgColour.copy( source->bgColour );
+  barColour.copy ( source->barColour );
+  fgColour.copy ( source->fgColour );
+  bgColour.copy ( source->bgColour );
 
-  readPvExpStr.copy( source->readPvExpStr );
-  nullPvExpStr.copy( source->nullPvExpStr );
-  maxPvExpStr.copy( source->maxPvExpStr );
-  minPvExpStr.copy( source->minPvExpStr );
+  readPvExpStr.copy ( source->readPvExpStr );
+  nullPvExpStr.copy ( source->nullPvExpStr );
+  maxPvExpStr.copy ( source->maxPvExpStr );
+  minPvExpStr.copy ( source->minPvExpStr );
 
-  strncpy( label, source->label, 39 );
+  strncpy ( label, source->label, 39 );
 
   barColourMode = source->barColourMode;
   fgColourMode = source->fgColourMode;
@@ -615,9 +615,9 @@ activeVsBarClass::activeVsBarClass
   efReadMax = source->efReadMax;
   efPrecision = source->efPrecision;
   efBarOriginX = source->efBarOriginX;
-  strncpy( scaleFormat, source->scaleFormat, 15 );
+  strncpy ( scaleFormat, source->scaleFormat, 15 );
 
-  strcpy( label, source->label );
+  strcpy ( label, source->label );
 
   horizontal = source->horizontal;
 
@@ -625,14 +625,14 @@ activeVsBarClass::activeVsBarClass
 
   eBuf = NULL;
 
-  updateDimensions();
+  updateDimensions ();
 
 }
 
 activeVsBarClass::~activeVsBarClass ( void )
 {
 
-/*   printf( "In activeVsBarClass::~activeVsBarClass\n" ); */
+/*   printf ( "In activeVsBarClass::~activeVsBarClass\n" ); */
 
   if ( name ) delete[] name;
 
@@ -640,7 +640,7 @@ activeVsBarClass::~activeVsBarClass ( void )
 
   if ( unconnectedTimer )
   {
-    XtRemoveTimeOut( unconnectedTimer );
+    XtRemoveTimeOut ( unconnectedTimer );
     unconnectedTimer = 0;
   }
 
@@ -680,21 +680,21 @@ int activeVsBarClass::createInteractive (
     if ( h < minVertH ) h = minVertH;
   }
 
-  barColour.setColorIndex( actWin->defaultFg1Color, actWin->ci );
-  fgColour.setColorIndex( actWin->defaultTextFgColor, actWin->ci );
-  bgColour.setColorIndex( actWin->defaultBgColor, actWin->ci );
+  barColour.setColorIndex ( actWin->defaultFg1Color, actWin->ci );
+  fgColour.setColorIndex ( actWin->defaultTextFgColor, actWin->ci );
+  bgColour.setColorIndex ( actWin->defaultBgColor, actWin->ci );
 
-  strcpy( fontTag, actWin->defaultCtlFontTag );
-  actWin->fi->loadFontTag( fontTag );
-  fs = actWin->fi->getXFontStruct( fontTag );
+  strcpy ( fontTag, actWin->defaultCtlFontTag );
+  actWin->fi->loadFontTag ( fontTag );
+  fs = actWin->fi->getXFontStruct ( fontTag );
 
-  efPrecision.setValue( 0 );
+  efPrecision.setValue ( 0 );
 
-  updateDimensions();
+  updateDimensions ();
 
-  this->draw();
+  this->draw ();
 
-  this->editCreate();
+  this->editCreate ();
 
   return 1;
 
@@ -739,46 +739,46 @@ int activeVsBarClass::save (
   minor = BARC_MINOR_VERSION;
   release = BARC_RELEASE;
 
-  tag.init();
-  tag.loadW( "beginObjectProperties" );
-  tag.loadW( "major", &major );
-  tag.loadW( "minor", &minor );
-  tag.loadW( "release", &release );
-  tag.loadW( "x", &x );
-  tag.loadW( "y", &y );
-  tag.loadW( "w", &w );
-  tag.loadW( "h", &h );
-  tag.loadW( "indicatorColour", actWin->ci, &barColour );
-  tag.loadBoolW( "indicatorAlarm", &barColourMode, &zero );
-  tag.loadW( "fgColour", actWin->ci, &fgColour );
-  tag.loadBoolW( "fgAlarm", &fgColourMode, &zero );
-  tag.loadW( "bgColour", actWin->ci, &bgColour );
-  tag.loadW( "indicatorPv", &readPvExpStr, emptyStr );
-  tag.loadW( "nullPv", &nullPvExpStr, emptyStr );
-  tag.loadW( "maxPv", &maxPvExpStr, emptyStr );
-  tag.loadW( "minPv", &minPvExpStr, emptyStr );
-  tag.loadW( "label", label, emptyStr );
-  tag.loadW( "labelType", 2, labelTypeEnumStr, labelTypeEnum,
+  tag.init ();
+  tag.loadW ( "beginObjectProperties" );
+  tag.loadW ( "major", &major );
+  tag.loadW ( "minor", &minor );
+  tag.loadW ( "release", &release );
+  tag.loadW ( "x", &x );
+  tag.loadW ( "y", &y );
+  tag.loadW ( "w", &w );
+  tag.loadW ( "h", &h );
+  tag.loadW ( "indicatorColour", actWin->ci, &barColour );
+  tag.loadBoolW ( "indicatorAlarm", &barColourMode, &zero );
+  tag.loadW ( "fgColour", actWin->ci, &fgColour );
+  tag.loadBoolW ( "fgAlarm", &fgColourMode, &zero );
+  tag.loadW ( "bgColour", actWin->ci, &bgColour );
+  tag.loadW ( "indicatorPv", &readPvExpStr, emptyStr );
+  tag.loadW ( "nullPv", &nullPvExpStr, emptyStr );
+  tag.loadW ( "maxPv", &maxPvExpStr, emptyStr );
+  tag.loadW ( "minPv", &minPvExpStr, emptyStr );
+  tag.loadW ( "label", label, emptyStr );
+  tag.loadW ( "labelType", 2, labelTypeEnumStr, labelTypeEnum,
    &labelType, &lit );
-  tag.loadBoolW( "showScale", &showScale, &zero );
-  tag.loadW( "origin", &efBarOriginX );
-  tag.loadW( "font", fontTag );
-  tag.loadW( "labelTicks", &labelTicks, &zero );
-  tag.loadW( "majorTicks", &majorTicks, &zero );
-  tag.loadW( "minorTicks", &minorTicks, &zero );
-  tag.loadBoolW( "border", &border, &zero );
-  tag.loadBoolW( "limitsFromDb", &limitsFromDb, &zero );
-  tag.loadBoolW( "limitsFromPVs", &limitsFromPVs, &zero );
-  tag.loadW( "precision", &efPrecision );
-  tag.loadW( "min", &efReadMin );
-  tag.loadW( "max", &efReadMax );
-  tag.loadW( "scaleFormat", scaleFormat );
-  tag.loadW( "orientation", 2, orienTypeEnumStr, orienTypeEnum,
+  tag.loadBoolW ( "showScale", &showScale, &zero );
+  tag.loadW ( "origin", &efBarOriginX );
+  tag.loadW ( "font", fontTag );
+  tag.loadW ( "labelTicks", &labelTicks, &zero );
+  tag.loadW ( "majorTicks", &majorTicks, &zero );
+  tag.loadW ( "minorTicks", &minorTicks, &zero );
+  tag.loadBoolW ( "border", &border, &zero );
+  tag.loadBoolW ( "limitsFromDb", &limitsFromDb, &zero );
+  tag.loadBoolW ( "limitsFromPVs", &limitsFromPVs, &zero );
+  tag.loadW ( "precision", &efPrecision );
+  tag.loadW ( "min", &efReadMin );
+  tag.loadW ( "max", &efReadMax );
+  tag.loadW ( "scaleFormat", scaleFormat );
+  tag.loadW ( "orientation", 2, orienTypeEnumStr, orienTypeEnum,
    &horizontal, &horz );
-  tag.loadW( "endObjectProperties" );
-  tag.loadW( "" );
+  tag.loadW ( "endObjectProperties" );
+  tag.loadW ( "" );
 
-  stat = tag.writeTags( f );
+  stat = tag.writeTags ( f );
 
   return stat;
 
@@ -826,125 +826,125 @@ int activeVsBarClass::createFromFile (
 
   this->actWin = _actWin;
 
-  tag.init();
-  tag.loadR( "beginObjectProperties" );
-  tag.loadR( "major", &major );
-  tag.loadR( "minor", &minor );
-  tag.loadR( "release", &release );
-  tag.loadR( "x", &x );
-  tag.loadR( "y", &y );
-  tag.loadR( "w", &w );
-  tag.loadR( "h", &h );
-  tag.loadR( "indicatorColour", actWin->ci, &barColour );
-  tag.loadR( "indicatorAlarm", &barColourMode, &zero );
-  tag.loadR( "fgColour", actWin->ci, &fgColour );
-  tag.loadR( "fgAlarm", &fgColourMode, &zero );
-  tag.loadR( "bgColour", actWin->ci, &bgColour );
-  tag.loadR( "indicatorPv", &readPvExpStr, emptyStr );
-  tag.loadR( "nullPv", &nullPvExpStr, emptyStr );
-  tag.loadR( "maxPv", &maxPvExpStr, emptyStr );
-  tag.loadR( "minPv", &minPvExpStr, emptyStr );
-  tag.loadR( "label", 39, label, emptyStr );
-  tag.loadR( "labelType", 2, labelTypeEnumStr, labelTypeEnum,
+  tag.init ();
+  tag.loadR ( "beginObjectProperties" );
+  tag.loadR ( "major", &major );
+  tag.loadR ( "minor", &minor );
+  tag.loadR ( "release", &release );
+  tag.loadR ( "x", &x );
+  tag.loadR ( "y", &y );
+  tag.loadR ( "w", &w );
+  tag.loadR ( "h", &h );
+  tag.loadR ( "indicatorColour", actWin->ci, &barColour );
+  tag.loadR ( "indicatorAlarm", &barColourMode, &zero );
+  tag.loadR ( "fgColour", actWin->ci, &fgColour );
+  tag.loadR ( "fgAlarm", &fgColourMode, &zero );
+  tag.loadR ( "bgColour", actWin->ci, &bgColour );
+  tag.loadR ( "indicatorPv", &readPvExpStr, emptyStr );
+  tag.loadR ( "nullPv", &nullPvExpStr, emptyStr );
+  tag.loadR ( "maxPv", &maxPvExpStr, emptyStr );
+  tag.loadR ( "minPv", &minPvExpStr, emptyStr );
+  tag.loadR ( "label", 39, label, emptyStr );
+  tag.loadR ( "labelType", 2, labelTypeEnumStr, labelTypeEnum,
    &labelType, &lit );
-  tag.loadR( "showScale", &showScale, &zero );
-  tag.loadR( "origin", &efBarOriginX );
-  tag.loadR( "font", 63, fontTag );
-  tag.loadR( "labelTicks", &labelTicks, &zero );
-  tag.loadR( "majorTicks", &majorTicks, &zero );
-  tag.loadR( "minorTicks", &minorTicks, &zero );
-  tag.loadR( "border", &border, &zero );
-  tag.loadR( "limitsFromDb", &limitsFromDb, &zero );
-  tag.loadR( "limitsFromPVs", &limitsFromPVs, &zero );
-  tag.loadR( "precision", &efPrecision );
-  tag.loadR( "min", &efReadMin );
-  tag.loadR( "max", &efReadMax );
-  tag.loadR( "scaleFormat", 15, scaleFormat );
-  tag.loadR( "orientation", 2, orienTypeEnumStr, orienTypeEnum,
+  tag.loadR ( "showScale", &showScale, &zero );
+  tag.loadR ( "origin", &efBarOriginX );
+  tag.loadR ( "font", 63, fontTag );
+  tag.loadR ( "labelTicks", &labelTicks, &zero );
+  tag.loadR ( "majorTicks", &majorTicks, &zero );
+  tag.loadR ( "minorTicks", &minorTicks, &zero );
+  tag.loadR ( "border", &border, &zero );
+  tag.loadR ( "limitsFromDb", &limitsFromDb, &zero );
+  tag.loadR ( "limitsFromPVs", &limitsFromPVs, &zero );
+  tag.loadR ( "precision", &efPrecision );
+  tag.loadR ( "min", &efReadMin );
+  tag.loadR ( "max", &efReadMax );
+  tag.loadR ( "scaleFormat", 15, scaleFormat );
+  tag.loadR ( "orientation", 2, orienTypeEnumStr, orienTypeEnum,
    &horizontal, &horz );
-  tag.loadR( "endObjectProperties" );
+  tag.loadR ( "endObjectProperties" );
 
-  stat = tag.readTags( f, "endObjectProperties" );
+  stat = tag.readTags ( f, "endObjectProperties" );
 
   if ( !( stat & 1 ) )
   {
-    actWin->appCtx->postMessage( tag.errMsg() );
+    actWin->appCtx->postMessage ( tag.errMsg () );
   }
 
   if ( major > BARC_MAJOR_VERSION )
   {
-    postIncompatable();
+    postIncompatable ();
     return 0;
   }
 
   if ( major < 4 )
   {
-    postIncompatable();
+    postIncompatable ();
     return 0;
   }
 
-  this->initSelectBox(); // call after getting x,y,w,h
+  this->initSelectBox (); // call after getting x, y, w, h
 
   if ( barColourMode == BARC_K_COLORMODE_ALARM )
-    barColour.setAlarmSensitive();
+    barColour.setAlarmSensitive ();
   else
-    barColour.setAlarmInsensitive();
+    barColour.setAlarmInsensitive ();
 
   if ( fgColourMode == BARC_K_COLORMODE_ALARM )
-    fgColour.setAlarmSensitive();
+    fgColour.setAlarmSensitive ();
   else
-    fgColour.setAlarmInsensitive();
+    fgColour.setAlarmInsensitive ();
 
-  bgColour.setAlarmInsensitive();
+  bgColour.setAlarmInsensitive ();
 
-  actWin->fi->loadFontTag( fontTag );
-  fs = actWin->fi->getXFontStruct( fontTag );
+  actWin->fi->loadFontTag ( fontTag );
+  fs = actWin->fi->getXFontStruct ( fontTag );
 
   if ( fs )
   {
-    barStrLen = XTextWidth( fs, "10", 2 );
+    barStrLen = XTextWidth ( fs, "10", 2 );
   }
 
-  if ( limitsFromDb || efPrecision.isNull() )
+  if ( limitsFromDb || efPrecision.isNull () )
     precision = 0;
   else
-    precision = efPrecision.value();
+    precision = efPrecision.value ();
 
-  if ( ( limitsFromPVs || limitsFromDb || efReadMin.isNull() ) &&
-       ( limitsFromPVs || limitsFromDb || efReadMax.isNull() ) )
+  if ( ( limitsFromPVs || limitsFromDb || efReadMin.isNull () ) &&
+       ( limitsFromPVs || limitsFromDb || efReadMax.isNull () ) )
   {
     readMin = 0;
     readMax = 10;
   }
   else
   {
-    readMin = efReadMin.value();
-    readMax = efReadMax.value();
+    readMin = efReadMin.value ();
+    readMax = efReadMax.value ();
   }
 
-  if ( strcmp( scaleFormat, "GFloat" ) == 0 )
+  if ( strcmp ( scaleFormat, "GFloat" ) == 0 )
   {
-    sprintf( fmt, "%%.%-dg", precision );
+    sprintf ( fmt, "%%.%-dg", precision );
   }
-  else if ( strcmp( scaleFormat, "Exponential" ) == 0 )
+  else if ( strcmp ( scaleFormat, "Exponential" ) == 0 )
   {
-    sprintf( fmt, "%%.%-de", precision );
+    sprintf ( fmt, "%%.%-de", precision );
   }
   else
   {
-    sprintf( fmt, "%%.%-df", precision );
+    sprintf ( fmt, "%%.%-df", precision );
   }
 
-  sprintf( str, fmt, readMin );
+  sprintf ( str, fmt, readMin );
   if ( fs )
   {
-    barStrLen = XTextWidth( fs, str, strlen(str) );
+    barStrLen = XTextWidth ( fs, str, strlen (str) );
   }
 
-  sprintf( str, fmt, readMax );
+  sprintf ( str, fmt, readMax );
   if ( fs )
   {
-    l = XTextWidth( fs, str, strlen(str) );
+    l = XTextWidth ( fs, str, strlen (str) );
     if ( l > barStrLen ) barStrLen = l;
   }
 
@@ -953,7 +953,7 @@ int activeVsBarClass::createFromFile (
   curNullV = 0.0;
   curMaxV = readMax;
   curMinV = readMin;
-  updateDimensions();
+  updateDimensions ();
 
   return stat;
 
@@ -970,54 +970,54 @@ int activeVsBarClass::genericEdit ( void )
   }
 
   if ( horizontal )
-    strcpy( title, activeVsBarClass_str3 );
+    strcpy ( title, activeVsBarClass_str3 );
   else
-    strcpy( title, activeVsBarClass_str4 );
+    strcpy ( title, activeVsBarClass_str4 );
 
-  ptr = actWin->obj.getNameFromClass( "activeVsBarClass" );
+  ptr = actWin->obj.getNameFromClass ( "activeVsBarClass" );
   if ( ptr )
-    Strncat( title, ptr, 47 );
+    Strncat ( title, ptr, 47 );
   else
-    Strncat( title, activeVsBarClass_str5, 47 );
+    Strncat ( title, activeVsBarClass_str5, 47 );
 
-  Strncat( title, activeVsBarClass_str6, 47 );
+  Strncat ( title, activeVsBarClass_str6, 47 );
 
   bufX = x;
   bufY = y;
   bufW = w;
   bufH = h;
 
-  bufBarColour = barColour.pixelIndex();
+  bufBarColour = barColour.pixelIndex ();
   bufBarColourMode = barColourMode;
 
-  bufFgColour = fgColour.pixelIndex();
+  bufFgColour = fgColour.pixelIndex ();
   bufFgColourMode = fgColourMode;
 
-  bufBgColour = bgColour.pixelIndex();
+  bufBgColour = bgColour.pixelIndex ();
 
-  strncpy( bufFontTag, fontTag, 63 );
+  strncpy ( bufFontTag, fontTag, 63 );
 
-  if ( readPvExpStr.getRaw() )
-    strncpy( eBuf->bufReadPvName, readPvExpStr.getRaw(), PV_Factory::MAX_PV_NAME );
+  if ( readPvExpStr.getRaw () )
+    strncpy ( eBuf->bufReadPvName, readPvExpStr.getRaw (), PV_Factory::MAX_PV_NAME );
   else
-    strcpy( eBuf->bufReadPvName, "" );
+    strcpy ( eBuf->bufReadPvName, "" );
 
-  if ( nullPvExpStr.getRaw() )
-    strncpy( eBuf->bufNullPvName, nullPvExpStr.getRaw(), PV_Factory::MAX_PV_NAME );
+  if ( nullPvExpStr.getRaw () )
+    strncpy ( eBuf->bufNullPvName, nullPvExpStr.getRaw (), PV_Factory::MAX_PV_NAME );
   else
-    strcpy( eBuf->bufNullPvName, "" );
+    strcpy ( eBuf->bufNullPvName, "" );
 
-  if ( maxPvExpStr.getRaw() )
-    strncpy( eBuf->bufMaxPvName, maxPvExpStr.getRaw(), PV_Factory::MAX_PV_NAME );
+  if ( maxPvExpStr.getRaw () )
+    strncpy ( eBuf->bufMaxPvName, maxPvExpStr.getRaw (), PV_Factory::MAX_PV_NAME );
   else
-    strcpy( eBuf->bufMaxPvName, "" );
+    strcpy ( eBuf->bufMaxPvName, "" );
 
-  if ( minPvExpStr.getRaw() )
-    strncpy( eBuf->bufMinPvName, minPvExpStr.getRaw(), PV_Factory::MAX_PV_NAME );
+  if ( minPvExpStr.getRaw () )
+    strncpy ( eBuf->bufMinPvName, minPvExpStr.getRaw (), PV_Factory::MAX_PV_NAME );
   else
-    strcpy( eBuf->bufMinPvName, "" );
+    strcpy ( eBuf->bufMinPvName, "" );
 
-  strncpy( bufLabel, label, 39 );
+  strncpy ( bufLabel, label, 39 );
 
   bufLabelType = labelType;
 
@@ -1035,53 +1035,53 @@ int activeVsBarClass::genericEdit ( void )
   bufEfPrecision = efPrecision;
   bufEfReadMin = efReadMin;
   bufEfReadMax = efReadMax;
-  strncpy( bufScaleFormat, scaleFormat, 15 );
+  strncpy ( bufScaleFormat, scaleFormat, 15 );
   bufHorizontal = horizontal;
 
-  ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
+  ef.create ( actWin->top, actWin->appCtx->ci.getColorMap (),
    &actWin->appCtx->entryFormX,
    &actWin->appCtx->entryFormY, &actWin->appCtx->entryFormW,
    &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
    title, NULL, NULL, NULL );
 
-  ef.addTextField( activeVsBarClass_str7, 35, &bufX );
-  ef.addTextField( activeVsBarClass_str8, 35, &bufY );
-  ef.addTextField( activeVsBarClass_str9, 35, &bufW );
-  ef.addTextField( activeVsBarClass_str10, 35, &bufH );
-  ef.addTextField( activeVsBarClass_str12, 35, eBuf->bufReadPvName, PV_Factory::MAX_PV_NAME );
-  ef.addTextField( activeVsBarClass_str13, 35, eBuf->bufNullPvName, PV_Factory::MAX_PV_NAME );
-  ef.addTextField( activeVsBarClass_str47, 35, eBuf->bufMinPvName, PV_Factory::MAX_PV_NAME );
-  ef.addTextField( activeVsBarClass_str46, 35, eBuf->bufMaxPvName, PV_Factory::MAX_PV_NAME );
-  ef.addOption( activeVsBarClass_str14, activeVsBarClass_str15, &bufLabelType );
-  ef.addTextField( activeVsBarClass_str16, 35, bufLabel, 39 );
-  ef.addToggle( activeVsBarClass_str18, &bufBorder );
-  ef.addToggle( activeVsBarClass_str19, &bufShowScale );
+  ef.addTextField ( activeVsBarClass_str7, 35, &bufX );
+  ef.addTextField ( activeVsBarClass_str8, 35, &bufY );
+  ef.addTextField ( activeVsBarClass_str9, 35, &bufW );
+  ef.addTextField ( activeVsBarClass_str10, 35, &bufH );
+  ef.addTextField ( activeVsBarClass_str12, 35, eBuf->bufReadPvName, PV_Factory::MAX_PV_NAME );
+  ef.addTextField ( activeVsBarClass_str13, 35, eBuf->bufNullPvName, PV_Factory::MAX_PV_NAME );
+  ef.addTextField ( activeVsBarClass_str47, 35, eBuf->bufMinPvName, PV_Factory::MAX_PV_NAME );
+  ef.addTextField ( activeVsBarClass_str46, 35, eBuf->bufMaxPvName, PV_Factory::MAX_PV_NAME );
+  ef.addOption ( activeVsBarClass_str14, activeVsBarClass_str15, &bufLabelType );
+  ef.addTextField ( activeVsBarClass_str16, 35, bufLabel, 39 );
+  ef.addToggle ( activeVsBarClass_str18, &bufBorder );
+  ef.addToggle ( activeVsBarClass_str19, &bufShowScale );
 
-  ef.addTextField( activeVsBarClass_str20, 35, &bufLabelTicks );
-  ef.addTextField( activeVsBarClass_str21, 35, &bufMajorTicks );
-  ef.addTextField( activeVsBarClass_str22, 35, &bufMinorTicks );
+  ef.addTextField ( activeVsBarClass_str20, 35, &bufLabelTicks );
+  ef.addTextField ( activeVsBarClass_str21, 35, &bufMajorTicks );
+  ef.addTextField ( activeVsBarClass_str22, 35, &bufMinorTicks );
 
-  ef.addToggle( activeVsBarClass_str48, &bufLimitsFromPVs );
-  ef.addToggle( activeVsBarClass_str23, &bufLimitsFromDb );
-  ef.addOption( activeVsBarClass_str24, activeVsBarClass_str25, bufScaleFormat, 15 );
-  ef.addTextField( activeVsBarClass_str26, 35, &bufEfPrecision );
-  ef.addTextField( activeVsBarClass_str27, 35, &bufEfReadMin );
-  ef.addTextField( activeVsBarClass_str28, 35, &bufEfReadMax );
+  ef.addToggle ( activeVsBarClass_str48, &bufLimitsFromPVs );
+  ef.addToggle ( activeVsBarClass_str23, &bufLimitsFromDb );
+  ef.addOption ( activeVsBarClass_str24, activeVsBarClass_str25, bufScaleFormat, 15 );
+  ef.addTextField ( activeVsBarClass_str26, 35, &bufEfPrecision );
+  ef.addTextField ( activeVsBarClass_str27, 35, &bufEfReadMin );
+  ef.addTextField ( activeVsBarClass_str28, 35, &bufEfReadMax );
 
-  ef.addTextField( activeVsBarClass_str29, 35, &bufEfBarOriginX );
+  ef.addTextField ( activeVsBarClass_str29, 35, &bufEfBarOriginX );
 
-  ef.addOption( activeVsBarClass_str44, activeVsBarClass_str45,
+  ef.addOption ( activeVsBarClass_str44, activeVsBarClass_str45,
    &bufHorizontal );
 
-  ef.addColorButton( activeVsBarClass_str30, actWin->ci, &barCb, &bufBarColour );
-  ef.addToggle( activeVsBarClass_str31, &bufBarColourMode );
-  ef.addColorButton( activeVsBarClass_str32, actWin->ci, &fgCb, &bufFgColour );
-  ef.addToggle( activeVsBarClass_str33, &bufFgColourMode );
-  ef.addColorButton( activeVsBarClass_str34, actWin->ci, &bgCb, &bufBgColour );
+  ef.addColorButton ( activeVsBarClass_str30, actWin->ci, &barCb, &bufBarColour );
+  ef.addToggle ( activeVsBarClass_str31, &bufBarColourMode );
+  ef.addColorButton ( activeVsBarClass_str32, actWin->ci, &fgCb, &bufFgColour );
+  ef.addToggle ( activeVsBarClass_str33, &bufFgColourMode );
+  ef.addColorButton ( activeVsBarClass_str34, actWin->ci, &bgCb, &bufBgColour );
 
-  ef.addFontMenu( activeVsBarClass_str17, actWin->fi, &fm, fontTag );
+  ef.addFontMenu ( activeVsBarClass_str17, actWin->fi, &fm, fontTag );
 
-  XtUnmanageChild( fm.alignWidget() ); // no alignment info
+  XtUnmanageChild ( fm.alignWidget () ); // no alignment info
 
   return 1;
 
@@ -1090,10 +1090,10 @@ int activeVsBarClass::genericEdit ( void )
 int activeVsBarClass::editCreate ( void )
 {
 
-  this->genericEdit();
-  ef.finished( barc_edit_ok, barc_edit_apply, barc_edit_cancel_delete, this );
+  this->genericEdit ();
+  ef.finished ( barc_edit_ok, barc_edit_apply, barc_edit_cancel_delete, this );
   actWin->currentEf = NULL;
-  ef.popup();
+  ef.popup ();
 
   return 1;
 
@@ -1102,10 +1102,10 @@ int activeVsBarClass::editCreate ( void )
 int activeVsBarClass::edit ( void )
 {
 
-  this->genericEdit();
-  ef.finished( barc_edit_ok, barc_edit_apply, barc_edit_cancel, this );
+  this->genericEdit ();
+  ef.finished ( barc_edit_ok, barc_edit_apply, barc_edit_cancel, this );
   actWin->currentEf = &ef;
-  ef.popup();
+  ef.popup ();
 
   return 1;
 
@@ -1116,14 +1116,14 @@ int activeVsBarClass::erase ( void )
 
   if ( deleteRequest ) return 1;
 
-  actWin->drawGc.setLineWidth( 1 );
-  actWin->drawGc.setLineStyle( LineSolid );
+  actWin->drawGc.setLineWidth ( 1 );
+  actWin->drawGc.setLineStyle ( LineSolid );
 
-  XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-   actWin->drawGc.eraseGC(), x, y, w, h );
+  XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+   actWin->drawGc.eraseGC (), x, y, w, h );
 
-  XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-   actWin->drawGc.eraseGC(), x, y, w, h );
+  XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+   actWin->drawGc.eraseGC (), x, y, w, h );
 
   return 1;
 
@@ -1134,35 +1134,35 @@ int activeVsBarClass::eraseActive ( void )
 
   if ( !enabled || !activeMode || !init ) return 1;
 
-  actWin->executeGc.setFG( bgColour.getColor() );
+  actWin->executeGc.setFG ( bgColour.getColor () );
 
   if ( bufInvalid )
   {
 
-    actWin->executeGc.setLineWidth( 1 );
-    actWin->executeGc.setLineStyle( LineSolid );
+    actWin->executeGc.setLineWidth ( 1 );
+    actWin->executeGc.setLineStyle ( LineSolid );
 
-    //XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-    // actWin->executeGc.normGC(), x, y, w, h );
+    //XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+    // actWin->executeGc.normGC (), x, y, w, h );
 
-    //XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-    // actWin->executeGc.normGC(), x, y, w, h );
+    //XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+    // actWin->executeGc.normGC (), x, y, w, h );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-     actWin->executeGc.eraseGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+     actWin->executeGc.eraseGC (), x, y, w, h );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-     actWin->executeGc.eraseGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+     actWin->executeGc.eraseGC (), x, y, w, h );
 
   }
   else
   {
 
-//      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-//       actWin->executeGc.normGC(), oldBarX, barY, oldBarW, barH );
+//      XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+//       actWin->executeGc.normGC (), oldBarX, barY, oldBarW, barH );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-     actWin->executeGc.normGC(), oldBarX, barY, oldBarW, barH );
+    XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+     actWin->executeGc.normGC (), oldBarX, barY, oldBarW, barH );
 
   }
 
@@ -1174,10 +1174,10 @@ void activeVsBarClass::drawHorzScale (
   Widget widget,
   gcClass *gc )
 {
-  drawXLinearScale ( actWin->d, XtWindow(widget), gc, 1, barAreaX,
+  drawXLinearScale ( actWin->d, XtWindow (widget), gc, 1, barAreaX,
    barY + barH + 3, barAreaW, readMin, readMax, labelTicks,
-   majorTicks, minorTicks, fgColour.pixelColor(),
-   bgColour.pixelColor(), 0, 0, 0, 0, 0, actWin->fi, fontTag, fs, 1, 0, 0, 0 );
+   majorTicks, minorTicks, fgColour.pixelColor (),
+   bgColour.pixelColor (), 0, 0, 0, 0, 0, actWin->fi, fontTag, fs, 1, 0, 0, 0 );
 
   return;
 }
@@ -1186,10 +1186,10 @@ void activeVsBarClass::drawVertScale (
   Widget widget,
   gcClass *gc )
 {
-  drawYLinearScale ( actWin->d, XtWindow(widget), gc, 1, barAreaX - 4,
+  drawYLinearScale ( actWin->d, XtWindow (widget), gc, 1, barAreaX - 4,
    barAreaY, barAreaH, readMin, readMax, labelTicks,
-   majorTicks, minorTicks, fgColour.pixelColor(),
-   bgColour.pixelColor(), 0, 0, 0, 0, 0, actWin->fi, fontTag, fs, 1, 0, 0, 0 );
+   majorTicks, minorTicks, fgColour.pixelColor (),
+   bgColour.pixelColor (), 0, 0, 0, 0, 0, actWin->fi, fontTag, fs, 1, 0, 0, 0 );
 
   return;
 }
@@ -1200,9 +1200,9 @@ void activeVsBarClass::drawScale (
 {
 
   if ( horizontal )
-    drawHorzScale( widget, gc );
+    drawHorzScale ( widget, gc );
   else
-    drawVertScale( widget, gc );
+    drawVertScale ( widget, gc );
 
 }
 
@@ -1213,40 +1213,40 @@ int activeVsBarClass::draw ( void )
 
   if ( deleteRequest ) return 1;
 
-  actWin->executeGc.setLineWidth( 1 );
-  actWin->executeGc.setLineStyle( LineSolid );
+  actWin->executeGc.setLineWidth ( 1 );
+  actWin->executeGc.setLineStyle ( LineSolid );
 
-  actWin->drawGc.saveFg();
+  actWin->drawGc.saveFg ();
 
   if ( horizontal )
   {
 
-    actWin->drawGc.setFG( bgColour.pixelColor() );
+    actWin->drawGc.setFG ( bgColour.pixelColor () );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), x, y, w, h );
 
-    actWin->drawGc.setFG( barColour.pixelColor() );
+    actWin->drawGc.setFG ( barColour.pixelColor () );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), barAreaX, barY, barAreaW, barH );
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), barAreaX, barY, barAreaW, barH );
 
-    actWin->drawGc.setFG( fgColour.getColor() );
+    actWin->drawGc.setFG ( fgColour.getColor () );
 
-    if ( showScale ) drawScale( actWin->drawWidget, &actWin->drawGc );
+    if ( showScale ) drawScale ( actWin->drawWidget, &actWin->drawGc );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), x, y, w, h );
 
-    if ( strcmp( label, "" ) != 0 )
+    if ( strcmp ( label, "" ) != 0 )
     {
       if ( fs )
       {
-        actWin->drawGc.setFontTag( fontTag, actWin->fi );
+        actWin->drawGc.setFontTag ( fontTag, actWin->fi );
         tX = barAreaX;
         tY = y + 2;
         if ( border ) tY += 2;
-        drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
+        drawText ( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
          XmALIGNMENT_BEGINNING, label );
       }
     }
@@ -1255,40 +1255,40 @@ int activeVsBarClass::draw ( void )
   else
   { // vertical
 
-    actWin->drawGc.setFG( bgColour.pixelColor() );
+    actWin->drawGc.setFG ( bgColour.pixelColor () );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), x, y, w, h );
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), x, y, w, h );
 
-    actWin->drawGc.setFG( barColour.pixelColor() );
+    actWin->drawGc.setFG ( barColour.pixelColor () );
 
-    XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), barAreaX, barAreaY-barAreaH,
+    XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), barAreaX, barAreaY - barAreaH,
      barAreaW, barAreaH );
 
-    actWin->drawGc.setFG( fgColour.getColor() );
+    actWin->drawGc.setFG ( fgColour.getColor () );
 
-    if ( showScale ) drawScale( actWin->drawWidget, &actWin->drawGc );
+    if ( showScale ) drawScale ( actWin->drawWidget, &actWin->drawGc );
 
-    XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-     actWin->drawGc.normGC(), x, y, w, h );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
+     actWin->drawGc.normGC (), x, y, w, h );
 
-    if ( strcmp( label, "" ) != 0 )
+    if ( strcmp ( label, "" ) != 0 )
     {
       if ( fs )
       {
-        actWin->drawGc.setFontTag( fontTag, actWin->fi );
+        actWin->drawGc.setFontTag ( fontTag, actWin->fi );
         tX = barAreaX + barAreaW;
         tY = y + (int) ( .25 * (double) fontHeight );
         if ( border ) tY += 2;
-        drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
+        drawText ( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
          XmALIGNMENT_END, label );
       }
     }
 
   }
 
-  actWin->drawGc.restoreFg();
+  actWin->drawGc.restoreFg ();
 
   return 1;
 
@@ -1298,34 +1298,34 @@ int activeVsBarClass::drawActive ( void )
 {
 
   int tX, tY, x0, y0, x1, y1;
-  char str[39+1];
+  char str[39 + 1];
 
   if ( !init )
   {
     if ( needToDrawUnconnected )
     {
-      actWin->executeGc.saveFg();
-      actWin->executeGc.setFG( bgColour.getDisconnected() );
-      actWin->executeGc.setLineWidth( 1 );
-      actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), x, y, w, h );
-      actWin->executeGc.restoreFg();
+      actWin->executeGc.saveFg ();
+      actWin->executeGc.setFG ( bgColour.getDisconnected () );
+      actWin->executeGc.setLineWidth ( 1 );
+      actWin->executeGc.setLineStyle ( LineSolid );
+      XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), x, y, w, h );
+      actWin->executeGc.restoreFg ();
       needToEraseUnconnected = 1;
     }
   }
   else if ( needToEraseUnconnected )
   {
-    actWin->executeGc.setLineWidth( 1 );
-    actWin->executeGc.setLineStyle( LineSolid );
-    XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-     actWin->executeGc.eraseGC(), x, y, w, h );
+    actWin->executeGc.setLineWidth ( 1 );
+    actWin->executeGc.setLineStyle ( LineSolid );
+    XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+     actWin->executeGc.eraseGC (), x, y, w, h );
     needToEraseUnconnected = 0;
   }
 
   if ( !enabled || !activeMode || !init ) return 1;
 
-  actWin->executeGc.saveFg();
+  actWin->executeGc.saveFg ();
 
   if ( horizontal )
   {
@@ -1333,15 +1333,15 @@ int activeVsBarClass::drawActive ( void )
     if ( bufInvalid )
     {
 
-      actWin->executeGc.setFG( bgColour.getColor() );
+      actWin->executeGc.setFG ( bgColour.getColor () );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), x, y, w, h );
+      XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), x, y, w, h );
 
-      actWin->executeGc.setFG( barColour.getColor() );
+      actWin->executeGc.setFG ( barColour.getColor () );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), barX, barY, barW, barH );
+      XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), barX, barY, barW, barH );
 
     }
     else
@@ -1350,15 +1350,15 @@ int activeVsBarClass::drawActive ( void )
       if ( zeroCrossover )
       {
 
-        actWin->executeGc.setFG( bgColour.getColor() );
+        actWin->executeGc.setFG ( bgColour.getColor () );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-         actWin->executeGc.normGC(), oldBarX, barY, oldBarW, barH );
+        XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+         actWin->executeGc.normGC (), oldBarX, barY, oldBarW, barH );
 
-        actWin->executeGc.setFG( barColour.getColor() );
+        actWin->executeGc.setFG ( barColour.getColor () );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-         actWin->executeGc.normGC(), barX, barY, barW, barH );
+        XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+         actWin->executeGc.normGC (), barX, barY, barW, barH );
 
       }
       else
@@ -1370,21 +1370,21 @@ int activeVsBarClass::drawActive ( void )
           if ( barW > oldBarW )
           {
 
-            actWin->executeGc.setFG( barColour.getColor() );
+            actWin->executeGc.setFG ( barColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), oldBarX+oldBarW, barY,
-             barW-oldBarW, barH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), oldBarX + oldBarW, barY,
+             barW - oldBarW, barH );
 
           }
           else
           {
 
-            actWin->executeGc.setFG( bgColour.getColor() );
+            actWin->executeGc.setFG ( bgColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX+barW, barY,
-             oldBarW-barW, barH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX + barW, barY,
+             oldBarW - barW, barH );
 
           }
 
@@ -1395,21 +1395,21 @@ int activeVsBarClass::drawActive ( void )
           if ( barX < oldBarX )
           {
 
-            actWin->executeGc.setFG( barColour.getColor() );
+            actWin->executeGc.setFG ( barColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX, barY,
-             oldBarX-barX, barH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX, barY,
+             oldBarX - barX, barH );
 
           }
           else
           {
 
-            actWin->executeGc.setFG( bgColour.getColor() );
+            actWin->executeGc.setFG ( bgColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), oldBarX, barY,
-             barX-oldBarX, barH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), oldBarX, barY,
+             barX - oldBarX, barH );
 
           }
 
@@ -1429,15 +1429,15 @@ int activeVsBarClass::drawActive ( void )
     if ( bufInvalid )
     {
 
-      actWin->executeGc.setFG( bgColour.getColor() );
+      actWin->executeGc.setFG ( bgColour.getColor () );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), x, y, w, h );
+      XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), x, y, w, h );
 
-      actWin->executeGc.setFG( barColour.getColor() );
+      actWin->executeGc.setFG ( barColour.getColor () );
 
-      XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), barX, barY-barH, barW, barH );
+      XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), barX, barY - barH, barW, barH );
 
       // draw line along origin
       if ( border || showScale )
@@ -1445,10 +1445,10 @@ int activeVsBarClass::drawActive ( void )
       else
         x0 = x;
       x1 = x + w;
-      y1 = y0 = (int) rint( barAreaY -
+      y1 = y0 = (int) rint ( barAreaY -
        ( barOriginX - readMin ) * barAreaH / ( readMax - readMin ) );
-      XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), x0, y0, x1, y1 );
+      XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), x0, y0, x1, y1 );
 
     }
     else
@@ -1457,15 +1457,15 @@ int activeVsBarClass::drawActive ( void )
       if ( zeroCrossover )
       {
 
-        actWin->executeGc.setFG( bgColour.getColor() );
+        actWin->executeGc.setFG ( bgColour.getColor () );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-         actWin->executeGc.normGC(), barX, oldBarY-oldBarH, barW, oldBarH );
+        XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+         actWin->executeGc.normGC (), barX, oldBarY - oldBarH, barW, oldBarH );
 
-        actWin->executeGc.setFG( barColour.getColor() );
+        actWin->executeGc.setFG ( barColour.getColor () );
 
-        XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-         actWin->executeGc.normGC(), barX, barY-barH, barW, barH );
+        XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+         actWin->executeGc.normGC (), barX, barY - barH, barW, barH );
 
         // draw line along origin
         if ( border || showScale )
@@ -1473,10 +1473,10 @@ int activeVsBarClass::drawActive ( void )
         else
           x0 = x;
         x1 = x + w;
-        y1 = y0 = (int) rint( barAreaY -
+        y1 = y0 = (int) rint ( barAreaY -
          ( barOriginX - readMin ) * barAreaH / ( readMax - readMin ) );
-        XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
-         actWin->executeGc.normGC(), x0, y0, x1, y1 );
+        XDrawLine ( actWin->d, XtWindow (actWin->executeWidget),
+         actWin->executeGc.normGC (), x0, y0, x1, y1 );
 
       }
       else
@@ -1488,21 +1488,21 @@ int activeVsBarClass::drawActive ( void )
           if ( barH > oldBarH )
           {
 
-            actWin->executeGc.setFG( barColour.getColor() );
+            actWin->executeGc.setFG ( barColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX, barY-barH,
-             barW, barH-oldBarH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX, barY - barH,
+             barW, barH - oldBarH );
 
           }
           else
           {
 
-            actWin->executeGc.setFG( bgColour.getColor() );
+            actWin->executeGc.setFG ( bgColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX, barY-oldBarH,
-             barW, oldBarH-barH );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX, barY - oldBarH,
+             barW, oldBarH - barH );
 
           }
 
@@ -1513,21 +1513,21 @@ int activeVsBarClass::drawActive ( void )
           if ( barY > oldBarY )
           {
 
-            actWin->executeGc.setFG( barColour.getColor() );
+            actWin->executeGc.setFG ( barColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX, oldBarY,
-             barW, barY-oldBarY );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX, oldBarY,
+             barW, barY - oldBarY );
 
           }
           else
           {
 
-            actWin->executeGc.setFG( bgColour.getColor() );
+            actWin->executeGc.setFG ( bgColour.getColor () );
 
-            XFillRectangle( actWin->d, XtWindow(actWin->executeWidget),
-             actWin->executeGc.normGC(), barX, barY,
-             barW, oldBarY-barY );
+            XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+             actWin->executeGc.normGC (), barX, barY,
+             barW, oldBarY - barY );
 
           }
 
@@ -1545,30 +1545,30 @@ int activeVsBarClass::drawActive ( void )
   if ( bufInvalid )
   { // draw scale, label, etc ...
 
-    actWin->executeGc.setFG( fgColour.getColor() );
+    actWin->executeGc.setFG ( fgColour.getColor () );
 
     if ( showScale )
     {
-      drawScale( actWin->executeWidget, &actWin->executeGc );
+      drawScale ( actWin->executeWidget, &actWin->executeGc );
     }
 
     if ( labelType == BARC_K_PV_NAME )
-      strncpy( str, readPvId->get_name(), 39 );
+      strncpy ( str, readPvId->get_name (), 39 );
     else
-      strncpy( str, label, 39 );
+      strncpy ( str, label, 39 );
 
     if ( horizontal )
     {
 
-      if ( strcmp( str, "" ) != 0 )
+      if ( strcmp ( str, "" ) != 0 )
       {
         if ( fs )
         {
-          actWin->executeGc.setFontTag( fontTag, actWin->fi );
+          actWin->executeGc.setFontTag ( fontTag, actWin->fi );
           tX = barAreaX;
           tY = y + 2;
           if ( border ) tY += 2;
-          drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+          drawText ( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
            XmALIGNMENT_BEGINNING, str );
         }
       }
@@ -1577,15 +1577,15 @@ int activeVsBarClass::drawActive ( void )
     else
     {
 
-      if ( strcmp( str, "" ) != 0 )
+      if ( strcmp ( str, "" ) != 0 )
       {
         if ( fs )
         {
-          actWin->executeGc.setFontTag( fontTag, actWin->fi );
+          actWin->executeGc.setFontTag ( fontTag, actWin->fi );
           tX = barAreaX + barAreaW;
           tY = y + (int) ( .25 * (double) fontHeight );
           if ( border ) tY += 2;
-          drawText( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
+          drawText ( actWin->executeWidget, &actWin->executeGc, fs, tX, tY,
            XmALIGNMENT_END, str );
         }
       }
@@ -1594,17 +1594,17 @@ int activeVsBarClass::drawActive ( void )
 
     if ( border )
     {
-      actWin->executeGc.setLineWidth( 1 );
-      actWin->executeGc.setLineStyle( LineSolid );
-      XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
-       actWin->executeGc.normGC(), x, y, w, h );
+      actWin->executeGc.setLineWidth ( 1 );
+      actWin->executeGc.setLineStyle ( LineSolid );
+      XDrawRectangle ( actWin->d, XtWindow (actWin->executeWidget),
+       actWin->executeGc.normGC (), x, y, w, h );
     }
 
     bufInvalid = 0;
 
   }
 
-  actWin->executeGc.restoreFg();
+  actWin->executeGc.restoreFg ();
 
   return 1;
 
@@ -1656,8 +1656,8 @@ int activeVsBarClass::activate (
     pvNotConnectedMask = active = init = 0;
     activeMode = 1;
 
-    if ( !readPvExpStr.getExpanded() ||
-       blankOrComment( readPvExpStr.getExpanded() ) )
+    if ( !readPvExpStr.getExpanded () ||
+       blankOrComment ( readPvExpStr.getExpanded () ) )
     {
       readExists = 0;
     }
@@ -1665,12 +1665,12 @@ int activeVsBarClass::activate (
     {
       readExists = 1;
       pvNotConnectedMask |= 1;
-      barColour.setConnectSensitive();
-      fgColour.setConnectSensitive();
+      barColour.setConnectSensitive ();
+      fgColour.setConnectSensitive ();
     }
 
-    if ( !nullPvExpStr.getExpanded() ||
-       blankOrComment( nullPvExpStr.getExpanded() ) )
+    if ( !nullPvExpStr.getExpanded () ||
+       blankOrComment ( nullPvExpStr.getExpanded () ) )
     {
       nullExists = 0;
     }
@@ -1680,8 +1680,8 @@ int activeVsBarClass::activate (
       pvNotConnectedMask |= 2;
     }
 
-    if ( !maxPvExpStr.getExpanded() ||
-       blankOrComment( maxPvExpStr.getExpanded() ) )
+    if ( !maxPvExpStr.getExpanded () ||
+       blankOrComment ( maxPvExpStr.getExpanded () ) )
     {
       maxExists = 0;
     }
@@ -1691,8 +1691,8 @@ int activeVsBarClass::activate (
       pvNotConnectedMask |= 4;
     }
 
-    if ( !minPvExpStr.getExpanded() ||
-       blankOrComment( minPvExpStr.getExpanded() ) )
+    if ( !minPvExpStr.getExpanded () ||
+       blankOrComment ( minPvExpStr.getExpanded () ) )
     {
       minExists = 0;
     }
@@ -1709,11 +1709,11 @@ int activeVsBarClass::activate (
     if ( !opComplete )
     {
 
-      initEnable();
+      initEnable ();
 
       if ( !unconnectedTimer )
       {
-        unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
+        unconnectedTimer = appAddTimeOut ( actWin->appCtx->appContext (),
          2000, unconnectedTimeout, this );
       }
 
@@ -1721,60 +1721,60 @@ int activeVsBarClass::activate (
 
       if ( readExists )
       {
-        readPvId = the_PV_Factory->create( readPvExpStr.getExpanded() );
+        readPvId = the_PV_Factory->create ( readPvExpStr.getExpanded () );
         if ( readPvId )
         {
-          readPvId->add_conn_state_callback( bar_monitor_read_connect_state,
+          readPvId->add_conn_state_callback ( bar_monitor_read_connect_state,
            this );
         }
         else
         {
-          printf( activeVsBarClass_str36 );
+          printf ( activeVsBarClass_str36 );
           opStat = 0;
         }
       }
 
       if ( nullExists )
       {
-        nullPvId = the_PV_Factory->create( nullPvExpStr.getExpanded() );
+        nullPvId = the_PV_Factory->create ( nullPvExpStr.getExpanded () );
         if ( nullPvId )
         {
-          nullPvId->add_conn_state_callback( bar_monitor_null_connect_state,
+          nullPvId->add_conn_state_callback ( bar_monitor_null_connect_state,
            this );
         }
         else
         {
-          printf( activeVsBarClass_str36 );
+          printf ( activeVsBarClass_str36 );
           opStat = 0;
         }
       }
 
       if ( maxExists )
       {
-        maxPvId = the_PV_Factory->create( maxPvExpStr.getExpanded() );
+        maxPvId = the_PV_Factory->create ( maxPvExpStr.getExpanded () );
         if ( maxPvId )
         {
-          maxPvId->add_conn_state_callback( bar_monitor_max_connect_state,
+          maxPvId->add_conn_state_callback ( bar_monitor_max_connect_state,
            this );
         }
         else
         {
-          printf( activeVsBarClass_str36 );
+          printf ( activeVsBarClass_str36 );
           opStat = 0;
         }
       }
 
       if ( minExists )
       {
-        minPvId = the_PV_Factory->create( minPvExpStr.getExpanded() );
+        minPvId = the_PV_Factory->create ( minPvExpStr.getExpanded () );
         if ( minPvId )
         {
-          minPvId->add_conn_state_callback( bar_monitor_min_connect_state,
+          minPvId->add_conn_state_callback ( bar_monitor_min_connect_state,
            this );
         }
         else
         {
-          printf( activeVsBarClass_str36 );
+          printf ( activeVsBarClass_str36 );
           opStat = 0;
         }
       }
@@ -1813,7 +1813,7 @@ int activeVsBarClass::deactivate (
 
     if ( unconnectedTimer )
     {
-      XtRemoveTimeOut( unconnectedTimer );
+      XtRemoveTimeOut ( unconnectedTimer );
       unconnectedTimer = 0;
     }
 
@@ -1821,10 +1821,10 @@ int activeVsBarClass::deactivate (
     {
       if ( readPvId )
       {
-        readPvId->remove_conn_state_callback( bar_monitor_read_connect_state,
+        readPvId->remove_conn_state_callback ( bar_monitor_read_connect_state,
          this );
-        readPvId->remove_value_callback( bar_readUpdate, this );
-        readPvId->release();
+        readPvId->remove_value_callback ( bar_readUpdate, this );
+        readPvId->release ();
         readPvId = NULL;
       }
     }
@@ -1833,10 +1833,10 @@ int activeVsBarClass::deactivate (
     {
       if ( nullPvId )
       {
-        nullPvId->remove_conn_state_callback( bar_monitor_null_connect_state,
+        nullPvId->remove_conn_state_callback ( bar_monitor_null_connect_state,
          this );
-        nullPvId->remove_value_callback( bar_nullUpdate, this );
-        nullPvId->release();
+        nullPvId->remove_value_callback ( bar_nullUpdate, this );
+        nullPvId->release ();
         nullPvId = NULL;
       }
     }
@@ -1845,10 +1845,10 @@ int activeVsBarClass::deactivate (
     {
       if ( maxPvId )
       {
-        maxPvId->remove_conn_state_callback( bar_monitor_max_connect_state,
+        maxPvId->remove_conn_state_callback ( bar_monitor_max_connect_state,
          this );
-        maxPvId->remove_value_callback( bar_maxUpdate, this );
-        maxPvId->release();
+        maxPvId->remove_value_callback ( bar_maxUpdate, this );
+        maxPvId->release ();
         maxPvId = NULL;
       }
     }
@@ -1857,10 +1857,10 @@ int activeVsBarClass::deactivate (
     {
       if ( minPvId )
       {
-        minPvId->remove_conn_state_callback( bar_monitor_min_connect_state,
+        minPvId->remove_conn_state_callback ( bar_monitor_min_connect_state,
          this );
-        minPvId->remove_value_callback( bar_minUpdate, this );
-        minPvId->release();
+        minPvId->remove_value_callback ( bar_minUpdate, this );
+        minPvId->release ();
         minPvId = NULL;
       }
     }
@@ -1901,7 +1901,7 @@ void activeVsBarClass::updateDimensions ( void )
     barAreaX = x;
     barAreaW = w;
 
-    if ( ( strcmp( label, "" ) != 0 ) ||
+    if ( ( strcmp ( label, "" ) != 0 ) ||
          ( labelType == BARC_K_PV_NAME ) )
     {
       minH += fontHeight + 5;
@@ -1930,7 +1930,7 @@ void activeVsBarClass::updateDimensions ( void )
       barAreaW = w - barStrLen - 6;
     }
 
-    if ( border && !showScale && ( ( strcmp( label, "" ) == 0 ) ||
+    if ( border && !showScale && ( ( strcmp ( label, "" ) == 0 ) ||
      ( labelType == BARC_K_PV_NAME ) ) )
     {
       minH += 9;
@@ -1949,7 +1949,7 @@ void activeVsBarClass::updateDimensions ( void )
 
     barH = h;
 
-    if ( ( strcmp( label, "" ) != 0 ) ||
+    if ( ( strcmp ( label, "" ) != 0 ) ||
          ( labelType == BARC_K_PV_NAME ) )
     {
       barH -= ( fontHeight + 5 );
@@ -1961,7 +1961,7 @@ void activeVsBarClass::updateDimensions ( void )
       barH -= ( fontHeight + fontHeight + 5 );
     }
 
-    if ( border && !showScale && ( ( strcmp( label, "" ) == 0 ) ||
+    if ( border && !showScale && ( ( strcmp ( label, "" ) == 0 ) ||
      ( labelType == BARC_K_PV_NAME ) ) )
     {
       barH -= 9;
@@ -1974,7 +1974,7 @@ void activeVsBarClass::updateDimensions ( void )
     minVertW = 5;
     minVertH = 10;
 
-    if ( ( strcmp( label, "" ) != 0 ) ||
+    if ( ( strcmp ( label, "" ) != 0 ) ||
          ( labelType == BARC_K_PV_NAME ) )
     {
       minVertH += fontHeight + 5;
@@ -1983,7 +1983,7 @@ void activeVsBarClass::updateDimensions ( void )
     if ( showScale )
     {
       minVertH += fontHeight;
-      minVertW += 4 + barStrLen + 10 + (int) rint( 0.5 * fontHeight );
+      minVertW += 4 + barStrLen + 10 + (int) rint ( 0.5 * fontHeight );
     }
     else if ( border )
     {
@@ -2008,7 +2008,7 @@ void activeVsBarClass::updateDimensions ( void )
     barX = barAreaX = x;
     barW = barAreaW = w;
 
-    if ( ( strcmp( label, "" ) != 0 ) ||
+    if ( ( strcmp ( label, "" ) != 0 ) ||
          ( labelType == BARC_K_PV_NAME ) )
     {
       barAreaH -= (int) ( 1.5 * (double) fontHeight ) - 5;
@@ -2028,12 +2028,12 @@ void activeVsBarClass::updateDimensions ( void )
 
     if ( showScale )
     {
-      barY -= (int) rint( 0.5 * fontHeight );
-      barAreaY -= (int) rint( 0.5 * fontHeight );
-      barAreaW -= ( 4 +  barStrLen + 8 + (int) rint( 0.5 * fontHeight ) );
-      barW -= ( 4 + barStrLen + 8 + (int) rint( 0.5 * fontHeight ) );
-      barAreaX += 2 + barStrLen + 8 + (int) rint( 0.5 * fontHeight );
-      barX += 2 + barStrLen + 8 + (int) rint( 0.5 * fontHeight );
+      barY -= (int) rint ( 0.5 * fontHeight );
+      barAreaY -= (int) rint ( 0.5 * fontHeight );
+      barAreaW -= ( 4 +  barStrLen + 8 + (int) rint ( 0.5 * fontHeight ) );
+      barW -= ( 4 + barStrLen + 8 + (int) rint ( 0.5 * fontHeight ) );
+      barAreaX += 2 + barStrLen + 8 + (int) rint ( 0.5 * fontHeight );
+      barX += 2 + barStrLen + 8 + (int) rint ( 0.5 * fontHeight );
     }
     else if ( border )
     {
@@ -2047,7 +2047,7 @@ void activeVsBarClass::updateDimensions ( void )
 
   }
 
-  updateScaleInfo();
+  updateScaleInfo ();
 
 }
 
@@ -2112,10 +2112,10 @@ int activeVsBarClass::expand1st (
 
   int stat;
 
-  stat = readPvExpStr.expand1st( numMacros, macros, expansions );
-  stat = nullPvExpStr.expand1st( numMacros, macros, expansions );
-  stat = maxPvExpStr.expand1st( numMacros, macros, expansions );
-  stat = minPvExpStr.expand1st( numMacros, macros, expansions );
+  stat = readPvExpStr.expand1st ( numMacros, macros, expansions );
+  stat = nullPvExpStr.expand1st ( numMacros, macros, expansions );
+  stat = maxPvExpStr.expand1st ( numMacros, macros, expansions );
+  stat = minPvExpStr.expand1st ( numMacros, macros, expansions );
 
   return stat;
 
@@ -2129,10 +2129,10 @@ int activeVsBarClass::expand2nd (
 
 int stat;
 
-  stat = readPvExpStr.expand2nd( numMacros, macros, expansions );
-  stat = nullPvExpStr.expand2nd( numMacros, macros, expansions );
-  stat = maxPvExpStr.expand2nd( numMacros, macros, expansions );
-  stat = minPvExpStr.expand2nd( numMacros, macros, expansions );
+  stat = readPvExpStr.expand2nd ( numMacros, macros, expansions );
+  stat = nullPvExpStr.expand2nd ( numMacros, macros, expansions );
+  stat = maxPvExpStr.expand2nd ( numMacros, macros, expansions );
+  stat = minPvExpStr.expand2nd ( numMacros, macros, expansions );
 
   return stat;
 
@@ -2143,16 +2143,16 @@ int activeVsBarClass::containsMacros ( void )
 
   int result;
 
-  result = readPvExpStr.containsPrimaryMacros();
+  result = readPvExpStr.containsPrimaryMacros ();
   if ( result ) return 1;
 
-  result = nullPvExpStr.containsPrimaryMacros();
+  result = nullPvExpStr.containsPrimaryMacros ();
   if ( result ) return 1;
 
-  result = maxPvExpStr.containsPrimaryMacros();
+  result = maxPvExpStr.containsPrimaryMacros  ();
   if ( result ) return 1;
 
-  result = minPvExpStr.containsPrimaryMacros();
+  result = minPvExpStr.containsPrimaryMacros ();
   if ( result ) return 1;
 
   return 0;
@@ -2271,9 +2271,9 @@ int activeVsBarClass::checkResizeSelectBoxAbs (
 void activeVsBarClass::updateScaleInfo ( void )
 {
   if ( horizontal )
-    updateHorzScaleInfo();
+    updateHorzScaleInfo ();
   else
-    updateVertScaleInfo();
+    updateVertScaleInfo ();
 
 }
 
@@ -2294,7 +2294,7 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
     else if ( barOriginX > readMax )
      barOriginX = readMax;
 
-    originW = (int) rint( ( barOriginX - readMin ) *
+    originW = (int) rint ( ( barOriginX - readMin ) *
      barAreaW / ( readMax - readMin ) );
 
     if ( readV > readMax ) readV = readMax;
@@ -2311,7 +2311,7 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
     else if ( barOriginX < readMax )
       barOriginX = readMax;
 
-    originW = (int) rint( ( barOriginX - readMin ) *
+    originW = (int) rint ( ( barOriginX - readMin ) *
      barAreaW / ( readMax - readMin ) );
 
     if ( readV < readMax ) readV = readMax;
@@ -2375,7 +2375,7 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
 
       barX = originW - locW;
 
-      barW = abs( locW );
+      barW = abs ( locW );
 
       if ( barX < 0 )
       {
@@ -2441,7 +2441,7 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
 
       barX = originW - locW;
 
-      barW = abs( locW );
+      barW = abs ( locW );
 
       if ( barX < 0 )
       {
@@ -2476,7 +2476,7 @@ void activeVsBarClass::updateVertScaleInfo ( void )
     else if ( barOriginX > readMax )
      barOriginX = readMax;
 
-    originH = (int) rint( ( barOriginX - readMin ) *
+    originH = (int) rint ( ( barOriginX - readMin ) *
      barAreaH / ( readMax - readMin ) );
 
     if ( readV > readMax ) readV = readMax;
@@ -2493,7 +2493,7 @@ void activeVsBarClass::updateVertScaleInfo ( void )
     else if ( barOriginX < readMax )
      barOriginX = readMax;
 
-    originH = (int) rint( ( barOriginX - readMin ) *
+    originH = (int) rint ( ( barOriginX - readMin ) *
      barAreaH / ( readMax - readMin ) );
 
     if ( readV < readMax ) readV = readMax;
@@ -2544,7 +2544,7 @@ void activeVsBarClass::updateVertScaleInfo ( void )
       }
 
       barY = barAreaY - ( originH - locH );
-      barH = abs( locH );
+      barH = abs ( locH );
 
       if ( barY < 0 )
       {
@@ -2596,7 +2596,7 @@ void activeVsBarClass::updateVertScaleInfo ( void )
       }
 
       barY = barAreaY - ( originH - locH );
-      barH = abs( locH );
+      barH = abs ( locH );
 
       if ( barY < 0 )
       {
@@ -2646,7 +2646,7 @@ void activeVsBarClass::updateBar ( void )
     {
       oldAboveBarOrigin = aboveBarOrigin;
       zeroCrossover = 1;
-      updateScaleInfo();
+      updateScaleInfo ();
     }
     else
     {
@@ -2667,7 +2667,7 @@ void activeVsBarClass::updateBar ( void )
       {
         locW = (int) ( ( readV - barOriginX ) * factorLt + 0.5 );
         barX = originW - locW;
-        barW = abs( locW );
+        barW = abs ( locW );
 
         if ( barX < 0 )
         {
@@ -2689,7 +2689,7 @@ void activeVsBarClass::updateBar ( void )
       {
         locW = (int) ( factorGe * ( readV - barOriginX ) + 0.5 );
         barX = originW - locW;
-        barW = abs( locW );
+        barW = abs ( locW );
 
         if ( barX < 0 )
         {
@@ -2736,7 +2736,7 @@ void activeVsBarClass::updateBar ( void )
     {
       oldAboveBarOrigin = aboveBarOrigin;
       zeroCrossover = 1;
-      updateScaleInfo();
+      updateScaleInfo ();
     }
     else
     {
@@ -2758,7 +2758,7 @@ void activeVsBarClass::updateBar ( void )
       {
         locH = (int) ( ( readV - barOriginX ) * factorLt + 0.5 );
         barY = barAreaY - ( originH - locH );
-        barH = abs( locH );
+        barH = abs ( locH );
 
         if ( barY > barAreaY )
         {
@@ -2780,7 +2780,7 @@ void activeVsBarClass::updateBar ( void )
       {
         locH = (int) ( factorGe * ( readV - barOriginX ) + 0.5 );
         barY = barAreaY - ( originH - locH );
-        barH = abs( locH );
+        barH = abs ( locH );
 
         if ( barY > barAreaY )
         {
@@ -2796,12 +2796,12 @@ void activeVsBarClass::updateBar ( void )
 void activeVsBarClass::executeDeferred ( void )
 {
   int l, nc, ni, nr, ne, nd, nfd, ndc;
-  char fmt[31+1], str[31+1];
+  char fmt[31 + 1], str[31 + 1];
   double v;
 
   if ( actWin->isIconified ) return;
 
-  actWin->appCtx->proc->lock();
+  actWin->appCtx->proc->lock ();
   nc = needConnectInit; needConnectInit = 0;
   ni = needInfoInit; needInfoInit = 0;
   nr = needRefresh; needRefresh = 0;
@@ -2810,8 +2810,8 @@ void activeVsBarClass::executeDeferred ( void )
   nfd = needFullDraw; needFullDraw = 0;
   ndc = needDrawCheck; needDrawCheck = 0;
   v = curReadV - curNullV;
-  actWin->remDefExeNode( aglPtr );
-  actWin->appCtx->proc->unlock();
+  actWin->remDefExeNode ( aglPtr );
+  actWin->appCtx->proc->unlock ();
 
   if ( !activeMode ) return;
 
@@ -2819,7 +2819,7 @@ void activeVsBarClass::executeDeferred ( void )
 
   if ( nc )
   {
-    v = curReadV = readPvId->get_double();
+    v = curReadV = readPvId->get_double ();
 
     if (limitsFromPVs)
     {
@@ -2828,20 +2828,20 @@ void activeVsBarClass::executeDeferred ( void )
     }
     else
     {
-      if ( limitsFromDb || efReadMin.isNull() )
+      if ( limitsFromDb || efReadMin.isNull () )
       {
-        readMin = readPvId->get_lower_disp_limit();
+        readMin = readPvId->get_lower_disp_limit ();
       }
 
-      if ( limitsFromDb || efReadMax.isNull() )
+      if ( limitsFromDb || efReadMax.isNull () )
       {
-        readMax = readPvId->get_upper_disp_limit();
+        readMax = readPvId->get_upper_disp_limit ();
       }
     }
 
-    if ( limitsFromPVs || limitsFromDb || efPrecision.isNull() )
+    if ( limitsFromPVs || limitsFromDb || efPrecision.isNull () )
     {
-      precision = readPvId->get_precision();
+      precision = readPvId->get_precision ();
     }
     ni = 1;
   }
@@ -2851,53 +2851,53 @@ void activeVsBarClass::executeDeferred ( void )
   if ( ni )
   {
 
-    if ( efBarOriginX.isNull() )
+    if ( efBarOriginX.isNull () )
     {
       barOriginX = readMin;
     }
 
-    if ( strcmp( scaleFormat, "GFloat" ) == 0 )
+    if ( strcmp ( scaleFormat, "GFloat" ) == 0 )
     {
-      sprintf( fmt, "%%.%-dg", precision );
+      sprintf ( fmt, "%%.%-dg", precision );
     }
-    else if ( strcmp( scaleFormat, "Exponential" ) == 0 )
+    else if ( strcmp ( scaleFormat, "Exponential" ) == 0 )
     {
-      sprintf( fmt, "%%.%-de", precision );
+      sprintf ( fmt, "%%.%-de", precision );
     }
     else
     {
-      sprintf( fmt, "%%.%-df", precision );
+      sprintf ( fmt, "%%.%-df", precision );
     }
 
-    sprintf( str, fmt, readMin );
+    sprintf ( str, fmt, readMin );
     if ( fs )
     {
-      barStrLen = XTextWidth( fs, str, strlen(str) );
+      barStrLen = XTextWidth ( fs, str, strlen (str) );
     }
 
-    sprintf( str, fmt, readMax );
+    sprintf ( str, fmt, readMax );
     if ( fs )
     {
-      l = XTextWidth( fs, str, strlen(str) );
+      l = XTextWidth ( fs, str, strlen (str) );
       if ( l > barStrLen ) barStrLen = l;
     }
 
-    updateDimensions();
+    updateDimensions ();
 
     active = 1;
     init = 1;
-    barColour.setConnected();
-    fgColour.setConnected();
-    bufInvalidate();
-    eraseActive();
+    barColour.setConnected ();
+    fgColour.setConnected ();
+    bufInvalidate ();
+    eraseActive ();
     readV = v;
-    updateDimensions();
-    drawActive();
+    updateDimensions ();
+    drawActive ();
 
     if ( initialReadConnection )
     {
       initialReadConnection = 0;
-      readPvId->add_value_callback( bar_readUpdate, this );
+      readPvId->add_value_callback ( bar_readUpdate, this );
     }
 
     if ( nullExists )
@@ -2905,7 +2905,7 @@ void activeVsBarClass::executeDeferred ( void )
       if ( initialNullConnection )
       {
         initialNullConnection = 0;
-        nullPvId->add_value_callback( bar_nullUpdate, this );
+        nullPvId->add_value_callback ( bar_nullUpdate, this );
       }
     }
 
@@ -2914,7 +2914,7 @@ void activeVsBarClass::executeDeferred ( void )
       if ( initialMaxConnection )
       {
         initialMaxConnection = 0;
-        maxPvId->add_value_callback( bar_maxUpdate, this );
+        maxPvId->add_value_callback ( bar_maxUpdate, this );
       }
     }
 
@@ -2923,7 +2923,7 @@ void activeVsBarClass::executeDeferred ( void )
       if ( initialMinConnection )
       {
         initialMinConnection = 0;
-        minPvId->add_value_callback( bar_minUpdate, this );
+        minPvId->add_value_callback ( bar_minUpdate, this );
       }
     }
   }
@@ -2932,18 +2932,18 @@ void activeVsBarClass::executeDeferred ( void )
 
   if ( nr )
   {
-    bufInvalidate();
-    eraseActive();
+    bufInvalidate ();
+    eraseActive ();
     readV = v;
-    updateDimensions();
-    drawActive();
+    updateDimensions ();
+    drawActive ();
   }
 
 //----------------------------------------------------------------------------
 
   if ( ne )
   {
-    eraseActive();
+    eraseActive ();
   }
 
 //----------------------------------------------------------------------------
@@ -2951,7 +2951,7 @@ void activeVsBarClass::executeDeferred ( void )
   if ( nd )
   {
     readV = v;
-    drawActive();
+    drawActive ();
   }
 
 //----------------------------------------------------------------------------
@@ -2959,8 +2959,8 @@ void activeVsBarClass::executeDeferred ( void )
   if ( nfd )
   {
     readV = v;
-    bufInvalidate();
-    drawActive();
+    bufInvalidate ();
+    drawActive ();
   }
 
 //----------------------------------------------------------------------------
@@ -2968,8 +2968,8 @@ void activeVsBarClass::executeDeferred ( void )
   if ( ndc )
   {
       readV = v;
-      updateBar();
-      drawActive();
+      updateBar ();
+      drawActive ();
   }
 
 //----------------------------------------------------------------------------
@@ -2988,7 +2988,7 @@ char *activeVsBarClass::nextDragName ( void )
 {
   if ( !enabled ) return NULL;
 
-  if ( dragIndex < (int) ( sizeof(dragName) / sizeof(char *) ) - 1 )
+  if ( dragIndex < (int) ( sizeof (dragName) / sizeof (char *) ) - 1 )
   {
     dragIndex++;
     return dragName[dragIndex];
@@ -3008,42 +3008,42 @@ char *activeVsBarClass::dragValue (
   {
     if ( !i )
     {
-      return readPvExpStr.getExpanded();
+      return readPvExpStr.getExpanded ();
     }
     else
     if (i == 1)
     {
-      return nullPvExpStr.getExpanded();
+      return nullPvExpStr.getExpanded ();
     }
     else
     if (i == 2)
     {
-      return maxPvExpStr.getExpanded();
+      return maxPvExpStr.getExpanded ();
     }
     else
     {
-      return minPvExpStr.getExpanded();
+      return minPvExpStr.getExpanded ();
     }
   }
   else
   {
     if ( !i )
     {
-      return readPvExpStr.getRaw();
+      return readPvExpStr.getRaw ();
     }
     else
     if (i == 1)
     {
-      return nullPvExpStr.getRaw();
+      return nullPvExpStr.getRaw ();
     }
     else
     if (i == 2)
     {
-      return maxPvExpStr.getRaw();
+      return maxPvExpStr.getRaw ();
     }
     else
     {
-      return minPvExpStr.getRaw();
+      return minPvExpStr.getRaw ();
     }
   }
 }
@@ -3065,20 +3065,20 @@ void activeVsBarClass::changeDisplayParams (
   int _botShadowColour )
 {
   if ( _flag & ACTGRF_FG1COLOR_MASK )
-    barColour.setColorIndex( _fg1Colour, actWin->ci );
+    barColour.setColorIndex ( _fg1Colour, actWin->ci );
 
   if ( _flag & ACTGRF_TEXTFGCOLOR_MASK )
-    fgColour.setColorIndex( _textFgColour, actWin->ci );
+    fgColour.setColorIndex ( _textFgColour, actWin->ci );
 
   if ( _flag & ACTGRF_BGCOLOR_MASK )
-    bgColour.setColorIndex( _bgColour, actWin->ci );
+    bgColour.setColorIndex ( _bgColour, actWin->ci );
 
   if ( _flag & ACTGRF_CTLFONTTAG_MASK )
   {
-    strcpy( fontTag, _ctlFontTag );
-    actWin->fi->loadFontTag( fontTag );
-    fs = actWin->fi->getXFontStruct( fontTag );
-    updateDimensions();
+    strcpy ( fontTag, _ctlFontTag );
+    actWin->fi->loadFontTag ( fontTag );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    updateDimensions ();
   }
 }
 
@@ -3099,7 +3099,7 @@ void activeVsBarClass::changePvNames (
   {
     if ( numReadbackPvs )
     {
-      readPvExpStr.setRaw( readbackPvs[0] );
+      readPvExpStr.setRaw ( readbackPvs[0] );
     }
   }
 
@@ -3107,7 +3107,7 @@ void activeVsBarClass::changePvNames (
   {
     if ( numNullPvs )
     {
-      nullPvExpStr.setRaw( nullPvs[0] );
+      nullPvExpStr.setRaw ( nullPvs[0] );
     }
   }
 }
@@ -3148,7 +3148,7 @@ void *clone_activeVsBarClassPtr (
   activeVsBarClass *ptr, *srcPtr;
 
   srcPtr = (activeVsBarClass *) _srcPtr;
-  ptr = new activeVsBarClass( srcPtr );
+  ptr = new activeVsBarClass ( srcPtr );
   return (void *) ptr;
 }
 
