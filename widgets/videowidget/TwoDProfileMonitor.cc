@@ -767,7 +767,7 @@ public:
         }
 
         if ((dataHeight != 0) &&
-            ((dataHeight * dataWidth) != (int)dataPv->get_dimension()))
+            ((dataHeight * dataWidth) != (int)dataPv->get_dimension ()))
         {
             // Data height or width has changed.  Ignore the current data which
             // is the wrong size.  Cancel subscription and restart it to make
@@ -781,8 +781,8 @@ public:
             dataPv->remove_value_callback ( dataUpdate, this );
             dataPv->remove_conn_state_callback (monitorDataConnectState, this);
             dataPv->release ();
-            dataPv = the_PV_Factory->create_size(
-                dataPvStr.getExpanded(), dataHeight * dataWidth);
+            dataPv = the_PV_Factory->create_size (
+                dataPvStr.getExpanded (), dataHeight * dataWidth);
             dataPv->add_conn_state_callback ( monitorDataConnectState, this );
             dataPv->add_value_callback ( dataUpdate, this );
             actWin->appCtx->proc->unlock ();
@@ -1000,7 +1000,7 @@ public:
 
 private:
 
-    TwoDProfileMonitor &operator=(const TwoDProfileMonitor &s);
+    TwoDProfileMonitor &operator = (const TwoDProfileMonitor &s);
 
 };
 
@@ -1166,7 +1166,7 @@ public:
 
 private:
     TwoDProfileMonitorTags (const TwoDProfileMonitorTags &s);
-    TwoDProfileMonitorTags &operator= (const TwoDProfileMonitorTags &s);
+    TwoDProfileMonitorTags &operator = (const TwoDProfileMonitorTags &s);
 
 };
 

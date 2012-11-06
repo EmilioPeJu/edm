@@ -23,74 +23,74 @@ int tmp;
 
   }
   else if ( w==kp->pb0) {
-	  *(kp->intDest) = 0;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 0;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb1) {
-	  *(kp->intDest) = 1;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 1;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb2) {
-	  *(kp->intDest) = 2;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 2;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb3) {
-	  *(kp->intDest) = 3;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 3;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb4) {
-	  *(kp->intDest) = 4;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 4;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb5) {
-	  *(kp->intDest) = 5;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 5;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb6) {
-	  *(kp->intDest) = 6;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 6;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb7) {
-	  *(kp->intDest) = 7;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 7;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb8) {
-	  *(kp->intDest) = 8;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 8;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
   else if ( w==kp->pb9) {
-	  *(kp->intDest) = 9;
-	  kp->popdown();
-	  XtDestroyWidget(kp->shell);
-	  kp->shell=NULL;
-	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
+          *(kp->intDest) = 9;
+          kp->popdown();
+          XtDestroyWidget(kp->shell);
+          kp->shell=NULL;
+          (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
   }
 
 
@@ -456,10 +456,10 @@ int tmp;
       else if ( w == kp->pbSign ) {
         if ( kp->positive ) {
           kp->positive = 0;
-	}
-	else {
+        }
+        else {
           kp->positive = 1;
-	}
+        }
       }
       else if ( w == kp->pbBksp ) {
         if ( kp->count == 1 ) {
@@ -467,11 +467,11 @@ int tmp;
           kp->state = onekeypadClass::ISNULL;
           kp->count = 0;
           strcpy( kp->buf, "-" );
-	}
+        }
         else {
           kp->buf[kp->count] = 0;
           kp->count--;
-	}
+        }
       }
 
       break;
@@ -561,10 +561,10 @@ int tmp;
       else if ( w == kp->pbSign ) {
         if ( kp->positive ) {
           kp->positive = 0;
-	}
-	else {
+        }
+        else {
           kp->positive = 1;
-	}
+        }
       }
       else if ( w == kp->pbBksp ) {
         if ( kp->count == 1 ) {
@@ -572,16 +572,16 @@ int tmp;
           kp->state = onekeypadClass::ISNULL;
           kp->count = 0;
           strcpy( kp->buf, "-" );
-	}
+        }
         else if ( kp->buf[kp->count] == '.' ) {
           kp->buf[kp->count] = 0;
           kp->state = onekeypadClass::NODECPOINT;
           kp->count--;
-	}
+        }
         else {
           kp->buf[kp->count] = 0;
           kp->count--;
-	}
+        }
       }
 
       break;
@@ -1506,10 +1506,10 @@ int result, isXEvent, argc;
       if ( isXEvent ) {
         if ( Xev.type != Expose ) {
           XtAppProcessEvent( app, result );
-	}
+        }
         else {
           XtAppProcessEvent( app, result );
-	}
+        }
       }
       else { // process all timer or alternate events
         XtAppProcessEvent( app, result );

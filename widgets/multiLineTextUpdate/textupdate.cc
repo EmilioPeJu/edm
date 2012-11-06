@@ -49,7 +49,7 @@ static void localCvtDoubleToExpNotationString(double value,
     {
         exp = 0;
         if (absVal != 0.)
-        {		/* really ought to test against some epsilon */
+        {        /* really ought to test against some epsilon */
             do
             {
                 newVal *= 1000.0;
@@ -66,7 +66,7 @@ static void localCvtDoubleToExpNotationString(double value,
         textField[k++] = 'e';
         if (exp == 0)
         {
-            textField[k++] = '+';	/* want e+00 for consistency with norms */
+            textField[k++] = '+';    /* want e+00 for consistency with norms */
         } else {
             textField[k++] = '-';
         }
@@ -899,8 +899,8 @@ void edmTextupdateClass::changePvNames(int flag,
 }
 
 void edmTextupdateClass::getPvs(int max,
-				ProcessVariable *pvs[],
-				int *n)
+                                ProcessVariable *pvs[],
+                                int *n)
 {
   if ( max < 2 ) {
     *n = 0;
@@ -948,12 +948,12 @@ int edmTextupdateClass::activate(int pass, void *ptr)
             is_executing = true;
             //is_pv_valid =
             // strcmp(getExpandedName(pv_name), "") != 0;
-	    is_pv_valid =
-             !blankOrComment( (char *) getExpandedName(pv_name) );
+            is_pv_valid =
+                !blankOrComment( (char *) getExpandedName(pv_name) );
             //is_color_pv_valid =
             // strcmp(getExpandedName(color_pv_name), "") != 0;
-	    is_color_pv_valid =
-             !blankOrComment( (char *) getExpandedName(color_pv_name) );
+            is_color_pv_valid =
+                !blankOrComment( (char *) getExpandedName(color_pv_name) );
             initEnable();
             break;
         case 2: // connect to pv
@@ -1033,7 +1033,7 @@ bool edmTextupdateClass::get_current_values(char *text, size_t &len)
             case dm_exp:
                 if (pv->get_type().type < ProcessVariable::Type::enumerated)
                 {
-                 	len = cvtDoubleToExpString(pv->get_double(), text,
+                    len = cvtDoubleToExpString(pv->get_double(), text,
                                                (unsigned short) precision);
                     break;
                 }
@@ -1284,12 +1284,12 @@ int edmTextentryClass::activate(int pass, void *ptr)
             // from man XmTextField
             initEnable();
             fonts = XmFontListCreate(fs, XmSTRING_DEFAULT_CHARSET);
-	    if ( g_transInit ) {
-	      g_transInit = 0;
+            if ( g_transInit ) {
+              g_transInit = 0;
               g_parsedTrans = XtParseTranslationTable(g_dragTrans);
-	    }
+            }
             actWin->appCtx->addActions( g_dragActions,
-					XtNumber(g_dragActions) );
+                                        XtNumber(g_dragActions) );
 
             widget = XtVaCreateManagedWidget("TextEntry",
                                              xmTextFieldWidgetClass,
@@ -1331,7 +1331,7 @@ int edmTextentryClass::activate(int pass, void *ptr)
                           (XtPointer)this);
 
             if ( !enabled ) {
-	      if ( widget ) XtUnmapWidget( widget );
+              if ( widget ) XtUnmapWidget( widget );
             }
 
             break;

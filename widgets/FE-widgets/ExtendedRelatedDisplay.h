@@ -18,7 +18,7 @@
 
 /********************************************************************************/
 /*                                                                              */
-/*  ExtendedRelatedDisplay.cc																     */
+/*  ExtendedRelatedDisplay.cc                                                                    */
 /*                                                                              */
 /*                                                                              */
 /********************************************************************************/
@@ -56,10 +56,10 @@
 #define RDC_RELEASE 0
 
 typedef struct objAndIndexTag
-	{
-	void *obj;
-	int index;
-	} objAndIndexType;
+    {
+    void *obj;
+    int index;
+    } objAndIndexType;
 
 #ifdef __ExtendedRelatedDisplay_cc
 
@@ -68,9 +68,9 @@ typedef struct objAndIndexTag
 
 #ifdef COMMENT_OUT
 static char *dragName[] =
-	{
-	ExtendedRelatedDisplayClass_str48
-	};
+    {
+    ExtendedRelatedDisplayClass_str48
+    };
 #endif
 
 
@@ -105,274 +105,274 @@ static void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call 
 #endif
 
 class ExtendedRelatedDisplayClass : public activeGraphicClass
-	{
+    {
 
-	public:
+    public:
 
-		static const int NUMPVS = 4;
-		static const int maxDsps = 24;
+        static const int NUMPVS = 4;
+        static const int maxDsps = 24;
 
-	private:
+    private:
 
-		friend void doBlink ( void *ptr );
+        friend void doBlink ( void *ptr );
 
-		friend void unconnectedTimeout ( XtPointer client, XtIntervalId *id );
+        friend void unconnectedTimeout ( XtPointer client, XtIntervalId *id );
 
-		friend void menu_cb ( Widget w, XtPointer client, XtPointer call );
+        friend void menu_cb ( Widget w, XtPointer client, XtPointer call );
 
-		friend void relDsp_monitor_dest_connect_state ( ProcessVariable *pv, void *userarg );
+        friend void relDsp_monitor_dest_connect_state ( ProcessVariable *pv, void *userarg );
 
-		friend void relDsp_monitor_color_connect_state ( ProcessVariable *pv, void *userarg );
+        friend void relDsp_monitor_color_connect_state ( ProcessVariable *pv, void *userarg );
 
-		friend void relDsp_monitor_enab_connect_state ( ProcessVariable *pv, void *userarg );
+        friend void relDsp_monitor_enab_connect_state ( ProcessVariable *pv, void *userarg );
 
-		friend void relDsp_color_value_update ( ProcessVariable *pv, void *userarg );
+        friend void relDsp_color_value_update ( ProcessVariable *pv, void *userarg );
 
-		friend void relDsp_enab_value_update ( ProcessVariable *pv, void *userarg );
+        friend void relDsp_enab_value_update ( ProcessVariable *pv, void *userarg );
 
-		friend void openDisplay ( Widget w, XtPointer client, XtPointer call );
+        friend void openDisplay ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_ok1 ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_ok1 ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_update1 ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_update1 ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_apply1 ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_apply1 ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_cancel1 ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_cancel1 ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_ok ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_ok ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_update ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_update ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_apply ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_apply ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_cancel ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_cancel ( Widget w, XtPointer client, XtPointer call );
 
-		friend void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call );
+        friend void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call );
 
-		typedef struct bufTag
-			{
-			int bufUseFocus;
-			int bufX;
-			int bufY;
-			int bufW;
-			int bufH;
-			int bufTopShadowColor;
-			int bufBotShadowColor;
-			int bufFgColor;
-			int bufBgColor;
-			int bufInvisible;
-			int bufNoEdit;
-			int bufCloseAction[maxDsps];
-			int bufSetPostion[maxDsps];
-			int bufAllowDups[maxDsps];
-			int bufCascade[maxDsps];
-			int bufPropagateMacros[maxDsps];
-			char bufDisplayFileName[maxDsps][127+1];
-			char bufSymbols[maxDsps][255+1];
-			int bufReplaceSymbols[maxDsps];
-			char bufButtonLabel[127+1];
-			char bufLabel[maxDsps][127+1];
-			char bufFontTag[63+1];
-			char bufColorPvName[PV_Factory::MAX_PV_NAME+1];
-			char bufDestPvName[NUMPVS][PV_Factory::MAX_PV_NAME+1];
-			char bufSource[NUMPVS][39+1];
-			char bufEnabPvName[PV_Factory::MAX_PV_NAME+1];
-			int bufOfsX;
-			int bufOfsY;
-			int bufButton3Popup;
-			int bufIcon;
-			} bufType, *bufPtr;
+        typedef struct bufTag
+            {
+            int bufUseFocus;
+            int bufX;
+            int bufY;
+            int bufW;
+            int bufH;
+            int bufTopShadowColor;
+            int bufBotShadowColor;
+            int bufFgColor;
+            int bufBgColor;
+            int bufInvisible;
+            int bufNoEdit;
+            int bufCloseAction[maxDsps];
+            int bufSetPostion[maxDsps];
+            int bufAllowDups[maxDsps];
+            int bufCascade[maxDsps];
+            int bufPropagateMacros[maxDsps];
+            char bufDisplayFileName[maxDsps][127+1];
+            char bufSymbols[maxDsps][255+1];
+            int bufReplaceSymbols[maxDsps];
+            char bufButtonLabel[127+1];
+            char bufLabel[maxDsps][127+1];
+            char bufFontTag[63+1];
+            char bufColorPvName[PV_Factory::MAX_PV_NAME+1];
+            char bufDestPvName[NUMPVS][PV_Factory::MAX_PV_NAME+1];
+            char bufSource[NUMPVS][39+1];
+            char bufEnabPvName[PV_Factory::MAX_PV_NAME+1];
+            int bufOfsX;
+            int bufOfsY;
+            int bufButton3Popup;
+            int bufIcon;
+            } bufType, *bufPtr;
 
-		colorButtonClass fgCb, bgCb, topShadowCb, botShadowCb;
+        colorButtonClass fgCb, bgCb, topShadowCb, botShadowCb;
 
-		int numDsps, dspIndex;
+        int numDsps, dspIndex;
 
-		bufPtr buf;
+        bufPtr buf;
 
-		activeWindowClass *aw;
-		int useFocus, needClose, needConnect, needUpdate, needRefresh;
-		int needToDrawUnconnected, needToEraseUnconnected;
-		int unconnectedTimer;
+        activeWindowClass *aw;
+        int useFocus, needClose, needConnect, needUpdate, needRefresh;
+        int needToDrawUnconnected, needToEraseUnconnected;
+        int unconnectedTimer;
 
-		int topShadowColor;
-		int botShadowColor;
-		pvColorClass fgColor, bgColor;
-		int invisible, noEdit;
+        int topShadowColor;
+        int botShadowColor;
+        pvColorClass fgColor, bgColor;
+        int invisible, noEdit;
 
-		int closeAction[maxDsps];
-		int setPostion[maxDsps];
-		int allowDups[maxDsps];
-		int cascade[maxDsps];
-		int propagateMacros[maxDsps];
+        int closeAction[maxDsps];
+        int setPostion[maxDsps];
+        int allowDups[maxDsps];
+        int cascade[maxDsps];
+        int propagateMacros[maxDsps];
 
-		expStringClass displayFileName[maxDsps];
+        expStringClass displayFileName[maxDsps];
 
-		expStringClass symbolsExpStr[maxDsps];
-		char symbols[maxDsps][255+1];
+        expStringClass symbolsExpStr[maxDsps];
+        char symbols[maxDsps][255+1];
 
-		int replaceSymbols[maxDsps]; // else append
+        int replaceSymbols[maxDsps]; // else append
 
-		expStringClass buttonLabel;
+        expStringClass buttonLabel;
 
-		expStringClass label[maxDsps];
+        expStringClass label[maxDsps];
 
-		fontMenuClass fm;
-		char fontTag[63+1];
-		XmFontList fontList;
-		XFontStruct *fs;
-		int fontAscent, fontDescent, fontHeight;
+        fontMenuClass fm;
+        char fontTag[63+1];
+        XmFontList fontList;
+        XFontStruct *fs;
+        int fontAscent, fontDescent, fontHeight;
 
-		ProcessVariable *colorPvId, *enabPvId, *destPvId[NUMPVS];
-		int initialConnection[NUMPVS];
+        ProcessVariable *colorPvId, *enabPvId, *destPvId[NUMPVS];
+        int initialConnection[NUMPVS];
 
-		objAndIndexType objAndIndex[NUMPVS];
+        objAndIndexType objAndIndex[NUMPVS];
 
-		int opComplete[NUMPVS], singleOpComplete,
-		    colorExists, enabExists, destExists[NUMPVS],
-		    atLeastOneExists, destType[NUMPVS];
+        int opComplete[NUMPVS], singleOpComplete,
+            colorExists, enabExists, destExists[NUMPVS],
+            atLeastOneExists, destType[NUMPVS];
 
-		static const int enabPvConnection = 2;
-		pvConnectionClass connection;
+        static const int enabPvConnection = 2;
+        pvConnectionClass connection;
 
-		expStringClass colorPvExpString;
+        expStringClass colorPvExpString;
 
-		expStringClass destPvExpString[NUMPVS];
+        expStringClass destPvExpString[NUMPVS];
 
-		expStringClass sourceExpString[NUMPVS];
+        expStringClass sourceExpString[NUMPVS];
 
-		expStringClass enabPvExpString;
-		
-		int activeMode, active, init;
+        expStringClass enabPvExpString;
+        
+        int activeMode, active, init;
 
-		Widget popUpMenu, pullDownMenu, pb[maxDsps];
+        Widget popUpMenu, pullDownMenu, pb[maxDsps];
 
-		entryFormClass *ef1;
+        entryFormClass *ef1;
 
-		int posX, posY;
+        int posX, posY;
 
-		int ofsX, ofsY;
+        int ofsX, ofsY;
 
-		int button3Popup;
+        int button3Popup;
 
-		int icon;
-		
-	public:
+        int icon;
+        
+    public:
 
-		ExtendedRelatedDisplayClass ( void );
+        ExtendedRelatedDisplayClass ( void );
 
-		ExtendedRelatedDisplayClass( const ExtendedRelatedDisplayClass *source );
+        ExtendedRelatedDisplayClass( const ExtendedRelatedDisplayClass *source );
 
-		~ExtendedRelatedDisplayClass ( void );
+        ~ExtendedRelatedDisplayClass ( void );
 
-		char *objName ( void ) { return name;}
+        char *objName ( void ) { return name;}
 
-		int createInteractive ( activeWindowClass *aw_obj, int x, int y, int w, int h );
+        int createInteractive ( activeWindowClass *aw_obj, int x, int y, int w, int h );
 
-		int save ( FILE *f );
+        int save ( FILE *f );
 
-		int old_save ( FILE *f );
+        int old_save ( FILE *f );
 
-		int createFromFile ( FILE *fptr, char *name, activeWindowClass *actWin );
+        int createFromFile ( FILE *fptr, char *name, activeWindowClass *actWin );
 
-		int old_createFromFile ( FILE *fptr, char *name, activeWindowClass *actWin );
+        int old_createFromFile ( FILE *fptr, char *name, activeWindowClass *actWin );
 
-		int importFromXchFile ( FILE *f, char *name, activeWindowClass *_actWin );
+        int importFromXchFile ( FILE *f, char *name, activeWindowClass *_actWin );
 
-		int createSpecial ( char *fname, activeWindowClass *_actWin );
+        int createSpecial ( char *fname, activeWindowClass *_actWin );
 
-		void sendMsg ( char *param );
+        void sendMsg ( char *param );
 
-		int genericEdit ( void );
+        int genericEdit ( void );
 
-		int edit ( void );
+        int edit ( void );
 
-		int editCreate ( void );
+        int editCreate ( void );
 
-		int draw ( void );
+        int draw ( void );
 
-		int erase ( void );
+        int erase ( void );
 
-		int drawActive ( void );
+        int drawActive ( void );
 
-		int eraseActive ( void );
+        int eraseActive ( void );
 
-		int activate ( int pass, void *ptr );
+        int activate ( int pass, void *ptr );
 
-		int deactivate ( int pass );
+        int deactivate ( int pass );
 
-		void updateDimensions ( void );
+        void updateDimensions ( void );
 
-		int expand1st ( int numMacros, char *macros[], char *expansions[] );
+        int expand1st ( int numMacros, char *macros[], char *expansions[] );
 
-		int expand2nd ( int numMacros, char *macros[], char *expansions[] );
+        int expand2nd ( int numMacros, char *macros[], char *expansions[] );
 
-		int containsMacros ( void );
+        int containsMacros ( void );
 
-		void btnUp ( XButtonEvent *be, int x, int y, int buttonState, int buttonNumber, int *action );
+        void btnUp ( XButtonEvent *be, int x, int y, int buttonState, int buttonNumber, int *action );
 
-		void popupDisplay ( int index );
+        void popupDisplay ( int index );
 
-		void btnDown (
-		XButtonEvent *be,
-		int x,
-		int y,
-		int buttonState,
-		int buttonNumber,
-		int *action );
+        void btnDown (
+        XButtonEvent *be,
+        int x,
+        int y,
+        int buttonState,
+        int buttonNumber,
+        int *action );
 
-		int getButtonActionRequest (
-		int *up,
-		int *down,
-		int *drag,
-		int *focus );
+        int getButtonActionRequest (
+        int *up,
+        int *down,
+        int *drag,
+        int *focus );
 
-		void changeDisplayParams (
-		unsigned int flag,
-		char *fontTag,
-		int alignment,
-		char *ctlFontTag,
-		int ctlAlignment,
-		char *btnFontTag,
-		int btnAlignment,
-		int textFgColor,
-		int fg1Color,
-		int fg2Color,
-		int offsetColor,
-		int bgColor,
-		int topShadowColor,
-		int botShadowColor );
+        void changeDisplayParams (
+        unsigned int flag,
+        char *fontTag,
+        int alignment,
+        char *ctlFontTag,
+        int ctlAlignment,
+        char *btnFontTag,
+        int btnAlignment,
+        int textFgColor,
+        int fg1Color,
+        int fg2Color,
+        int offsetColor,
+        int bgColor,
+        int topShadowColor,
+        int botShadowColor );
 
-		void pointerIn (
-		XMotionEvent *me,
-		int _x,
-		int _y,
-		int buttonState );
+        void pointerIn (
+        XMotionEvent *me,
+        int _x,
+        int _y,
+        int buttonState );
 
-		void pointerOut (
-		XMotionEvent *me,
-		int _x,
-		int _y,
-		int buttonState );
+        void pointerOut (
+        XMotionEvent *me,
+        int _x,
+        int _y,
+        int buttonState );
 
-		void mousePointerIn (
-		XMotionEvent *me,
-		int _x,
-		int _y,
-		int buttonState );
+        void mousePointerIn (
+        XMotionEvent *me,
+        int _x,
+        int _y,
+        int buttonState );
 
-		void mousePointerOut (
-		XMotionEvent *me,
-		int _x,
-		int _y,
-		int buttonState );
+        void mousePointerOut (
+        XMotionEvent *me,
+        int _x,
+        int _y,
+        int buttonState );
 
-		void executeDeferred ( void );
+        void executeDeferred ( void );
 
-		static void enabPvConnectStateCallback (ProcessVariable *pv, void *userarg);
-		static void enabPvValueCallback (ProcessVariable *pv, void *userarg);
-		
-	};
+        static void enabPvConnectStateCallback (ProcessVariable *pv, void *userarg);
+        static void enabPvValueCallback (ProcessVariable *pv, void *userarg);
+        
+    };
 
 #ifdef __cplusplus
 extern "C" {
