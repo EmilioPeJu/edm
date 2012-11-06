@@ -24,7 +24,7 @@ static void wheelSwitchEventHandler(
   XtPointer client,
   XEvent *e,
   Boolean *continueToDispatch );
-  
+
 static void unconnectedTimeout (
   XtPointer client,
   XtIntervalId *id );
@@ -33,7 +33,7 @@ static void slc_edit_ok (
   Widget w,
   XtPointer client,
   XtPointer call );
-  
+
 static void slc_edit_apply (
   Widget w,
   XtPointer client,
@@ -53,11 +53,11 @@ static void slc_edit_update (
   Widget w,
   XtPointer client,
   XtPointer call );
-  
+
 static void sl_monitor_control_connect_state (
   ProcessVariable *pv,
   void *userarg );
-  
+
 static void xtdoCancelKp (
   Widget w,
   XtPointer client,
@@ -66,9 +66,9 @@ static void xtdoCancelKp (
 static void xtdoSetKpIntValue (
   Widget w,
   XtPointer client,
-  XtPointer call );  
-  
-static void setd ( int which, XtPointer client, int ud );  
+  XtPointer call );
+
+static void setd ( int which, XtPointer client, int ud );
 static void updown ( int which, XtPointer client, int ud );
 
 #endif
@@ -85,7 +85,7 @@ friend void wheelSwitchEventHandler(
   XtPointer client,
   XEvent *e,
   Boolean *continueToDispatch );
-  
+
 friend void unconnectedTimeout (
   XtPointer client,
   XtIntervalId *id );
@@ -94,7 +94,7 @@ friend void slc_edit_ok (
   Widget w,
   XtPointer client,
   XtPointer call );
-  
+
 friend void slc_edit_apply (
   Widget w,
   XtPointer client,
@@ -109,7 +109,7 @@ friend void slc_edit_cancel_delete (
   Widget w,
   XtPointer client,
   XtPointer call );
-  
+
 friend void slc_edit_update (
   Widget w,
   XtPointer client,
@@ -128,7 +128,7 @@ friend void xtdoSetKpIntValue (
   Widget w,
   XtPointer client,
   XtPointer call );
-  
+
 friend void setd ( int which, XtPointer client, int ud );
 friend void updown ( int which, XtPointer client, int ud );
 
@@ -244,7 +244,7 @@ int createInteractive (
   int y,
   int w,
   int h );
-  
+
 int save ( FILE *f );
 
 int createFromFile ( FILE *fptr, char *name, activeWindowClass *actWin );
@@ -273,12 +273,12 @@ int expand1st (
   int numMacros,
   char *macros[],
   char *expansions[] );
-  
+
 int expand2nd (
   int numMacros,
   char *macros[],
   char *expansions[] );
-  
+
 int containsMacros ( void );
 
 };

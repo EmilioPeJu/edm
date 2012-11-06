@@ -47,16 +47,16 @@ static void doBlink ( void *ptr )
 
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) ptr;
 
-    if ( !rdo->activeMode ) 
+    if ( !rdo->activeMode )
     {
-        if ( rdo->isSelected() ) rdo->drawSelectBoxCorners(); // erase via xor
-        rdo->smartDrawAll();
-        if ( rdo->isSelected() ) rdo->drawSelectBoxCorners();
+        if ( rdo->isSelected () ) rdo->drawSelectBoxCorners (); // erase via xor
+        rdo->smartDrawAll ();
+        if ( rdo->isSelected () ) rdo->drawSelectBoxCorners ();
     }
-    else 
+    else
     {
-        rdo->bufInvalidate();
-        rdo->smartDrawAllActive();
+        rdo->bufInvalidate ();
+        rdo->smartDrawAllActive ();
     }
 
 }
@@ -66,11 +66,11 @@ static void unconnectedTimeout ( XtPointer client, XtIntervalId *id )
 
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
-    if ( !rdo->init ) 
+    if ( !rdo->init )
     {
         rdo->needToDrawUnconnected = 1;
         rdo->needRefresh = 1;
-        rdo->actWin->addDefExeNode( rdo->aglPtr );
+        rdo->actWin->addDefExeNode ( rdo->aglPtr );
     }
 
     rdo->unconnectedTimer = 0;
@@ -82,11 +82,11 @@ static void menu_cb (  Widget w,  XtPointer client,  XtPointer call )
     int i;
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
-    for ( i=0; i<rdo->maxDsps; i++ ) 
+    for ( i=0; i<rdo->maxDsps; i++ )
     {
-        if ( w == rdo->pb[i] ) 
+        if ( w == rdo->pb[i] )
         {
-            rdo->popupDisplay( i );
+            rdo->popupDisplay ( i );
             return;
         }
     }
@@ -98,26 +98,26 @@ static void relDsp_monitor_dest_connect_state ( ProcessVariable *pv, void *usera
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) ptr->obj;
     int i = ptr->index;
 
-    if ( pv->is_valid() ) 
+    if ( pv->is_valid () )
     {
-        if ( !rdo->connection.pvsConnected() ) 
+        if ( !rdo->connection.pvsConnected () )
         {
-            rdo->connection.setPvConnected( (void *) ptr->index );
-            if ( rdo->connection.pvsConnected() ) 
+            rdo->connection.setPvConnected ( (void *) ptr->index );
+            if ( rdo->connection.pvsConnected () )
             {
-                rdo->actWin->appCtx->proc->lock();
-                rdo->destType[i] = (int) pv->get_type().type;
+                rdo->actWin->appCtx->proc->lock ();
+                rdo->destType[i] = (int) pv->get_type ().type;
                 rdo->needConnect = 1;
-                rdo->actWin->addDefExeNode( rdo->aglPtr );
-                rdo->actWin->appCtx->proc->unlock();
+                rdo->actWin->addDefExeNode ( rdo->aglPtr );
+                rdo->actWin->appCtx->proc->unlock ();
             }
-            else 
+            else
             {
-                rdo->connection.setPvDisconnected( (void *) ptr->index );
-                rdo->actWin->appCtx->proc->lock();
+                rdo->connection.setPvDisconnected ( (void *) ptr->index );
+                rdo->actWin->appCtx->proc->lock ();
                 rdo->needRefresh = 1;
-                rdo->actWin->addDefExeNode( rdo->aglPtr );
-                rdo->actWin->appCtx->proc->unlock();
+                rdo->actWin->addDefExeNode ( rdo->aglPtr );
+                rdo->actWin->appCtx->proc->unlock ();
             }
         }
     }
@@ -127,30 +127,30 @@ static void relDsp_monitor_color_connect_state ( ProcessVariable *pv,  void *use
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) userarg;
 
-    if ( pv->is_valid() ) 
+    if ( pv->is_valid () )
     {
-        if ( !rdo->connection.pvsConnected() ) 
+        if ( !rdo->connection.pvsConnected () )
         {
-            rdo->connection.setPvConnected( (void *) ExtendedRelatedDisplayClass::NUMPVS );
-            if ( rdo->connection.pvsConnected() ) 
+            rdo->connection.setPvConnected ( (void *) ExtendedRelatedDisplayClass::NUMPVS );
+            if ( rdo->connection.pvsConnected () )
             {
-                rdo->actWin->appCtx->proc->lock();
+                rdo->actWin->appCtx->proc->lock ();
                 rdo->needConnect = 1;
-                rdo->actWin->addDefExeNode( rdo->aglPtr );
-                rdo->actWin->appCtx->proc->unlock();
+                rdo->actWin->addDefExeNode ( rdo->aglPtr );
+                rdo->actWin->appCtx->proc->unlock ();
             }
         }
     }
-    else 
+    else
     {
-        rdo->connection.setPvDisconnected( (void *) ExtendedRelatedDisplayClass::NUMPVS );
-        rdo->fgColor.setDisconnected();
-        rdo->bgColor.setDisconnected();
-        rdo->actWin->appCtx->proc->lock();
+        rdo->connection.setPvDisconnected ( (void *) ExtendedRelatedDisplayClass::NUMPVS );
+        rdo->fgColor.setDisconnected ();
+        rdo->bgColor.setDisconnected ();
+        rdo->actWin->appCtx->proc->lock ();
         rdo->active = 0;
         rdo->needRefresh = 1;
-        rdo->actWin->addDefExeNode( rdo->aglPtr );
-        rdo->actWin->appCtx->proc->unlock();
+        rdo->actWin->addDefExeNode ( rdo->aglPtr );
+        rdo->actWin->appCtx->proc->unlock ();
     }
 }
 
@@ -158,31 +158,31 @@ static void relDsp_monitor_enab_connect_state ( ProcessVariable *pv,  void *user
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) userarg;
 
-    if ( pv->is_valid() ) 
+    if ( pv->is_valid () )
     {
-        if ( !rdo->connection.pvsConnected() ) 
+        if ( !rdo->connection.pvsConnected () )
         {
-            rdo->connection.setPvConnected( (void *) ExtendedRelatedDisplayClass::NUMPVS );
-            if ( rdo->connection.pvsConnected() ) 
+            rdo->connection.setPvConnected ( (void *) ExtendedRelatedDisplayClass::NUMPVS );
+            if ( rdo->connection.pvsConnected () )
             {
-                rdo->actWin->appCtx->proc->lock();
+                rdo->actWin->appCtx->proc->lock ();
                 rdo->needConnect = 1;
-                rdo->actWin->addDefExeNode( rdo->aglPtr );
-                rdo->actWin->appCtx->proc->unlock();
+                rdo->actWin->addDefExeNode ( rdo->aglPtr );
+                rdo->actWin->appCtx->proc->unlock ();
             }
         }
     }
-    else 
+    else
     {
-        rdo->connection.setPvDisconnected( (void *) ExtendedRelatedDisplayClass::NUMPVS );
+        rdo->connection.setPvDisconnected ( (void *) ExtendedRelatedDisplayClass::NUMPVS );
 // Should we have something in place of the next two lines?
-//      rdo->fgColor.setDisconnected();
-//      rdo->bgColor.setDisconnected();
-        rdo->actWin->appCtx->proc->lock();
+//      rdo->fgColor.setDisconnected ();
+//      rdo->bgColor.setDisconnected ();
+        rdo->actWin->appCtx->proc->lock ();
         rdo->active = 0;
         rdo->needRefresh = 1;
-        rdo->actWin->addDefExeNode( rdo->aglPtr );
-        rdo->actWin->appCtx->proc->unlock();
+        rdo->actWin->addDefExeNode ( rdo->aglPtr );
+        rdo->actWin->appCtx->proc->unlock ();
     }
 }
 
@@ -191,20 +191,20 @@ static void relDsp_color_value_update ( ProcessVariable *pv,  void *userarg )
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) userarg;
 
-    rdo->actWin->appCtx->proc->lock();
+    rdo->actWin->appCtx->proc->lock ();
     rdo->needUpdate = 1;
-    rdo->actWin->addDefExeNode( rdo->aglPtr );
-    rdo->actWin->appCtx->proc->unlock();
+    rdo->actWin->addDefExeNode ( rdo->aglPtr );
+    rdo->actWin->appCtx->proc->unlock ();
 }
 
 static void relDsp_enab_value_update ( ProcessVariable *pv,  void *userarg )
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) userarg;
 
-    rdo->actWin->appCtx->proc->lock();
+    rdo->actWin->appCtx->proc->lock ();
     rdo->needUpdate = 1;
-    rdo->actWin->addDefExeNode( rdo->aglPtr );
-    rdo->actWin->appCtx->proc->unlock();
+    rdo->actWin->addDefExeNode ( rdo->aglPtr );
+    rdo->actWin->appCtx->proc->unlock ();
 }
 
 static void rdc_edit_ok1 ( Widget w, XtPointer client, XtPointer call )
@@ -212,7 +212,7 @@ static void rdc_edit_ok1 ( Widget w, XtPointer client, XtPointer call )
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
     //rdc_edit_update1 ( w, client, call );
-    rdo->ef1->popdownNoDestroy();
+    rdo->ef1->popdownNoDestroy ();
 }
 
 static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
@@ -220,94 +220,94 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
     int i, more;
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
-    rdo->actWin->setChanged();
+    rdo->actWin->setChanged ();
 
-    rdo->eraseSelectBoxCorners();
-    rdo->erase();
+    rdo->eraseSelectBoxCorners ();
+    rdo->erase ();
 
-    rdo->displayFileName[0].setRaw( rdo->buf->bufDisplayFileName[0] );
-    if ( blank( rdo->displayFileName[0].getRaw() ) ) 
+    rdo->displayFileName[0].setRaw ( rdo->buf->bufDisplayFileName[0] );
+    if ( blank ( rdo->displayFileName[0].getRaw () ) )
     {
         rdo->closeAction[0]     = 0;
         rdo->setPostion[0]      = 0;
         rdo->allowDups[0]       = 0;
         rdo->cascade[0]         = 0;
         rdo->propagateMacros[0] = 1;
-        rdo->label[0].setRaw( "" );
-        rdo->symbolsExpStr[0].setRaw( "" );
+        rdo->label[0].setRaw ( "" );
+        rdo->symbolsExpStr[0].setRaw ( "" );
         rdo->replaceSymbols[0]  = 0;
         rdo->numDsps            = 0;
     }
-    else 
+    else
     {
         rdo->closeAction[0]     = rdo->buf->bufCloseAction[0];
         rdo->setPostion[0]      = rdo->buf->bufSetPostion[0];
         rdo->allowDups[0]       = rdo->buf->bufAllowDups[0];
         rdo->cascade[0]         = rdo->buf->bufCascade[0];
         rdo->propagateMacros[0] = rdo->buf->bufPropagateMacros[0];
-        rdo->label[0].setRaw( rdo->buf->bufLabel[0] );
-        rdo->symbolsExpStr[0].setRaw( rdo->buf->bufSymbols[0] );
+        rdo->label[0].setRaw ( rdo->buf->bufLabel[0] );
+        rdo->symbolsExpStr[0].setRaw ( rdo->buf->bufSymbols[0] );
         rdo->replaceSymbols[0]  = rdo->buf->bufReplaceSymbols[0];
         rdo->numDsps            = 1;
     }
 
-    if ( rdo->numDsps ) 
+    if ( rdo->numDsps )
     {
         more = 1;
-        for ( i=1; (i<rdo->maxDsps) && more; i++ ) 
+        for ( i=1; (i<rdo->maxDsps) && more; i++ )
         {
-            rdo->displayFileName[i].setRaw( rdo->buf->bufDisplayFileName[i] );
-            if ( blank( rdo->displayFileName[i].getRaw() ) ) 
+            rdo->displayFileName[i].setRaw ( rdo->buf->bufDisplayFileName[i] );
+            if ( blank ( rdo->displayFileName[i].getRaw () ) )
             {
                 rdo->closeAction[i] = 0;
                 rdo->setPostion[i] = 0;
                 rdo->allowDups[i] = 0;
                 rdo->cascade[i] = 0;
                 rdo->propagateMacros[i] = 1;
-                rdo->label[i].setRaw( "" );
-                rdo->symbolsExpStr[i].setRaw( "" );
+                rdo->label[i].setRaw ( "" );
+                rdo->symbolsExpStr[i].setRaw ( "" );
                 rdo->replaceSymbols[i] = 0;
                 more = 0;
             }
-            else 
+            else
             {
                 rdo->closeAction[i] = rdo->buf->bufCloseAction[i];
                 rdo->setPostion[i] = rdo->buf->bufSetPostion[i];
                 rdo->allowDups[i] = rdo->buf->bufAllowDups[i];
                 rdo->cascade[i] = rdo->buf->bufCascade[i];
                 rdo->propagateMacros[i] = rdo->buf->bufPropagateMacros[i];
-                rdo->label[i].setRaw( rdo->buf->bufLabel[i] );
-                rdo->symbolsExpStr[i].setRaw( rdo->buf->bufSymbols[i] );
+                rdo->label[i].setRaw ( rdo->buf->bufLabel[i] );
+                rdo->symbolsExpStr[i].setRaw ( rdo->buf->bufSymbols[i] );
                 rdo->replaceSymbols[i] = rdo->buf->bufReplaceSymbols[i];
                 (rdo->numDsps)++;
             }
         }
     }
 
-    for ( i=rdo->numDsps; i<rdo->maxDsps; i++ ) 
+    for ( i=rdo->numDsps; i<rdo->maxDsps; i++ )
     {
         rdo->closeAction[i] = 0;
         rdo->setPostion[i] = 0;
         rdo->allowDups[i] = 0;
         rdo->cascade[i] = 0;
         rdo->propagateMacros[i] = 1;
-        rdo->label[i].setRaw( "" );
-        rdo->symbolsExpStr[i].setRaw( "" );
+        rdo->label[i].setRaw ( "" );
+        rdo->symbolsExpStr[i].setRaw ( "" );
         rdo->replaceSymbols[i] = 0;
     }
 
-    strncpy( rdo->fontTag, rdo->fm.currentFontTag(), 63 );
-    rdo->actWin->fi->loadFontTag( rdo->fontTag );
-    rdo->actWin->drawGc.setFontTag( rdo->fontTag, rdo->actWin->fi );
-    rdo->actWin->fi->getTextFontList( rdo->fontTag, &rdo->fontList );
-    rdo->fs = rdo->actWin->fi->getXFontStruct( rdo->fontTag );
+    strncpy ( rdo->fontTag, rdo->fm.currentFontTag (), 63 );
+    rdo->actWin->fi->loadFontTag ( rdo->fontTag );
+    rdo->actWin->drawGc.setFontTag ( rdo->fontTag, rdo->actWin->fi );
+    rdo->actWin->fi->getTextFontList ( rdo->fontTag, &rdo->fontList );
+    rdo->fs = rdo->actWin->fi->getXFontStruct ( rdo->fontTag );
 
     rdo->topShadowColor = rdo->buf->bufTopShadowColor;
     rdo->botShadowColor = rdo->buf->bufBotShadowColor;
 
-    rdo->fgColor.setColorIndex( rdo->buf->bufFgColor, rdo->actWin->ci );
+    rdo->fgColor.setColorIndex ( rdo->buf->bufFgColor, rdo->actWin->ci );
 
-    rdo->bgColor.setColorIndex( rdo->buf->bufBgColor, rdo->actWin->ci );
+    rdo->bgColor.setColorIndex ( rdo->buf->bufBgColor, rdo->actWin->ci );
 
     rdo->invisible = rdo->buf->bufInvisible;
 
@@ -319,11 +319,11 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
 
     rdo->useFocus = rdo->buf->bufUseFocus;
 
-    if ( !rdo->useFocus ) 
+    if ( !rdo->useFocus )
     {
         rdo->button3Popup = rdo->buf->bufButton3Popup;
     }
-    else 
+    else
     {
         rdo->button3Popup = 0;
     }
@@ -342,25 +342,25 @@ static void rdc_edit_update (  Widget w, XtPointer client, XtPointer call )
     rdo->h = rdo->buf->bufH;
     rdo->sboxH = rdo->buf->bufH;
 
-    rdo->buttonLabel.setRaw( rdo->buf->bufButtonLabel );
+    rdo->buttonLabel.setRaw ( rdo->buf->bufButtonLabel );
 
-    for ( i=0; i<rdo->NUMPVS; i++ ) 
+    for ( i=0; i<rdo->NUMPVS; i++ )
     {
-        rdo->destPvExpString[i].setRaw( rdo->buf->bufDestPvName[i] );
-        rdo->sourceExpString[i].setRaw( rdo->buf->bufSource[i] );
+        rdo->destPvExpString[i].setRaw ( rdo->buf->bufDestPvName[i] );
+        rdo->sourceExpString[i].setRaw ( rdo->buf->bufSource[i] );
     }
 
-    rdo->colorPvExpString.setRaw( rdo->buf->bufColorPvName );
-    rdo->enabPvExpString.setRaw( rdo->buf->bufEnabPvName );
+    rdo->colorPvExpString.setRaw ( rdo->buf->bufColorPvName );
+    rdo->enabPvExpString.setRaw ( rdo->buf->bufEnabPvName );
 
-    rdo->updateDimensions();
+    rdo->updateDimensions ();
 }
 
 static void rdc_edit_apply (Widget w, XtPointer client, XtPointer call )
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
     rdc_edit_update ( w, client, call );
-    rdo->refresh( rdo );
+    rdo->refresh ( rdo );
 }
 
 static void rdc_edit_ok ( Widget w, XtPointer client, XtPointer call )
@@ -368,8 +368,8 @@ static void rdc_edit_ok ( Widget w, XtPointer client, XtPointer call )
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
     rdc_edit_update ( w, client, call );
-    rdo->ef.popdown();
-    rdo->operationComplete();
+    rdo->ef.popdown ();
+    rdo->operationComplete ();
 
     delete rdo->buf;
     rdo->buf = NULL;
@@ -379,8 +379,8 @@ static void rdc_edit_cancel ( Widget w, XtPointer client, XtPointer call )
 {
     ExtendedRelatedDisplayClass *rdo = (ExtendedRelatedDisplayClass *) client;
 
-    rdo->ef.popdown();
-    rdo->operationCancel();
+    rdo->ef.popdown ();
+    rdo->operationCancel ();
 
     delete rdo->buf;
     rdo->buf = NULL;
@@ -393,21 +393,21 @@ static void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call 
     delete rdo->buf;
     rdo->buf = NULL;
 
-    rdo->ef.popdown();
-    rdo->operationCancel();
-    rdo->erase();
+    rdo->ef.popdown ();
+    rdo->operationCancel ();
+    rdo->erase ();
     rdo->deleteRequest = 1;
-    rdo->drawAll();
+    rdo->drawAll ();
 
 }
 
-ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void ) 
+ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void )
 {
 
     int i;
 
-    name = new char[strlen("ExtendedRelatedDisplayClass")+1];
-    strcpy( name, "ExtendedRelatedDisplayClass" );
+    name = new char[strlen ("ExtendedRelatedDisplayClass")+1];
+    strcpy ( name, "ExtendedRelatedDisplayClass" );
 
     activeMode = 0;
     invisible = 0;
@@ -418,7 +418,7 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void )
     button3Popup = 0;
     icon = 0;
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
         closeAction[i] = 0;
         setPostion[i] = 0;
@@ -436,27 +436,27 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( void )
 
     unconnectedTimer = 0;
 
-    connection.setMaxPvs( NUMPVS + 1 );
+    connection.setMaxPvs ( NUMPVS + 1 );
 
-    setBlinkFunction( (void *) doBlink );
+    setBlinkFunction ( (void *) doBlink );
 
 }
 
-ExtendedRelatedDisplayClass::~ExtendedRelatedDisplayClass ( void ) 
+ExtendedRelatedDisplayClass::~ExtendedRelatedDisplayClass ( void )
 {
     int                     okToClose;
     activeWindowListPtr     cur;
 
-    /*   printf( "In ExtendedRelatedDisplayClass::~ExtendedRelatedDisplayClass\n" ); */
+    /*   printf ( "In ExtendedRelatedDisplayClass::~ExtendedRelatedDisplayClass\n" ); */
 
-    if ( aw ) 
+    if ( aw )
     {
         okToClose = 0;
         // make sure the window is currently in list
         cur = actWin->appCtx->head->flink;
-        while ( cur != actWin->appCtx->head ) 
+        while ( cur != actWin->appCtx->head )
         {
-            if ( &cur->node == aw ) 
+            if ( &cur->node == aw )
             {
                 okToClose = 1;
                 break;
@@ -464,45 +464,45 @@ ExtendedRelatedDisplayClass::~ExtendedRelatedDisplayClass ( void )
             cur = cur->flink;
         }
 
-        if ( okToClose ) 
+        if ( okToClose )
         {
-            aw->returnToEdit( 1 );
+            aw->returnToEdit ( 1 );
             aw = NULL;
         }
     }
 
-    if ( name ) 
+    if ( name )
         delete[] name;
-    if ( fontList ) 
-        XmFontListFree( fontList );
-    if ( buf ) 
+    if ( fontList )
+        XmFontListFree ( fontList );
+    if ( buf )
     {
         delete buf;
         buf = NULL;
     }
 
-    if ( unconnectedTimer ) 
+    if ( unconnectedTimer )
     {
-        XtRemoveTimeOut( unconnectedTimer );
+        XtRemoveTimeOut ( unconnectedTimer );
         unconnectedTimer = 0;
     }
-    updateBlink( 0 );
+    updateBlink ( 0 );
 }
 
 // copy constructor
-ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass( const ExtendedRelatedDisplayClass *source ) 
+ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass ( const ExtendedRelatedDisplayClass *source )
 {
     int i;
     activeGraphicClass *rdo = (activeGraphicClass *) this;
 
-    rdo->clone( (activeGraphicClass *) source );
+    rdo->clone ( (activeGraphicClass *) source );
 
-    name = new char[strlen("ExtendedRelatedDisplayClass")+1];
-    strcpy( name, "ExtendedRelatedDisplayClass" );
+    name = new char[strlen ("ExtendedRelatedDisplayClass")+1];
+    strcpy ( name, "ExtendedRelatedDisplayClass" );
 
-    strncpy( fontTag, source->fontTag, 63 );
-    fs = actWin->fi->getXFontStruct( fontTag );
-    actWin->fi->getTextFontList( fontTag, &fontList );
+    strncpy ( fontTag, source->fontTag, 63 );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    actWin->fi->getTextFontList ( fontTag, &fontList );
 
     fontAscent = source->fontAscent;
     fontDescent = source->fontDescent;
@@ -511,8 +511,8 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass( const ExtendedRelatedD
     topShadowColor = source->topShadowColor;
     botShadowColor = source->botShadowColor;
 
-    fgColor.copy(source->fgColor);
-    bgColor.copy(source->bgColor);
+    fgColor.copy (source->fgColor);
+    bgColor.copy (source->bgColor);
 
     invisible = source->invisible;
     ofsX = source->ofsX;
@@ -522,49 +522,49 @@ ExtendedRelatedDisplayClass::ExtendedRelatedDisplayClass( const ExtendedRelatedD
     button3Popup = source->button3Popup;
     icon = source->icon;
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
         closeAction[i] = source->closeAction[i];
         setPostion[i] = source->setPostion[i];
         allowDups[i] = source->allowDups[i];
         cascade[i] = source->cascade[i];
         propagateMacros[i] = source->propagateMacros[i];
-        displayFileName[i].copy( source->displayFileName[i] );
-        //strncpy( displayFileName[i], source->displayFileName[i], 127 );
-        label[i].copy( source->label[i] );
-        // strncpy( label[i], source->label[i], 127 );
-        symbolsExpStr[i].copy( source->symbolsExpStr[i] );
-        // strncpy( symbols[i], source->symbols[i], 255 );
+        displayFileName[i].copy ( source->displayFileName[i] );
+        //strncpy ( displayFileName[i], source->displayFileName[i], 127 );
+        label[i].copy ( source->label[i] );
+        // strncpy ( label[i], source->label[i], 127 );
+        symbolsExpStr[i].copy ( source->symbolsExpStr[i] );
+        // strncpy ( symbols[i], source->symbols[i], 255 );
         replaceSymbols[i] = source->replaceSymbols[i];
     }
 
     numDsps = source->numDsps;
 
-    buttonLabel.copy( source->buttonLabel );
+    buttonLabel.copy ( source->buttonLabel );
 
     activeMode = 0;
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        destPvExpString[i].copy( source->destPvExpString[i] );
-        sourceExpString[i].copy( source->sourceExpString[i] );
+        destPvExpString[i].copy ( source->destPvExpString[i] );
+        sourceExpString[i].copy ( source->sourceExpString[i] );
     }
 
-    colorPvExpString.copy( source->colorPvExpString );
-    enabPvExpString.copy( source->enabPvExpString );
+    colorPvExpString.copy ( source->colorPvExpString );
+    enabPvExpString.copy ( source->enabPvExpString );
 
     aw = NULL;
     buf = NULL;
 
     unconnectedTimer = 0;
 
-    connection.setMaxPvs( NUMPVS + 1 );
+    connection.setMaxPvs ( NUMPVS + 1 );
 
-    setBlinkFunction( (void *) doBlink );
+    setBlinkFunction ( (void *) doBlink );
 
 }
 
-int ExtendedRelatedDisplayClass::createInteractive ( activeWindowClass *aw_obj, int _x, int _y, int _w, int _h ) 
+int ExtendedRelatedDisplayClass::createInteractive ( activeWindowClass *aw_obj, int _x, int _y, int _w, int _h )
 {
     actWin  = (activeWindowClass *) aw_obj;
     x           = _x;
@@ -572,22 +572,22 @@ int ExtendedRelatedDisplayClass::createInteractive ( activeWindowClass *aw_obj, 
     w           = _w;
     h           = _h;
 
-    strcpy( fontTag, actWin->defaultBtnFontTag );
-    actWin->fi->loadFontTag( fontTag );
-    fs = actWin->fi->getXFontStruct( fontTag );
-    actWin->fi->getTextFontList( fontTag, &fontList );
+    strcpy ( fontTag, actWin->defaultBtnFontTag );
+    actWin->fi->loadFontTag ( fontTag );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    actWin->fi->getTextFontList ( fontTag, &fontList );
 
-    updateDimensions();
+    updateDimensions ();
 
     topShadowColor = actWin->defaultTopShadowColor;
     botShadowColor = actWin->defaultBotShadowColor;
 
-    fgColor.setColorIndex( actWin->defaultTextFgColor, actWin->ci );
-    bgColor.setColorIndex( actWin->defaultBgColor, actWin->ci );
+    fgColor.setColorIndex ( actWin->defaultTextFgColor, actWin->ci );
+    bgColor.setColorIndex ( actWin->defaultBgColor, actWin->ci );
 
-    this->draw();
+    this->draw ();
 
-    this->editCreate();
+    this->editCreate ();
 
     return 1;
 }
@@ -602,13 +602,13 @@ int ExtendedRelatedDisplayClass::save ( FILE *f )
     char *emptyStr = "";
 
     int setPosOriginal = 0;
-    static char *setPosEnumStr[3] = 
+    static char *setPosEnumStr[3] =
     {
         "original",
         "button",
         "parentWindow"
     };
-    static int setPosEnum[3] = 
+    static int setPosEnum[3] =
     {
         0,
         1,
@@ -621,7 +621,7 @@ int ExtendedRelatedDisplayClass::save ( FILE *f )
 
     numPvs = NUMPVS;
 
-    tag.init();
+    tag.init ();
     tag.loadW( "beginObjectProperties" );
     tag.loadW( "major", &major );
     tag.loadW( "minor", &minor );
@@ -649,7 +649,7 @@ int ExtendedRelatedDisplayClass::save ( FILE *f )
     tag.loadW( "displayFileName", displayFileName, numDsps, emptyStr );
     tag.loadW( "menuLabel", label, numDsps, emptyStr );
     tag.loadW( "closeAction", closeAction, numDsps, &zero );
-    tag.loadW( "setPosition", 3, setPosEnumStr, setPosEnum, setPostion, 
+    tag.loadW( "setPosition", 3, setPosEnumStr, setPosEnum, setPostion,
         numDsps, &setPosOriginal );
     tag.loadW( "allowDups", allowDups, numDsps, &zero );
     //tag.loadW( "cascade", cascade, numDsps, &zero );
@@ -663,7 +663,7 @@ int ExtendedRelatedDisplayClass::save ( FILE *f )
     tag.loadW( "endObjectProperties" );
     tag.loadW( "" );
 
-    stat = tag.writeTags( f );
+    stat = tag.writeTags ( f );
 
     return (stat);
 }
@@ -672,141 +672,141 @@ int ExtendedRelatedDisplayClass::old_save ( FILE *f )
 {
     int i, index;
 
-    fprintf( f, "%-d %-d %-d\n", RDC_MAJOR_VERSION, RDC_MINOR_VERSION,
+    fprintf ( f, "%-d %-d %-d\n", RDC_MAJOR_VERSION, RDC_MINOR_VERSION,
         RDC_RELEASE );
 
-    fprintf( f, "%-d\n", x );
-    fprintf( f, "%-d\n", y );
-    fprintf( f, "%-d\n", w );
-    fprintf( f, "%-d\n", h );
+    fprintf ( f, "%-d\n", x );
+    fprintf ( f, "%-d\n", y );
+    fprintf ( f, "%-d\n", w );
+    fprintf ( f, "%-d\n", h );
 
-    index = fgColor.pixelIndex();
-    actWin->ci->writeColorIndex( f, index );
-    //fprintf( f, "%-d\n", index );
+    index = fgColor.pixelIndex ();
+    actWin->ci->writeColorIndex ( f, index );
+    //fprintf ( f, "%-d\n", index );
 
-    index = bgColor.pixelIndex();
-    actWin->ci->writeColorIndex( f, index );
-    //fprintf( f, "%-d\n", index );
+    index = bgColor.pixelIndex ();
+    actWin->ci->writeColorIndex ( f, index );
+    //fprintf ( f, "%-d\n", index );
 
     index = topShadowColor;
-    actWin->ci->writeColorIndex( f, index );
-    //fprintf( f, "%-d\n", index );
+    actWin->ci->writeColorIndex ( f, index );
+    //fprintf ( f, "%-d\n", index );
 
     index = botShadowColor;
-    actWin->ci->writeColorIndex( f, index );
-    //fprintf( f, "%-d\n", index );
+    actWin->ci->writeColorIndex ( f, index );
+    //fprintf ( f, "%-d\n", index );
 
-    if ( displayFileName[0].getRaw() )
-        writeStringToFile( f, displayFileName[0].getRaw() );
+    if ( displayFileName[0].getRaw () )
+        writeStringToFile ( f, displayFileName[0].getRaw () );
     else
-        writeStringToFile( f, "" );
+        writeStringToFile ( f, "" );
 
-    if ( label[0].getRaw() )
-        writeStringToFile( f, label[0].getRaw() );
+    if ( label[0].getRaw () )
+        writeStringToFile ( f, label[0].getRaw () );
     else
-        writeStringToFile( f, "" );
+        writeStringToFile ( f, "" );
 
-    writeStringToFile( f, fontTag );
+    writeStringToFile ( f, fontTag );
 
-    fprintf( f, "%-d\n", invisible );
+    fprintf ( f, "%-d\n", invisible );
 
-    fprintf( f, "%-d\n", closeAction[0] );
+    fprintf ( f, "%-d\n", closeAction[0] );
 
-    fprintf( f, "%-d\n", setPostion[0] );
+    fprintf ( f, "%-d\n", setPostion[0] );
 
-    fprintf( f, "%-d\n", NUMPVS );
+    fprintf ( f, "%-d\n", NUMPVS );
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        if ( destPvExpString[i].getRaw() ) 
+        if ( destPvExpString[i].getRaw () )
         {
-            writeStringToFile( f, destPvExpString[i].getRaw() );
+            writeStringToFile ( f, destPvExpString[i].getRaw () );
         }
-        else 
-        {
-            writeStringToFile( f, "" );
-        }
-        if ( sourceExpString[i].getRaw() ) 
-        {
-            writeStringToFile( f, sourceExpString[i].getRaw() );
-        }
-        else 
-        {
-            writeStringToFile( f, "" );
-        }
-    }
-
-    fprintf( f, "%-d\n", allowDups[0] );
-
-    fprintf( f, "%-d\n", cascade[0] );
-
-    if ( symbolsExpStr[0].getRaw() ) 
-    {
-        writeStringToFile( f, symbolsExpStr[0].getRaw() );
-    }
-    else 
-    {
-        writeStringToFile( f, "" );
-    }
-
-    fprintf( f, "%-d\n", replaceSymbols[0] );
-
-    fprintf( f, "%-d\n", propagateMacros[0] );
-
-    fprintf( f, "%-d\n", useFocus );
-
-    fprintf( f, "%-d\n", numDsps );
-
-    for ( i=1; i<numDsps; i++ ) 
-    {
-        if ( displayFileName[i].getRaw() )
-            writeStringToFile( f, displayFileName[i].getRaw() );
         else
-            writeStringToFile( f, "" );
-
-        if ( label[i].getRaw() )
-            writeStringToFile( f, label[i].getRaw() );
+        {
+            writeStringToFile ( f, "" );
+        }
+        if ( sourceExpString[i].getRaw () )
+        {
+            writeStringToFile ( f, sourceExpString[i].getRaw () );
+        }
         else
-            writeStringToFile( f, "" );
-
-        fprintf( f, "%-d\n", closeAction[i] );
-
-        fprintf( f, "%-d\n", setPostion[i] );
-
-        fprintf( f, "%-d\n", allowDups[i] );
-
-        fprintf( f, "%-d\n", cascade[i] );
-
-        if ( symbolsExpStr[i].getRaw() ) 
         {
-            writeStringToFile( f, symbolsExpStr[i].getRaw() );
+            writeStringToFile ( f, "" );
         }
-        else 
+    }
+
+    fprintf ( f, "%-d\n", allowDups[0] );
+
+    fprintf ( f, "%-d\n", cascade[0] );
+
+    if ( symbolsExpStr[0].getRaw () )
+    {
+        writeStringToFile ( f, symbolsExpStr[0].getRaw () );
+    }
+    else
+    {
+        writeStringToFile ( f, "" );
+    }
+
+    fprintf ( f, "%-d\n", replaceSymbols[0] );
+
+    fprintf ( f, "%-d\n", propagateMacros[0] );
+
+    fprintf ( f, "%-d\n", useFocus );
+
+    fprintf ( f, "%-d\n", numDsps );
+
+    for ( i=1; i<numDsps; i++ )
+    {
+        if ( displayFileName[i].getRaw () )
+            writeStringToFile ( f, displayFileName[i].getRaw () );
+        else
+            writeStringToFile ( f, "" );
+
+        if ( label[i].getRaw () )
+            writeStringToFile ( f, label[i].getRaw () );
+        else
+            writeStringToFile ( f, "" );
+
+        fprintf ( f, "%-d\n", closeAction[i] );
+
+        fprintf ( f, "%-d\n", setPostion[i] );
+
+        fprintf ( f, "%-d\n", allowDups[i] );
+
+        fprintf ( f, "%-d\n", cascade[i] );
+
+        if ( symbolsExpStr[i].getRaw () )
         {
-            writeStringToFile( f, "" );
+            writeStringToFile ( f, symbolsExpStr[i].getRaw () );
+        }
+        else
+        {
+            writeStringToFile ( f, "" );
         }
 
-        fprintf( f, "%-d\n", replaceSymbols[i] );
+        fprintf ( f, "%-d\n", replaceSymbols[i] );
 
-        fprintf( f, "%-d\n", propagateMacros[i] );
+        fprintf ( f, "%-d\n", propagateMacros[i] );
     }
 
-    if ( buttonLabel.getRaw() ) 
+    if ( buttonLabel.getRaw () )
     {
-        writeStringToFile( f, buttonLabel.getRaw() );
+        writeStringToFile ( f, buttonLabel.getRaw () );
     }
-    else 
+    else
     {
-        writeStringToFile( f, "" );
+        writeStringToFile ( f, "" );
     }
 
-    fprintf( f, "%-d\n", noEdit );
+    fprintf ( f, "%-d\n", noEdit );
 
-    fprintf( f, "%-d\n", ofsX );
+    fprintf ( f, "%-d\n", ofsX );
 
-    fprintf( f, "%-d\n", ofsY );
+    fprintf ( f, "%-d\n", ofsY );
 
-    fprintf( f, "%-d\n", button3Popup );
+    fprintf ( f, "%-d\n", button3Popup );
 
     return 1;
 }
@@ -822,13 +822,13 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
     char *emptyStr = "";
 
     int setPosOriginal = 0;
-    static char *setPosEnumStr[3] = 
+    static char *setPosEnumStr[3] =
     {
         "original",
         "button",
         "parentWindow"
     };
-    static int setPosEnum[3] = 
+    static int setPosEnum[3] =
     {
         0,
         1,
@@ -841,7 +841,7 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
 
     this->actWin = _actWin;
 
-    tag.init();
+    tag.init ();
     tag.loadR( "beginObjectProperties" );
     tag.loadR( "major", &major );
     tag.loadR( "minor", &minor );
@@ -869,7 +869,7 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
     tag.loadR( "displayFileName", maxDsps, displayFileName, &n2, emptyStr );
     tag.loadR( "menuLabel", maxDsps, label, &n2, emptyStr );
     tag.loadR( "closeAction", maxDsps, closeAction, &n2, &zero );
-    tag.loadR( "setPosition", 3, setPosEnumStr, setPosEnum, maxDsps, setPostion, 
+    tag.loadR( "setPosition", 3, setPosEnumStr, setPosEnum, maxDsps, setPostion,
         &n2, &setPosOriginal );
     tag.loadR( "allowDups", maxDsps, allowDups, &n2, &zero );
     tag.loadR( "cascade", maxDsps, cascade, &n2, &zero );
@@ -884,40 +884,40 @@ int ExtendedRelatedDisplayClass::createFromFile ( FILE *f, char *name, activeWin
 
     stat = tag.loadR( "endObjectProperties" );
 
-    stat = tag.readTags( f, "endObjectProperties" );
+    stat = tag.readTags ( f, "endObjectProperties" );
 
-    if ( !( stat & 1 ) ) 
+    if ( !( stat & 1 ) )
     {
-        actWin->appCtx->postMessage( tag.errMsg() );
+        actWin->appCtx->postMessage ( tag.errMsg () );
     }
 
-    if ( major > RDC_MAJOR_VERSION ) 
+    if ( major > RDC_MAJOR_VERSION )
     {
-        postIncompatable();
+        postIncompatable ();
         return 0;
     }
 
-    if ( major < 4 ) 
+    if ( major < 4 )
     {
-        postIncompatable();
+        postIncompatable ();
         return 0;
     }
 
-    this->initSelectBox(); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x,y,w,h
 
-    for ( i=numPvs; i<NUMPVS; i++ ) 
+    for ( i=numPvs; i<NUMPVS; i++ )
     {
-        destPvExpString[i].setRaw( "" );
-        sourceExpString[i].setRaw( "" );
+        destPvExpString[i].setRaw ( "" );
+        sourceExpString[i].setRaw ( "" );
     }
 
-    actWin->fi->loadFontTag( fontTag );
-    actWin->drawGc.setFontTag( fontTag, actWin->fi );
+    actWin->fi->loadFontTag ( fontTag );
+    actWin->drawGc.setFontTag ( fontTag, actWin->fi );
 
-    fs = actWin->fi->getXFontStruct( fontTag );
-    actWin->fi->getTextFontList( fontTag, &fontList );
+    fs = actWin->fi->getXFontStruct ( fontTag );
+    actWin->fi->getTextFontList ( fontTag, &fontList );
 
-    updateDimensions();
+    updateDimensions ();
 
     return (stat);
 }
@@ -932,28 +932,28 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     this->actWin = _actWin;
 
-    fscanf( f, "%d %d %d\n", &major, &minor, &release ); actWin->incLine();
+    fscanf ( f, "%d %d %d\n", &major, &minor, &release ); actWin->incLine ();
 
-    if ( major > RDC_MAJOR_VERSION ) 
+    if ( major > RDC_MAJOR_VERSION )
     {
-        postIncompatable();
+        postIncompatable ();
         return 0;
     }
 
-    fscanf( f, "%d\n", &x ); actWin->incLine();
-    fscanf( f, "%d\n", &y ); actWin->incLine();
-    fscanf( f, "%d\n", &w ); actWin->incLine();
-    fscanf( f, "%d\n", &h ); actWin->incLine();
+    fscanf ( f, "%d\n", &x ); actWin->incLine ();
+    fscanf ( f, "%d\n", &y ); actWin->incLine ();
+    fscanf ( f, "%d\n", &w ); actWin->incLine ();
+    fscanf ( f, "%d\n", &h ); actWin->incLine ();
 
-    this->initSelectBox(); // call after getting x,y,w,h
+    this->initSelectBox (); // call after getting x,y,w,h
 
-    if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 4 ) ) ) 
+    if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 4 ) ) )
     {
-        actWin->ci->readColorIndex( f, &index );
-        actWin->incLine(); actWin->incLine();
-        fgColor.setColorIndex( index, actWin->ci );
+        actWin->ci->readColorIndex ( f, &index );
+        actWin->incLine (); actWin->incLine ();
+        fgColor.setColorIndex ( index, actWin->ci );
 
-        actWin->ci->readColorIndex( f, &index );
+        actWin->ci->readColorIndex ( f, &index );
         actWin->incLine(); actWin->incLine();
         bgColor.setColorIndex( index, actWin->ci );
 
@@ -965,7 +965,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         actWin->incLine(); actWin->incLine();
         botShadowColor = index;
     }
-    else if ( major > 1 ) 
+    else if ( major > 1 )
     {
         fscanf( f, "%d\n", &index ); actWin->incLine();
         fgColor.setColorIndex( index, actWin->ci );
@@ -979,10 +979,10 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         fscanf( f, "%d\n", &index ); actWin->incLine();
         botShadowColor = index;
     }
-    else 
+    else
     {
         fscanf( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine();
-        if ( ( major < 2 ) && ( minor < 2 ) ) 
+        if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
@@ -992,9 +992,9 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         index = actWin->ci->pixIndex( pixel );
         fgColor.setColorIndex( index, actWin->ci );
 
-        fscanf( f, "%d %d %d\n", &r, &g, &b ); 
+        fscanf( f, "%d %d %d\n", &r, &g, &b );
         actWin->incLine();
-        if ( ( major < 2 ) && ( minor < 2 ) ) 
+        if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
@@ -1005,7 +1005,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         bgColor.setColorIndex( index, actWin->ci );
 
         fscanf( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine();
-        if ( ( major < 2 ) && ( minor < 2 ) ) 
+        if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
@@ -1014,9 +1014,9 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
         actWin->ci->setRGB( r, g, b, &pixel );
         topShadowColor = actWin->ci->pixIndex( pixel );
 
-        fscanf( f, "%d %d %d\n", &r, &g, &b ); 
+        fscanf( f, "%d %d %d\n", &r, &g, &b );
         actWin->incLine();
-        if ( ( major < 2 ) && ( minor < 2 ) ) 
+        if ( ( major < 2 ) && ( minor < 2 ) )
         {
             r *= 256;
             g *= 256;
@@ -1029,12 +1029,12 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
     readStringFromFile( oneName, 127+1, f ); actWin->incLine();
     displayFileName[0].setRaw( oneName );
 
-    if ( blank( displayFileName[0].getRaw() ) ) 
+    if ( blank( displayFileName[0].getRaw() ) )
     {
         more = 0;
         numDsps = 0;
     }
-    else 
+    else
     {
         more = 1;
         numDsps = 1;
@@ -1045,32 +1045,32 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     readStringFromFile( fontTag, 63+1, f ); actWin->incLine();
 
-    if ( ( major > 1 ) || ( minor > 2 ) ) 
+    if ( ( major > 1 ) || ( minor > 2 ) )
     {
-        fscanf( f, "%d\n", &invisible ); 
+        fscanf( f, "%d\n", &invisible );
         actWin->incLine();
-        fscanf( f, "%d\n", &closeAction[0] ); 
+        fscanf( f, "%d\n", &closeAction[0] );
         actWin->incLine();
     }
-    else 
+    else
     {
         invisible = 0;
         closeAction[0] = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 3 ) ) 
+    if ( ( major > 1 ) || ( minor > 3 ) )
     {
         fscanf( f, "%d\n", &setPostion[0] ); actWin->incLine();
     }
-    else 
+    else
     {
         setPostion[0] = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 4 ) ) 
+    if ( ( major > 1 ) || ( minor > 4 ) )
     {
         fscanf( f, "%d\n", &numPvs ); actWin->incLine();
-        for ( i=0; i<numPvs; i++ ) 
+        for ( i=0; i<numPvs; i++ )
         {
             if ( i >= NUMPVS ) i = NUMPVS - 1;
             readStringFromFile( onePvName, PV_Factory::MAX_PV_NAME+1, f );
@@ -1079,86 +1079,86 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
             readStringFromFile( onePvName, 39+1, f ); actWin->incLine();
             sourceExpString[i].setRaw( onePvName );
         }
-        for ( i=numPvs; i<NUMPVS; i++ ) 
+        for ( i=numPvs; i<NUMPVS; i++ )
         {
             destPvExpString[i].setRaw( "" );
             sourceExpString[i].setRaw( "" );
         }
     }
-    else 
+    else
     {
-        for ( i=numPvs; i<NUMPVS; i++ ) 
+        for ( i=numPvs; i<NUMPVS; i++ )
         {
             destPvExpString[i].setRaw( "" );
             sourceExpString[i].setRaw( "" );
         }
     }
 
-    if ( ( major > 1 ) || ( minor > 6 ) ) 
+    if ( ( major > 1 ) || ( minor > 6 ) )
     {
         fscanf( f, "%d\n", &allowDups[0] ); actWin->incLine();
     }
-    else 
+    else
     {
         allowDups[0] = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 7 ) ) 
+    if ( ( major > 1 ) || ( minor > 7 ) )
     {
         fscanf( f, "%d\n", &cascade[0] ); actWin->incLine();
     }
-    else 
+    else
     {
         cascade[0] = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 8 ) ) 
+    if ( ( major > 1 ) || ( minor > 8 ) )
     {
         readStringFromFile( oneName, 255+1, f ); actWin->incLine();
         symbolsExpStr[0].setRaw( oneName );
         fscanf( f, "%d\n", &replaceSymbols[0] ); actWin->incLine();
     }
-    else 
+    else
     {
         symbolsExpStr[0].setRaw( "" );
         replaceSymbols[0]  = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 9 ) ) 
+    if ( ( major > 1 ) || ( minor > 9 ) )
     {
         fscanf( f, "%d\n", &propagateMacros[0] ); actWin->incLine();
     }
-    else 
+    else
     {
         propagateMacros[0] = 0;
     }
 
-    if ( ( major > 1 ) || ( minor > 10 ) ) 
+    if ( ( major > 1 ) || ( minor > 10 ) )
     {
         fscanf( f, "%d\n", &useFocus ); actWin->incLine();
     }
-    else 
+    else
     {
         useFocus = 0;
     }
 
     // after v 2.3 read numDsps and then the data
-    if ( ( major < 2 ) || ( major == 2 ) && ( minor < 4 ) ) 
+    if ( ( major < 2 ) || ( major == 2 ) && ( minor < 4 ) )
     {
         md = 8;
 
-        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 0 ) ) 
+        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 0 ) )
         {
-            for ( i=1; i<md; i++ ) 
+            for ( i=1; i<md; i++ )
             { // for forward compatibility
                 readStringFromFile( oneName, 127+1, f ); actWin->incLine();
                 displayFileName[i].setRaw( oneName );
 
-                if ( more && !blank(displayFileName[i].getRaw() ) ) 
+                if ( more && !blank(displayFileName[i].getRaw() ) )
                 {
                     numDsps++;
                 }
-                else 
+                else
                 {
                     more = 0;
                 }
@@ -1182,7 +1182,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
                 fscanf( f, "%d\n", &propagateMacros[i] );
             }
 
-            for ( i=numDsps; i<maxDsps; i++ ) 
+            for ( i=numDsps; i<maxDsps; i++ )
             {
                 closeAction[i] = 0;
                 setPostion[i] = 0;
@@ -1195,41 +1195,41 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
             }
         }
 
-        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 1 ) ) 
+        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 1 ) )
         {
             readStringFromFile( oneName, 127+1, f ); actWin->incLine();
             buttonLabel.setRaw( oneName );
         }
-        else 
+        else
         {
             buttonLabel.setRaw( label[0].getRaw() );
         }
 
-        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 2 ) ) 
+        if ( ( major > 2 ) || ( major == 2 ) && ( minor > 2 ) )
         {
             fscanf( f, "%d\n", &noEdit ); actWin->incLine();
         }
-        else 
+        else
         {
             noEdit = 0;
         }
     }
-    else 
+    else
     {
         fscanf( f, "%d\n", &numDsps ); actWin->incLine();
 
-        for ( i=1; i<numDsps; i++ ) 
+        for ( i=1; i<numDsps; i++ )
         {
-            readStringFromFile( oneName, 127+1, f ); 
+            readStringFromFile( oneName, 127+1, f );
             actWin->incLine();
             displayFileName[i].setRaw( oneName );
 
-            if ( blank(displayFileName[i].getRaw() ) ) 
+            if ( blank(displayFileName[i].getRaw() ) )
             {
                 more = 0;
             }
 
-            readStringFromFile( oneName, 127+1, f ); 
+            readStringFromFile( oneName, 127+1, f );
             actWin->incLine();
             label[i].setRaw( oneName );
 
@@ -1241,7 +1241,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
             fscanf( f, "%d\n", &cascade[i] );
 
-            readStringFromFile( oneName, 255+1, f ); 
+            readStringFromFile( oneName, 255+1, f );
             actWin->incLine();
             symbolsExpStr[i].setRaw( oneName );
 
@@ -1251,7 +1251,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
         }
 
-        for ( i=numDsps; i<maxDsps; i++ ) 
+        for ( i=numDsps; i<maxDsps; i++ )
         {
             closeAction[i] = 0;
             setPostion[i] = 0;
@@ -1270,27 +1270,27 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
 
     }
 
-    if ( ( major > 2 ) || ( major == 2 ) && ( minor > 5 ) ) 
+    if ( ( major > 2 ) || ( major == 2 ) && ( minor > 5 ) )
     {
         fscanf( f, "%d\n", &ofsX ); actWin->incLine();
         fscanf( f, "%d\n", &ofsY ); actWin->incLine();
     }
-    else 
+    else
     {
         ofsX = 0;
         ofsY = 0;
     }
 
-    if ( ( major > 2 ) || ( major == 2 ) && ( minor > 6 ) ) 
+    if ( ( major > 2 ) || ( major == 2 ) && ( minor > 6 ) )
     {
         fscanf( f, "%d\n", &button3Popup ); actWin->incLine();
     }
-    else 
+    else
     {
         button3Popup = 0;
     }
 
-    if ( useFocus ) 
+    if ( useFocus )
     {
         button3Popup = 0;
     }
@@ -1308,7 +1308,7 @@ int ExtendedRelatedDisplayClass::old_createFromFile ( FILE *f, char *name, activ
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, activeWindowClass *_actWin ) 
+int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, activeWindowClass *_actWin )
 {
     int fgR, fgG, fgB, bgR, bgG, bgB, more, index;
     unsigned int pixel;
@@ -1335,10 +1335,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
 
     // continue until tag is <eod>
 
-    do 
+    do
     {
         gotData = getNextDataString( buf, 255, f );
-        if ( !gotData ) 
+        if ( !gotData )
         {
             actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
             return 0;
@@ -1347,24 +1347,24 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
         context = NULL;
 
         tk = strtok_r( buf, " \t\n", &context );
-        if ( !tk ) 
+        if ( !tk )
         {
             actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
             return 0;
         }
 
-        if ( strcmp( tk, "<eod>" ) == 0 ) 
+        if ( strcmp( tk, "<eod>" ) == 0 )
         {
             more = 0;
         }
-        else 
+        else
         {
             more = 1;
 
-            if ( strcmp( tk, "x" ) == 0 ) 
+            if ( strcmp( tk, "x" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1372,20 +1372,20 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
 
                 x = atol( tk );
             }
-            else if ( strcmp( tk, "y" ) == 0 ) 
+            else if ( strcmp( tk, "y" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
                 }
                 y = atol( tk );
             }
-            else if ( strcmp( tk, "w" ) == 0 ) 
+            else if ( strcmp( tk, "w" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1393,10 +1393,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
 
                 w = atol( tk );
             }
-            else if ( strcmp( tk, "h" ) == 0 ) 
+            else if ( strcmp( tk, "h" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1404,10 +1404,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 h = atol( tk );
             }
 
-            else if ( strcmp( tk, "fgred" ) == 0 ) 
+            else if ( strcmp( tk, "fgred" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1416,10 +1416,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 fgR = atol( tk );
             }
 
-            else if ( strcmp( tk, "fggreen" ) == 0 ) 
+            else if ( strcmp( tk, "fggreen" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1427,10 +1427,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 fgG = atol( tk );
             }
 
-            else if ( strcmp( tk, "fgblue" ) == 0 ) 
+            else if ( strcmp( tk, "fgblue" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1439,10 +1439,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 fgB = atol( tk );
             }
 
-            else if ( strcmp( tk, "bgred" ) == 0 ) 
+            else if ( strcmp( tk, "bgred" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1450,10 +1450,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 bgR = atol( tk );
             }
 
-            else if ( strcmp( tk, "bggreen" ) == 0 ) 
+            else if ( strcmp( tk, "bggreen" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1461,10 +1461,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 bgG = atol( tk );
             }
 
-            else if ( strcmp( tk, "bgblue" ) == 0 ) 
+            else if ( strcmp( tk, "bgblue" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1472,10 +1472,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 bgB = atol( tk );
             }
 
-            else if ( strcmp( tk, "closecurrent" ) == 0 ) 
+            else if ( strcmp( tk, "closecurrent" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1483,10 +1483,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 closeAction[0] = atol( tk );
             }
 
-            else if ( strcmp( tk, "invisible" ) == 0 ) 
+            else if ( strcmp( tk, "invisible" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1495,10 +1495,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 invisible = atol( tk );
             }
 
-            else if ( strcmp( tk, "font" ) == 0 ) 
+            else if ( strcmp( tk, "font" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"\n", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1507,10 +1507,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 strncpy( fontTag, tk, 63 );
             }
 
-            else if ( strcmp( tk, "displayname" ) == 0 ) 
+            else if ( strcmp( tk, "displayname" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1519,10 +1519,10 @@ int ExtendedRelatedDisplayClass::importFromXchFile ( FILE *f, char *name, active
                 displayFileName[0].setRaw( tk );
             }
 
-            else if ( strcmp( tk, "label" ) == 0 ) 
+            else if ( strcmp( tk, "label" ) == 0 )
             {
                 tk = strtok_r( NULL, "\"", &context );
-                if ( !tk ) 
+                if ( !tk )
                 {
                     actWin->appCtx->postMessage( ExtendedRelatedDisplayClass_str1 );
                     return 0;
@@ -1580,7 +1580,7 @@ int ExtendedRelatedDisplayClass::createSpecial ( char *fname, activeWindowClass 
 
     this->initSelectBox(); // call after getting x,y,w,h
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
         destPvExpString[i].setRaw( "" );
         sourceExpString[i].setRaw( "" );
@@ -1591,19 +1591,19 @@ int ExtendedRelatedDisplayClass::createSpecial ( char *fname, activeWindowClass 
 
 void ExtendedRelatedDisplayClass::sendMsg ( char *param )
 {
-    if ( param ) 
+    if ( param )
     {
         //printf( "  msg = [%s]\n", param );
         popupDisplay( 0 );
     }
 }
 
-int ExtendedRelatedDisplayClass::genericEdit ( void ) 
+int ExtendedRelatedDisplayClass::genericEdit ( void )
 {
     int i;
     char title[32], *ptr;
 
-    if ( !buf ) 
+    if ( !buf )
     {
         buf = new bufType;
     }
@@ -1640,7 +1640,7 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
 
     buf->bufUseFocus = useFocus;
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
         if ( displayFileName[i].getRaw() )
             strncpy( buf->bufDisplayFileName[i], displayFileName[i].getRaw(), 127 );
@@ -1662,11 +1662,11 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
 
         buf->bufPropagateMacros[i] = propagateMacros[i];
 
-        if ( symbolsExpStr[i].getRaw() ) 
+        if ( symbolsExpStr[i].getRaw() )
         {
             strncpy( buf->bufSymbols[i], symbolsExpStr[i].getRaw(), 255 );
         }
-        else 
+        else
         {
             strncpy( buf->bufSymbols[i], "", 255 );
         }
@@ -1674,57 +1674,57 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
         buf->bufReplaceSymbols[i] = replaceSymbols[i];
     }
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        if ( destPvExpString[i].getRaw() ) 
+        if ( destPvExpString[i].getRaw() )
         {
             strncpy( buf->bufDestPvName[i], destPvExpString[i].getRaw(),
             PV_Factory::MAX_PV_NAME );
             buf->bufDestPvName[i][PV_Factory::MAX_PV_NAME] = 0;
         }
-        else 
+        else
         {
             strcpy( buf->bufDestPvName[i], "" );
         }
-        if ( sourceExpString[i].getRaw() ) 
+        if ( sourceExpString[i].getRaw() )
         {
             strncpy( buf->bufSource[i], sourceExpString[i].getRaw(), 39 );
             buf->bufSource[i][39] = 0;
         }
-        else 
+        else
         {
             strcpy( buf->bufSource[i], "" );
         }
     }
 
-    if ( colorPvExpString.getRaw() ) 
+    if ( colorPvExpString.getRaw() )
     {
         strncpy( buf->bufColorPvName, colorPvExpString.getRaw(),
         PV_Factory::MAX_PV_NAME );
         buf->bufColorPvName[PV_Factory::MAX_PV_NAME] = 0;
     }
-    else 
+    else
     {
         strcpy( buf->bufColorPvName, "" );
     }
 
-    if ( enabPvExpString.getRaw() ) 
+    if ( enabPvExpString.getRaw() )
     {
         strncpy( buf->bufEnabPvName, enabPvExpString.getRaw(),
         PV_Factory::MAX_PV_NAME );
         buf->bufEnabPvName[PV_Factory::MAX_PV_NAME] = 0;
     }
-    else 
+    else
     {
         strcpy( buf->bufEnabPvName, "" );
     }
 
-    if ( buttonLabel.getRaw() ) 
+    if ( buttonLabel.getRaw() )
     {
         strncpy( buf->bufButtonLabel, buttonLabel.getRaw(), 127 );
         buf->bufButtonLabel[127] = 0;
     }
-    else 
+    else
     {
         strncpy( buf->bufButtonLabel, "", 127 );
     }
@@ -1767,7 +1767,7 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
         &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
         title, NULL, NULL, NULL );
 
-    for ( i=1; i<maxDsps; i++ ) 
+    for ( i=1; i<maxDsps; i++ )
     {
         ef1->beginSubForm();
         ef1->addTextField( ExtendedRelatedDisplayClass_str38, 35, buf->bufLabel[i], 127 );
@@ -1810,7 +1810,7 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
     ef.addTextField( "Color PV", 35, buf->bufColorPvName,   PV_Factory::MAX_PV_NAME );
     ef.addTextField( "Enable PV", 35, buf->bufEnabPvName,   PV_Factory::MAX_PV_NAME );
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
         ef.addTextField( ExtendedRelatedDisplayClass_str15, 35, buf->bufDestPvName[i],
         PV_Factory::MAX_PV_NAME );
@@ -1830,7 +1830,7 @@ int ExtendedRelatedDisplayClass::genericEdit ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::editCreate ( void ) 
+int ExtendedRelatedDisplayClass::editCreate ( void )
 {
     this->genericEdit();
     ef.finished( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel_delete, this );
@@ -1840,7 +1840,7 @@ int ExtendedRelatedDisplayClass::editCreate ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::edit ( void ) 
+int ExtendedRelatedDisplayClass::edit ( void )
 {
     this->genericEdit();
     ef.finished( rdc_edit_ok, rdc_edit_apply, rdc_edit_cancel, this );
@@ -1850,9 +1850,9 @@ int ExtendedRelatedDisplayClass::edit ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::erase ( void ) 
+int ExtendedRelatedDisplayClass::erase ( void )
 {
-    if ( deleteRequest ) 
+    if ( deleteRequest )
         return 1;
 
     XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
@@ -1864,9 +1864,9 @@ int ExtendedRelatedDisplayClass::erase ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::eraseActive ( void ) 
+int ExtendedRelatedDisplayClass::eraseActive ( void )
 {
-    if ( !enabled || !activeMode || !init || invisible ) 
+    if ( !enabled || !activeMode || !init || invisible )
         return 1;
 
     XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
@@ -1878,14 +1878,14 @@ int ExtendedRelatedDisplayClass::eraseActive ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::draw ( void ) 
+int ExtendedRelatedDisplayClass::draw ( void )
 {
     char *ptr;
     int tX, tY, cx, cy, min, ofs, size, strW;
     XRectangle xR = { x, y, w, h };
     int blink = 0;
 
-    if ( deleteRequest ) 
+    if ( deleteRequest )
         return 1;
 
     actWin->drawGc.saveFg();
@@ -1942,15 +1942,15 @@ int ExtendedRelatedDisplayClass::draw ( void )
     XDrawLine( actWin->d, XtWindow(actWin->drawWidget),
         actWin->drawGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
 
-    if ( fs ) 
+    if ( fs )
     {
         actWin->drawGc.addNormXClipRectangle( xR );
 
-        if ( buttonLabel.getRaw() && !blank( buttonLabel.getRaw() ) ) 
+        if ( buttonLabel.getRaw() && !blank( buttonLabel.getRaw() ) )
         {
             ptr = buttonLabel.getRaw();
 
-            if ( !icon ) 
+            if ( !icon )
             {
                 // no icon
                 tX = x + w/2;
@@ -1962,7 +1962,7 @@ int ExtendedRelatedDisplayClass::draw ( void )
                 drawText( actWin->drawWidget, &actWin->drawGc, fs, tX, tY,
                     XmALIGNMENT_CENTER, ptr );
             }
-            else 
+            else
             {
                 // draw icon and text
                 strW = XTextWidth( fs, ptr, strlen(ptr) ) +
@@ -2000,9 +2000,9 @@ int ExtendedRelatedDisplayClass::draw ( void )
             }
 
         }
-        else 
+        else
         {
-            if ( icon ) 
+            if ( icon )
             {
                 // draw icon on button without text
                 min = (int) ( w*3/5 );
@@ -2039,16 +2039,16 @@ int ExtendedRelatedDisplayClass::draw ( void )
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::drawActive ( void ) 
+int ExtendedRelatedDisplayClass::drawActive ( void )
 {
     int tX, tY, cx, cy, min, ofs, size, strW;
     char string[39+1];
     XRectangle xR = { x, y, w, h };
     int blink = 0;
 
-    if ( !init ) 
+    if ( !init )
     {
-        if ( needToDrawUnconnected ) 
+        if ( needToDrawUnconnected )
         {
             actWin->executeGc.saveFg();
             actWin->executeGc.setFG( fgColor.getDisconnectedIndex(), &blink );
@@ -2061,21 +2061,21 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
             updateBlink( blink );
         }
     }
-    else if ( needToEraseUnconnected ) 
+    else if ( needToEraseUnconnected )
     {
         actWin->executeGc.setLineWidth( 1 );
         actWin->executeGc.setLineStyle( LineSolid );
         XDrawRectangle( actWin->d, XtWindow(actWin->executeWidget),
         actWin->executeGc.eraseGC(), x, y, w, h );
         needToEraseUnconnected = 0;
-        if ( invisible ) 
+        if ( invisible )
         {
             eraseActive();
             smartDrawAllActive();
         }
     }
 
-    if ( !enabled || !activeMode || !init || invisible ) 
+    if ( !enabled || !activeMode || !init || invisible )
     {
         return 1;
     }
@@ -2143,13 +2143,13 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
     XDrawLine( actWin->d, XtWindow(actWin->executeWidget),
         actWin->executeGc.normGC(), x+w-2, y+2, x+w-2, y+h-2 );
 
-    if ( fs ) 
+    if ( fs )
     {
         actWin->executeGc.addNormXClipRectangle( xR );
 
-        if ( !blank( string ) ) 
+        if ( !blank( string ) )
         {
-            if ( !icon ) 
+            if ( !icon )
             {
                 // no icon
                 tX = x + w/2;
@@ -2162,7 +2162,7 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
                     XmALIGNMENT_CENTER, string );
 
             }
-            else 
+            else
             {
                 // draw icon and text
 
@@ -2202,13 +2202,13 @@ int ExtendedRelatedDisplayClass::drawActive ( void )
             }
 
         }
-        else 
+        else
         {
-            if ( icon ) 
+            if ( icon )
             {
                     // draw icon on button without text
                 min = (int) ( w*3/5 );
-                if ( (int) ( h*3/5 ) < min ) 
+                if ( (int) ( h*3/5 ) < min )
                     min = (int) ( h*3/5 );
                 cx = x + w/2;
                 cy = y + h/2;
@@ -2252,7 +2252,7 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
     Arg args[5];
     XmString str;
 
-    switch ( pass ) 
+    switch ( pass )
     {
     case 1:
         connection.init();
@@ -2270,11 +2270,11 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
 
         singleOpComplete = 0;
 
-        if ( !colorPvExpString.getExpanded() || blankOrComment( colorPvExpString.getExpanded() ) ) 
+        if ( !colorPvExpString.getExpanded() || blankOrComment( colorPvExpString.getExpanded() ) )
         {
             colorExists = 0;
         }
-        else 
+        else
         {
             colorExists = 1;
             atLeastOneExists = 1;
@@ -2282,11 +2282,11 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
             bgColor.setConnectSensitive();
         }
 
-        if ( !enabPvExpString.getExpanded() || blankOrComment( enabPvExpString.getExpanded() ) ) 
+        if ( !enabPvExpString.getExpanded() || blankOrComment( enabPvExpString.getExpanded() ) )
         {
             enabExists = 0;
         }
-        else 
+        else
         {
             enabExists = 1;
             atLeastOneExists = 1;
@@ -2297,16 +2297,16 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
 //          bgColor.setConnectSensitive();
         }
 
-        for ( i=0; i<NUMPVS; i++ ) 
+        for ( i=0; i<NUMPVS; i++ )
         {
             opComplete[i] = 0;
 
             if ( !destPvExpString[i].getExpanded() ||
-                    blankOrComment( destPvExpString[i].getExpanded() ) ) 
+                    blankOrComment( destPvExpString[i].getExpanded() ) )
             {
                 destExists[i] = 0;
             }
-            else 
+            else
             {
                 destExists[i] = 1;
                 // ****** SJS Modification 22/07/05                      ******
@@ -2326,19 +2326,19 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
     case 3:
         opStat = 1;
 
-        if ( !singleOpComplete ) 
+        if ( !singleOpComplete )
         {
 
-            if ( atLeastOneExists ) 
+            if ( atLeastOneExists )
             {
                 init = 0;
-                if ( !unconnectedTimer ) 
+                if ( !unconnectedTimer )
                 {
-                    unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
+                    unconnectedTimer = appAddTimeOut ( actWin->appCtx->appContext (),
                                                                 2000, unconnectedTimeout, this );
                 }
             }
-            else 
+            else
             {
                 init = 1; // no pvs to connect
                 active = 1;
@@ -2347,97 +2347,97 @@ int ExtendedRelatedDisplayClass::activate ( int pass, void *ptr )
 
             colorPvId = NULL;
 
-            if ( colorExists ) 
+            if ( colorExists )
             {
-                connection.addPv();
+                connection.addPv ();
 
-                colorPvId = the_PV_Factory->create( colorPvExpString.getExpanded() );
-                if ( colorPvId ) 
+                colorPvId = the_PV_Factory->create ( colorPvExpString.getExpanded () );
+                if ( colorPvId )
                 {
-                    colorPvId->add_conn_state_callback(
+                    colorPvId->add_conn_state_callback (
                         relDsp_monitor_color_connect_state, (void *) this );
                     singleOpComplete = 1;
                 }
-                else 
+                else
                 {
-                    printf( ExtendedRelatedDisplayClass_str27 );
+                    printf ( ExtendedRelatedDisplayClass_str27 );
                     opStat = 0;
                 }
             }
 
             enabPvId = NULL;
 
-            if ( enabExists ) 
+            if ( enabExists )
             {
-                connection.addPv();
+                connection.addPv ();
 
-                enabPvId = the_PV_Factory->create( enabPvExpString.getExpanded() );
-                if ( enabPvId ) 
+                enabPvId = the_PV_Factory->create ( enabPvExpString.getExpanded () );
+                if ( enabPvId )
                 {
-                    enabPvId->add_conn_state_callback(
+                    enabPvId->add_conn_state_callback (
                         relDsp_monitor_enab_connect_state, (void *) this );
                     singleOpComplete = 1;
                 }
-                else 
+                else
                 {
-                    printf( ExtendedRelatedDisplayClass_str27 );
+                    printf ( ExtendedRelatedDisplayClass_str27 );
                     opStat = 0;
                 }
             }
         }
 
-        for ( i=0; i<NUMPVS; i++ ) 
+        for ( i=0; i<NUMPVS; i++ )
         {
-            if ( !opComplete[i] ) 
+            if ( !opComplete[i] )
             {
-                initEnable();
+                initEnable ();
                 initialConnection[i] = 1;
                 destPvId[i] = NULL;
 
-                if ( i == 0 ) 
+                if ( i == 0 )
                 {
                     n = 0;
-                    XtSetArg( args[n], XmNpopupEnabled, (XtArgVal) False ); 
+                    XtSetArg ( args[n], XmNpopupEnabled, (XtArgVal) False );
                     n++;
-                    popUpMenu = XmCreatePopupMenu( actWin->topWidgetId(), "", args, n );
-                    pullDownMenu = XmCreatePulldownMenu( popUpMenu, "", NULL, 0 );
+                    popUpMenu = XmCreatePopupMenu ( actWin->topWidgetId (), "", args, n );
+                    pullDownMenu = XmCreatePulldownMenu ( popUpMenu, "", NULL, 0 );
 
-                    for ( ii=0; ii<numDsps; ii++ ) 
+                    for ( ii=0; ii<numDsps; ii++ )
                     {
-                        if ( label[ii].getExpanded() ) 
+                        if ( label[ii].getExpanded () )
                         {
-                            str = XmStringCreateLocalized( label[ii].getExpanded() );
+                            str = XmStringCreateLocalized ( label[ii].getExpanded () );
                         }
-                        else 
+                        else
                         {
-                            str = XmStringCreateLocalized( " " );
+                            str = XmStringCreateLocalized ( " " );
                         }
-                        pb[ii] = XtVaCreateManagedWidget( "", xmPushButtonWidgetClass,
+                        pb[ii] = XtVaCreateManagedWidget ( "", xmPushButtonWidgetClass,
                                                           popUpMenu,
                                                           XmNlabelString, str,
                                                           NULL );
-                        XmStringFree( str );
+                        XmStringFree ( str );
 
-                        XtAddCallback( pb[ii], XmNactivateCallback, menu_cb,
+                        XtAddCallback ( pb[ii], XmNactivateCallback, menu_cb,
                             (XtPointer) this );
                     }
                 }
 
-                if ( destExists[i] ) 
+                if ( destExists[i] )
                 {
                     objAndIndex[i].obj = (void *) this;
                     objAndIndex[i].index = i;
-                    connection.addPv();
+                    connection.addPv ();
 
-                    destPvId[i] = the_PV_Factory->create(destPvExpString[i].getExpanded() );
-                    if ( destPvId[i] ) 
+                    destPvId[i] = the_PV_Factory->create (destPvExpString[i].getExpanded () );
+                    if ( destPvId[i] )
                     {
-                        destPvId[i]->add_conn_state_callback(relDsp_monitor_dest_connect_state, (void *) &objAndIndex[i] );
+                        destPvId[i]->add_conn_state_callback (relDsp_monitor_dest_connect_state, (void *) &objAndIndex[i] );
                         opComplete[i] = 1;
                     }
-                    else 
+                    else
                     {
-                        printf( ExtendedRelatedDisplayClass_str27 );
+                        printf ( ExtendedRelatedDisplayClass_str27 );
                         opStat = 0;
                     }
                 }
@@ -2467,47 +2467,47 @@ int ExtendedRelatedDisplayClass::deactivate ( int pass )
     active = 0;
     activeMode = 0;
 
-    if ( pass == 1 ) 
+    if ( pass == 1 )
     {
-        if ( unconnectedTimer ) 
+        if ( unconnectedTimer )
         {
-            XtRemoveTimeOut( unconnectedTimer );
+            XtRemoveTimeOut ( unconnectedTimer );
             unconnectedTimer = 0;
         }
 
-        XtDestroyWidget( popUpMenu );
+        XtDestroyWidget ( popUpMenu );
 
-        if ( colorExists ) 
+        if ( colorExists )
         {
-            if ( colorPvId ) 
+            if ( colorPvId )
             {
-                colorPvId->remove_conn_state_callback(  relDsp_monitor_color_connect_state, (void *) this );
-                colorPvId->remove_value_callback( relDsp_color_value_update, (void *) this );
-                colorPvId->release();
+                colorPvId->remove_conn_state_callback (  relDsp_monitor_color_connect_state, (void *) this );
+                colorPvId->remove_value_callback ( relDsp_color_value_update, (void *) this );
+                colorPvId->release ();
                 colorPvId = NULL;
             }
         }
 
-        if ( enabExists ) 
+        if ( enabExists )
         {
-            if ( enabPvId ) 
+            if ( enabPvId )
             {
-                enabPvId->remove_conn_state_callback(   relDsp_monitor_enab_connect_state, (void *) this );
-                enabPvId->remove_value_callback( relDsp_enab_value_update, (void *) this );
-                enabPvId->release();
+                enabPvId->remove_conn_state_callback ( relDsp_monitor_enab_connect_state, (void *) this );
+                enabPvId->remove_value_callback ( relDsp_enab_value_update, (void *) this );
+                enabPvId->release ();
                 enabPvId = NULL;
             }
         }
 
-        for ( i=0; i<NUMPVS; i++ ) 
+        for ( i=0; i<NUMPVS; i++ )
         {
-            if ( destExists[i] ) 
+            if ( destExists[i] )
             {
-                if ( destPvId[i] ) 
+                if ( destPvId[i] )
                 {
-                    destPvId[i]->remove_conn_state_callback(
+                    destPvId[i]->remove_conn_state_callback (
                                     relDsp_monitor_dest_connect_state, (void *) &objAndIndex[i] );
-                    destPvId[i]->release();
+                    destPvId[i]->release ();
                     destPvId[i] = NULL;
                 }
             }
@@ -2519,13 +2519,13 @@ int ExtendedRelatedDisplayClass::deactivate ( int pass )
 
 void ExtendedRelatedDisplayClass::updateDimensions ( void )
 {
-    if ( fs ) 
+    if ( fs )
     {
         fontAscent = fs->ascent;
         fontDescent = fs->descent;
         fontHeight = fontAscent + fontDescent;
     }
-    else 
+    else
     {
         fontAscent = 10;
         fontDescent = 5;
@@ -2537,22 +2537,22 @@ int ExtendedRelatedDisplayClass::expand1st ( int numMacros, char *macros[], char
 {
     int i;
 
-    colorPvExpString.expand1st( numMacros, macros, expansions );
+    colorPvExpString.expand1st ( numMacros, macros, expansions );
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        destPvExpString[i].expand1st( numMacros, macros, expansions );
-        sourceExpString[i].expand1st( numMacros, macros, expansions );
+        destPvExpString[i].expand1st ( numMacros, macros, expansions );
+        sourceExpString[i].expand1st ( numMacros, macros, expansions );
     }
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
-        symbolsExpStr[i].expand1st( numMacros, macros, expansions );
-        label[i].expand1st( numMacros, macros, expansions );
-        displayFileName[i].expand1st( numMacros, macros, expansions );
+        symbolsExpStr[i].expand1st ( numMacros, macros, expansions );
+        label[i].expand1st ( numMacros, macros, expansions );
+        displayFileName[i].expand1st ( numMacros, macros, expansions );
     }
 
-    buttonLabel.expand1st( numMacros, macros, expansions );
+    buttonLabel.expand1st ( numMacros, macros, expansions );
 
     return 1;
 }
@@ -2561,52 +2561,52 @@ int ExtendedRelatedDisplayClass::expand2nd ( int numMacros, char *macros[], char
 {
     int i;
 
-    colorPvExpString.expand2nd( numMacros, macros, expansions );
+    colorPvExpString.expand2nd ( numMacros, macros, expansions );
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        destPvExpString[i].expand2nd( numMacros, macros, expansions );
-        sourceExpString[i].expand2nd( numMacros, macros, expansions );
+        destPvExpString[i].expand2nd ( numMacros, macros, expansions );
+        sourceExpString[i].expand2nd ( numMacros, macros, expansions );
     }
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
-        symbolsExpStr[i].expand2nd( numMacros, macros, expansions );
-        label[i].expand2nd( numMacros, macros, expansions );
-        displayFileName[i].expand2nd( numMacros, macros, expansions );
+        symbolsExpStr[i].expand2nd ( numMacros, macros, expansions );
+        label[i].expand2nd ( numMacros, macros, expansions );
+        displayFileName[i].expand2nd ( numMacros, macros, expansions );
     }
 
-    buttonLabel.expand2nd( numMacros, macros, expansions );
+    buttonLabel.expand2nd ( numMacros, macros, expansions );
 
     return 1;
 }
 
-int ExtendedRelatedDisplayClass::containsMacros ( void ) 
+int ExtendedRelatedDisplayClass::containsMacros ( void )
 {
     int i;
 
-    if ( colorPvExpString.containsPrimaryMacros() ) 
+    if ( colorPvExpString.containsPrimaryMacros () )
         return 1;
 
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        if ( destPvExpString[i].containsPrimaryMacros() ) 
+        if ( destPvExpString[i].containsPrimaryMacros () )
             return 1;
-        if ( sourceExpString[i].containsPrimaryMacros() ) 
+        if ( sourceExpString[i].containsPrimaryMacros () )
             return 1;
     }
 
-    for ( i=0; i<maxDsps; i++ ) 
+    for ( i=0; i<maxDsps; i++ )
     {
-        if ( symbolsExpStr[i].containsPrimaryMacros() ) 
+        if ( symbolsExpStr[i].containsPrimaryMacros () )
             return 1;
-        if ( label[i].containsPrimaryMacros() ) 
+        if ( label[i].containsPrimaryMacros () )
             return 1;
-        if ( displayFileName[i].containsPrimaryMacros() ) 
+        if ( displayFileName[i].containsPrimaryMacros () )
             return 1;
     }
 
-    if ( buttonLabel.containsPrimaryMacros() ) 
+    if ( buttonLabel.containsPrimaryMacros () )
         return 1;
 
     return 0;
@@ -2637,7 +2637,7 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     char prefix[127+1];
 
     focus = useFocus;
-    if ( numDsps > 1 ) 
+    if ( numDsps > 1 )
     {
         focus = 0;
     }
@@ -2645,109 +2645,109 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     // allow the syntax: @filename s1=v1,s2=v2,...
     // which means read symbols from file and append list
     gotSymbolsFromFile = 0;
-    strncpy( buf, symbolsExpStr[index].getExpanded(), 255 );
+    strncpy ( buf, symbolsExpStr[index].getExpanded (), 255 );
     buf[255] = 0;
     context = NULL;
-    tk = strtok_r( buf, " \t\n", &context );
-    if ( tk ) 
+    tk = strtok_r ( buf, " \t\n", &context );
+    if ( tk )
     {
-        if ( tk[0] == '@' ) 
+        if ( tk[0] == '@' )
         {
-            if ( tk[1] ) 
+            if ( tk[1] )
             {
-                f = actWin->openAnyGenericFile( &tk[1], "r", name, 127 );
-                if ( !f ) 
+                f = actWin->openAnyGenericFile ( &tk[1], "r", name, 127 );
+                if ( !f )
                 {
-                    snprintf( msg, 79, ExtendedRelatedDisplayClass_str44, &tk[1] );
+                    snprintf ( msg, 79, ExtendedRelatedDisplayClass_str44, &tk[1] );
                     msg[79] = 0;
-                    actWin->appCtx->postMessage( msg );
-                    symbolsFromFile.setRaw( "" );
+                    actWin->appCtx->postMessage ( msg );
+                    symbolsFromFile.setRaw ( "" );
                 }
-                else 
+                else
                 {
-                    result = fgets( fileBuf, 255, f );
-                    if ( result ) 
+                    result = fgets ( fileBuf, 255, f );
+                    if ( result )
                     {
                         fileContext = NULL;
-                        fileTk = strtok_r( fileBuf, "\n", &fileContext );
-                        if ( fileTk ) 
+                        fileTk = strtok_r ( fileBuf, "\n", &fileContext );
+                        if ( fileTk )
                         {
-                            symbolsFromFile.setRaw( fileTk );
+                            symbolsFromFile.setRaw ( fileTk );
                         }
-                        else 
+                        else
                         {
-                            snprintf( msg, 79, ExtendedRelatedDisplayClass_str45, name );
+                            snprintf ( msg, 79, ExtendedRelatedDisplayClass_str45, name );
                             msg[79] = 0;
-                            actWin->appCtx->postMessage( msg );
-                            symbolsFromFile.setRaw( "" );
+                            actWin->appCtx->postMessage ( msg );
+                            symbolsFromFile.setRaw ( "" );
                         }
                     }
-                    else 
+                    else
                     {
-                        if ( errno ) 
+                        if ( errno )
 
                         msg[79] = 0;
-                        actWin->appCtx->postMessage( msg );
-                        symbolsFromFile.setRaw( "" );
+                        actWin->appCtx->postMessage ( msg );
+                        symbolsFromFile.setRaw ( "" );
                     }
-                    fclose( f );
+                    fclose ( f );
                 }
             }
             // append inline list to file contents
-            tk = strtok_r( NULL, "\n", &context );
-            if ( tk ) 
+            tk = strtok_r ( NULL, "\n", &context );
+            if ( tk )
             {
-                strncpy( fileBuf, symbolsFromFile.getRaw(), 255 );
+                strncpy ( fileBuf, symbolsFromFile.getRaw (), 255 );
                 fileBuf[255] = 0;
-                if ( blank(fileBuf) ) 
+                if ( blank (fileBuf) )
                 {
-                    strcpy( fileBuf, "" );
+                    strcpy ( fileBuf, "" );
                 }
-                else 
+                else
                 {
-                    Strncat( fileBuf, ",", 255 );
+                    Strncat ( fileBuf, ",", 255 );
                 }
-                Strncat( fileBuf, tk, 255 );
-                symbolsFromFile.setRaw( fileBuf );
+                Strncat ( fileBuf, tk, 255 );
+                symbolsFromFile.setRaw ( fileBuf );
             }
             // do special substitutions
-            actWin->substituteSpecial( 255, symbolsFromFile.getExpanded(), symbolsWithSubs );
+            actWin->substituteSpecial ( 255, symbolsFromFile.getExpanded (), symbolsWithSubs );
             gotSymbolsFromFile = 1;
         }
     }
 
-    if ( !gotSymbolsFromFile ) 
+    if ( !gotSymbolsFromFile )
     {
         // do special substitutions
-        actWin->substituteSpecial( 255, symbolsExpStr[index].getExpanded(),
+        actWin->substituteSpecial ( 255, symbolsExpStr[index].getExpanded (),
         symbolsWithSubs );
     }
 
     // set all existing pvs
-    for ( i=0; i<NUMPVS; i++ ) 
+    for ( i=0; i<NUMPVS; i++ )
     {
-        if ( destExists[i] && connection.pvsConnected() ) 
+        if ( destExists[i] && connection.pvsConnected () )
         {
-            switch ( destType[i] ) 
+            switch ( destType[i] )
             {
                 case ProcessVariable::Type::real:
-                destV.d = atof( sourceExpString[i].getExpanded() );
-                destPvId[i]->put( destV.d );
+                destV.d = atof ( sourceExpString[i].getExpanded () );
+                destPvId[i]->put ( destV.d );
                 break;
 
                 case ProcessVariable::Type::integer:
-                destV.l = atol( sourceExpString[i].getExpanded() );
-                destPvId[i]->put( destV.l );
+                destV.l = atol ( sourceExpString[i].getExpanded () );
+                destPvId[i]->put ( destV.l );
                 break;
 
                 case ProcessVariable::Type::text:
-                strncpy( destV.str, sourceExpString[i].getExpanded(), 39 );
-                destPvId[i]->putText( destV.str );
+                strncpy ( destV.str, sourceExpString[i].getExpanded (), 39 );
+                destPvId[i]->putText ( destV.str );
                 break;
 
                 case ProcessVariable::Type::enumerated:
-                destV.s = (short) atol( sourceExpString[i].getExpanded() );
-                destPvId[i]->put( destV.s );
+                destV.s = (short) atol ( sourceExpString[i].getExpanded () );
+                destPvId[i]->put ( destV.s );
                 break;
             }
         }
@@ -2756,34 +2756,34 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     numNewMacros = 0;
 
     // get info on whether to use the small local array for symbols
-    stat = countSymbolsAndValues( symbolsWithSubs, &symbolCount, &maxSymbolLength );
+    stat = countSymbolsAndValues ( symbolsWithSubs, &symbolCount, &maxSymbolLength );
 
-    if ( !replaceSymbols[index] ) 
+    if ( !replaceSymbols[index] )
     {
-        if ( propagateMacros[index] ) 
+        if ( propagateMacros[index] )
         {
-            for ( i=0; i<actWin->numMacros; i++ ) 
+            for ( i=0; i<actWin->numMacros; i++ )
             {
-                l = strlen(actWin->macros[i]);
-                if ( l > maxSymbolLength ) 
+                l = strlen (actWin->macros[i]);
+                if ( l > maxSymbolLength )
                     maxSymbolLength = l;
 
-                l = strlen(actWin->expansions[i]);
+                l = strlen (actWin->expansions[i]);
                 if ( l > maxSymbolLength ) maxSymbolLength = l;
             }
 
             symbolCount += actWin->numMacros;
         }
-        else 
+        else
         {
-            for ( i=0; i<actWin->appCtx->numMacros; i++ ) 
+            for ( i=0; i<actWin->appCtx->numMacros; i++ )
             {
-                l = strlen(actWin->appCtx->macros[i]);
-                if ( l > maxSymbolLength ) 
+                l = strlen (actWin->appCtx->macros[i]);
+                if ( l > maxSymbolLength )
                     maxSymbolLength = l;
 
-                l = strlen(actWin->appCtx->expansions[i]);
-                if ( l > maxSymbolLength ) 
+                l = strlen (actWin->appCtx->expansions[i]);
+                if ( l > maxSymbolLength )
                     maxSymbolLength = l;
             }
 
@@ -2792,37 +2792,37 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     }
 
     useSmallArrays = 1;
-    if ( symbolCount > SMALL_SYM_ARRAY_SIZE ) 
+    if ( symbolCount > SMALL_SYM_ARRAY_SIZE )
         useSmallArrays = 0;
-    if ( maxSymbolLength > SMALL_SYM_ARRAY_LEN ) 
+    if ( maxSymbolLength > SMALL_SYM_ARRAY_LEN )
         useSmallArrays = 0;
 
-    if ( useSmallArrays ) 
+    if ( useSmallArrays )
     {
-        for ( i=0; i<SMALL_SYM_ARRAY_SIZE; i++ ) 
+        for ( i=0; i<SMALL_SYM_ARRAY_SIZE; i++ )
         {
             newMacros[i] = &smallNewMacros[i][0];
             newValues[i] = &smallNewValues[i][0];
         }
 
-        if ( !replaceSymbols[index] ) 
+        if ( !replaceSymbols[index] )
         {
-            if ( propagateMacros[index] ) 
+            if ( propagateMacros[index] )
             {
-                for ( i=0; i<actWin->numMacros; i++ ) 
+                for ( i=0; i<actWin->numMacros; i++ )
                 {
-                    strcpy( newMacros[i], actWin->macros[i] );
-                    strcpy( newValues[i], actWin->expansions[i] );
+                    strcpy ( newMacros[i], actWin->macros[i] );
+                    strcpy ( newValues[i], actWin->expansions[i] );
                     numNewMacros++;
                 }
             }
-            else 
+            else
             {
-                for ( i=0; i<actWin->appCtx->numMacros; i++ ) 
+                for ( i=0; i<actWin->appCtx->numMacros; i++ )
                 {
-                    strcpy( newMacros[i], actWin->appCtx->macros[i] );
+                    strcpy ( newMacros[i], actWin->appCtx->macros[i] );
 
-                    strcpy( newValues[i], actWin->appCtx->expansions[i] );
+                    strcpy ( newValues[i], actWin->appCtx->expansions[i] );
 
                     numNewMacros++;
                 }
@@ -2830,42 +2830,42 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         }
 
         max = SMALL_SYM_ARRAY_SIZE - numNewMacros;
-        stat = parseLocalSymbolsAndValues( symbolsWithSubs, max,
+        stat = parseLocalSymbolsAndValues ( symbolsWithSubs, max,
         SMALL_SYM_ARRAY_LEN, &newMacros[numNewMacros], &newValues[numNewMacros],
         &numFound );
         numNewMacros += numFound;
     }
-    else 
+    else
     {
-        if ( !replaceSymbols[index] ) 
+        if ( !replaceSymbols[index] )
         {
-            if ( propagateMacros[index] ) 
+            if ( propagateMacros[index] )
             {
-                for ( i=0; i<actWin->numMacros; i++ ) 
+                for ( i=0; i<actWin->numMacros; i++ )
                 {
-                    l = strlen(actWin->macros[i]) + 1;
+                    l = strlen (actWin->macros[i]) + 1;
                     newMacros[i] = (char *) new char[l];
-                    strcpy( newMacros[i], actWin->macros[i] );
+                    strcpy ( newMacros[i], actWin->macros[i] );
 
-                    l = strlen(actWin->expansions[i]) + 1;
+                    l = strlen (actWin->expansions[i]) + 1;
                     newValues[i] = (char *) new char[l];
-                    strcpy( newValues[i], actWin->expansions[i] );
+                    strcpy ( newValues[i], actWin->expansions[i] );
 
                     numNewMacros++;
                 }
 
             }
-            else 
+            else
             {
-                for ( i=0; i<actWin->appCtx->numMacros; i++ ) 
+                for ( i=0; i<actWin->appCtx->numMacros; i++ )
                 {
-                    l = strlen(actWin->appCtx->macros[i]) + 1;
+                    l = strlen (actWin->appCtx->macros[i]) + 1;
                     newMacros[i] = (char *) new char[l];
-                    strcpy( newMacros[i], actWin->appCtx->macros[i] );
+                    strcpy ( newMacros[i], actWin->appCtx->macros[i] );
 
-                    l = strlen(actWin->appCtx->expansions[i]) + 1;
+                    l = strlen (actWin->appCtx->expansions[i]) + 1;
                     newValues[i] = (char *) new char[l];
-                    strcpy( newValues[i], actWin->appCtx->expansions[i] );
+                    strcpy ( newValues[i], actWin->appCtx->expansions[i] );
 
                     numNewMacros++;
                 }
@@ -2873,54 +2873,54 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
         }
 
         max = 100 - numNewMacros;
-        stat = parseSymbolsAndValues( symbolsWithSubs, max,
+        stat = parseSymbolsAndValues ( symbolsWithSubs, max,
         &newMacros[numNewMacros], &newValues[numNewMacros], &numFound );
         numNewMacros += numFound;
     }
 
-    stat = getFileName( name, displayFileName[index].getExpanded(), 127 );
-    stat = getFilePrefix( prefix, displayFileName[index].getExpanded(), 127 );
+    stat = getFileName ( name, displayFileName[index].getExpanded (), 127 );
+    stat = getFilePrefix ( prefix, displayFileName[index].getExpanded (), 127 );
 
     // calc crc
 
     crc = 0;
-    for ( i=0; i<numNewMacros; i++ ) 
+    for ( i=0; i<numNewMacros; i++ )
     {
-        crc = updateCRC( crc, newMacros[i], strlen(newMacros[i]) );
-        crc = updateCRC( crc, newValues[i], strlen(newValues[i]) );
+        crc = updateCRC( crc, newMacros[i], strlen (newMacros[i]) );
+        crc = updateCRC( crc, newValues[i], strlen (newValues[i]) );
     }
 
-    if ( !allowDups[index] ) 
+    if ( !allowDups[index] )
     {
         cur = actWin->appCtx->head->flink;
-        while ( cur != actWin->appCtx->head ) 
+        while ( cur != actWin->appCtx->head )
         {
-            if ( ( strcmp( name, cur->node.displayName ) == 0 ) &&
-                ( strcmp( prefix, cur->node.prefix ) == 0 ) &&
-                ( crc == cur->node.crc ) && !cur->node.isEmbedded ) 
+            if ( ( strcmp ( name, cur->node.displayName ) == 0 ) &&
+                ( strcmp ( prefix, cur->node.prefix ) == 0 ) &&
+                ( crc == cur->node.crc ) && !cur->node.isEmbedded )
             {
                 // display is already open; don't open another instance
                 // move (maybe)
-                if ( setPostion[index] == RDC_BUTTON_POS ) 
+                if ( setPostion[index] == RDC_BUTTON_POS )
                 {
-                    newX = actWin->xPos()+posX+ofsX;
-                    newY = actWin->yPos()+posY+ofsY;
-                    cur->node.move( newX, newY );
+                    newX = actWin->xPos ()+posX+ofsX;
+                    newY = actWin->yPos ()+posY+ofsY;
+                    cur->node.move ( newX, newY );
                 }
-                else if ( setPostion[index] == RDC_PARENT_OFS_POS ) 
+                else if ( setPostion[index] == RDC_PARENT_OFS_POS )
                 {
-                    newX = actWin->xPos()+ofsX;
-                    newY = actWin->yPos()+ofsY;
-                    cur->node.move( newX, newY );
+                    newX = actWin->xPos ()+ofsX;
+                    newY = actWin->yPos ()+ofsY;
+                    cur->node.move ( newX, newY );
                 }
                 // deiconify
-                XMapWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
+                XMapWindow ( cur->node.d, XtWindow (cur->node.topWidgetId ()) );
                 // raise
-                XRaiseWindow( cur->node.d, XtWindow(cur->node.topWidgetId()) );
+                XRaiseWindow ( cur->node.d, XtWindow (cur->node.topWidgetId ()) );
             // cleanup
-                if ( !useSmallArrays ) 
+                if ( !useSmallArrays )
                 {
-                    for ( i=0; i<numNewMacros; i++ ) 
+                    for ( i=0; i<numNewMacros; i++ )
                     {
                         delete newMacros[i];
                         delete newValues[i];
@@ -2933,73 +2933,73 @@ void ExtendedRelatedDisplayClass::popupDisplay ( int index )
     }
 
     cur = new activeWindowListType;
-    actWin->appCtx->addActiveWindow( cur );
+    actWin->appCtx->addActiveWindow ( cur );
 
-    if ( focus || button3Popup ) 
+    if ( focus || button3Popup )
     {
-        cur->node.createAutoPopup( actWin->appCtx, NULL, 0, 0, 0, 0,
+        cur->node.createAutoPopup ( actWin->appCtx, NULL, 0, 0, 0, 0,
         numNewMacros, newMacros, newValues );
     }
-    else 
+    else
     {
-        if ( noEdit ) 
+        if ( noEdit )
         {
-            cur->node.createNoEdit( actWin->appCtx, NULL, 0, 0, 0, 0,
+            cur->node.createNoEdit ( actWin->appCtx, NULL, 0, 0, 0, 0,
             numNewMacros, newMacros, newValues );
         }
-        else 
+        else
         {
-            cur->node.create( actWin->appCtx, NULL, 0, 0, 0, 0,
+            cur->node.create ( actWin->appCtx, NULL, 0, 0, 0, 0,
             numNewMacros, newMacros, newValues );
         }
     }
 
-    if ( !useSmallArrays ) 
+    if ( !useSmallArrays )
     {
-        for ( i=0; i<numNewMacros; i++ ) 
+        for ( i=0; i<numNewMacros; i++ )
         {
             delete newMacros[i];
             delete newValues[i];
         }
     }
 
-    cur->node.realize();
-    cur->node.setGraphicEnvironment( &actWin->appCtx->ci, &actWin->appCtx->fi );
+    cur->node.realize ();
+    cur->node.setGraphicEnvironment ( &actWin->appCtx->ci, &actWin->appCtx->fi );
 
-    cur->node.storeFileName( displayFileName[index].getExpanded() );
+    cur->node.storeFileName ( displayFileName[index].getExpanded () );
 
-    if ( setPostion[index] == RDC_BUTTON_POS ) 
+    if ( setPostion[index] == RDC_BUTTON_POS )
     {
-        actWin->appCtx->openActivateActiveWindow( &cur->node,
-        //actWin->xPos()+x+ofsX, actWin->yPos()+y+ofsY );
-        actWin->xPos()+posX+ofsX, actWin->yPos()+posY+ofsY );
+        actWin->appCtx->openActivateActiveWindow ( &cur->node,
+        //actWin->xPos ()+x+ofsX, actWin->yPos ()+y+ofsY );
+        actWin->xPos ()+posX+ofsX, actWin->yPos ()+posY+ofsY );
     }
-    else if ( setPostion[index] == RDC_PARENT_OFS_POS ) 
+    else if ( setPostion[index] == RDC_PARENT_OFS_POS )
     {
-        actWin->appCtx->openActivateActiveWindow( &cur->node,
-        actWin->xPos()+ofsX, actWin->yPos()+ofsY );
+        actWin->appCtx->openActivateActiveWindow ( &cur->node,
+        actWin->xPos ()+ofsX, actWin->yPos ()+ofsY );
     }
-    else 
+    else
     {
-        actWin->appCtx->openActivateActiveWindow( &cur->node );
+        actWin->appCtx->openActivateActiveWindow ( &cur->node );
     }
 
-    if ( focus || button3Popup ) 
+    if ( focus || button3Popup )
     {
         aw = &cur->node;
     }
-    else 
+    else
     {
         aw = NULL;
     }
 
     done:
 
-    if ( !actWin->isEmbedded ) 
+    if ( !actWin->isEmbedded )
     {
-        if ( !focus && !button3Popup && closeAction[index] ) 
+        if ( !focus && !button3Popup && closeAction[index] )
         {
-            actWin->closeDeferred( 2 );
+            actWin->closeDeferred ( 2 );
         }
     }
 }
@@ -3008,30 +3008,30 @@ void ExtendedRelatedDisplayClass::btnUp ( XButtonEvent *be, int _x, int _y, int 
 {
     *action = 0;
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
-    if ( numDsps == 1 ) 
+    if ( numDsps == 1 )
     {
-        if ( button3Popup ) 
+        if ( button3Popup )
         {
             needClose = 1;
-            actWin->addDefExeNode( aglPtr );
+            actWin->addDefExeNode ( aglPtr );
             return;
         }
     }
 
-    if ( numDsps < 2 ) 
+    if ( numDsps < 2 )
         return;
 
-    if ( buttonNumber != 1 ) 
+    if ( buttonNumber != 1 )
         return;
 
     posX = x + _x - be->x;
     posY = y + _y - be->y;
 
-    XmMenuPosition( popUpMenu, be );
-    XtManageChild( popUpMenu );
+    XmMenuPosition ( popUpMenu, be );
+    XtManageChild ( popUpMenu );
 }
 
 void ExtendedRelatedDisplayClass::btnDown ( XButtonEvent *be, int _x, int _y, int buttonState, int buttonNumber, int *action )
@@ -3040,37 +3040,37 @@ void ExtendedRelatedDisplayClass::btnDown ( XButtonEvent *be, int _x, int _y, in
 
     *action = 0; // close screen via actWin->closeDeferred
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
     focus = useFocus;
-    if ( numDsps > 1 ) 
+    if ( numDsps > 1 )
         focus = 0;
 
-    if ( focus ) 
+    if ( focus )
     {
         if ( buttonNumber != -1 ) return;
     }
-    else 
+    else
     {
-        if ( ( buttonNumber != 1 ) && ( buttonNumber != 3 ) ) 
+        if ( ( buttonNumber != 1 ) && ( buttonNumber != 3 ) )
             return;
-        if ( ( buttonNumber == 3 ) && !button3Popup ) 
+        if ( ( buttonNumber == 3 ) && !button3Popup )
             return;
-        if ( ( buttonNumber == 1 ) && button3Popup ) 
+        if ( ( buttonNumber == 1 ) && button3Popup )
             return;
-        if ( button3Popup && aw ) 
+        if ( button3Popup && aw )
             return;
     }
 
-    if ( numDsps < 1 ) 
+    if ( numDsps < 1 )
         return;
 
-    if ( numDsps == 1 ) 
+    if ( numDsps == 1 )
     {
         posX = x + _x - be->x;
         posY = y + _y - be->y;
-        popupDisplay( 0 );
+        popupDisplay ( 0 );
     }
 }
 
@@ -3078,14 +3078,14 @@ void ExtendedRelatedDisplayClass::pointerIn ( XMotionEvent *me, int _x, int _y, 
 {
     int focus;
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
     focus = useFocus;
 
-    if ( !focus ) 
+    if ( !focus )
     {
-        activeGraphicClass::pointerIn( me, me->x, me->y, buttonState );
+        activeGraphicClass::pointerIn ( me, me->x, me->y, buttonState );
     }
 }
 
@@ -3093,14 +3093,14 @@ void ExtendedRelatedDisplayClass::pointerOut (  XMotionEvent *me,  int _x,  int 
 {
     int focus;
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
     focus = useFocus;
 
-    if ( !focus ) 
+    if ( !focus )
     {
-        activeGraphicClass::pointerOut( me, me->x, me->y, buttonState );
+        activeGraphicClass::pointerOut ( me, me->x, me->y, buttonState );
     }
 }
 
@@ -3111,20 +3111,20 @@ void ExtendedRelatedDisplayClass::mousePointerIn ( XMotionEvent *me, int _x, int
     int focus;
     XButtonEvent *be;
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
     focus = useFocus;
-    if ( numDsps > 1 ) 
+    if ( numDsps > 1 )
         focus = 0;
 
-    if ( focus ) 
+    if ( focus )
     {
-        if ( aw ) 
+        if ( aw )
             return;
 
         be = (XButtonEvent *) me;
-        btnDown( be, _x, _y, buttonState, buttonNumber, &action );
+        btnDown ( be, _x, _y, buttonState, buttonNumber, &action );
     }
 }
 
@@ -3132,17 +3132,17 @@ void ExtendedRelatedDisplayClass::mousePointerOut (  XMotionEvent *me,  int _x, 
 {
     int focus;
 
-    if ( !enabled ) 
+    if ( !enabled )
         return;
 
     focus = useFocus;
-    if ( numDsps > 1 ) 
+    if ( numDsps > 1 )
         focus = 0;
 
-    if ( focus ) 
+    if ( focus )
     {
         needClose = 1;
-        actWin->addDefExeNode( aglPtr );
+        actWin->addDefExeNode ( aglPtr );
     }
 }
 
@@ -3152,7 +3152,7 @@ int ExtendedRelatedDisplayClass::getButtonActionRequest ( int *up, int *down, in
     *down = 1;
     *up = 1;
 
-    if ( !blank( displayFileName[0].getExpanded() ) )
+    if ( !blank ( displayFileName[0].getExpanded () ) )
         *focus = 1;
     else
         *focus = 0;
@@ -3177,10 +3177,10 @@ void ExtendedRelatedDisplayClass::changeDisplayParams (
   int _botShadowColor )
 {
     if ( _flag & ACTGRF_TEXTFGCOLOR_MASK )
-        fgColor.setColorIndex( _textFgColor, actWin->ci );
+        fgColor.setColorIndex ( _textFgColor, actWin->ci );
 
     if ( _flag & ACTGRF_BGCOLOR_MASK )
-        bgColor.setColorIndex( _bgColor, actWin->ci );
+        bgColor.setColorIndex ( _bgColor, actWin->ci );
 
     if ( _flag & ACTGRF_TOPSHADOWCOLOR_MASK )
         topShadowColor = _topShadowColor;
@@ -3188,66 +3188,66 @@ void ExtendedRelatedDisplayClass::changeDisplayParams (
     if ( _flag & ACTGRF_BOTSHADOWCOLOR_MASK )
         botShadowColor = _botShadowColor;
 
-    if ( _flag & ACTGRF_BTNFONTTAG_MASK ) 
+    if ( _flag & ACTGRF_BTNFONTTAG_MASK )
     {
-        strncpy( fontTag, _btnFontTag, 63 );
+        strncpy ( fontTag, _btnFontTag, 63 );
         fontTag[63] = 0;
-        actWin->fi->loadFontTag( fontTag );
-        fs = actWin->fi->getXFontStruct( fontTag );
-        updateDimensions();
+        actWin->fi->loadFontTag ( fontTag );
+        fs = actWin->fi->getXFontStruct ( fontTag );
+        updateDimensions ();
     }
 }
 
-void ExtendedRelatedDisplayClass::executeDeferred ( void ) 
+void ExtendedRelatedDisplayClass::executeDeferred ( void )
 {
     int nc, ncon, nu, nr, okToClose, colorIndex;
     activeWindowListPtr cur;
 
-    actWin->appCtx->proc->lock();
+    actWin->appCtx->proc->lock ();
     nc = needClose; needClose = 0;
     ncon = needConnect; needConnect = 0;
     nu = needUpdate; needUpdate = 0;
     nr = needRefresh; needRefresh = 0;
-    actWin->remDefExeNode( aglPtr );
-    actWin->appCtx->proc->unlock();
+    actWin->remDefExeNode ( aglPtr );
+    actWin->appCtx->proc->unlock ();
 
-    if ( ncon ) 
+    if ( ncon )
     {
         init = 1;
         active = 1;
 
-        fgColor.setConnected();
-        bgColor.setConnected();
+        fgColor.setConnected ();
+        bgColor.setConnected ();
 
-        if ( colorPvId ) 
+        if ( colorPvId )
         {
-            colorPvId->add_value_callback( relDsp_color_value_update,
+            colorPvId->add_value_callback ( relDsp_color_value_update,
             (void *) this );
         }
 
-        if ( enabPvId ) 
+        if ( enabPvId )
         {
-            enabPvId->add_value_callback( relDsp_enab_value_update,
+            enabPvId->add_value_callback ( relDsp_enab_value_update,
             (void *) this );
         }
     }
 
-    if ( nu ) 
+    if ( nu )
     {
         if (colorPvId)
         {
-            colorIndex = actWin->ci->evalRule( fgColor.pixelIndex(),
-                                               colorPvId->get_double() );
-            fgColor.changeIndex( colorIndex, actWin->ci );
+            colorIndex = actWin->ci->evalRule ( fgColor.pixelIndex (),
+                                               colorPvId->get_double () );
+            fgColor.changeIndex ( colorIndex, actWin->ci );
 
-            colorIndex = actWin->ci->evalRule( bgColor.pixelIndex(),
-                                               colorPvId->get_double() );
-            bgColor.changeIndex( colorIndex, actWin->ci );
+            colorIndex = actWin->ci->evalRule ( bgColor.pixelIndex (),
+                                               colorPvId->get_double () );
+            bgColor.changeIndex ( colorIndex, actWin->ci );
         }
 
         if (enabPvId)
-        { 
-            if (enabPvId->get_int())
+        {
+            if (enabPvId->get_int ())
             {
                 enabled = 1;
             }
@@ -3257,14 +3257,14 @@ void ExtendedRelatedDisplayClass::executeDeferred ( void )
                 enabled = 0;
             }
         }
-        smartDrawAllActive();
+        smartDrawAllActive ();
     }
 
-    if ( nr ) 
+    if ( nr )
     {
         if (enabPvId)
-        { 
-            if (enabPvId->get_int())
+        {
+            if (enabPvId->get_int ())
             {
                 enabled = 1;
             }
@@ -3274,19 +3274,19 @@ void ExtendedRelatedDisplayClass::executeDeferred ( void )
                 enabled = 0;
             }
         }
-        smartDrawAllActive();
+        smartDrawAllActive ();
     }
 
-    if ( nc ) 
+    if ( nc )
     {
-        if ( aw ) 
+        if ( aw )
         {
             okToClose = 0;
             // make sure the window was successfully opened
             cur = actWin->appCtx->head->flink;
-            while ( cur != actWin->appCtx->head ) 
+            while ( cur != actWin->appCtx->head )
             {
-                if ( &cur->node == aw ) 
+                if ( &cur->node == aw )
                 {
                     okToClose = 1;
                     break;
@@ -3294,12 +3294,12 @@ void ExtendedRelatedDisplayClass::executeDeferred ( void )
                 cur = cur->flink;
             }
 
-            if ( okToClose ) 
+            if ( okToClose )
             {
-                aw->returnToEdit( 1 );
+                aw->returnToEdit ( 1 );
                 aw = NULL;
             }
-            else 
+            else
             {
                 aw = NULL;
             }
@@ -3307,63 +3307,63 @@ void ExtendedRelatedDisplayClass::executeDeferred ( void )
     }
 }
 
-    
-void ExtendedRelatedDisplayClass::enabPvConnectStateCallback ( ProcessVariable *pv, void *userarg ) 
+
+void ExtendedRelatedDisplayClass::enabPvConnectStateCallback ( ProcessVariable *pv, void *userarg )
 {
     ExtendedRelatedDisplayClass *aao = (ExtendedRelatedDisplayClass *) userarg;
 
-    if ( pv->is_valid() ) 
+    if ( pv->is_valid () )
     {
 
     }
-    else 
+    else
     { // lost connection
-        aao->connection.setPvDisconnected( (void *) aao->enabPvConnection );
-        //aao->lineColor.setDisconnected();
-        //aao->fillColor.setDisconnected();
+        aao->connection.setPvDisconnected ( (void *) aao->enabPvConnection );
+        //aao->lineColor.setDisconnected ();
+        //aao->fillColor.setDisconnected ();
 
-        aao->actWin->appCtx->proc->lock();
+        aao->actWin->appCtx->proc->lock ();
         aao->needRefresh = 1;
-        aao->actWin->addDefExeNode( aao->aglPtr );
-        aao->actWin->appCtx->proc->unlock();
+        aao->actWin->addDefExeNode ( aao->aglPtr );
+        aao->actWin->appCtx->proc->unlock ();
     }
 }
 
-void ExtendedRelatedDisplayClass::enabPvValueCallback ( ProcessVariable *pv, void *userarg ) 
+void ExtendedRelatedDisplayClass::enabPvValueCallback ( ProcessVariable *pv, void *userarg )
 {
     ExtendedRelatedDisplayClass *aao = (ExtendedRelatedDisplayClass *) userarg;
 
-    if ( !aao->connection.pvsConnected() ) 
+    if ( !aao->connection.pvsConnected () )
     {
-        if ( pv->is_valid() ) 
+        if ( pv->is_valid () )
         {
-            aao->connection.setPvConnected( (void *) enabPvConnection );
+            aao->connection.setPvConnected ( (void *) enabPvConnection );
 
-            if ( aao->connection.pvsConnected() ) 
+            if ( aao->connection.pvsConnected () )
             {
-                aao->actWin->appCtx->proc->lock();
+                aao->actWin->appCtx->proc->lock ();
                 aao->needConnect = 1;
-                aao->actWin->addDefExeNode( aao->aglPtr );
-                aao->actWin->appCtx->proc->unlock();
+                aao->actWin->addDefExeNode ( aao->aglPtr );
+                aao->actWin->appCtx->proc->unlock ();
             }
         }
     }
-    else 
+    else
     {
-        aao->actWin->appCtx->proc->lock();
+        aao->actWin->appCtx->proc->lock ();
         aao->needRefresh = 1;
-        aao->actWin->addDefExeNode( aao->aglPtr );
-        aao->actWin->appCtx->proc->unlock();
+        aao->actWin->addDefExeNode ( aao->aglPtr );
+        aao->actWin->appCtx->proc->unlock ();
     }
 }
 
-    
-    
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void *create_ExtendedRelatedDisplayClassPtr ( void ) 
+void *create_ExtendedRelatedDisplayClassPtr ( void )
 {
     ExtendedRelatedDisplayClass *ptr;
 
@@ -3377,7 +3377,7 @@ void *clone_ExtendedRelatedDisplayClassPtr ( void *_srcPtr )
 
     srcPtr = (ExtendedRelatedDisplayClass *) _srcPtr;
 
-    ptr = new ExtendedRelatedDisplayClass( srcPtr );
+    ptr = new ExtendedRelatedDisplayClass ( srcPtr );
 
     return ((void *) ptr);
 }

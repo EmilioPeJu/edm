@@ -35,65 +35,65 @@ int tmp;
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb2) {
 	  *(kp->intDest) = 2;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb3) {
 	  *(kp->intDest) = 3;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb4) {
 	  *(kp->intDest) = 4;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb5) {
 	  *(kp->intDest) = 5;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb6) {
 	  *(kp->intDest) = 6;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb7) {
 	  *(kp->intDest) = 7;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb8) {
 	  *(kp->intDest) = 8;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
+  }
   else if ( w==kp->pb9) {
 	  *(kp->intDest) = 9;
 	  kp->popdown();
 	  XtDestroyWidget(kp->shell);
 	  kp->shell=NULL;
 	  (*kp->okFunc)( w, (XtPointer) kp->userPtr, client );
-  }  
-  
-  
+  }
+
+
 /*  else if ( w == kp->pbOK ) {
 
     if ( strcmp( &kp->buf[1], "." ) == 0 ) { // only single "." was entered
@@ -1236,7 +1236,7 @@ int onekeypadClass::create (
     XmStringFree( str );
 
     XtAddCallback( pb0, XmNactivateCallback, (XtCallbackProc) func, this );
- 
+
 // ---------------------------------------
   if ( entryTag )
     str = XmStringCreate( " x ", entryTag );
@@ -1255,7 +1255,7 @@ int onekeypadClass::create (
 
   XtAddCallback( pbCancel, XmNactivateCallback, (XtCallbackProc) func, this );
 
-// ---------------------------------------  
+// ---------------------------------------
 /*
     if ( entryTag )
       str = XmStringCreate( " .", entryTag );

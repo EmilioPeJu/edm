@@ -32,7 +32,7 @@ static void unconnectedTimeout (
 
 activeLogMeterClass *metero = (activeLogMeterClass *) client;
 
-  if ( !metero->activeInitFlag ) 
+  if ( !metero->activeInitFlag )
   {
     metero->needToDrawUnconnected = 1;
     metero->needDraw = 1;
@@ -222,7 +222,7 @@ static void logMeter_monitor_read_connect_state (
 
 activeLogMeterClass *metero = (activeLogMeterClass *) userarg;
 
-  if ( pv->is_valid () ) 
+  if ( pv->is_valid () )
   {
 
     metero->needConnectInit = 1;
@@ -231,7 +231,7 @@ activeLogMeterClass *metero = (activeLogMeterClass *) userarg;
     metero->actWin->appCtx->proc->unlock ();
 
   }
-  else 
+  else
   {
 
     metero->readPvConnected = 0;
@@ -261,7 +261,7 @@ int st, sev;
 
 /****** SJS 18/10/06 - make meter show invalid PV status ******
 ******* Following lines moved from here ******
-  if ( metero->active ) 
+  if ( metero->active )
   {
 ******/
   st = pv->get_status ();
@@ -292,7 +292,7 @@ int st, sev;
 
 }
 
-activeLogMeterClass::activeLogMeterClass ( void ) 
+activeLogMeterClass::activeLogMeterClass ( void )
 {
 
   name = new char[strlen ("activeLogMeterClass") + 1];
@@ -340,7 +340,7 @@ activeLogMeterClass::activeLogMeterClass ( void )
 
 // copy constructor
 activeLogMeterClass::activeLogMeterClass
- ( const activeLogMeterClass *source ) 
+ ( const activeLogMeterClass *source )
 {
 
   activeGraphicClass *metero = (activeGraphicClass *) this;
@@ -416,13 +416,13 @@ activeLogMeterClass::activeLogMeterClass
 
 }
 
-activeLogMeterClass::~activeLogMeterClass ( void ) 
+activeLogMeterClass::~activeLogMeterClass ( void )
 {
   if ( name ) delete[] name;
 
   if ( eBuf ) delete eBuf;
 
-  if ( unconnectedTimer ) 
+  if ( unconnectedTimer )
   {
     XtRemoveTimeOut ( unconnectedTimer );
     unconnectedTimer = 0;
@@ -434,7 +434,7 @@ int activeLogMeterClass::createInteractive (
   int _x,
   int _y,
   int _w,
-  int _h ) 
+  int _h )
 {
 
   actWin = (activeWindowClass *) aw_obj;
@@ -486,13 +486,13 @@ double a180 = 180;
 char *emptyStr = "";
 
 int lit = 2;
-static char *labelTypeEnumStr[3] = 
+static char *labelTypeEnumStr[3] =
 {
   "pvName",
   "pvLabel",
   "literal"
 };
-static int labelTypeEnum[3] = 
+static int labelTypeEnum[3] =
 {
   0,
   1,
@@ -643,7 +643,7 @@ int activeLogMeterClass::old_save (
 
   writeStringToFile ( f, scaleFontTag );
 
-  fprintf ( f, "%-g\n", meterAngle );  
+  fprintf ( f, "%-g\n", meterAngle );
 
   return 1;
 
@@ -664,13 +664,13 @@ double a180 = 180;
 char *emptyStr = "";
 
 int lit = 2;
-static char *labelTypeEnumStr[3] = 
+static char *labelTypeEnumStr[3] =
 {
   "pvName",
   "pvLabel",
   "literal"
 };
-static int labelTypeEnum[3] = 
+static int labelTypeEnum[3] =
 {
   0,
   1,
@@ -722,52 +722,52 @@ static int labelTypeEnum[3] =
 
   stat = tag.readTags ( f, "endObjectProperties" );
 
-  if ( !( stat & 1 ) ) 
+  if ( !( stat & 1 ) )
   {
     actWin->appCtx->postMessage ( tag.errMsg () );
   }
 
-  if ( major > METERC_MAJOR_VERSION ) 
+  if ( major > METERC_MAJOR_VERSION )
   {
     postIncompatable ();
     return 0;
   }
 
-  if ( major < 4 ) 
+  if ( major < 4 )
   {
     postIncompatable ();
     return 0;
   }
 
-  if ( ( major == 4 ) && ( minor < 1 ) ) 
+  if ( ( major == 4 ) && ( minor < 1 ) )
   {
 
-    if ( blank (scaleMinExpStr.getRaw ()) ) 
+    if ( blank (scaleMinExpStr.getRaw ()) )
     {
       scaleMinExpStr.setRaw ( "0" );
     }
 
-    if ( blank (scaleMaxExpStr.getRaw ()) ) 
+    if ( blank (scaleMaxExpStr.getRaw ()) )
     {
       scaleMaxExpStr.setRaw ( "0" );
     }
 
-    if ( blank (scalePrecExpStr.getRaw ()) ) 
+    if ( blank (scalePrecExpStr.getRaw ()) )
     {
       scalePrecExpStr.setRaw ( "0" );
     }
 
-    if ( blank (labIntExpStr.getRaw ()) ) 
+    if ( blank (labIntExpStr.getRaw ()) )
     {
       labIntExpStr.setRaw ( "0" );
     }
 
-    if ( blank (majorIntExpStr.getRaw ()) ) 
+    if ( blank (majorIntExpStr.getRaw ()) )
     {
       majorIntExpStr.setRaw ( "0" );
     }
 
-    if ( blank (minorIntExpStr.getRaw ()) ) 
+    if ( blank (minorIntExpStr.getRaw ()) )
     {
       minorIntExpStr.setRaw ( "0" );
     }
@@ -827,7 +827,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
 
   fscanf ( f, "%d %d %d\n", &major, &minor, &release ); actWin->incLine ();
 
-  if ( major > METERC_MAJOR_VERSION ) 
+  if ( major > METERC_MAJOR_VERSION )
   {
     postIncompatable ();
     return 0;
@@ -840,7 +840,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
 
   this->initSelectBox ();
 
-  if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 0 ) ) ) 
+  if ( ( major > 2 ) || ( ( major == 2 ) && ( minor > 0 ) ) )
   {
 
     actWin->ci->readColorIndex ( f, &index );
@@ -891,7 +891,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
     bsColor.setColorIndex ( index, actWin->ci );
 
   }
-  else if ( major > 1 ) 
+  else if ( major > 1 )
   {
 
     fscanf ( f, "%d\n", &index ); actWin->incLine ();
@@ -935,7 +935,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
     bsColor.setColorIndex ( index, actWin->ci );
 
   }
-  else 
+  else
   {
 
     fscanf ( f, "%d %d %d\n", &r, &g, &b ); actWin->incLine ();
@@ -1012,7 +1012,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
 
   fscanf ( f, "%d\n", &showScale ); actWin->incLine ();
 
-  if ( major > 1 || minor > 1 ) 
+  if ( major > 1 || minor > 1 )
   {
     readStringFromFile ( oneName, 39 + 1, f ); actWin->incLine ();
     strncpy ( scaleFormat, oneName, 15 );
@@ -1086,7 +1086,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
   updateFont ( scaleFontTag, &scaleFs, &scaleFontAscent, &scaleFontDescent,
                &scaleFontHeight );
 
-  if ( major > 1 || minor > 0 ) 
+  if ( major > 1 || minor > 0 )
   {
     fscanf ( f, "%lg\n", &meterAngle ); actWin->incLine ();
   }
@@ -1097,12 +1097,12 @@ char oneName[PV_Factory::MAX_PV_NAME + 1], str[15 + 1];
 
 }
 
-int activeLogMeterClass::genericEdit ( void ) 
+int activeLogMeterClass::genericEdit ( void )
 {
 
   char title[32], *ptr;
 
-  if ( !eBuf ) 
+  if ( !eBuf )
   {
     eBuf = new editBufType;
   }
@@ -1147,7 +1147,7 @@ int activeLogMeterClass::genericEdit ( void )
 
   eBuf->bufFgColor = fgColor.pixelIndex ();
   eBuf->bufFgColorMode = fgColorMode;
-  
+
   eBuf->bufShadowMode = shadowMode;
   eBuf->bufTsColor = tsColor.pixelIndex ();
   eBuf->bufBsColor = bsColor.pixelIndex ();
@@ -1240,7 +1240,7 @@ int activeLogMeterClass::genericEdit ( void )
   ef.addTextField (activeLogMeterClass_str44, 35, eBuf->bufLabelIntervals, 15 );
   ef.addTextField (activeLogMeterClass_str26, 35, eBuf->bufMajorIntervals, 15 );
   ef.addTextField (activeLogMeterClass_str27, 35, eBuf->bufMinorIntervals, 15 );
-  ef.addToggle (activeLogMeterClass_str28, &eBuf->bufNeedleType);  
+  ef.addToggle (activeLogMeterClass_str28, &eBuf->bufNeedleType);
   ef.addColorButton ( activeLogMeterClass_str29, actWin->ci, &eBuf->fgCb,
                       &eBuf->bufFgColor );
   ef.addToggle ( activeLogMeterClass_str30, &eBuf->bufFgColorMode );
@@ -1267,7 +1267,7 @@ int activeLogMeterClass::genericEdit ( void )
 
 }
 
-int activeLogMeterClass::editCreate ( void ) 
+int activeLogMeterClass::editCreate ( void )
 {
 
   this->genericEdit ();
@@ -1280,7 +1280,7 @@ int activeLogMeterClass::editCreate ( void )
 
 }
 
-int activeLogMeterClass::edit ( void ) 
+int activeLogMeterClass::edit ( void )
 {
   this->genericEdit ();
   ef.finished ( logMeterc_edit_ok, logMeterc_edit_apply,
@@ -1292,7 +1292,7 @@ int activeLogMeterClass::edit ( void )
 
 }
 
-int activeLogMeterClass::erase ( void ) 
+int activeLogMeterClass::erase ( void )
 {
   if ( deleteRequest ) return 1;
 
@@ -1307,12 +1307,12 @@ int activeLogMeterClass::erase ( void )
   return 1;
 }
 
-int activeLogMeterClass::eraseActive ( void ) 
+int activeLogMeterClass::eraseActive ( void )
 {
   if ( !enabled || !activeMode) return 1;
 
-  if ( bufInvalid) 
-  { 
+  if ( bufInvalid)
+  {
     actWin->executeGc.setLineStyle ( LineSolid );
     actWin->executeGc.setLineWidth ( 1 );
 
@@ -1325,7 +1325,7 @@ int activeLogMeterClass::eraseActive ( void )
   return 1;
 }
 
-int activeLogMeterClass::draw ( void ) 
+int activeLogMeterClass::draw ( void )
 {
   int i, ii, tX, tY;
   char scaleMinString[39 + 1], scaleMaxString[39 + 1], scaleString[39 + 1];
@@ -1419,7 +1419,7 @@ int activeLogMeterClass::draw ( void )
   sprintf (scaleMaxString, fmt, scaleMax);
 
   if ( scaleFs )
-  { 
+  {
     scaleMinWidth = XTextWidth (scaleFs, scaleMinString,
                                 strlen (scaleMinString));
     scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString,
@@ -1430,7 +1430,7 @@ int activeLogMeterClass::draw ( void )
     scaleMinWidth = 10;
     scaleMaxWidth = 10;
   }
- 
+
   if (scaleMinWidth >= scaleMaxWidth)
     scaleFontWidth =  scaleMinWidth;
   else
@@ -1464,7 +1464,7 @@ int activeLogMeterClass::draw ( void )
   biggestHorizNeedlePlusScale = 0.5 * faceW - 4 - scaleFontWidth;
   if (descentAngle > 0)
     biggestHorizNeedlePlusScale /= cos (descentAngle);
- 
+
   if (descentAngle > 0)
   {
     //   visibleFraction = 1.1 * (1 - .45 * descentAngle);
@@ -1478,7 +1478,7 @@ int activeLogMeterClass::draw ( void )
     biggestVertNeedlePlusScale = (faceH - scaleFontHeight - 12) /
                                  visibleFraction;
   }
- 
+
   if (biggestVertNeedlePlusScale <biggestHorizNeedlePlusScale)
     needlePlusScale = biggestVertNeedlePlusScale;
   else
@@ -1508,16 +1508,16 @@ int activeLogMeterClass::draw ( void )
   meterNeedleXorigin += faceX;
   meterNeedleYorigin += faceY;
   meterNeedleXend    += faceX;
-  meterNeedleYend    += faceY;    
+  meterNeedleYend    += faceY;
 
   actWin->drawGc.setFG ( meterColor.pixelColor () );
-   
+
   XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
                    actWin->drawGc.normGC (), x, y, w, h );
 
-   
+
   actWin->drawGc.setFG ( bgColor.pixelColor () );
-   
+
   XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
                    actWin->drawGc.normGC (),
                    faceX, faceY, faceW, faceH );
@@ -1570,7 +1570,7 @@ int activeLogMeterClass::draw ( void )
                faceX + faceW, faceY );
 
   }
- 
+
   if ((labelIntervals != 0) && (labelIntervals !=0 && showScale))
   {
     labelAngleIncr = meterTotalAngle / labelIntervals;
@@ -1589,20 +1589,20 @@ int activeLogMeterClass::draw ( void )
                                             sin (labelAngle));
       nearEndX = (int) (meterNeedleXorigin + insideArc * cos (labelAngle));
       nearEndY = (int) (meterNeedleYorigin - insideArc * sin (labelAngle));
-     
+
       actWin->drawGc.setFG ( scaleColor.pixelColor () );
       XDrawLine (actWin->d, XtWindow (actWin->drawWidget),
                  actWin->drawGc.normGC (),
                  farEndX, farEndY,
                  nearEndX, nearEndY);
-     
+
       if ( strcmp ( scaleFontTag, "" ) != 0 )
       {
         actWin->drawGc.setFontTag ( scaleFontTag, actWin->fi );
       }
-     
+
       updateDimensions ();
-     
+
       if (labelAngle < (beginAngle + 0.001))
       {
         tX = farEndX + 2;
@@ -1640,7 +1640,7 @@ int activeLogMeterClass::draw ( void )
         tY = farEndY - scaleFontAscent / 2;
         drawText (actWin->drawWidget, &actWin->drawGc, scaleFs, tX, tY,
                   XmALIGNMENT_END, scaleMinString);
-      }       
+      }
     }
 
     for (labelAngle = beginAngle;
@@ -1652,7 +1652,7 @@ int activeLogMeterClass::draw ( void )
         for (ii = 1; ii < minorIntervals; ii++)
         {
           tickSize = minorTickSize;
-       
+
           farEndX = (int) (meterNeedleXorigin +
                           (insideArc + tickSize) *
                           cos (ii * minorAngleIncr + labelAngle +
@@ -1675,7 +1675,7 @@ int activeLogMeterClass::draw ( void )
         if ( i > 0 )
         {
           tickSize = majorTickSize;
-       
+
           farEndX = (int) (meterNeedleXorigin +
                            (insideArc + tickSize) *
                            cos (i * majorAngleIncr + labelAngle));
@@ -1695,11 +1695,11 @@ int activeLogMeterClass::draw ( void )
   }
  // }
   actWin->drawGc.restoreFg ();
- 
+
   return 1;
 }
 
-int activeLogMeterClass::drawActive ( void ) 
+int activeLogMeterClass::drawActive ( void )
 {
 
   int i, ii, tX, tY;
@@ -1725,9 +1725,9 @@ int activeLogMeterClass::drawActive ( void )
 
   XPoint xpoints[6];
 
-  if ( !activeInitFlag ) 
+  if ( !activeInitFlag )
   {
-    if ( needToDrawUnconnected ) 
+    if ( needToDrawUnconnected )
     {
       actWin->executeGc.saveFg ();
       actWin->executeGc.setFG ( meterColor.getDisconnected () );
@@ -1818,7 +1818,7 @@ int activeLogMeterClass::drawActive ( void )
   sprintf (scaleMaxString, fmt, scaleMax);
 
   if ( scaleFs )
-  {  
+  {
     scaleMinWidth = XTextWidth (scaleFs, scaleMinString,
                                 strlen (scaleMinString));
     scaleMaxWidth = XTextWidth (scaleFs, scaleMaxString,
@@ -1844,7 +1844,7 @@ int activeLogMeterClass::drawActive ( void )
   if ( XTextWidth (scaleFs, scaleString, strlen (scaleString)) >
        scaleFontWidth)
     scaleFontWidth = XTextWidth (scaleFs, scaleString, strlen (scaleString));
-    
+
   scaleLogValue = scaleLogMin + scaleLogTextIncr;
   sprintf (scaleString, fmt, pow (10, scaleLogValue));
 
@@ -1857,7 +1857,7 @@ int activeLogMeterClass::drawActive ( void )
   biggestHorizNeedlePlusScale = 0.5 * faceW - 4 - scaleFontWidth;
   if (descentAngle > 0)
     biggestHorizNeedlePlusScale /= cos (descentAngle);
- 
+
   if (descentAngle > 0)
   {
     //   visibleFraction = 1.1 * (1 - .45 * descentAngle);
@@ -1871,7 +1871,7 @@ int activeLogMeterClass::drawActive ( void )
     biggestVertNeedlePlusScale = (faceH - scaleFontHeight - 12) /
                                   visibleFraction;
   }
- 
+
   if (biggestVertNeedlePlusScale <biggestHorizNeedlePlusScale)
     needlePlusScale = biggestVertNeedlePlusScale;
   else
@@ -1922,29 +1922,29 @@ int activeLogMeterClass::drawActive ( void )
                                                 cos (needleAngle));
   meterNeedleYend = (int) (meterNeedleYorigin - needleLength *
                                                 sin (needleAngle));
- 
+
   meterNeedleXorigin += faceX;
   meterNeedleYorigin += faceY;
   meterNeedleXend    += faceX;
-  meterNeedleYend    += faceY;    
- 
+  meterNeedleYend    += faceY;
+
   if (drawStaticFlag)
   {
     actWin->executeGc.setFG ( meterColor.getColor () );
-   
+
     XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
                      actWin->executeGc.normGC (), x, y, w, h );
 
-   
+
     actWin->executeGc.setFG ( bgColor.getColor () );
-   
+
     XFillRectangle ( actWin->d, XtWindow (actWin->executeWidget),
                      actWin->executeGc.normGC (),
                      faceX, faceY, faceW, faceH );
 
     actWin->executeGc.setFG ( labelColor.getColor () );
 
-    if ( strcmp ( labelFontTag, "" ) != 0 ) 
+    if ( strcmp ( labelFontTag, "" ) != 0 )
     {
       actWin->executeGc.setFontTag ( labelFontTag, actWin->fi );
     }
@@ -1956,7 +1956,7 @@ int activeLogMeterClass::drawActive ( void )
                 XmALIGNMENT_BEGINNING, label);
     }
 
-    if (shadowMode) 
+    if (shadowMode)
     {
       actWin->executeGc.setFG ( tsColor.getColor () );
 
@@ -1988,9 +1988,9 @@ int activeLogMeterClass::drawActive ( void )
                  actWin->executeGc.normGC (),
                  faceX, faceY,
                  faceX + faceW, faceY );
-    }   
+    }
   }
- 
+
   if (drawStaticFlag && showScale)
   {
     drawStaticFlag = 0;
@@ -2014,14 +2014,14 @@ int activeLogMeterClass::drawActive ( void )
            labelAngle <= (1.001 * endAngle);
            labelAngle += labelAngleIncr, scaleLogValue -= scaleLogTextIncr)
       {
-       
+
         farEndX = (int) (meterNeedleXorigin + (insideArc + labelTickSize) *
                                               cos (labelAngle));
         farEndY = (int) (meterNeedleYorigin - (insideArc + labelTickSize) *
                                               sin (labelAngle));
         nearEndX = (int) (meterNeedleXorigin + insideArc * cos (labelAngle));
         nearEndY = (int) (meterNeedleYorigin - insideArc * sin (labelAngle));
-       
+
         actWin->executeGc.setFG ( scaleColor.getColor () );
         XDrawLine (actWin->d, XtWindow (actWin->executeWidget),
                    actWin->executeGc.normGC (),
@@ -2072,7 +2072,7 @@ int activeLogMeterClass::drawActive ( void )
           tY = farEndY - scaleFontAscent/2;
           drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
                     XmALIGNMENT_END, scaleMinString);
-        }       
+        }
       }
 
       for (labelAngle = beginAngle;
@@ -2084,13 +2084,13 @@ int activeLogMeterClass::drawActive ( void )
           for (ii = 1; ii < minorIntervals; ii++)
           {
             tickSize = minorTickSize;
-       
+
             farEndX = (int) (meterNeedleXorigin +
-                             (insideArc + tickSize) * 
+                             (insideArc + tickSize) *
                              cos (ii * minorAngleIncr + labelAngle +
                                   i * majorAngleIncr));
             farEndY = (int) (meterNeedleYorigin -
-                             (insideArc + tickSize) * 
+                             (insideArc + tickSize) *
                              sin (ii * minorAngleIncr + labelAngle +
                                   i * majorAngleIncr));
             nearEndX = (int) (meterNeedleXorigin +
@@ -2110,7 +2110,7 @@ int activeLogMeterClass::drawActive ( void )
           {
 
             tickSize = majorTickSize;
-       
+
             farEndX = (int) (meterNeedleXorigin +
                              (insideArc + tickSize) *
                              cos (i * majorAngleIncr + labelAngle));
@@ -2134,7 +2134,7 @@ int activeLogMeterClass::drawActive ( void )
     }
   }
 
-  if (oldMeterNeedleXEnd != meterNeedleXend || 
+  if (oldMeterNeedleXEnd != meterNeedleXend ||
       oldMeterNeedleYEnd != meterNeedleYend )
   {
 
@@ -2156,7 +2156,7 @@ int activeLogMeterClass::drawActive ( void )
                  oldMeterNeedleXEnd, oldMeterNeedleYEnd,
                  oldMeterNeedleXOrigin, oldMeterNeedleYOrigin);
     }
-    else 
+    else
     {
       xpoints[0].x = oldMeterNeedleXOrigin - 1;
       xpoints[0].y = oldMeterNeedleYOrigin;
@@ -2179,7 +2179,7 @@ int activeLogMeterClass::drawActive ( void )
       XDrawLines ( actWin->d, XtWindow (actWin->executeWidget),
                    actWin->executeGc.normGC (), xpoints, 6, CoordModeOrigin );
     }
-   
+
     /* draw new needle */
 
     actWin->executeGc.setFG ( fgColor.getColor () );
@@ -2244,7 +2244,7 @@ int activeLogMeterClass::drawActive ( void )
                   actWin->executeGc.normGC (),
                   meterNeedleXend, meterNeedleYend,
                   meterNeedleXorigin, meterNeedleYorigin);
-    }    
+    }
     else
     {
 
@@ -2316,23 +2316,23 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
     activeMode = 1;
 
     if ( !controlPvExpStr.getExpanded () ||
-         // ( strcmp ( controlPvExpStr.getExpanded (), "" ) == 0 ) ) 
+         // ( strcmp ( controlPvExpStr.getExpanded (), "" ) == 0 ) )
          blankOrComment ( controlPvExpStr.getExpanded () ) )
     {
       controlExists = 0;
     }
-    else 
+    else
     {
       controlExists = 1;
     }
 
     if ( !readPvExpStr.getExpanded () ||
-         // ( strcmp ( readPvExpStr.getExpanded (), "" ) == 0 ) ) 
+         // ( strcmp ( readPvExpStr.getExpanded (), "" ) == 0 ) )
          blankOrComment ( readPvExpStr.getExpanded () ) )
     {
       readExists = 0;
     }
-    else 
+    else
     {
       readExists = 1;
       meterColor.setConnectSensitive ();
@@ -2354,7 +2354,7 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
         scaleMin = 0;
       }
 
-      if ( scaleMaxExpStr.getExpanded () ) 
+      if ( scaleMaxExpStr.getExpanded () )
       {
         scaleMax = atof ( scaleMaxExpStr.getExpanded () );
       }
@@ -2409,7 +2409,7 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
                                            2000, unconnectedTimeout, this );
       }
 
-      if ( readExists ) 
+      if ( readExists )
       {
         readPvId = the_PV_Factory->create ( readPvExpStr.getExpanded () );
         if ( readPvId )
@@ -2445,23 +2445,23 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
 
 int activeLogMeterClass::deactivate (
   int pass
-) 
+)
 {
 
-  if ( pass == 1 ) 
+  if ( pass == 1 )
   {
     active = 0;
     activeMode = 0;
 
-    if ( unconnectedTimer ) 
+    if ( unconnectedTimer )
     {
       XtRemoveTimeOut ( unconnectedTimer );
       unconnectedTimer = 0;
     }
 
-    if ( readExists ) 
+    if ( readExists )
     {
-      if ( readPvId ) 
+      if ( readPvId )
       {
         readPvId->remove_conn_state_callback (
             logMeter_monitor_read_connect_state, this );
@@ -2628,7 +2628,7 @@ int stat, retStat = 1;
 
 }
 
-int activeLogMeterClass::containsMacros ( void ) 
+int activeLogMeterClass::containsMacros ( void )
 {
   int result;
 
@@ -2663,7 +2663,7 @@ int activeLogMeterClass::checkResizeSelectBox (
   int _x,
   int _y,
   int _w,
-  int _h ) 
+  int _h )
 {
   int tmpw, tmph, ret_stat;
 
@@ -2717,7 +2717,7 @@ int activeLogMeterClass::checkResizeSelectBoxAbs (
   return ret_stat;
 }
 
-void activeLogMeterClass::executeDeferred ( void ) 
+void activeLogMeterClass::executeDeferred ( void )
 {
 
   double v;
@@ -2761,7 +2761,7 @@ void activeLogMeterClass::executeDeferred ( void )
       {
         baseV = readPvId->get_double ();
       }
-      else 
+      else
       {
         baseV = 0;
       }
@@ -2818,7 +2818,7 @@ void activeLogMeterClass::executeDeferred ( void )
   }
 }
 
-char *activeLogMeterClass::firstDragName ( void ) 
+char *activeLogMeterClass::firstDragName ( void )
 {
   if ( !enabled ) return NULL;
 
@@ -2826,7 +2826,7 @@ char *activeLogMeterClass::firstDragName ( void )
   return dragName[dragIndex];
 }
 
-char *activeLogMeterClass::nextDragName ( void ) 
+char *activeLogMeterClass::nextDragName ( void )
 {
   return NULL;
 }
@@ -2840,7 +2840,7 @@ char *activeLogMeterClass::dragValue ( int i )
   {
     return readPvExpStr.getExpanded ();
   }
-  else 
+  else
   {
     return readPvExpStr.getRaw ();
   }
@@ -2884,7 +2884,7 @@ void activeLogMeterClass::changeDisplayParams (
   if ( _flag & ACTGRF_BOTSHADOWCOLOR_MASK )
     bsColor.setColorIndex ( _botShadowColor, actWin->ci );
 
-  if ( _flag & ACTGRF_CTLFONTTAG_MASK ) 
+  if ( _flag & ACTGRF_CTLFONTTAG_MASK )
   {
 
     strcpy ( scaleFontTag, _ctlFontTag );
@@ -2945,7 +2945,7 @@ char *activeLogMeterClass::crawlerGetFirstPv ( void )
   return readPvExpStr.getExpanded ();
 }
 
-char *activeLogMeterClass::crawlerGetNextPv ( void ) 
+char *activeLogMeterClass::crawlerGetNextPv ( void )
 {
   return NULL;
 }

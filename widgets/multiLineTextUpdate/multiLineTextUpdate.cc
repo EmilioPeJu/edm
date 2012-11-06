@@ -41,7 +41,7 @@ static void localCvtDoubleToExpNotationString (double value,
     bool minus;
     int exp, k, l;
     char TF[PV_Factory::MAX_PV_NAME + 1];
-    
+
     absVal = fabs (value);
     minus = value < 0.0;
     newVal = absVal;
@@ -73,7 +73,7 @@ static void localCvtDoubleToExpNotationString (double value,
         textField[k++] = '0' + exp / 10;
         textField[k++] = '0' + exp % 10;
         textField[k++] = '\0';
-        
+
     }
     else
     {
@@ -204,7 +204,7 @@ int zero = 0;
 char *emptyStr = "";
 
 int deflt = 0;
-static char *dspModeEnumStr[5] = 
+static char *dspModeEnumStr[5] =
 {
     "default",
     "decimal",
@@ -212,7 +212,7 @@ static char *dspModeEnumStr[5] =
     "engineer",
     "exp"
 };
-static int dspMode[5] = 
+static int dspMode[5] =
 {
     0,
     1,
@@ -222,13 +222,13 @@ static int dspMode[5] =
 };
 
 int left = XmALIGNMENT_BEGINNING;
-static char *alignEnumStr[3] = 
+static char *alignEnumStr[3] =
 {
     "left",
     "center",
     "right"
 };
-static int alignEnum[3] = 
+static int alignEnum[3] =
 {
     XmALIGNMENT_BEGINNING,
     XmALIGNMENT_CENTER,
@@ -305,7 +305,7 @@ int edmmultiLineTextUpdateClass::old_save (FILE *f)
     // Line
     line_width.write (f);
     fprintf (f, "%-d\n", is_line_alarm_sensitive);
-   
+
     return 1;
 }
 
@@ -323,7 +323,7 @@ int zero = 0;
 char *emptyStr = "";
 
 int deflt = 0;
-static char *dspModeEnumStr[5] = 
+static char *dspModeEnumStr[5] =
 {
     "default",
     "decimal",
@@ -331,7 +331,7 @@ static char *dspModeEnumStr[5] =
     "engineer",
     "exp"
 };
-static int dspMode[5] = 
+static int dspMode[5] =
 {
     0,
     1,
@@ -341,13 +341,13 @@ static int dspMode[5] =
 };
 
 int left = XmALIGNMENT_BEGINNING;
-static char *alignEnumStr[3] = 
+static char *alignEnumStr[3] =
 {
     "left",
     "center",
     "right"
 };
-static int alignEnum[3] = 
+static int alignEnum[3] =
 {
     XmALIGNMENT_BEGINNING,
     XmALIGNMENT_CENTER,
@@ -382,18 +382,18 @@ static int alignEnum[3] =
 
     stat = tag.readTags ( f, "endObjectProperties" );
 
-    if ( !( stat & 1 ) ) 
+    if ( !( stat & 1 ) )
     {
         actWin->appCtx->postMessage ( tag.errMsg () );
     }
 
-    if ( major > TEXT_MAJOR ) 
+    if ( major > TEXT_MAJOR )
     {
         postIncompatable ();
         return 0;
     }
 
-    if ( major < 10 ) 
+    if ( major < 10 )
     {
         postIncompatable ();
         return 0;
@@ -435,7 +435,7 @@ int edmmultiLineTextUpdateClass::old_createFromFile (FILE *f, char *filename,
     // Version, bounding box
     fscanf (f, "%d %d %d\n", &major, &minor, &release); actWin->incLine ();
 
-    if ( major > TEXT_MAJOR ) 
+    if ( major > TEXT_MAJOR )
     {
       postIncompatable ();
       return 0;
@@ -467,7 +467,7 @@ int edmmultiLineTextUpdateClass::old_createFromFile (FILE *f, char *filename,
     }
     // text colour. Changed for 2.0.0: Use names
     // Since 5.0.0: back to indices
-    if ( major > 5 ) 
+    if ( major > 5 )
     {
         actWin->ci->readColorIndex ( f, &index );
         actWin->incLine (); actWin->incLine ();
@@ -492,7 +492,7 @@ int edmmultiLineTextUpdateClass::old_createFromFile (FILE *f, char *filename,
         textColour.setAlarmSensitive (index > 0);
     }
     // fillcolour index & mode
-    if ( major > 5 ) 
+    if ( major > 5 )
     {
         actWin->ci->readColorIndex ( f, &index );
         actWin->incLine (); actWin->incLine ();
@@ -663,7 +663,7 @@ void edmmultiLineTextUpdateClass::redraw_text (Display *dis,
                                      size_t len)
 {
     int fg_pixel = textColour.getPixel (actWin->ci);
-    
+
     // Background fill?
     if (is_filled)
     {
@@ -742,7 +742,7 @@ int edmmultiLineTextUpdateClass::draw ()  // render the edit-mode image
     if (is_executing || deleteRequest)
         return 1;
     actWin->drawGc.saveFg ();
-    
+
     const char *pvname = getRawName (data_pv_name);
     size_t len = strlen (pvname);
     textColour.reset ();
@@ -752,7 +752,7 @@ int edmmultiLineTextUpdateClass::draw ()  // render the edit-mode image
                 actWin->drawGc,
                 actWin->drawGc.normGC (),
                 pvname, len);
-    
+
     actWin->drawGc.restoreFg ();
     return 1;
 }
@@ -934,7 +934,7 @@ void edmmultiLineTextUpdateClass::getPvs (int max,
                                           ProcessVariable *pvs[],
                                           int *n)
 {
-    if ( max < 2 ) 
+    if ( max < 2 )
     {
         *n = 0;
         return;
@@ -943,7 +943,7 @@ void edmmultiLineTextUpdateClass::getPvs (int max,
     pvs[0] = data_pv;
     pvs[1] = colour_pv;
 }
-    
+
 // --------------------------------------------------------
 // Macro support
 // --------------------------------------------------------
@@ -1026,7 +1026,7 @@ int edmmultiLineTextUpdateClass::activate (int pass, void *ptr)
     XmFontList fonts;
     if (! setupPVs (pass, ptr))
         return 0;
-    
+
     switch (pass) // ... up to 6
     {
     case 1: // initialize
@@ -1069,7 +1069,7 @@ int edmmultiLineTextUpdateClass::activate (int pass, void *ptr)
                                           XmNwordWrap, True,
                                           XmNcursorPositionVisible, False,
                                           NULL);
-        if ( !enabled ) 
+        if ( !enabled )
         {
             if ( widget ) XtUnmapWidget ( widget );
         }
@@ -1152,7 +1152,7 @@ bool edmmultiLineTextUpdateClass::get_current_values (char *text, size_t &len)
             strncpy (text, textPtr, MAX_TEXT_LENGTH);
         else
             strcpy (text, "!! Invalid PV type !!");
-        
+
         for (len = 0; len < MAX_TEXT_LENGTH && text[len] != 0; len++);
 #ifdef DEBUG
         printf ("edmMultiLineTextUpdateClass::get_current_values returns true\n");
@@ -1185,7 +1185,7 @@ int edmmultiLineTextUpdateClass::drawActive ()
                  actWin->executeGc,
                  actWin->executeGc.normGC (),
                  text, len);
-   
+
     actWin->executeGc.restoreFg ();
     return 1;
 }
@@ -1198,7 +1198,7 @@ int edmmultiLineTextUpdateClass::drawActive ()
 #ifdef DEBUG
     printf ("Start of multiLineTextUpdateClass::drawActive\n");
 #endif
-    if ( !enabled ) 
+    if ( !enabled )
     {
         if ( widget ) XtUnmapWidget ( widget );
     }
@@ -1308,7 +1308,7 @@ void edmmultiLineTextUpdateClass::executeDeferred ()
 
 // Drag & drop support
 char *edmmultiLineTextUpdateClass::firstDragName ()
-{   
+{
     if ( !enabled ) return NULL;
     return "PV";
 }
@@ -1323,11 +1323,11 @@ char *edmmultiLineTextUpdateClass::dragValue (int i)
 {
     if ( !enabled ) return NULL;
 
-    if ( actWin->mode == AWC_EXECUTE ) 
+    if ( actWin->mode == AWC_EXECUTE )
     {
         return (char *)getExpandedName (data_pv_name);
     }
-    else 
+    else
     {
       return (char *)getRawName (data_pv_name);
     }
@@ -1359,7 +1359,7 @@ static void drag (Widget w, XEvent *e, String *params, Cardinal numParams)
 {
     activeGraphicClass *obj;
     XtVaGetValues (w, XmNuserData, &obj, NULL);
-    
+
     obj->startDrag (w, e);
 }
 
@@ -1421,13 +1421,13 @@ bool edmmultiLineTextEntryClass::get_current_values (char *text, size_t &len)
 #endif
     return result;
 }
-        
+
 int edmmultiLineTextEntryClass::activate (int pass, void *ptr)
 {
     XmFontList fonts;
     if (! edmmultiLineTextUpdateClass::setupPVs (pass, ptr))
         return 0;
-    
+
     switch (pass) // ... up to 6
     {
     case 1: // initialize
@@ -1484,7 +1484,7 @@ int edmmultiLineTextEntryClass::activate (int pass, void *ptr)
                        (XtCallbackProc)text_edit_callback,
                        (XtPointer)this);
 
-        if ( !enabled ) 
+        if ( !enabled )
         {
             if ( widget ) XtUnmapWidget ( widget );
         }
@@ -1519,7 +1519,7 @@ int edmmultiLineTextEntryClass::drawActive ()
 #ifdef DEBUG
     printf ("Start of multiLineTextEntryClass::drawActive\n");
 #endif
-    if ( !enabled ) 
+    if ( !enabled )
     {
         if ( widget ) XtUnmapWidget ( widget );
     }
@@ -1554,7 +1554,7 @@ int edmmultiLineTextEntryClass::drawActive ()
     }
     XmTextSetString (widget, text);
 
-#ifdef DEBUG   
+#ifdef DEBUG
     printf ("End of multiLineTextEntryClass::drawActive\n");
 #endif
     return 1;
@@ -1572,7 +1572,7 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
                                                      XtPointer clientData,
                                                      XtPointer pCallbackData)
 {
-#ifdef DEBUG    
+#ifdef DEBUG
     printf ("Start of edmmultiLineTextEntryClass::text_edit_callback\n");
 #endif
     edmmultiLineTextEntryClass *me = (edmmultiLineTextEntryClass *) clientData;
@@ -1598,7 +1598,7 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
                the EDM window is not the active one ?!
                Confuses the Mac X server: steals keyboard
                from Striptool until EDM is stopped!
-                   
+
                XSetInputFocus (me->actWin->display (), XtWindow (w),
                RevertToNone, CurrentTime);
             */
@@ -1628,7 +1628,7 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
     {
         // Text has changed - write it
         strncpy (me->old_text, text, MAX_TEXT_LENGTH);
-       
+
     double num;
     int hexnum;
 
@@ -1730,18 +1730,18 @@ void edmmultiLineTextEntryClass::unmap ( void )
 }
 
 // crawler functions may return blank pv names
-char *edmmultiLineTextUpdateClass::crawlerGetFirstPv ( void ) 
+char *edmmultiLineTextUpdateClass::crawlerGetFirstPv ( void )
 {
     crawlerPvIndex = 0;
     return data_pv_name.getExpanded ();
 
 }
 
-char *edmmultiLineTextUpdateClass::crawlerGetNextPv ( void ) 
+char *edmmultiLineTextUpdateClass::crawlerGetNextPv ( void )
 {
     if ( crawlerPvIndex >= 1 ) return NULL;
     crawlerPvIndex++;
-    if ( crawlerPvIndex == 1 ) 
+    if ( crawlerPvIndex == 1 )
     {
         return colour_pv_name.getExpanded ();
     }

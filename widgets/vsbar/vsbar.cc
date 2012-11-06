@@ -31,7 +31,7 @@ static void unconnectedTimeout (
 
   activeVsBarClass *baro = (activeVsBarClass *) client;
 
-  if ( !baro->init ) 
+  if ( !baro->init )
   {
     baro->needToDrawUnconnected = 1;
     baro->needRefresh = 1;
@@ -717,19 +717,19 @@ int activeVsBarClass::save (
     "pvName",
     "literal"
   };
-  static int labelTypeEnum[2] = 
+  static int labelTypeEnum[2] =
   {
     0,
     1
   };
 
   int horz = 1;
-  static char *orienTypeEnumStr[2] = 
+  static char *orienTypeEnumStr[2] =
   {
     "vertical",
     "horizontal"
   };
-  static int orienTypeEnum[2] = 
+  static int orienTypeEnum[2] =
   {
     0,
     1
@@ -798,24 +798,24 @@ int activeVsBarClass::createFromFile (
   static char *emptyStr = "";
 
   int lit = 1;
-  static char *labelTypeEnumStr[2] = 
+  static char *labelTypeEnumStr[2] =
   {
     "pvName",
     "literal"
   };
-  static int labelTypeEnum[2] = 
+  static int labelTypeEnum[2] =
   {
     0,
     1
   };
 
   int horz = 1;
-  static char *orienTypeEnumStr[2] = 
+  static char *orienTypeEnumStr[2] =
   {
     "vertical",
     "horizontal"
   };
-  static int orienTypeEnum[2] = 
+  static int orienTypeEnum[2] =
   {
     0,
     1
@@ -911,7 +911,7 @@ int activeVsBarClass::createFromFile (
     precision = efPrecision.value();
 
   if ( ( limitsFromPVs || limitsFromDb || efReadMin.isNull() ) &&
-       ( limitsFromPVs || limitsFromDb || efReadMax.isNull() ) ) 
+       ( limitsFromPVs || limitsFromDb || efReadMax.isNull() ) )
   {
     readMin = 0;
     readMax = 10;
@@ -1087,7 +1087,7 @@ int activeVsBarClass::genericEdit ( void )
 
 }
 
-int activeVsBarClass::editCreate ( void ) 
+int activeVsBarClass::editCreate ( void )
 {
 
   this->genericEdit();
@@ -1099,7 +1099,7 @@ int activeVsBarClass::editCreate ( void )
 
 }
 
-int activeVsBarClass::edit ( void ) 
+int activeVsBarClass::edit ( void )
 {
 
   this->genericEdit();
@@ -1111,7 +1111,7 @@ int activeVsBarClass::edit ( void )
 
 }
 
-int activeVsBarClass::erase ( void ) 
+int activeVsBarClass::erase ( void )
 {
 
   if ( deleteRequest ) return 1;
@@ -1129,14 +1129,14 @@ int activeVsBarClass::erase ( void )
 
 }
 
-int activeVsBarClass::eraseActive ( void ) 
+int activeVsBarClass::eraseActive ( void )
 {
 
   if ( !enabled || !activeMode || !init ) return 1;
 
   actWin->executeGc.setFG( bgColour.getColor() );
 
-  if ( bufInvalid ) 
+  if ( bufInvalid )
   {
 
     actWin->executeGc.setLineWidth( 1 );
@@ -1426,7 +1426,7 @@ int activeVsBarClass::drawActive ( void )
   else
   { // vertical
 
-    if ( bufInvalid ) 
+    if ( bufInvalid )
     {
 
       actWin->executeGc.setFG( bgColour.getColor() );
@@ -1574,7 +1574,7 @@ int activeVsBarClass::drawActive ( void )
       }
 
     }
-    else 
+    else
     {
 
       if ( strcmp( str, "" ) != 0 )
@@ -1592,7 +1592,7 @@ int activeVsBarClass::drawActive ( void )
 
     }
 
-    if ( border ) 
+    if ( border )
     {
       actWin->executeGc.setLineWidth( 1 );
       actWin->executeGc.setLineStyle( LineSolid );
@@ -1670,7 +1670,7 @@ int activeVsBarClass::activate (
     }
 
     if ( !nullPvExpStr.getExpanded() ||
-       blankOrComment( nullPvExpStr.getExpanded() ) ) 
+       blankOrComment( nullPvExpStr.getExpanded() ) )
     {
       nullExists = 0;
     }
@@ -1681,7 +1681,7 @@ int activeVsBarClass::activate (
     }
 
     if ( !maxPvExpStr.getExpanded() ||
-       blankOrComment( maxPvExpStr.getExpanded() ) ) 
+       blankOrComment( maxPvExpStr.getExpanded() ) )
     {
       maxExists = 0;
     }
@@ -1692,7 +1692,7 @@ int activeVsBarClass::activate (
     }
 
     if ( !minPvExpStr.getExpanded() ||
-       blankOrComment( minPvExpStr.getExpanded() ) ) 
+       blankOrComment( minPvExpStr.getExpanded() ) )
     {
       minExists = 0;
     }
@@ -1802,7 +1802,7 @@ int activeVsBarClass::activate (
 
 int activeVsBarClass::deactivate (
   int pass
-) 
+)
 {
 
   active = 0;
@@ -1931,7 +1931,7 @@ void activeVsBarClass::updateDimensions ( void )
     }
 
     if ( border && !showScale && ( ( strcmp( label, "" ) == 0 ) ||
-     ( labelType == BARC_K_PV_NAME ) ) ) 
+     ( labelType == BARC_K_PV_NAME ) ) )
     {
       minH += 9;
       barY += 5;
@@ -1939,7 +1939,7 @@ void activeVsBarClass::updateDimensions ( void )
       barAreaW = w - 9;
     }
 
-    if ( h < minH ) 
+    if ( h < minH )
     {
 
       h = minH;
@@ -1968,7 +1968,7 @@ void activeVsBarClass::updateDimensions ( void )
     }
 
   }
-  else 
+  else
   {  // vertical
 
     minVertW = 5;
@@ -2324,12 +2324,12 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
 
   case BARC_K_MAX_GE_MIN:
 
-    if ( readV >= barOriginX) 
+    if ( readV >= barOriginX)
     {
 
       barX = originW;
 
-      if ( barOriginX == readMax) 
+      if ( barOriginX == readMax)
       {
 
         barW = 0;
@@ -2352,7 +2352,7 @@ void activeVsBarClass::updateHorzScaleInfo ( void )
       }
 
     }
-    else 
+    else
     {
 
       if ( barOriginX == readMin )
@@ -2586,7 +2586,7 @@ void activeVsBarClass::updateVertScaleInfo ( void )
         locH = 0;
         factorGe = 0;
       }
-      else 
+      else
       {
         locH = (int) ( ( originH ) *
          ( readV - barOriginX ) /
@@ -2657,7 +2657,7 @@ void activeVsBarClass::updateBar ( void )
     {
     case BARC_K_MAX_GE_MIN:
 
-      if ( readV >= barOriginX ) 
+      if ( readV >= barOriginX )
       {
         barX = originW;
         barW = (int) ( factorGe * ( readV - barOriginX ) + 0.5 );
@@ -2850,7 +2850,7 @@ void activeVsBarClass::executeDeferred ( void )
 
   if ( ni )
   {
-    
+
     if ( efBarOriginX.isNull() )
     {
       barOriginX = readMin;

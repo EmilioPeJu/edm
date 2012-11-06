@@ -1,6 +1,6 @@
 // g++ -shared -o TwoDProfileMonitor.so TwoDProfileMonitor.cc -g -O -Wall -ansi
 // -pedantic -I/ade/epics/supTop/extensions/R3.14.4/src/edm/util
-// -I/ade/epics/supTop/extensions/R3.14.4/src/edm/lib 
+// -I/ade/epics/supTop/extensions/R3.14.4/src/edm/lib
 // -I/ade/epics/supTop/extensions/R3.14.4/src/edm/pvlib
 // -I /ade/epics/supTop/base/R3.14.4/include -I/usr/X11R6/include
 // -L/usr/X11R6/lib widget.cc -lXpm
@@ -11,8 +11,8 @@
 #define VIDEO_MAX_LOAD_FACTOR 4
 #define VIDEO_MAX_DATA_WIDTH 10000
 #define VIDEO_MAX_DATA_HEIGHT 10000
-#define VIDEO_MAJOR_VERSION 4 
-#define VIDEO_MINOR_VERSION 3 
+#define VIDEO_MAJOR_VERSION 4
+#define VIDEO_MINOR_VERSION 3
 #define VIDEO_RELEASE 1
 
 #include <time.h>
@@ -31,7 +31,7 @@ class TwoDProfileMonitor : public activeGraphicClass
 {
 
     // standard colours for various PV states
-    pvColorClass pvColour; 
+    pvColorClass pvColour;
 
     // width of data (fixed or from PV)
     int dataWidth, dataHeight;
@@ -152,43 +152,43 @@ public:
     // Called when the grid size process variable connects or disconnects
     static void monitorGridSizeConnectState (ProcessVariable *pv,
                                              void *userarg );
-  
+
     // Called when the value of any of the data, use false colour, show grid,
     // width offset, height offset or grid size process variables
     // changes
     static void dataUpdate (ProcessVariable *pv,
                             void *userarg );
-    
+
     // Called when the value of the width or height process variable changes
     static void sizeUpdate (ProcessVariable *pv,
                             void *userarg );
-  
+
     static void grabButtonEvent (Widget w, XtPointer closure, XEvent* event,
                                  Boolean* b)
     {
-    
+
         TwoDProfileMonitor *me = (TwoDProfileMonitor *) closure;
         // normalize dimensions (button and motion events store x, y in the
         // same location)
         event->xbutton.x += me->getX0 ();
         event->xbutton.y += me->getY0 ();
-    
+
         // now send this event to EDM
         XtDispatchEventToWidget (me->actWin->executeWidget, event);
         *b = False; // terminate this "dispatch path"
     }
-  
 
-    virtual int draw ( void ); 
-  
+
+    virtual int draw ( void );
+
     // called in response to "cut" command
-    virtual int erase ( void );  
-  
+    virtual int erase ( void );
+
     virtual int activate (int pass);
-  
+
     // apply the results of either "Apply" or "OK" buttons
     void applyEditChanges (void);
-  
+
     // user hit the "OK" button on the edit popup
     static void editOK (Widget w,
                         XtPointer client,
@@ -201,12 +201,12 @@ public:
     static void editCancel (Widget w,
                             XtPointer client,
                             XtPointer call );
- 
+
     // user hit the "Cancel" button on the edit popup during widget creation
     static void editCancelCreate (Widget w,
                                   XtPointer client,
                                   XtPointer call );
- 
+
     // "helper" function for editing widget under a variety of circumstances
     void editCommon ( activeWindowClass *actWin, entryFormClass *ef,
                       int create = 0 ) ;
@@ -232,23 +232,23 @@ public:
     virtual int save ( FILE *fptr );
 
     virtual int edit ( void );
-  
+
     // ========================================================
     // execute mode widget functions
-  
+
     virtual int deactivate ( int pass );
-  
+
     virtual int initDefExeNode ( void *ptr )
-    { 
+    {
         aglPtr = ptr; /* why isn't this done for me? */
         return activeGraphicClass::initDefExeNode (ptr);
     }
-  
+
     virtual int expand1st (int numMacros,
                            char *macros[],
-                           char *expansions[] ) 
+                           char *expansions[] )
     {
-        int stat; 
+        int stat;
         stat = dataPvStr.expand1st (numMacros, macros, expansions);
         if (stat)
             stat = widthPvStr.expand1st (numMacros, macros, expansions);
@@ -276,15 +276,15 @@ public:
             stat = dataRangeMaxPvStr.expand1st (numMacros, macros,
                                                 expansions);
         return stat;
-    
+
     }
-  
-    // currently only used by mux devices (which we are not) 
+
+    // currently only used by mux devices (which we are not)
     virtual int expand2nd (int numMacros,
                            char *macros[],
                            char *expansions[] )
     {
-        int stat; 
+        int stat;
         stat = dataPvStr.expand2nd (numMacros, macros, expansions);
         if (stat)
             stat = widthPvStr.expand2nd (numMacros, macros, expansions);
@@ -312,10 +312,10 @@ public:
             stat = dataRangeMaxPvStr.expand2nd (numMacros, macros,
                                                 expansions);
         return stat;
-    
+
     }
-  
-    // currently only used by mux devices (which we are not) 
+
+    // currently only used by mux devices (which we are not)
     virtual int containsMacros ( void )
     {
         return dataPvStr.containsPrimaryMacros () ? 1 : 0;
@@ -351,7 +351,7 @@ public:
 #ifdef DEBUG
         printf ("Start of TwoDProfMon::executeDeferred\n");
 #endif
-        if (actWin->isIconified) 
+        if (actWin->isIconified)
         {
 #ifdef DEBUG
              printf ("TwoDProfMon::execDeferred return - window iconified\n");
@@ -361,8 +361,8 @@ public:
         // The widget may not be able to handle video data as fast as it is
         // produced (particularly if it is displaying a large image on a
         // remote X display).  If this happens, unprocessed channel access
-        // data is queued for transmission in the IOC and eventually some 
-        // has to be discarded.  What is lost is not necessarily video data, 
+        // data is queued for transmission in the IOC and eventually some
+        // has to be discarded.  What is lost is not necessarily video data,
         // with the result that other edm widgets appear to stop working.
         // To avoid this happening, we must make sure we receive all screen
         // images that are produced and ignore any we haven't time to put out.
@@ -389,7 +389,7 @@ public:
         if (++counter == PRINT_COUNT)
         {
             counter = 0;
-            
+
             printf ("TwoDPrfMon - time between refreshes - average %lu max %lu\n",
                     totalElapsedUsec / PRINT_COUNT, maxElapsedUsec);
             totalElapsedUsec = 0;
@@ -423,7 +423,7 @@ public:
         {
             ni = 1;
         }
- 
+
         if (ni)
         {
             active = 1;
@@ -541,7 +541,7 @@ public:
                                                    this );
             }
         }
-        
+
         // need to check if we're being updated because of width change
 #ifdef DEBUG
         printf ("executeDeferred (TwoDMon.cc) - pvBasedDataSize = %d\n",
@@ -743,8 +743,7 @@ public:
                 dataRangeMax = 0;
             }
         }
-    
-    
+
         if (dataWidth <= 0 || dataWidth > VIDEO_MAX_DATA_WIDTH ||
             dataHeight < 0 || dataHeight > VIDEO_MAX_DATA_HEIGHT ||
             widthOffset < -VIDEO_MAX_DATA_WIDTH ||
@@ -764,8 +763,8 @@ public:
                 "TwoDProfMon::execDef - widthOffset %d heightOffset %d"
                 " gridSize %d gridColour %d\n",
                 widthOffset, heightOffset, gridSize, gridColour);
-            return; 
-        } 
+            return;
+        }
 
         if ((dataHeight != 0) &&
             ((dataHeight * dataWidth) != (int)dataPv->get_dimension()))
@@ -796,10 +795,10 @@ public:
 #endif
         if (dataPv && dataPv->is_valid ())
         {
-      
+
             switch (dataPv->get_type ().type)
             {
-        
+
             case ProcessVariable::Type::real:
 #ifdef DEBUG
                 printf ("TwoDProfMon::execDef case real - calling widgetNewDispData\n");
@@ -808,7 +807,7 @@ public:
                 widgetNewDisplayData (
                     wd, dataPv->get_time_t (), dataPv->get_nano (),
                     (unsigned long) w, (unsigned long) h, dataWidth,
-                    (dataHeight > 0 ? dataHeight 
+                    (dataHeight > 0 ? dataHeight
                                     : dataPv->get_dimension () / dataWidth),
                     maxDataWidth,
                     maxDataHeight,
@@ -837,7 +836,7 @@ public:
                     widgetNewDisplayData (
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
                         (unsigned long)w, (unsigned long) h, dataWidth,
-                        (dataHeight > 0 ? dataHeight 
+                        (dataHeight > 0 ? dataHeight
                                         : dataPv->get_dimension () / dataWidth),
                         maxDataWidth,
                         maxDataHeight,
@@ -868,7 +867,7 @@ public:
                     widgetNewDisplayData (
                         wd, dataPv->get_time_t (), dataPv->get_nano (),
                         (unsigned long) w, (unsigned long) h, dataWidth,
-                        (dataHeight > 0 ? dataHeight 
+                        (dataHeight > 0 ? dataHeight
                                         : dataPv->get_dimension () / dataWidth),
                         maxDataWidth,
                         maxDataHeight,
@@ -902,11 +901,11 @@ public:
         {
             widgetNewDisplayInfo (wd, false, 0, 0);
         }
-    
+
         // actWin->remDefExeNode (aglPtr);
-    
+
         actWin->appCtx->proc->unlock ();
-    
+
         // Get approx average elapsed time for call - no point in being precise
         gettimeofday (&tv, 0);
         elapsedusec = (tv.tv_sec - lasttv.tv_sec) * 1000000 +
@@ -920,24 +919,24 @@ public:
                 average_time_usec);
 #endif
     }
-  
+
     // let the user select among a field of functional names for drag-n-drop
     virtual char *firstDragName ( void ){ return "data PV"; };
     virtual char *nextDragName ( void ){ return NULL; } ;
-  
+
 
     virtual char *dragValue ( int i )
     { return i ? NULL : dataPvStr.getExpanded (); };
-  
+
     // yes we use PVs, therefore we support drag-n-drop and info dialogs
     virtual int atLeastOneDragPv (int x,
                                   int y ){ return 1; };
- 
+
     // this one is to support an info dialog about widget-related PVs
     virtual void getPvs (int max,
                          ProcessVariable *pvs[],
                          int *n ){ *n = 1; pvs[0] = dataPv;};
-  
+
     // This is a funny interface. It seems that the idea is to have a generic
     // interface to all widgets with a "standard" set of parameters (e.g.
     // control PV).  However, there doesn't seem to be a clean way to associate
@@ -977,7 +976,7 @@ public:
     }
 
     // see previous comments
-  
+
     virtual void changeDisplayParams (unsigned int flag,
                                       char *fontTag,
                                       int alignment,
@@ -995,14 +994,14 @@ public:
     {
 
         if (flag & ACTGRF_FONTTAG_MASK) textFontTag = fontTag; // strcpy???
-        if (flag & ACTGRF_ALIGNMENT_MASK) textAlignment = alignment; 
+        if (flag & ACTGRF_ALIGNMENT_MASK) textAlignment = alignment;
         if (flag & ACTGRF_TEXTFGCOLOR_MASK) textColour = textFgColour;
     }
-  
+
 private:
-  
+
     TwoDProfileMonitor &operator=(const TwoDProfileMonitor &s);
-  
+
 };
 
 
@@ -1010,13 +1009,13 @@ private:
 // I like to break this out because it forces me to
 // enumerate all the data memebers that are saved
 // It is more work, but less error-prone (IMHO)
-class TwoDProfileMonitorTags : public tagClass 
+class TwoDProfileMonitorTags : public tagClass
 {
 
 public:
     TwoDProfileMonitorTags (void){ init (); }
     ~TwoDProfileMonitorTags (){}
-  
+
     int read (TwoDProfileMonitor* mon,
               FILE *fptr,
               int *x, int *y, int *w, int *h,
@@ -1057,13 +1056,13 @@ public:
         loadR ( "h", h );
         loadR ( "dataPvStr", dataPvStr, (char *) "" );
         loadR ( "widthPvStr", widthPvStr, (char *) "" );
-        loadR ( "heightPvStr", heightPvStr, (char *) "" ); 
+        loadR ( "heightPvStr", heightPvStr, (char *) "" );
         loadR ( "widthOffsetPvStr", widthOffsetPvStr, (char *) "" );
         loadR ( "heightOffsetPvStr", heightOffsetPvStr, (char *) "" );
         loadR ( "gridSizePvStr", gridSizePvStr, (char *) "100" );
-        loadR ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
-        loadR ( "showGridPvStr", showGridPvStr, (char *) "" ); 
-        loadR ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
+        loadR ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" );
+        loadR ( "showGridPvStr", showGridPvStr, (char *) "" );
+        loadR ( "gridColourPvStr", gridColourPvStr, (char *) "" );
         loadR ( "dataRangeMinPvStr", dataRangeMinPvStr, (char *) "" );
         loadR ( "dataRangeMaxPvStr", dataRangeMaxPvStr, (char *) "" );
         loadR ( "pvBasedDataSize", pvBasedDataSize);
@@ -1083,7 +1082,7 @@ public:
         if (major > VIDEO_MAJOR_VERSION ||
             (major == VIDEO_MAJOR_VERSION && minor > VIDEO_MINOR_VERSION))
         {
-             // edl file was produced by a more recent version of edm than 
+             // edl file was produced by a more recent version of edm than
              // this and we can't predict the future
              mon->postIncompatable ();
              return 0;
@@ -1137,15 +1136,15 @@ public:
         loadW ( "h", h );
         loadW ( "dataPvStr", dataPvStr, (char *) "" );
         loadW ( "widthPvStr", widthPvStr, (char *) "" );
-        loadW ( "heightPvStr", heightPvStr, (char *) "" ); 
+        loadW ( "heightPvStr", heightPvStr, (char *) "" );
         loadW ( "widthOffsetPvStr", widthOffsetPvStr, (char *) "" );
         loadW ( "heightOffsetPvStr", heightOffsetPvStr, (char *) "" );
         loadW ( "gridSizePvStr", gridSizePvStr, (char *) "" );
-        loadW ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" ); 
-        loadW ( "showGridPvStr", showGridPvStr, (char *) "" ); 
-        loadW ( "gridColourPvStr", gridColourPvStr, (char *) "" ); 
-        loadW ( "dataRangeMinPvStr", dataRangeMinPvStr, (char *) "" ); 
-        loadW ( "dataRangeMaxPvStr", dataRangeMaxPvStr, (char *) "" ); 
+        loadW ( "useFalseColourPvStr", useFalseColourPvStr, (char *) "" );
+        loadW ( "showGridPvStr", showGridPvStr, (char *) "" );
+        loadW ( "gridColourPvStr", gridColourPvStr, (char *) "" );
+        loadW ( "dataRangeMinPvStr", dataRangeMinPvStr, (char *) "" );
+        loadW ( "dataRangeMaxPvStr", dataRangeMaxPvStr, (char *) "" );
         loadW ( "pvBasedDataSize", pvBasedDataSize);
         loadW ( "maxDataWidth", maxDataWidth);
         loadW ( "maxDataHeight", maxDataHeight);
@@ -1161,7 +1160,7 @@ public:
         loadW ( "transposeXY", transposeXY);
         loadW ( "endObjectProperties" );
         loadW ( "" );
-  
+
         return writeTags ( fptr );
     }
 
@@ -1173,7 +1172,7 @@ private:
 
 
 // stuff needed for EDM to load from DLL
-extern "C" 
+extern "C"
 {
 
     void *create_TwoDProfileMonitorClassPtr ( void )
@@ -1209,46 +1208,46 @@ typedef struct libRecTag
 
 static int libRecIndex = 0;
 
-static libRecType libRec[] = 
+static libRecType libRec[] =
 {
     { "TwoDProfileMonitor", global_str2, "New Monitor" }
 };
 
-extern "C" 
+extern "C"
 {
 
     int firstRegRecord (char **className,
                         char **typeName,
                         char **text )
     {
-    
+
         libRecIndex = 0;
-    
+
         *className = libRec[libRecIndex].className;
         *typeName = libRec[libRecIndex].typeName;
         *text = libRec[libRecIndex].text;
-    
+
         return 0; // OK
-    
+
     }
-  
+
     int nextRegRecord (char **className,
                        char **typeName,
                        char **text )
     {
-    
+
         if (libRecIndex >= sizeof (libRec)/sizeof (libRecType) - 1)
             return -1; // done
         ++libRecIndex;
-    
+
         *className = libRec[libRecIndex].className;
         *typeName = libRec[libRecIndex].typeName;
         *text = libRec[libRecIndex].text;
-    
+
         return 0; // OK
-    
+
     }
-  
+
 }
 
 void TwoDProfileMonitor::constructCommon (void)
@@ -1282,7 +1281,7 @@ void TwoDProfileMonitor::constructCommon (void)
     twoDWidget = NULL;
 
     name = "TwoDProfileMonitorClass";
-  
+
     dataPvStr.setRaw ("");
     widthPvStr.setRaw ("");
     heightPvStr.setRaw ("");
@@ -1294,7 +1293,7 @@ void TwoDProfileMonitor::constructCommon (void)
     gridColourPvStr.setRaw ("");
     dataRangeMinPvStr.setRaw ("");
     dataRangeMaxPvStr.setRaw ("");
-  
+
     dataPv = NULL;
     widthPv = NULL;
     heightPv = NULL;
@@ -1337,16 +1336,16 @@ void TwoDProfileMonitor::constructCommon (void)
 
 }
 
-TwoDProfileMonitor::TwoDProfileMonitor (void) : activeGraphicClass () 
-{ 
-  
+TwoDProfileMonitor::TwoDProfileMonitor (void) : activeGraphicClass ()
+{
+
     constructCommon ();
 }
 
 
 TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
-{ 
-  
+{
+
     // clone base class data
     // why doesn't activeGraphicClass copy constructor do this?
     activeGraphicClass::clone ( &s );
@@ -1377,7 +1376,7 @@ TwoDProfileMonitor::TwoDProfileMonitor (const TwoDProfileMonitor &s)
     pvBasedShowGrid = s.pvBasedShowGrid;
     gridColour = s.gridColour;
     pvBasedGridColour = s.pvBasedGridColour;
-    dataWidth = s.dataWidth; 
+    dataWidth = s.dataWidth;
     widthOffset = s.widthOffset;
     heightOffset = s.heightOffset;
     pvBasedOffsets = s.pvBasedOffsets;
@@ -1614,7 +1613,7 @@ int TwoDProfileMonitor::activate ( int pass )
             pvNotConnectedMask);
 #endif
         break;
-    
+
         // connect PVs during pass 2
     case 2:
         {
@@ -1623,9 +1622,9 @@ int TwoDProfileMonitor::activate ( int pass )
 #endif
             // assume the best!
             pvColour.setColorIndex ( actWin->defaultTextFgColor, actWin->ci );
-      
 
-            if (!dataPvExists) 
+
+            if (!dataPvExists)
             {
 #ifdef DEBUG
                 printf (
@@ -1637,18 +1636,18 @@ int TwoDProfileMonitor::activate ( int pass )
             dataPv = the_PV_Factory->create ( dataPvStr.getExpanded () );
             if ( dataPv )
             {
-#ifdef DEBUG             
+#ifdef DEBUG
                 printf (
-                    "TwoDProfMon::activate pass 2 - add data connect cb\n"); 
+                    "TwoDProfMon::activate pass 2 - add data connect cb\n");
 #endif
                 dataPv->add_conn_state_callback (monitorDataConnectState,
                                                  this);
                 //dataPv->add_value_callback ( pvUpdate, this );
             }
-     
+
             if (widthPvExists)
             {
-                // printf ("activate (TwoDMon.cc) - width PV = %s = %s\n", 
+                // printf ("activate (TwoDMon.cc) - width PV = %s = %s\n",
                 //         widthPvStr.getRaw (),
                 //         widthPvStr.getExpanded ());
                 widthPv = the_PV_Factory->create ( widthPvStr.getExpanded () );
@@ -1666,7 +1665,7 @@ int TwoDProfileMonitor::activate ( int pass )
             }
             if (heightPvExists)
             {
-                // printf ("activate (TwoDMon.cc) - height PV = %s = %s\n", 
+                // printf ("activate (TwoDMon.cc) - height PV = %s = %s\n",
                 //         heightPvStr.getRaw (),
                 //         heightPvStr.getExpanded ());
                 heightPv = the_PV_Factory->create ( heightPvStr.getExpanded ());
@@ -1686,7 +1685,7 @@ int TwoDProfileMonitor::activate ( int pass )
             if (widthOffsetPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - width offset PV"
-                //         " = %s = %s\n", 
+                //         " = %s = %s\n",
                 //         widthOffsetPvStr.getRaw (),
                 //         widthOffsetPvStr.getExpanded ());
                 widthOffsetPv = the_PV_Factory->create (
@@ -1706,7 +1705,7 @@ int TwoDProfileMonitor::activate ( int pass )
             if (heightOffsetPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - height offset PV"
-                //         " = %s = %s\n", 
+                //         " = %s = %s\n",
                 //         heightOffsetPvStr.getRaw (),
                 //         heightOffsetPvStr.getExpanded ());
                 heightOffsetPv = the_PV_Factory->create (
@@ -1725,7 +1724,7 @@ int TwoDProfileMonitor::activate ( int pass )
             }
             if (gridSizePvExists)
             {
-                // printf ("activate (TwoDMon.cc) - grid size PV = %s = %s\n", 
+                // printf ("activate (TwoDMon.cc) - grid size PV = %s = %s\n",
                 //         gridSizePvStr.getRaw (),
                 //         gridSizePvStr.getExpanded ());
                 gridSizePv = the_PV_Factory->create (
@@ -1749,7 +1748,7 @@ int TwoDProfileMonitor::activate ( int pass )
             if (useFalseColourPvExists)
             {
                 // printf ("activate (TwoDMon.cc) - use false colour"
-                //         " PV = %s = %s\n", 
+                //         " PV = %s = %s\n",
                 //         useFalseColourPvStr.getRaw (),
                 //         useFalseColourPvStr.getExpanded ());
                 useFalseColourPv = the_PV_Factory->create (
@@ -1773,7 +1772,7 @@ int TwoDProfileMonitor::activate ( int pass )
 #endif
             if (showGridPvExists)
             {
-                // printf ("activate (TwoDMon.cc) - show grid PV = %s = %s\n", 
+                // printf ("activate (TwoDMon.cc) - show grid PV = %s = %s\n",
                 //         showGridPvStr.getRaw (),
                 //         showGridPvStr.getExpanded ());
                 showGridPv = the_PV_Factory->create (
@@ -1797,7 +1796,7 @@ int TwoDProfileMonitor::activate ( int pass )
 #endif
             if (gridColourPvExists)
             {
-                // printf ("activate (TwoDMon.cc) - grid col PV = %s = %s\n", 
+                // printf ("activate (TwoDMon.cc) - grid col PV = %s = %s\n",
                 //         gridColourPvStr.getRaw (),
                 //         gridColourPvStr.getExpanded ());
                 gridColourPv = the_PV_Factory->create (
@@ -1904,18 +1903,18 @@ int TwoDProfileMonitor::activate ( int pass )
             LeaveWindowMask | EnterWindowMask | PointerMotionMask |
             ButtonPressMask |ButtonReleaseMask,
             False, grabButtonEvent, (XtPointer) this);
-   
-        // hand over control 
+
+        // hand over control
         XtManageChild (twoDWidget);
-   
+
         break;
 
 
     default:
         break;
-    
+
     }
-  
+
     return 1;
 }
 
@@ -1924,23 +1923,23 @@ void TwoDProfileMonitor::editOK (Widget w,
                                  XtPointer client,
                                  XtPointer call )
 {
-  
+
     TwoDProfileMonitor *me = (TwoDProfileMonitor *) client;
 
     // first apply any changes
-    editApply (w, client, call); 
+    editApply (w, client, call);
 
     me->ef.popdown ();
     me->operationComplete ();
-  
+
 }
-  
+
 // user hit the "Apply" button on the edit popup
 void TwoDProfileMonitor::editApply (Widget w,
                                     XtPointer client,
                                     XtPointer call )
 {
-  
+
     TwoDProfileMonitor *me = (TwoDProfileMonitor *) client;
 
     me->eraseSelectBoxCorners ();
@@ -2036,7 +2035,7 @@ void TwoDProfileMonitor::editApply (Widget w,
 
   // let EDM know that "Apply" was invoked
   me->refresh ();
-  
+
 }
 
 // user hit the "Cancel" button on the edit popup
@@ -2044,14 +2043,14 @@ void TwoDProfileMonitor::editCancel (Widget w,
                                      XtPointer client,
                                      XtPointer call )
 {
-  
+
     TwoDProfileMonitor *me = (TwoDProfileMonitor *) client;
-    
+
     me->ef.popdown ();
 
     // no need for EDM to do anything
     me->operationCancel ();
-    
+
 }
 
 // user hit the "Cancel" button on the edit popup
@@ -2059,18 +2058,18 @@ void TwoDProfileMonitor::editCancelCreate (Widget w,
                                            XtPointer client,
                                            XtPointer call )
 {
-  
+
     TwoDProfileMonitor *me = (TwoDProfileMonitor *) client;
-  
+
     me->ef.popdown ();
-  
+
     // remove all traces of our existence!
     me->erase ();
     me->deleteRequest = 1;
-  
+
     // no need for EDM to do anything
     me->operationCancel ();
-  
+
 }
 
 void TwoDProfileMonitor::editCommon ( activeWindowClass *actWin,
@@ -2185,7 +2184,7 @@ int TwoDProfileMonitor::createInteractive (activeWindowClass *actWin,
                                            int w,
                                            int h )
 {
-  
+
     this->actWin = actWin;
     this->x = x;
     this->y = y;
@@ -2193,7 +2192,7 @@ int TwoDProfileMonitor::createInteractive (activeWindowClass *actWin,
     this->h = h;
 
     draw ();
-  
+
     editCommon ( actWin, NULL, ~0 );
 
     return 1;
@@ -2203,17 +2202,17 @@ int TwoDProfileMonitor::createFromFile (FILE *fptr,
                                         char *name,
                                         activeWindowClass *actWin )
 {
-  
+
     this->actWin = actWin;
-  
+
     // use tag class and name to read from file
     TwoDProfileMonitorTags tag;
-  
+
     if ( !(1 & tag.read ( this,
                           fptr,
                           &x, &y, &w, &h,
                           &dataPvStr,
-                          &widthPvStr, &heightPvStr, 
+                          &widthPvStr, &heightPvStr,
                           &widthOffsetPvStr, &heightOffsetPvStr,
                           &gridSizePvStr,
                           &useFalseColourPvStr,
@@ -2236,10 +2235,10 @@ int TwoDProfileMonitor::createFromFile (FILE *fptr,
     {
         actWin->appCtx->postMessage ( tag.errMsg () );
     }
-  
+
     updateDimensions ();
     initSelectBox ();
-  
+
     return 1;
 }
 
@@ -2279,14 +2278,14 @@ int TwoDProfileMonitor::save ( FILE *fptr )
                        &transposeXY,
                        &dataRangeMin,
                        &dataRangeMax );
-  
+
 }
 
 // called any time the widget needs to draw or re-draw itself
-// in edit-mode 
+// in edit-mode
 int TwoDProfileMonitor::draw (void)
-{ 
-  
+{
+
     // draw rectangle using X primitives
     XFillRectangle ( actWin->d, XtWindow (actWin->drawWidget),
                      actWin->drawGc.eraseGC (), x, y, w, h );
@@ -2296,25 +2295,25 @@ int TwoDProfileMonitor::draw (void)
     XDrawImageString ( actWin->d, XtWindow (actWin->drawWidget),
                        actWin->drawGc.normGC (), x + 5, y + h / 2,
                        dataPvStr.getRaw (), strlen (dataPvStr.getRaw ()) );
-  
-    return activeGraphicClass::draw (); 
-} 
+
+    return activeGraphicClass::draw ();
+}
 
 // erase widget in responce to "cut" command
-// in edit-mode 
+// in edit-mode
 int TwoDProfileMonitor::erase (void)
-{ 
+{
 
     // draw rectangle using X primitives
     XDrawRectangle ( actWin->d, XtWindow (actWin->drawWidget),
                     actWin->drawGc.eraseGC (), x, y, w, h );
 
-    return activeGraphicClass::erase (); 
+    return activeGraphicClass::erase ();
 }
 
 // returning to edit mode, pass values are 1 and 2
 int TwoDProfileMonitor::deactivate ( int pass )
-{ 
+{
     active = 0;
     activeMode = 0;
 
@@ -2466,8 +2465,8 @@ int TwoDProfileMonitor::deactivate ( int pass )
         widgetDestroyWidget (wd);
 
     }
-  
-    return activeGraphicClass::deactivate (pass); 
+
+    return activeGraphicClass::deactivate (pass);
 }
 
 
@@ -2482,7 +2481,7 @@ void TwoDProfileMonitor::monitorDataConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 1); 
+            me->pvNotConnectedMask &= ~((unsigned int) 1);
 #ifdef DEBUG
             printf ("TwoDProfMon::monDataConState - set pvNotConnMask to %d\n",
                     me->pvNotConnectedMask);
@@ -2517,7 +2516,7 @@ void TwoDProfileMonitor::monitorWidthConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 2); 
+            me->pvNotConnectedMask &= ~((unsigned int) 2);
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthConState - set pvNotConMask to %d\n",
                     me->pvNotConnectedMask);
@@ -2552,7 +2551,7 @@ void TwoDProfileMonitor::monitorHeightConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 4); 
+            me->pvNotConnectedMask &= ~((unsigned int) 4);
 #ifdef DEBUG
             printf ("TwoDProfMon::monHeightConState - set pvNotConMsk to %d\n",
                     me->pvNotConnectedMask);
@@ -2588,7 +2587,7 @@ void TwoDProfileMonitor::monitorUseFalseColourConnectState (
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 8); 
+            me->pvNotConnectedMask &= ~((unsigned int) 8);
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monUseFalseColConState - set pvNotConMask to %d\n",
@@ -2625,7 +2624,7 @@ void TwoDProfileMonitor::monitorShowGridConnectState (
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 16); 
+            me->pvNotConnectedMask &= ~((unsigned int) 16);
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monShowGridConState - set pvNotConMask to %d\n",
@@ -2662,7 +2661,7 @@ void TwoDProfileMonitor::monitorGridColourConnectState (
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 256); 
+            me->pvNotConnectedMask &= ~((unsigned int) 256);
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monGridColConState - set pvNotConMask to %d\n",
@@ -2699,7 +2698,7 @@ void TwoDProfileMonitor::monitorDataRangeMinConnectState (
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 512); 
+            me->pvNotConnectedMask &= ~((unsigned int) 512);
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monDataRangeMinConState - set pvNotConMask to %d\n",
@@ -2736,7 +2735,7 @@ void TwoDProfileMonitor::monitorDataRangeMaxConnectState (
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 1024); 
+            me->pvNotConnectedMask &= ~((unsigned int) 1024);
 #ifdef DEBUG
             printf (
                "TwoDProfMon::monDataRangeMaxConState - set pvNotConMask to %d\n",
@@ -2772,7 +2771,7 @@ void TwoDProfileMonitor::monitorWidthOffsetConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 32); 
+            me->pvNotConnectedMask &= ~((unsigned int) 32);
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);
@@ -2807,7 +2806,7 @@ void TwoDProfileMonitor::monitorHeightOffsetConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 64); 
+            me->pvNotConnectedMask &= ~((unsigned int) 64);
 #ifdef DEBUG
             printf ("TwoDProfMon::monHeightOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);
@@ -2842,7 +2841,7 @@ void TwoDProfileMonitor::monitorGridSizeConnectState (ProcessVariable *pv,
     {
         if (pv->is_valid ())
         {
-            me->pvNotConnectedMask &= ~((unsigned int) 128); 
+            me->pvNotConnectedMask &= ~((unsigned int) 128);
 #ifdef DEBUG
             printf ("TwoDProfMon::monWidthOffsetConState - set pvNotConMask"
                     " to %d\n", me->pvNotConnectedMask);

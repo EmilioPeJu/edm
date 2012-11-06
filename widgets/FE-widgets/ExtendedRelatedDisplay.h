@@ -67,7 +67,7 @@ typedef struct objAndIndexTag
 
 
 #ifdef COMMENT_OUT
-static char *dragName[] = 
+static char *dragName[] =
 	{
 	ExtendedRelatedDisplayClass_str48
 	};
@@ -104,7 +104,7 @@ static void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call 
 
 #endif
 
-class ExtendedRelatedDisplayClass : public activeGraphicClass 
+class ExtendedRelatedDisplayClass : public activeGraphicClass
 	{
 
 	public:
@@ -150,7 +150,7 @@ class ExtendedRelatedDisplayClass : public activeGraphicClass
 
 		friend void rdc_edit_cancel_delete ( Widget w, XtPointer client, XtPointer call );
 
-		typedef struct bufTag 
+		typedef struct bufTag
 			{
 			int bufUseFocus;
 			int bufX;

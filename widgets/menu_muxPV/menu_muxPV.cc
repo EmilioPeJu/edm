@@ -26,7 +26,7 @@
 
 static void doBlink (
   void *ptr
-) 
+)
 {
 
 menuMuxPVClass *mmo = (menuMuxPVClass *) ptr;
@@ -120,7 +120,7 @@ int i;
   for ( i = 0; i < mmuxo->numStates; i++ )
   {
 
-    if ( w == mmuxo->pb[i] ) 
+    if ( w == mmuxo->pb[i] )
     {
 
       mmuxo->actWin->appCtx->proc->lock ();
@@ -181,7 +181,7 @@ static void mmux_monitor_control_connect_state (
     for (int i = 0; i < MMUX_MAX_ENTRIES; i++)
       if (mmuxo->expansionPvNotConnectedMask[i])
         allExpansionPvsConnected = false;
-    if (allExpansionPvsConnected) 
+    if (allExpansionPvsConnected)
     {
       mmuxo->needConnectInit = 1;
       mmuxo->actWin->appCtx->proc->lock ();
@@ -196,7 +196,7 @@ static void mmux_monitor_control_connect_state (
     for (int i = 0; i < MMUX_MAX_ENTRIES; i++)
       if (mmuxo->expansionPvNotConnectedMask[i])
         allExpansionPvsConnected = false;
-    if (allExpansionPvsConnected) 
+    if (allExpansionPvsConnected)
     {
       mmuxo->needDisconnect = 1;
       mmuxo->actWin->appCtx->proc->lock ();
@@ -228,7 +228,7 @@ static void mmux_monitor_expansion_connect_state (
           for (int j = 0; j < MMUX_MAX_ENTRIES; j++)
             if (mmuxo->expansionPvNotConnectedMask[j])
               allExpansionPvsConnected = false;
-          if (allExpansionPvsConnected && (!mmuxo->controlPvNotConnectedMask)) 
+          if (allExpansionPvsConnected && (!mmuxo->controlPvNotConnectedMask))
           {
             mmuxo->needConnectInit = 1;
             mmuxo->actWin->appCtx->proc->lock ();
@@ -254,7 +254,7 @@ static void mmux_monitor_expansion_connect_state (
           if (mmuxo->controlPvNotConnectedMask)
             allPvsWereConnected = false;
           mmuxo->expansionPvNotConnectedMask[i] |= (1 << n);
-          if (allPvsWereConnected) 
+          if (allPvsWereConnected)
           {
             mmuxo->needDisconnect = 1;
             mmuxo->actWin->appCtx->proc->lock ();
@@ -334,7 +334,7 @@ static void mmux_expansionUpdate (
         printf ("mmux_expansionUpdate - PV match found for n = %d i = %d\n",
                 n, i);
 #endif
-        pv->get_string (mmuxo->expansionStrings[n][i], MMUX_MAX_STRING_SIZE); 
+        pv->get_string (mmuxo->expansionStrings[n][i], MMUX_MAX_STRING_SIZE);
       }
     }
   }
@@ -1155,7 +1155,7 @@ char oneName[PV_Factory::MAX_PV_NAME + 1];
     readStringFromFile ( oneName, 39 + 1, f ); actWin->incLine ();
     initialStateExpStr.setRaw ( oneName );
   }
-  else 
+  else
   {
     initialStateExpStr.setRaw ( "0" );
   }
@@ -1461,7 +1461,7 @@ int blink = 0;
   XDrawLine ( actWin->d, XtWindow (actWin->drawWidget),
    actWin->drawGc.normGC (), bumpX + 10, bumpY + 10, bumpX, bumpY + 10 );
 
-  if ( fs ) 
+  if ( fs )
   {
 
     actWin->drawGc.addNormXClipRectangle ( xR );
@@ -1670,7 +1670,7 @@ int menuMuxPVClass::expand1st (
 {
 
 int stat;
-  
+
   stat = controlPvExpStr.expand1st ( numMacros, macros, expansions );
   stat = initialStateExpStr.expand1st ( numMacros, macros, expansions );
 
@@ -1679,7 +1679,7 @@ int stat;
     for (int i = 0; i <MMUX_MAX_ENTRIES; i++)
     {
       if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
-           ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
+           ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
       {
           expansionPvExpStr[n][i].setRaw (expansionPVNames[n][i]);
           expansionPvExpStr[n][i].expand1st (numMacros, macros, expansions);
@@ -1850,7 +1850,7 @@ int i, ii, n, count;
   for ( i = 0; i < MMUX_MAX_ENTRIES; i++ )
   {
     if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
-         ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
+         ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
     {
       strncpy ( mac[ii], macroStrings[n][i], MMUX_MAX_STRING_SIZE );
       mac[ii][MMUX_MAX_STRING_SIZE] = 0;
@@ -1878,7 +1878,7 @@ int menuMuxPVClass::activate (
 
 int opStat;
 
-  switch ( pass ) 
+  switch ( pass )
   {
 
   case 1:
@@ -1968,7 +1968,7 @@ int opStat;
         for (int i = 0; i <MMUX_MAX_ENTRIES; i++)
         {
           if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
-               ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
+               ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
           {
               expansionPVs[n][i] = the_PV_Factory->create (
                                      expansionPvExpStr[n][i].getExpanded () );
@@ -2001,7 +2001,7 @@ int opStat;
 
 int menuMuxPVClass::deactivate (
   int pass
-) 
+)
 {
 
 int i;
@@ -2037,7 +2037,7 @@ int i;
       for (int i = 0; i <MMUX_MAX_ENTRIES; i++)
       {
         if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
-             ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
+             ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
         {
           expansionPVs[n][i]->remove_conn_state_callback (
                                    mmux_monitor_expansion_connect_state,
@@ -2385,7 +2385,7 @@ int n;
       for (int i = 0; i <MMUX_MAX_ENTRIES; i++)
       {
         if ( ( strcmp ( macroStrings[n][i], "" ) != 0 ) &&
-             ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) ) 
+             ( strcmp ( expansionPVNames[n][i], "" ) != 0 ) )
         {
 #ifdef DEBUG
           printf ("menuMuxPVClass::execDef - Call add_val_callbk for PV %s\n",

@@ -42,7 +42,7 @@ public:
     edmmultiLineTextUpdateClass (edmmultiLineTextUpdateClass *rhs);
     virtual ~edmmultiLineTextUpdateClass ();
     char *objName ();
-    
+
     // Load/save
     int save (FILE *f);
     int old_save (FILE *f);
@@ -57,7 +57,7 @@ public:
     int erase ();
     int checkResizeSelectBox (int _x, int _y, int _w, int _h);
     int checkResizeSelectBoxAbs (int _x, int _y, int _w, int _h);
-    
+
         // Group Edit
     void changeDisplayParams (unsigned int flag,
                               char *fontTag,
@@ -85,19 +85,19 @@ public:
                         char *visPvs[],
                         int numAlarmPvs,
                         char *alarmPvs[]);
- 
+
     void getPvs (int max,
                  ProcessVariable *pvs[],
                  int *n);
 
     char *crawlerGetFirstPv ( void );
     char *crawlerGetNextPv ( void );
-    
+
     // Macro support
     int containsMacros ();
     int expand1st (int numMacros, char *macros[], char *expansions[]);
     int expand2nd (int numMacros, char *macros[], char *expansions[]);
-    
+
     // Execute
     int activate (int pass, void *ptr);
     int setupPVs (int pass, void *ptr);
@@ -111,7 +111,7 @@ public:
     char *firstDragName ();
     char *nextDragName ();
     char *dragValue (int i);
-    
+
 protected:
     Widget widget;
     void init (const char *classname);
@@ -120,7 +120,7 @@ protected:
     bool is_executing;          // edit or execute mode?
     bool is_data_pv_valid, is_colour_pv_valid;
     ProcessVariable *data_pv, *colour_pv;
-    
+
     // Properties
     expStringClass data_pv_name;  // PV names as macro-expandable string
     expStringClass colour_pv_name;
@@ -151,7 +151,7 @@ protected:
     int buf_precision;
     int buf_alarm_sensitive, buf_alarm_sensitive_line;
     int bufTextColour, bufFillColour;
-    
+
     efInt buf_line_width;
     colorButtonClass textCb;
     colorButtonClass fillCb;

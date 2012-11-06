@@ -36,7 +36,7 @@ extern "C"
   //    {
   //        int max = sizeof(exported) / sizeof(exported[0]);
   //        if (libRecIndex >= max)
-  //            return -1; //no more 
+  //            return -1; //no more
   //        *className = exported[libRecIndex].className;
   //        *typeName  = exported[libRecIndex].typeName;
   //        *text      = exported[libRecIndex].text;
@@ -49,7 +49,7 @@ extern "C"
         edmmultiLineTextUpdateClass *obj = new edmmultiLineTextUpdateClass;
         return (void *) obj;
     }
-    
+
     void *clone_multiLineTextUpdateClassPtr (void *rhs)
     {
         edmmultiLineTextUpdateClass *src = (edmmultiLineTextUpdateClass *) rhs;
@@ -62,7 +62,7 @@ extern "C"
         edmmultiLineTextEntryClass *obj = new edmmultiLineTextEntryClass;
         return (void *) obj;
     }
-    
+
     void *clone_multiLineTextEntryClassPtr (void *rhs)
     {
         edmmultiLineTextEntryClass *src = (edmmultiLineTextEntryClass *) rhs;

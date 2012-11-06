@@ -17,7 +17,7 @@ wheelSwitchClass::wheelSwitchClass ( void ) {
 
   valueD=0;
   strcpy(valueS,"0.0");
-    
+
   activeMode=0;
   deleteRequest=0;
   selected=-1;
@@ -38,10 +38,10 @@ wheelSwitchClass::wheelSwitchClass ( void ) {
   unitsFromDb=1;
   unconnectedTimer=0;
   leadingDigits=0;
-  
+
   frameWidget=NULL;
 //  eBuf=NULL;
-  
+
 }
 
 //copy constructor
@@ -53,7 +53,7 @@ wheelSwitchClass::wheelSwitchClass ( const wheelSwitchClass *source ) {
 
   name = new char[strlen(CLASS_NAME)+1];
   strcpy( name, CLASS_NAME );
-  
+
   controlPvName.copy( source->controlPvName );
 
   valueD=0;
@@ -93,17 +93,17 @@ wheelSwitchClass::wheelSwitchClass ( const wheelSwitchClass *source ) {
   strcpy(units,source->units);
   unitsFromDb=source->unitsFromDb;
   strcpy(displayFormat,source->displayFormat);
-                                                                                                    
+
   scaleMin=efScaleMin.value();
   scaleMax=efScaleMax.value();
   if (efPrecision.isNull()) precision=1;
   else precision=efPrecision.value();
   if (efScaleMin.isNull()) scaleMin=-1e+100;
-  if (efScaleMax.isNull()) scaleMax=1e+100;  
+  if (efScaleMax.isNull()) scaleMax=1e+100;
   if (efLeadingDigits.isNull()) leadingDigits=0;
   else leadingDigits=efLeadingDigits.value();
   outerRect=source->outerRect;
-  
+
   this->initSelectBox(); // call after getting x,y,w,h
 
   valueD=0;
@@ -119,10 +119,10 @@ wheelSwitchClass::wheelSwitchClass ( const wheelSwitchClass *source ) {
   fsT = actWin->fi->getXFontStruct( titleFontTag );
   updateFont( title, titleFontTag, &fsT, &titleFontAscent, &titleFontDescent, &titleFontHeight,
    &titleStringWidth );
-  
+
   frameWidget = NULL;
 //  eBuf = NULL;
-  
+
 }
 
 // called when widget is created
@@ -157,7 +157,7 @@ int wheelSwitchClass::createInteractive (
   strcpy( titleFontTag, actWin->defaultCtlFontTag );
   strcpy( displayFontTag, actWin->defaultCtlFontTag );
   actWin->fi->loadFontTag( displayFontTag );
-  
+
   strcpy(displayFormat,"Float");
 
   // SJS Modification 25-05-05 -initialise precision and precisionFromDb
@@ -199,7 +199,7 @@ char *emptyStr = "";
   tag.loadW( "shadeColor", actWin->ci, &shadeColor );
   tag.loadW( "titleFont", titleFontTag );
   tag.loadW( "displayFont", displayFontTag );
-  tag.loadBoolW( "outerRect", &outerRect, &zero );  
+  tag.loadBoolW( "outerRect", &outerRect, &zero );
   tag.loadW( "controlPv", &controlPvName, emptyStr );
   tag.loadBoolW( "precisionFromDb", &precisionFromDb, &zero );
   tag.loadW( "leadingDigits", &efLeadingDigits );
@@ -266,25 +266,25 @@ char *emptyStr = "";
   if ( !( stat & 1 ) ) {
     actWin->appCtx->postMessage( tag.errMsg() );
   }
-  
+
   scaleMin=efScaleMin.value();
   scaleMax=efScaleMax.value();
   if (efPrecision.isNull()) precision=1;
   else precision=efPrecision.value();
   if (efScaleMin.isNull()) scaleMin=-1e+100;
-  if (efScaleMax.isNull()) scaleMax=1e+100;  
+  if (efScaleMax.isNull()) scaleMax=1e+100;
   if (efLeadingDigits.isNull()) leadingDigits=0;
   else leadingDigits=efLeadingDigits.value();
-  
+
   this->initSelectBox(); // call after getting x,y,w,h
 
   valueD=0;
   strcpy(valueS,"0.0");
-  
+
   if (fgColorMode) fgColor.setAlarmSensitive(); else fgColor.setAlarmInsensitive();
   if (bgColorMode) bgColor.setAlarmSensitive(); else bgColor.setAlarmInsensitive();
   if (controlColorMode) controlColor.setAlarmSensitive(); else controlColor.setAlarmInsensitive();
-  
+
   actWin->fi->loadFontTag( displayFontTag );
   actWin->drawGc.setFontTag( displayFontTag, actWin->fi );
   fsD = actWin->fi->getXFontStruct( displayFontTag );
@@ -295,7 +295,7 @@ char *emptyStr = "";
   fsT = actWin->fi->getXFontStruct( titleFontTag );
   updateFont( title, titleFontTag, &fsT, &titleFontAscent, &titleFontDescent, &titleFontHeight,
    &titleStringWidth );
-  
+
   return stat;
 
 }
@@ -320,7 +320,7 @@ int wheelSwitchClass::genericEdit ( void ) {
 
   Strncat( editTitle, wheelSwitchClass_str2, 31 );
 
-  
+
   // set some vars
   bufX = x;
   bufY = y;
@@ -350,17 +350,17 @@ int wheelSwitchClass::genericEdit ( void ) {
   bufDisplayUnits=displayUnits;
   bufUnitsFromDb=unitsFromDb;
   strcpy(bufUnits,units);
-  
+
   strcpy(bufTitle,title);
   strcpy(bufTitlePosition,titlePosition);
-  
+
   if ( controlPvName.getRaw() )
     strncpy( controlBufPvName, controlPvName.getRaw(), PV_Factory::MAX_PV_NAME );
   else
     strncpy( controlBufPvName, "", 39 );
 
   strncpy( bufDisplayFormat, displayFormat, 15 );
-  
+
   // create the dialog box
   ef.create( actWin->top, actWin->appCtx->ci.getColorMap(),
    &actWin->appCtx->entryFormX,
@@ -399,8 +399,8 @@ int wheelSwitchClass::genericEdit ( void ) {
 //  ef.addColorButton( wheelSwitchClass_str32, actWin->ci, &offlineCb, &bufOfflineColor );
   ef.addFontMenu( wheelSwitchClass_str21, actWin->fi, &fmT, bufTitleFontTag );
   ef.addFontMenu( wheelSwitchClass_str22, actWin->fi, &fmD, bufDisplayFontTag );
- 
- 
+
+
   return 1;
 
 }
@@ -457,11 +457,11 @@ if (strcmp(displayFormat,"Exponential")==0) strcat(valueS,"e+00");
 
   actWin->drawGc.saveFg();
 
-  actWin->drawGc.setFG(bgColor.pixelColor());   
+  actWin->drawGc.setFG(bgColor.pixelColor());
   XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
    actWin->drawGc.normGC(), x, y, w, h );
-   
-  actWin->drawGc.setFG(fgColor.pixelColor());   
+
+  actWin->drawGc.setFG(fgColor.pixelColor());
   actWin->drawGc.setBG(bgColor.pixelColor());
 
   if (outerRect) XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
@@ -531,7 +531,7 @@ if (displayUnits&&!unitsFromDb) {
 
 //draw bounds
 if (boundsVisible) {
-actWin->drawGc.setFG(fgColor.pixelColor());  
+actWin->drawGc.setFG(fgColor.pixelColor());
 if (!limitsFromDb) {
 	char minS[16],maxS[16],format[16];
 	int maxStringWidth,minStringWidth;
@@ -624,14 +624,14 @@ else {
   actWin->drawGc.restoreFg();
   w=oldW;
   x=oldX;
-  
+
   return 1;
 
 }
 
 // erase active widget
 int wheelSwitchClass::eraseActive ( void ) {
-  
+
   if ( deleteRequest ) return 1;
   XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),actWin->drawGc.eraseGC(), 0, 0, w+1, h+1 );
   return 1;
@@ -672,11 +672,11 @@ if ( !init ) {
   actWin->executeGc.setLineStyle( LineSolid );
 	
   actWin->executeGc.saveFg();
-  
+
   actWin->executeGc.setFG(bgColor.getColor());
   XFillRectangle(actWin->d,XtWindow(wheelSwitchWidget),actWin->executeGc.normGC(),0,0,w+1,h+1);
 
-  actWin->executeGc.setFG(fgColor.getColor());   
+  actWin->executeGc.setFG(fgColor.getColor());
   actWin->executeGc.setBG(bgColor.getColor());
 
 int oldW;
@@ -842,7 +842,7 @@ int wheelSwitchClass::activate ( int pass, void *ptr ) {
 	
   switch ( pass ) {
   case 2:
-  
+
       opStat=1;
       initEnable();
 
@@ -882,7 +882,7 @@ int wheelSwitchClass::activate ( int pass, void *ptr ) {
        wheelSwitchEventHandler, (XtPointer) this );
 
       if ( frameWidget ) XtMapWidget( frameWidget );
-  
+
       controlPvConnected=0;
       aglPtr = ptr;
       activeMode=1;
@@ -890,7 +890,7 @@ int wheelSwitchClass::activate ( int pass, void *ptr ) {
       oldStat=-1;
       oldSev=-1;
       strcpy(oldUnits,units);
-      init=0;      
+      init=0;
       needToDrawUnconnected = 0;
       unconnectedTimer = 0;
 
@@ -898,7 +898,7 @@ int wheelSwitchClass::activate ( int pass, void *ptr ) {
         unconnectedTimer = appAddTimeOut( actWin->appCtx->appContext(),
          2000, unconnectedTimeout, this );
       }
-      
+
      if ( !controlPvName.getExpanded() || blankOrComment( controlPvName.getExpanded() ) ) controlExists = 0;
      else {
 	     controlExists = 1;
@@ -910,7 +910,7 @@ int wheelSwitchClass::activate ( int pass, void *ptr ) {
 	controlPvId = the_PV_Factory->create( controlPvName.getExpanded() );
 	if ( controlPvId ) controlPvId->add_conn_state_callback( sl_monitor_control_connect_state, this );
 	else opStat=0;
-     }      
+     }
 
      return opStat;
     break;
@@ -1097,7 +1097,7 @@ void wheelSwitchEventHandler(Widget w, XtPointer client, XEvent *e, Boolean *con
   int charCount;
   wheelSwitchClass *slo;
   int halfDigit,bx,by,ww,wh;
-  
+
   slo=(wheelSwitchClass *)client;
   halfDigit=slo->halfDigit;
   ww=slo->w;
@@ -1119,7 +1119,7 @@ void wheelSwitchEventHandler(Widget w, XtPointer client, XEvent *e, Boolean *con
 	    }
       }
       if (bx < ww-halfDigit && bx > ww - 3*halfDigit) {
-	      if (slo->selected!=-1) {    
+	      if (slo->selected!=-1) {
 		      if (by < wh/2) updown(slo->selected,client,1);
 		      else if (by > wh/2) updown(slo->selected,client,-1);
 	      }
@@ -1388,7 +1388,7 @@ static void slc_edit_update ( Widget w, XtPointer client, XtPointer call ) {
 	if (slo->fgColorMode) slo->fgColor.setAlarmSensitive(); else slo->fgColor.setAlarmInsensitive();
 	if (slo->bgColorMode) slo->bgColor.setAlarmSensitive(); else slo->bgColor.setAlarmInsensitive();
 	if (slo->controlColorMode) slo->controlColor.setAlarmSensitive(); else slo->controlColor.setAlarmInsensitive();
-  
+
 	slo->controlPvName.setRaw( slo->controlBufPvName );
 	
 	slo->efPrecision=slo->bufEfPrecision;

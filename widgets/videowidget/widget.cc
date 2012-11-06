@@ -9,7 +9,7 @@
 
 #include "widget.h"
 
-typedef struct 
+typedef struct
 {
     XtAppContext app;
     Widget w;
@@ -52,7 +52,7 @@ static Pixmap makePixmap (Display *d, Colormap cm, Widget w, char **data)
     attr.colormap = cm;
     attr.depth = DefaultDepth ( d, DefaultScreen (d));
     attr.visual = DefaultVisual ( d, DefaultScreen (d));
-  
+
     /* while it's at it, tell us what size the pixmap is */
     if (XpmCreatePixmapFromData (d, XtWindow (w), data, &p, NULL, &attr) !=
         XpmSuccess)
@@ -71,22 +71,22 @@ Widget widgetCreateWidget (widgetData wd, XtAppContext app, Display *d,
                            Colormap cm, Widget parent, int x, int y,
                            int h, int w)
 {
-  
+
     Widget widget;
-  
+
     myData *md = (myData *) wd;
-  
+
     md->app = app;
     md->d = d;
     md->cm = cm;
     md->parent = parent;
     if (md->p == 0)
         md->p = makePixmap (d, cm, parent, twoD);
- 
- 
+
+
     /* Here's our picture, no border around our nice pixmap */
 //  XtVaSetValues (parent, XmNmarginHeight, 0,  XmNmarginWidth, 0, NULL);
-    widget = XtVaCreateManagedWidget ("2D widget", xmLabelWidgetClass, parent, 
+    widget = XtVaCreateManagedWidget ("2D widget", xmLabelWidgetClass, parent,
                                      XmNshadowThickness, 0,
                                      XmNhighlightThickness, 0,
                                      XmNmarginHeight, 0,
@@ -98,11 +98,11 @@ Widget widgetCreateWidget (widgetData wd, XtAppContext app, Display *d,
                                      XmNrecomputeSize, False,
                                      NULL);
 
-#ifdef COMMENT_OUT  
+#ifdef COMMENT_OUT
     /* show the picture (centered) */
     XtVaSetValues (widget, XmNlabelType, XmPIXMAP, XmNlabelPixmap, md->p, NULL);
 #endif
-  
+
     md->w = widget;
 
     return widget;
@@ -154,16 +154,16 @@ void widgetNewDisplayData (widgetData wd,
         if (widgeth * datah > widgetw * dataw)
             widgeth = widgetw * dataw / datah;
         else
-        if (widgetw * dataw > widgeth * datah) 
-            widgetw = widgeth * datah / dataw; 
+        if (widgetw * dataw > widgeth * datah)
+            widgetw = widgeth * datah / dataw;
     }
     else
     {
         if (widgeth * dataw > widgetw * datah)
             widgeth = widgetw * datah / dataw;
         else
-        if (widgetw * datah > widgeth * dataw) 
-            widgetw = widgeth * dataw / datah; 
+        if (widgetw * datah > widgeth * dataw)
+            widgetw = widgeth * dataw / datah;
     }
     /* else if ratios are equal do nothing */
 
@@ -183,7 +183,7 @@ void widgetNewDisplayData (widgetData wd,
             pixmapData[index] = falseColour[index];
         else
             pixmapData[index] = pixmap[index];
-  
+
     while (index < (widgeth + 256 + 1))
     {
         pixmapData[index] = (char *) malloc (2 * widgetw + 1);
@@ -302,7 +302,7 @@ void widgetNewDisplayData (widgetData wd,
                      i += gridSizeWidget)
                 {
                     if ((j % dotSpacing == 0) ||
-                        (i == (unsigned long)gridXZero)) 
+                        (i == (unsigned long)gridXZero))
                         pixmapLine[i * 2] = pixmapLine[1 + i * 2] = gridChar;
                 }
             }
@@ -355,7 +355,7 @@ void widgetNewDisplayData (widgetData wd,
 
         XtVaSetValues (md->w, XmNlabelType, XmPIXMAP, XmNlabelPixmap, md->p,
                        NULL);
-  
+
         XFreePixmap (md->d, old);
 
 
@@ -390,7 +390,7 @@ void widgetNewDisplayInfo (widgetData wd, bool valid, short status,
 #ifdef DEBUG
     printf ("widgetNewDisplayInfo - valid = %d status = %d severity = %d\n",
             valid, status, severity);
-#endif        
+#endif
         XtVaSetValues (md->w, XmNlabelType, XmSTRING, NULL);
         md->widgetw_old = 0;
         md->widgeth_old = 0;
@@ -407,11 +407,11 @@ void widgetDestroyWidget (widgetData wd)
 // application is all done (this may never actually get called)
 void widgetDestroy (widgetData wd)
 {
-  
+
     myData *md = (myData *) wd;
-  
+
     if (md->p)
         XFreePixmap (md->d, md->p);
-  
+
     delete md;
 }

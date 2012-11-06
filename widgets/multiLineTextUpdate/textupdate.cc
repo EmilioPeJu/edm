@@ -41,7 +41,7 @@ static void localCvtDoubleToExpNotationString(double value,
     bool minus;
     int exp, k, l;
     char TF[PV_Factory::MAX_PV_NAME+1];
-    
+
     absVal = fabs(value);
     minus = value < 0.0;
     newVal = absVal;
@@ -73,7 +73,7 @@ static void localCvtDoubleToExpNotationString(double value,
         textField[k++] = '0' + exp/10;
         textField[k++] = '0' + exp%10;
         textField[k++] = '\0';
-        
+
     }
     else
     {
@@ -300,7 +300,7 @@ int edmTextupdateClass::old_save(FILE *f)
     // Line
     line_width.write(f);
     fprintf(f, "%-d\n", is_line_alarm_sensitive);
-   
+
     return 1;
 }
 
@@ -642,7 +642,7 @@ void edmTextupdateClass::redraw_text(Display *dis,
                                      size_t len)
 {
     int fg_pixel = textColor.getPixel(actWin->ci);
-    
+
     // Background fill?
     if (is_filled)
     {
@@ -717,7 +717,7 @@ int edmTextupdateClass::draw()  // render the edit-mode image
     if (is_executing || deleteRequest)
         return 1;
     actWin->drawGc.saveFg();
-    
+
     const char *pvname = getRawName(pv_name);
     size_t len = strlen(pvname);
     textColor.reset();
@@ -727,7 +727,7 @@ int edmTextupdateClass::draw()  // render the edit-mode image
                 actWin->drawGc,
                 actWin->drawGc.normGC(),
                 pvname, len);
-    
+
     actWin->drawGc.restoreFg();
     return 1;
 }
@@ -912,7 +912,7 @@ void edmTextupdateClass::getPvs(int max,
   pvs[1] = color_pv;
 
 }
-    
+
 // --------------------------------------------------------
 // Macro support
 // --------------------------------------------------------
@@ -1089,7 +1089,7 @@ int edmTextupdateClass::drawActive()
                 actWin->executeGc,
                 actWin->executeGc.normGC(),
                 text, len);
-   
+
     actWin->executeGc.restoreFg();
     return 1;
 }
@@ -1168,7 +1168,7 @@ void edmTextupdateClass::executeDeferred()
 
 // Drag & drop support
 char *edmTextupdateClass::firstDragName()
-{   
+{
 
     if ( !enabled ) return NULL;
 
@@ -1228,7 +1228,7 @@ static void drag(Widget w, XEvent *e, String *params, Cardinal numParams)
 {
     activeGraphicClass *obj;
     XtVaGetValues(w, XmNuserData, &obj, NULL);
-    
+
     obj->startDrag(w, e);
 }
 
@@ -1277,7 +1277,7 @@ int edmTextentryClass::activate(int pass, void *ptr)
     XmFontList fonts;
     if (! edmTextupdateClass::activate(pass, ptr))
         return 0;
-    
+
     switch (pass) // ... up to 6
     {
         case 1: // initialize
@@ -1361,7 +1361,7 @@ int edmTextentryClass::drawActive()
     // ****** SJS Addition 05_12_06 - do not show if widget is part of a ******
     // ****** disabled group.  Note that "enabled" is not correctly set ******
     // ****** in the function activate *******
-    if ( !enabled ) 
+    if ( !enabled )
     {
        if ( widget ) XtUnmapWidget( widget );
     }
@@ -1393,7 +1393,7 @@ int edmTextentryClass::drawActive()
         actWin->cursor.set(XtWindow(widget), CURSOR_K_WAIT);
     }
     XmTextFieldSetString(widget, text);
-   
+
     return 1;
 }
 
@@ -1430,7 +1430,7 @@ void edmTextentryClass::text_edit_callback(Widget w,
                    the EDM window is not the active one ?!
                    Confuses the Mac X server: steals keyboard
                    from Striptool until EDM is stopped!
-                   
+
                    XSetInputFocus(me->actWin->display(), XtWindow(w),
                    RevertToNone, CurrentTime);
                 */
