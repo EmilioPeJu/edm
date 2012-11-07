@@ -174,7 +174,7 @@ class activeTriumfSliderClass;
 
 #ifdef TRIUMF
 
-static void updateSliderLimits( 
+static void updateSliderLimits(
   activeTriumfSliderClass *mslo );
 #endif
 
@@ -306,7 +306,7 @@ friend void mslc_edit_cancel_delete (
 friend void updateSliderLimits(
   activeTriumfSliderClass *mslo );
 
-  
+
 
 static activeTriumfSliderClass* selectedSlider;
 #endif
@@ -804,7 +804,7 @@ class activeTriumfSliderClass;
 
 #ifdef TRIUMF
 
-static void updateSliderLimits( 
+static void updateSliderLimits(
   activeTriumfSliderClass *mslo );
 #endif
 
@@ -936,7 +936,7 @@ friend void mslc_edit_cancel_delete (
 friend void updateSliderLimits(
   activeTriumfSliderClass *mslo );
 
-  
+
 
 static activeTriumfSliderClass* selectedSlider;
 #endif

@@ -36,8 +36,8 @@ Xm_DIR = $(MOTIF_LIB)
 Xt_DIR = $(X11_LIB)
 X11_DIR = $(X11_LIB)
 Xmu_DIR = $(X11_LIB)
-# ELW added following two lines for 
-# Red Hat 7.0 LINUX 
+# ELW added following two lines for
+# Red Hat 7.0 LINUX
 Xp_DIR = $(X11_LIB)
 Xext = $(X11)/lib
 #
