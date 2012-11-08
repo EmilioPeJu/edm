@@ -120,7 +120,7 @@ static void scrollBarEventHandler (
   XEvent *e,
   Boolean *continueToDispatch );
 
-static void triumfSliderEventHandler(
+static void triumfSliderEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -174,7 +174,7 @@ class activeTriumfSliderClass;
 
 #ifdef TRIUMF
 
-static void updateSliderLimits(
+static void updateSliderLimits (
   activeTriumfSliderClass *mslo );
 #endif
 
@@ -252,7 +252,7 @@ friend void scrollBarEventHandler (
   XEvent *e,
   Boolean *continueToDispatch );
 
-friend void triumfSliderEventHandler(
+friend void triumfSliderEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -303,12 +303,12 @@ friend void mslc_edit_cancel_delete (
   XtPointer call );
 
 #ifdef TRIUMF
-friend void updateSliderLimits(
+friend void updateSliderLimits (
   activeTriumfSliderClass *mslo );
 
 
 
-static activeTriumfSliderClass* selectedSlider;
+static activeTriumfSliderClass *selectedSlider;
 #endif
 
 XtIntervalId updateControlTimer;
@@ -328,9 +328,9 @@ int minH;
 
 typedef struct editBufTag {
 // edit buffer
-  char controlBufPvName[PV_Factory::MAX_PV_NAME+1];
-  char controlBufLabelName[PV_Factory::MAX_PV_NAME+1];
-  char savedValueBufPvName[PV_Factory::MAX_PV_NAME+1];
+  char controlBufPvName[PV_Factory::MAX_PV_NAME + 1];
+  char controlBufLabelName[PV_Factory::MAX_PV_NAME + 1];
+  char savedValueBufPvName[PV_Factory::MAX_PV_NAME + 1];
 } editBufType, *editBufPtr;
 
 editBufPtr eBuf;
@@ -372,16 +372,16 @@ pvColorClass bgColor, fgColor;
 int bufBgColor, bufFgColor;
 int shadeColor, bufShadeColor, topColor, bufTopColor, botColor, bufBotColor;
 colorButtonClass fgCb, bgCb, shadeCb, topCb, botCb;
-char controlValue[14+1], savedValue[14+1];
-char minValue[14+1], maxValue[14+1];
-char incString[31+1];
+char controlValue[14 + 1], savedValue[14 + 1];
+char minValue[14 + 1], maxValue[14 + 1];
+char incString[31 + 1];
 
 int minX, minY, maxX, maxY, valX, valY, labelX, labelY, scaleX, scaleY,
  scaleW, scaleH, controlX, limitsH, labelH, midVertScaleY,
  midVertScaleY1, midVertScaleY2;
 
 fontMenuClass fm;
-char fontTag[63+1], bufFontTag[63+1];
+char fontTag[63 + 1], bufFontTag[63 + 1];
 XFontStruct *fs;
 int fontAscent, fontDescent, fontHeight;
 
@@ -389,9 +389,9 @@ ProcessVariable *controlPvId, *controlLabelPvId, *savedValuePvId;
 
 expStringClass controlPvName, controlLabelName, savedValuePvName;
 
-char controlLabel[PV_Factory::MAX_PV_NAME+1];
+char controlLabel[PV_Factory::MAX_PV_NAME + 1];
 int formatType, bufFormatType;
-char controlFormat[15+1];
+char controlFormat[15 + 1];
 
 int controlExists, controlLabelExists, savedValueExists;
 
@@ -412,7 +412,7 @@ int needErase, needDraw;
 int needToDrawUnconnected, needToEraseUnconnected;
 int unconnectedTimer;
 
-char displayFormat[15+1];
+char displayFormat[15 + 1];
 int limitsFromDb;
 double scaleMin, scaleMax;
 efDouble efScaleMin, efScaleMax;
@@ -422,7 +422,7 @@ efInt efPrecision;
 int bufLimitsFromDb;
 efDouble bufEfScaleMin, bufEfScaleMax;
 efInt bufEfPrecision;
-char bufDisplayFormat[15+1];
+char bufDisplayFormat[15 + 1];
 
 int orientation, bufOrientation;
 
@@ -479,7 +479,7 @@ char *objName ( void ) {
 }
 
 #ifdef TRIUMF
-Widget getScaleWidget(void ) { return scaleWidget; }
+Widget getScaleWidget (void ) { return scaleWidget; }
 #endif
 
 int createInteractive (
@@ -522,7 +522,7 @@ int eraseActive ( void );
 void bufInvalidate ( void );
 
 #ifdef TRIUMF
-void changeSelectedSlider(activeTriumfSliderClass *, int);
+void changeSelectedSlider (activeTriumfSliderClass *, int);
 #endif
 
 int activate ( int pass, void *ptr );
@@ -750,7 +750,7 @@ static void scrollBarEventHandler (
   XEvent *e,
   Boolean *continueToDispatch );
 
-static void triumfSliderEventHandler(
+static void triumfSliderEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -804,7 +804,7 @@ class activeTriumfSliderClass;
 
 #ifdef TRIUMF
 
-static void updateSliderLimits(
+static void updateSliderLimits (
   activeTriumfSliderClass *mslo );
 #endif
 
@@ -882,7 +882,7 @@ friend void scrollBarEventHandler (
   XEvent *e,
   Boolean *continueToDispatch );
 
-friend void triumfSliderEventHandler(
+friend void triumfSliderEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -933,12 +933,12 @@ friend void mslc_edit_cancel_delete (
   XtPointer call );
 
 #ifdef TRIUMF
-friend void updateSliderLimits(
+friend void updateSliderLimits (
   activeTriumfSliderClass *mslo );
 
 
 
-static activeTriumfSliderClass* selectedSlider;
+static activeTriumfSliderClass *selectedSlider;
 #endif
 
 XtIntervalId updateControlTimer;
@@ -958,9 +958,9 @@ int minH;
 
 typedef struct editBufTag {
 // edit buffer
-  char controlBufPvName[PV_Factory::MAX_PV_NAME+1];
-  char controlBufLabelName[PV_Factory::MAX_PV_NAME+1];
-  char savedValueBufPvName[PV_Factory::MAX_PV_NAME+1];
+  char controlBufPvName[PV_Factory::MAX_PV_NAME + 1];
+  char controlBufLabelName[PV_Factory::MAX_PV_NAME + 1];
+  char savedValueBufPvName[PV_Factory::MAX_PV_NAME + 1];
 } editBufType, *editBufPtr;
 
 editBufPtr eBuf;
@@ -1001,16 +1001,16 @@ pvColorClass bgColor, fgColor;
 int bufBgColor, bufFgColor;
 int shadeColor, bufShadeColor, topColor, bufTopColor, botColor, bufBotColor;
 colorButtonClass fgCb, bgCb, shadeCb, topCb, botCb;
-char controlValue[14+1], savedValue[14+1];
-char minValue[14+1], maxValue[14+1];
-char incString[31+1];
+char controlValue[14 + 1], savedValue[14 + 1];
+char minValue[14 + 1], maxValue[14 + 1];
+char incString[31 + 1];
 
 int minX, minY, maxX, maxY, valX, valY, labelX, labelY, scaleX, scaleY,
  scaleW, scaleH, controlX, limitsH, labelH, midVertScaleY,
  midVertScaleY1, midVertScaleY2;
 
 fontMenuClass fm;
-char fontTag[63+1], bufFontTag[63+1];
+char fontTag[63 + 1], bufFontTag[63 + 1];
 XFontStruct *fs;
 int fontAscent, fontDescent, fontHeight;
 
@@ -1018,9 +1018,9 @@ ProcessVariable *controlPvId, *controlLabelPvId, *savedValuePvId;
 
 expStringClass controlPvName, controlLabelName, savedValuePvName;
 
-char controlLabel[PV_Factory::MAX_PV_NAME+1];
+char controlLabel[PV_Factory::MAX_PV_NAME + 1];
 int formatType, bufFormatType;
-char controlFormat[15+1];
+char controlFormat[15 + 1];
 
 int controlExists, controlLabelExists, savedValueExists;
 
@@ -1041,7 +1041,7 @@ int needErase, needDraw;
 int needToDrawUnconnected, needToEraseUnconnected;
 int unconnectedTimer;
 
-char displayFormat[15+1];
+char displayFormat[15 + 1];
 int limitsFromDb;
 double scaleMin, scaleMax;
 efDouble efScaleMin, efScaleMax;
@@ -1051,7 +1051,7 @@ efInt efPrecision;
 int bufLimitsFromDb;
 efDouble bufEfScaleMin, bufEfScaleMax;
 efInt bufEfPrecision;
-char bufDisplayFormat[15+1];
+char bufDisplayFormat[15 + 1];
 
 int orientation, bufOrientation;
 
@@ -1108,7 +1108,7 @@ char *objName ( void ) {
 }
 
 #ifdef TRIUMF
-Widget getScaleWidget(void ) { return scaleWidget; }
+Widget getScaleWidget (void ) { return scaleWidget; }
 #endif
 
 int createInteractive (
@@ -1151,7 +1151,7 @@ int eraseActive ( void );
 void bufInvalidate ( void );
 
 #ifdef TRIUMF
-void changeSelectedSlider(activeTriumfSliderClass *, int);
+void changeSelectedSlider (activeTriumfSliderClass *, int);
 #endif
 
 int activate ( int pass, void *ptr );

@@ -1926,7 +1926,7 @@ void activeVsBarClass::updateDimensions ( void )
     if ( showScale )
     {
       minH += fontHeight + fontHeight + 5;
-      barAreaX = x + barStrLen/2 + 3;
+      barAreaX = x + barStrLen / 2 + 3;
       barAreaW = w - barStrLen - 6;
     }
 

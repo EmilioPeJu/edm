@@ -32,7 +32,7 @@ static XtActionsRec g_dragActions[] =
 };
 
 // Stolen from dm2k updateMonitors.c, Mark Andersion, Frederick Vong:
-// Display number in enineering notaion (power of ten is n*3)
+// Display number in enineering notaion (power of ten is n * 3)
 static void localCvtDoubleToExpNotationString (double value,
                                                char *textField,
                                                unsigned short precision)
@@ -707,12 +707,12 @@ void edmmultiLineTextUpdateClass::redraw_text (Display *dis,
             tx = x;
             break;
         case XmALIGNMENT_CENTER:
-            tx = x + (w - txt_width)/2;
+            tx = x + (w - txt_width) / 2;
             break;
         default:
             tx = x + w - txt_width;
         }
-        int ty = y + (fontAscent + h)/2;
+        int ty = y + (fontAscent + h) / 2;
 #ifdef DEBUG
         printf ("edmmultiLineTextUpdateClass::redraw_text - text is %s\n",
                 text);
@@ -1634,7 +1634,7 @@ void edmmultiLineTextEntryClass::text_edit_callback (Widget w,
 
     // Just copied the current 'text' that we'll write
     // Allow updates from now on:
-//  me->editing= false;
+//  me->editing = false;
     XtVaSetValues (w, XmNcursorPosition, (XmTextPosition) 0, NULL);
 #ifdef DEBUG_TEXTWIDGETS
     fprintf ( stderr, "multiLineTextEntry: Writing '%s'\n", text);
@@ -1716,7 +1716,7 @@ void edmmultiLineTextEntryClass::text_noedit_callback (Widget w,
 #endif
     edmmultiLineTextEntryClass *me = (edmmultiLineTextEntryClass *) clientData;
     me->callback_common (w, clientData);
-    me->editing= false;
+    me->editing = false;
 }
 
 void edmmultiLineTextEntryClass::map ( void )

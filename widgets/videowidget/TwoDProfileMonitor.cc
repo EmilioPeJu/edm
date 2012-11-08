@@ -54,17 +54,17 @@ class TwoDProfileMonitor : public activeGraphicClass
     int hBuf;
     int maxDataWidthBuf;
     int maxDataHeightBuf;
-    char dataPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char widthPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char heightPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char widthOffsetPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char heightOffsetPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char gridSizePvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char useFalseColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char showGridPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char gridColourPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char dataRangeMinPvBuf[activeGraphicClass::MAX_PV_NAME+1];
-    char dataRangeMaxPvBuf[activeGraphicClass::MAX_PV_NAME+1];
+    char dataPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char widthPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char heightPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char widthOffsetPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char heightOffsetPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char gridSizePvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char useFalseColourPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char showGridPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char gridColourPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char dataRangeMinPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
+    char dataRangeMaxPvBuf[activeGraphicClass::MAX_PV_NAME + 1];
 
     expStringClass dataPvStr, widthPvStr, heightPvStr, useFalseColourPvStr;
     expStringClass widthOffsetPvStr, heightOffsetPvStr, gridSizePvStr;
@@ -163,8 +163,8 @@ public:
     static void sizeUpdate (ProcessVariable *pv,
                             void *userarg );
 
-    static void grabButtonEvent (Widget w, XtPointer closure, XEvent* event,
-                                 Boolean* b)
+    static void grabButtonEvent (Widget w, XtPointer closure, XEvent *event,
+                                 Boolean *b)
     {
 
         TwoDProfileMonitor *me = (TwoDProfileMonitor *) closure;
@@ -827,7 +827,7 @@ public:
 
             case ProcessVariable::Type::text:
                 {
-                    double * temp = to_double<char>(
+                    double *temp = to_double<char> (
                                         dataPv->get_dimension (),
                                         dataPv->get_char_array ());
 #ifdef DEBUG
@@ -859,7 +859,7 @@ public:
             case ProcessVariable::Type::integer:
                 // printf ("int\n");
                 {
-                    double* temp = int_to_double (dataPv->get_dimension (),
+                    double *temp = int_to_double (dataPv->get_dimension (),
                                                   dataPv->get_int_array ());
 #ifdef DEBUG
                     printf ("TwoDProfMon::execDef case int - calling widgetNewDispData\n");
@@ -1016,7 +1016,7 @@ public:
     TwoDProfileMonitorTags (void){ init (); }
     ~TwoDProfileMonitorTags (){}
 
-    int read (TwoDProfileMonitor* mon,
+    int read (TwoDProfileMonitor *mon,
               FILE *fptr,
               int *x, int *y, int *w, int *h,
               expStringClass *dataPvStr,
@@ -1041,8 +1041,8 @@ public:
               int *rescaleData,
               int *pvBasedDataRange,
               int *transposeXY,
-              double* dataRangeMin,
-              double* dataRangeMax)
+              double *dataRangeMin,
+              double *dataRangeMax)
     {
         int major, minor, release;
         int stat;
@@ -1119,8 +1119,8 @@ public:
                int *rescaleData,
                int *pvBasedDataRange,
                int *transposeXY,
-               double* dataRangeMin,
-               double* dataRangeMax)
+               double *dataRangeMin,
+               double *dataRangeMax)
     {
         int major, minor, release;
         major = VIDEO_MAJOR_VERSION;
@@ -1236,7 +1236,7 @@ extern "C"
                        char **text )
     {
 
-        if (libRecIndex >= sizeof (libRec)/sizeof (libRecType) - 1)
+        if (libRecIndex >= sizeof (libRec) / sizeof (libRecType) - 1)
             return -1; // done
         ++libRecIndex;
 

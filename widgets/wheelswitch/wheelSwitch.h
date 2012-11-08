@@ -17,9 +17,9 @@
 
 #include "wheelSwitch.str"
 
-static int checkSelection(int selected, XtPointer client);
+static int checkSelection (int selected, XtPointer client);
 
-static void wheelSwitchEventHandler(
+static void wheelSwitchEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -78,9 +78,9 @@ class wheelSwitchClass : public activeGraphicClass {
 
 private:
 
-friend int checkSelection(int selected, XtPointer client);
+friend int checkSelection (int selected, XtPointer client);
 
-friend void wheelSwitchEventHandler(
+friend void wheelSwitchEventHandler (
   Widget w,
   XtPointer client,
   XEvent *e,
@@ -141,8 +141,8 @@ friend void updown ( int which, XtPointer client, int ud );
   int bufTitleDisplay;
   char bufTitlePosition[16];
   int bufOuterRect;
-  char controlBufPvName[PV_Factory::MAX_PV_NAME+1];
-  efInt bufEfPrecision,bufEfLeadingDigits;
+  char controlBufPvName[PV_Factory::MAX_PV_NAME + 1];
+  efInt bufEfPrecision, bufEfLeadingDigits;
   int bufLimitsFromDb;
   int bufPrecisionFromDb;
   int bufLeadingDigits;
@@ -153,9 +153,9 @@ friend void updown ( int which, XtPointer client, int ud );
   char bufUnits[16];
   efDouble bufEfScaleMin, bufEfScaleMax;
   char bufDisplayFormat[16];
-  int bufFgColor,bufBgColor,bufControlColor,bufOfflineColor;
-  int bufFgColorMode,bufBgColorMode,bufControlColorMode;
-  char bufTitleFontTag[64],bufDisplayFontTag[64];
+  int bufFgColor, bufBgColor, bufControlColor, bufOfflineColor;
+  int bufFgColorMode, bufBgColorMode, bufControlColorMode;
+  char bufTitleFontTag[64], bufDisplayFontTag[64];
 } editBufType, *editBufPtr;*/
 
   int bufX;
@@ -166,8 +166,8 @@ friend void updown ( int which, XtPointer client, int ud );
   int bufTitleDisplay;
   char bufTitlePosition[16];
   int bufOuterRect;
-  char controlBufPvName[PV_Factory::MAX_PV_NAME+1];
-  efInt bufEfPrecision,bufEfLeadingDigits;
+  char controlBufPvName[PV_Factory::MAX_PV_NAME + 1];
+  efInt bufEfPrecision, bufEfLeadingDigits;
   int bufLimitsFromDb;
   int bufPrecisionFromDb;
   int bufLeadingDigits;
@@ -178,9 +178,9 @@ friend void updown ( int which, XtPointer client, int ud );
   char bufUnits[16];
   efDouble bufEfScaleMin, bufEfScaleMax;
   char bufDisplayFormat[16];
-  int bufFgColor,bufBgColor,bufControlColor;
-  int bufFgColorMode,bufBgColorMode,bufControlColorMode;
-  char bufTitleFontTag[64],bufDisplayFontTag[64];
+  int bufFgColor, bufBgColor, bufControlColor;
+  int bufFgColorMode, bufBgColorMode, bufControlColorMode;
+  char bufTitleFontTag[64], bufDisplayFontTag[64];
 
 
 int controlPvConnected;
@@ -197,27 +197,27 @@ char title[64];
 int titleDisplay;
 char titlePosition[16];
 int outerRect;
-char valueS[16],oldValueS[16],value2[16],format[16],displayFormat[16],units[MAX_UNITS_SIZE+1],oldUnits[MAX_UNITS_SIZE+1];
+char valueS[16], oldValueS[16], value2[16], format[16], displayFormat[16], units[MAX_UNITS_SIZE + 1], oldUnits[MAX_UNITS_SIZE + 1];
 double valueD, scaleMin, scaleMax;
 //editBufPtr eBuf;
 expStringClass controlPvName;
 int precision;
-efInt efPrecision,efLeadingDigits;
+efInt efPrecision, efLeadingDigits;
 int limitsFromDb, precisionFromDb;
 efDouble efScaleMin, efScaleMax;
-Widget frameWidget,wheelSwitchWidget;
-pvColorClass fgColor,bgColor,controlColor,shadeColor;
-int fgColorMode,bgColorMode,controlColorMode;
-fontMenuClass fmT,fmD;
-XFontStruct *fsT,*fsD;
+Widget frameWidget, wheelSwitchWidget;
+pvColorClass fgColor, bgColor, controlColor, shadeColor;
+int fgColorMode, bgColorMode, controlColorMode;
+fontMenuClass fmT, fmD;
+XFontStruct *fsT, *fsD;
 colorButtonClass fgCb, bgCb, controlCb, offlineCb;
-char titleFontTag[64],displayFontTag[64];
+char titleFontTag[64], displayFontTag[64];
 int digitNumber, halfDigit, offset, selected, oldSelected, leadingDigits;
-int leadingPlus,boundsVisible,displayUnits,unitsFromDb;
+int leadingPlus, boundsVisible, displayUnits, unitsFromDb;
 int titleFontAscent, titleFontDescent, titleFontHeight, titleStringWidth;
 int displayFontAscent, displayFontDescent, displayFontHeight, displayStringWidth;
 int oldStat, oldSev;
-int unconnectedTimer,needToDrawUnconnected,init;
+int unconnectedTimer, needToDrawUnconnected, init;
 
 public:
 
@@ -229,7 +229,7 @@ wheelSwitchClass
 ~wheelSwitchClass ( void ) {
   if ( name ) delete[] name;
   if ( unconnectedTimer ) {
-    XtRemoveTimeOut( unconnectedTimer );
+    XtRemoveTimeOut ( unconnectedTimer );
     unconnectedTimer = 0;
   }
 }

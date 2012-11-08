@@ -23,7 +23,7 @@
 extern "C"
 {
 
-  //    int firstRegRecord(char **className, char **typeName, char **text)
+  //    int firstRegRecord (char **className, char **typeName, char **text)
   //    {
   //        *className = exported[0].className;
   //        *typeName  = exported[0].typeName;
@@ -32,9 +32,9 @@ extern "C"
   //        return 0;
   //    }
   //
-  //    int nextRegRecord(char **className, char **typeName, char **text)
+  //    int nextRegRecord (char **className, char **typeName, char **text)
   //    {
-  //        int max = sizeof(exported) / sizeof(exported[0]);
+  //        int max = sizeof (exported) / sizeof (exported[0]);
   //        if (libRecIndex >= max)
   //            return -1; //no more
   //        *className = exported[libRecIndex].className;
@@ -53,7 +53,7 @@ extern "C"
     void *clone_multiLineTextUpdateClassPtr (void *rhs)
     {
         edmmultiLineTextUpdateClass *src = (edmmultiLineTextUpdateClass *) rhs;
-        edmmultiLineTextUpdateClass *obj = new edmmultiLineTextUpdateClass(src);
+        edmmultiLineTextUpdateClass *obj = new edmmultiLineTextUpdateClass (src);
         return (void *) obj;
     }
 
@@ -66,7 +66,7 @@ extern "C"
     void *clone_multiLineTextEntryClassPtr (void *rhs)
     {
         edmmultiLineTextEntryClass *src = (edmmultiLineTextEntryClass *) rhs;
-        edmmultiLineTextEntryClass *obj = new edmmultiLineTextEntryClass(src);
+        edmmultiLineTextEntryClass *obj = new edmmultiLineTextEntryClass (src);
         return (void *) obj;
     }
 

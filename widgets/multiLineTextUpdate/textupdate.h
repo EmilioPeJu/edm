@@ -25,39 +25,39 @@
 #define TEXT_MINOR 0
 #define TEXT_RELEASE 0
 
-static void drag(Widget w, XEvent *e, String *params, Cardinal numParams);
-static void selectDrag(Widget w, XEvent *e, String *params,
+static void drag (Widget w, XEvent *e, String *params, Cardinal numParams);
+static void selectDrag (Widget w, XEvent *e, String *params,
  Cardinal numParams);
-static void selectActions(Widget w, XEvent *e, String *params,
+static void selectActions (Widget w, XEvent *e, String *params,
  Cardinal numParams);
-static void pvInfo(Widget w, XEvent *e, String *params,
+static void pvInfo (Widget w, XEvent *e, String *params,
  Cardinal numParams);
 
 class edmTextupdateClass : public activeGraphicClass
 {
 public:
-    edmTextupdateClass();
-    edmTextupdateClass(edmTextupdateClass *rhs);
-    virtual ~edmTextupdateClass();
-    char *objName();
+    edmTextupdateClass ();
+    edmTextupdateClass (edmTextupdateClass *rhs);
+    virtual ~edmTextupdateClass ();
+    char *objName ();
 
     // Load/save
-    int save(FILE *f);
-    int old_save(FILE *f);
-    int createFromFile(FILE *fptr, char *name, activeWindowClass *actWin);
-    int old_createFromFile(FILE *fptr, char *name, activeWindowClass *actWin);
+    int save (FILE *f);
+    int old_save (FILE *f);
+    int createFromFile (FILE *fptr, char *name, activeWindowClass *actWin);
+    int old_createFromFile (FILE *fptr, char *name, activeWindowClass *actWin);
 
     // Edit Mode
-    int createInteractive(activeWindowClass *aw_obj,
+    int createInteractive (activeWindowClass *aw_obj,
                           int x, int y, int w, int h);
-    int edit();
-    int draw();
-    int erase();
-    int checkResizeSelectBox(int _x, int _y, int _w, int _h);
-    int checkResizeSelectBoxAbs(int _x, int _y, int _w, int _h);
+    int edit ();
+    int draw ();
+    int erase ();
+    int checkResizeSelectBox (int _x, int _y, int _w, int _h);
+    int checkResizeSelectBoxAbs (int _x, int _y, int _w, int _h);
 
         // Group Edit
-    void changeDisplayParams(unsigned int flag,
+    void changeDisplayParams (unsigned int flag,
                              char *fontTag,
                              int alignment,
                              char *ctlFontTag,
@@ -72,7 +72,7 @@ public:
                              int topShadowColor,
                              int botShadowColor);
 
-    void changePvNames(int flag,
+    void changePvNames (int flag,
                        int numCtlPvs,
                        char *ctlPvs[],
                        int numReadbackPvs,
@@ -84,7 +84,7 @@ public:
                        int numAlarmPvs,
                        char *alarmPvs[]);
 
-    void getPvs(int max,
+    void getPvs (int max,
       ProcessVariable *pvs[],
       int *n);
 
@@ -92,25 +92,25 @@ public:
     char *crawlerGetNextPv ( void );
 
     // Macro support
-    int containsMacros();
-    int expand1st(int numMacros, char *macros[], char *expansions[]);
-    int expand2nd(int numMacros, char *macros[], char *expansions[]);
+    int containsMacros ();
+    int expand1st (int numMacros, char *macros[], char *expansions[]);
+    int expand2nd (int numMacros, char *macros[], char *expansions[]);
 
     // Execute
-    int activate(int pass, void *ptr);
-    int deactivate(int pass);
-    int drawActive();
-    int eraseActive();
-    void executeDeferred();
+    int activate (int pass, void *ptr);
+    int deactivate (int pass);
+    int drawActive ();
+    int eraseActive ();
+    void executeDeferred ();
 
     // Drag & drop support
-    char *firstDragName();
-    char *nextDragName();
-    char *dragValue(int i);
+    char *firstDragName ();
+    char *nextDragName ();
+    char *dragValue (int i);
 
 protected:
-    void init(const char *classname);
-    void clone(const edmTextupdateClass *rhs, const char *classname);
+    void init (const char *classname);
+    void clone (const edmTextupdateClass *rhs, const char *classname);
 
     bool is_executing;          // edit or execute mode?
     bool is_pv_valid, is_color_pv_valid;
@@ -131,17 +131,17 @@ protected:
     int is_line_alarm_sensitive;
     int is_filled;
     fontMenuClass fm;
-    char fontTag[63+1], bufFontTag[63+1];
+    char fontTag[63 + 1], bufFontTag[63 + 1];
     XFontStruct *fs;
     int alignment, fontAscent, fontDescent, fontHeight;
 
     // Helpers for createInteractive & edit,
     // buffers for property dialog
-    int genericEdit();
-    int editCreate();
+    int genericEdit ();
+    int editCreate ();
     int bufX, bufY, bufW, bufH;
-    char bufPvName[PV_Factory::MAX_PV_NAME+1];
-    char bufColorPvName[PV_Factory::MAX_PV_NAME+1];
+    char bufPvName[PV_Factory::MAX_PV_NAME + 1];
+    char bufColorPvName[PV_Factory::MAX_PV_NAME + 1];
     int buf_displayMode;
     int buf_precision;
     int buf_alarm_sensitive, buf_alarm_sensitive_line;
@@ -155,49 +155,49 @@ protected:
     // Get text & color value.
     // len has to be initialized with the text buffer size.
     // Returns 1 if PV is valid
-    bool get_current_values(char *text, size_t &len);
+    bool get_current_values (char *text, size_t &len);
 
-    void redraw_text(Display *dis,
+    void redraw_text (Display *dis,
                      Drawable drw,
                      gcClass &gcc,
                      GC gc,
                      const char *text,
                      size_t len);
-    void remove_text(Display *dis,
+    void remove_text (Display *dis,
                      Drawable drw,
                      gcClass &gcc,
                      GC gc);
 
     // Callbacks for property edit
-    static void edit_update(Widget w, XtPointer client, XtPointer call);
-    static void edit_ok(Widget w, XtPointer client, XtPointer call);
-    static void edit_apply(Widget w, XtPointer client, XtPointer call);
-    static void edit_cancel(Widget w, XtPointer client, XtPointer call);
-    static void edit_cancel_delete(Widget w, XtPointer client,
+    static void edit_update (Widget w, XtPointer client, XtPointer call);
+    static void edit_ok (Widget w, XtPointer client, XtPointer call);
+    static void edit_apply (Widget w, XtPointer client, XtPointer call);
+    static void edit_cancel (Widget w, XtPointer client, XtPointer call);
+    static void edit_cancel_delete (Widget w, XtPointer client,
                                    XtPointer call);
     // CA callbacks
-    static void pv_conn_state_callback(ProcessVariable *pv, void *userarg);
-    static void pv_value_callback(ProcessVariable *pv, void *userarg);
+    static void pv_conn_state_callback (ProcessVariable *pv, void *userarg);
+    static void pv_value_callback (ProcessVariable *pv, void *userarg);
 };
 
 class edmTextentryClass : public edmTextupdateClass
 {
 public:
-    edmTextentryClass();
-    edmTextentryClass(const edmTextentryClass *rhs);
+    edmTextentryClass ();
+    edmTextentryClass (const edmTextentryClass *rhs);
 protected:
     Widget widget;
     bool editing;
-    int activate(int pass, void *ptr);
-    int deactivate(int pass);
-    int drawActive();
-    int eraseActive();
-    void map( void );
-    void unmap( void );
+    int activate (int pass, void *ptr);
+    int deactivate (int pass);
+    int drawActive ();
+    int eraseActive ();
+    void map ( void );
+    void unmap ( void );
 private:
-    static void text_edit_callback(Widget, XtPointer, XtPointer);
-    static void text_noedit_callback(Widget, XtPointer, XtPointer);
-    static void text_entered_callback(Widget, XtPointer, XtPointer);
+    static void text_edit_callback (Widget, XtPointer, XtPointer);
+    static void text_noedit_callback (Widget, XtPointer, XtPointer);
+    static void text_entered_callback (Widget, XtPointer, XtPointer);
 };
 
 #endif

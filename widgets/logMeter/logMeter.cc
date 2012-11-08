@@ -1375,7 +1375,7 @@ int activeLogMeterClass::draw ( void )
 // {
 //    fetch pv label ...
 // }
-// else if (labelType =2)
+// else if (labelType = 2)
 // {
   if (strlen (literalLabel))
   {
@@ -1492,15 +1492,15 @@ int activeLogMeterClass::draw ( void )
 
   // needleLength = 0.83 * needlePlusScale;
   // insideArc    = 0.85 * needlePlusScale;
-  // // labelTickSize= 0.15 * needlePlusScale;
+  // // labelTickSize = 0.15 * needlePlusScale;
 
   labelTickSize = scaleFontHeight * 0.8;
   if ( labelTickSize > 15 ) labelTickSize = 15;
   insideArc     = needlePlusScale - labelTickSize;
   needleLength = 0.98 * insideArc;
 
-  majorTickSize= 0.7 * labelTickSize;
-  minorTickSize  = 0.4 * labelTickSize;
+  majorTickSize = 0.7 * labelTickSize;
+  minorTickSize = 0.4 * labelTickSize;
 
   meterNeedleXorigin = faceW / 2;
   meterNeedleYorigin = (int) ( needlePlusScale + 4 + scaleFontHeight);
@@ -1571,7 +1571,7 @@ int activeLogMeterClass::draw ( void )
 
   }
 
-  if ((labelIntervals != 0) && (labelIntervals !=0 && showScale))
+  if ((labelIntervals != 0) && (labelIntervals != 0 && showScale))
   {
     labelAngleIncr = meterTotalAngle / labelIntervals;
     majorAngleIncr = labelAngleIncr / majorIntervals;
@@ -1770,7 +1770,7 @@ int activeLogMeterClass::drawActive ( void )
 // else if (labelType = 1) {
 //    fetch pv label ...
 //}
-// else if (labelType =2) {
+// else if (labelType = 2) {
   if (strlen (literalLabel))
   {
     strncpy (label, literalLabel, 39);
@@ -1888,15 +1888,15 @@ int activeLogMeterClass::drawActive ( void )
 
   // needleLength = 0.83 * needlePlusScale;
   // insideArc    = 0.85 * needlePlusScale;
-  // labelTickSize= 0.15 * needlePlusScale;
+  // labelTickSize = 0.15 * needlePlusScale;
 
   labelTickSize = scaleFontHeight * 0.8;
   if ( labelTickSize > 15 ) labelTickSize = 15;
   insideArc = needlePlusScale - labelTickSize;
   needleLength = 0.98 * insideArc;
 
-  majorTickSize= 0.7 * labelTickSize;
-  minorTickSize  = 0.4 * labelTickSize;
+  majorTickSize = 0.7 * labelTickSize;
+  minorTickSize = 0.4 * labelTickSize;
 
   // crude attempt to prevent divide by zero in angle calc
   if ((scaleMax - scaleMin) < 0.000001 * (readV - scaleMin))
@@ -1995,7 +1995,7 @@ int activeLogMeterClass::drawActive ( void )
   {
     drawStaticFlag = 0;
 
-    if ((labelIntervals != 0) && (labelIntervals !=0 && showScale))
+    if ((labelIntervals != 0) && (labelIntervals != 0 && showScale))
     {
       xR.x = faceX;
       xR.y = faceY;
@@ -2038,7 +2038,7 @@ int activeLogMeterClass::drawActive ( void )
         if (labelAngle < (beginAngle + 0.001))
         {
           tX = farEndX + 2;
-          tY = farEndY - scaleFontAscent/2;
+          tY = farEndY - scaleFontAscent / 2;
           drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
                     XmALIGNMENT_BEGINNING, scaleMaxString);
         }
@@ -2069,7 +2069,7 @@ int activeLogMeterClass::drawActive ( void )
         else if (labelAngle > (endAngle - 0.001))
         {
           tX = farEndX -2;
-          tY = farEndY - scaleFontAscent/2;
+          tY = farEndY - scaleFontAscent / 2;
           drawText (actWin->executeWidget, &actWin->executeGc, scaleFs, tX, tY,
                     XmALIGNMENT_END, scaleMinString);
         }
@@ -2258,7 +2258,7 @@ int activeLogMeterClass::drawActive ( void )
       xpoints[2].y = meterNeedleYorigin;
 
       xpoints[3].x = meterNeedleXorigin;
-      xpoints[3].y = meterNeedleYorigin-1;
+      xpoints[3].y = meterNeedleYorigin - 1;
 
       xpoints[4].x = meterNeedleXend;
       xpoints[4].y = meterNeedleYend;
@@ -2312,7 +2312,7 @@ int activeLogMeterClass::activate ( int pass, void *ptr )
 
     drawStaticFlag = 1;
 
-    controlPvConnected = readPvConnected = active = activeInitFlag= 0;
+    controlPvConnected = readPvConnected = active = activeInitFlag = 0;
     activeMode = 1;
 
     if ( !controlPvExpStr.getExpanded () ||

@@ -65,7 +65,7 @@ int nextRegRecord (
   char **text )
 {
 
-int max = sizeof(libRec) / sizeof(libRecType) - 1;
+int max = sizeof (libRec) / sizeof (libRecType) - 1;
 
   if ( libRecIndex >= max ) return -1; //no more
   libRecIndex++;

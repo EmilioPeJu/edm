@@ -20,7 +20,7 @@
 //  - slider must be selected (left-click on slider bar) before value can change
 //  - if selected, slider bar changes to mslo->colorSelected
 //  - if mouse leaves slider, color changes to mslo->colorOutofWindow
-//  - a slider sensitivity selection widget is used to narrow slider range to sensitivity*(original range)
+//  - a slider sensitivity selection widget is used to narrow slider range to sensitivity * (original range)
 //    centred around current value. This allows higher precision sliding.
 //  - if a slider with sensitivity < 100% is moved to left or right edge of widget and released,
 //    the slider pans the range to center around current value
@@ -4286,8 +4286,8 @@ int max;
 }
 
 
-activeTriumfSliderClass* activeTriumfSliderClass::selectedSlider = NULL;
-char* activeTriumfSliderClass::rangeString = "100%|10%|1%|.1%|.01%|.001%|.0001%";
+activeTriumfSliderClass *activeTriumfSliderClass::selectedSlider = NULL;
+char *activeTriumfSliderClass::rangeString = "100%|10%|1%|.1%|.01%|.001%|.0001%";
 double activeTriumfSliderClass::rangeArray[7] = { 1., 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001 };
 
 

@@ -220,11 +220,11 @@ typedef struct editBufTag {
   int bufBgColour;
   int bufFgColourMode;
   int bufBgColourMode;
-  char bufTag[MMUX_MAX_STATES][MMUX_MAX_STRING_SIZE+1];
-  char bufM[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE+1];
-  char bufE[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE+1];
-  char bufInitialState[30+1];
-  char bufControlPvName[PV_Factory::MAX_PV_NAME+1];
+  char bufTag[MMUX_MAX_STATES][MMUX_MAX_STRING_SIZE + 1];
+  char bufM[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE + 1];
+  char bufE[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE + 1];
+  char bufInitialState[30 + 1];
+  char bufControlPvName[PV_Factory::MAX_PV_NAME + 1];
   colorButtonClass fgCb;
   colorButtonClass bgCb;
   colorButtonClass topShadowCb;
@@ -247,12 +247,12 @@ int numStates;
 
 entryListBase *elbt, *elbm[MMUX_MAX_ENTRIES], *elbe[MMUX_MAX_ENTRIES];
 
-char tag[MMUX_MAX_STATES][MMUX_MAX_STRING_SIZE+1],
- macroStrings[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE+1],
- expansionPVNames[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE+1],
- expansionStrings[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE+1];
+char tag[MMUX_MAX_STATES][MMUX_MAX_STRING_SIZE + 1],
+ macroStrings[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE + 1],
+ expansionPVNames[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE + 1],
+ expansionStrings[MMUX_MAX_STATES][MMUX_MAX_ENTRIES][MMUX_MAX_STRING_SIZE + 1];
 
-ProcessVariable* expansionPVs[MMUX_MAX_STATES][MMUX_MAX_ENTRIES];
+ProcessVariable *expansionPVs[MMUX_MAX_STATES][MMUX_MAX_ENTRIES];
 expStringClass expansionPvExpStr[MMUX_MAX_STATES][MMUX_MAX_ENTRIES];
 
 char *tagPtr[MMUX_MAX_STATES], *mPtr[MMUX_MAX_ENTRIES][MMUX_MAX_STATES],
@@ -264,7 +264,7 @@ int numItems, numMac;
 unsigned char controlPvNotConnectedMask;
 unsigned int expansionPvNotConnectedMask[MMUX_MAX_ENTRIES];
 fontMenuClass fm;
-char fontTag[63+1];
+char fontTag[63 + 1];
 XmFontList fontList;
 XFontStruct *fs;
 int fontAscent, fontDescent, fontHeight;

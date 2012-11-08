@@ -88,7 +88,7 @@ Widget shell, rowcol, kprowcol, topForm, mainForm, bottomForm, text,
  pbPoint, pbSign, pbOK, pbApply, pbCancel, pbBksp,
  pba, pbb, pbc, pbd, pbe, pbf;
 onekeypadWidgetListPtr wlHead, wlTail;
-char buf[MAXCHARS_TOP+1];
+char buf[MAXCHARS_TOP + 1];
 
 int *intDest;
 double *doubleDest;
@@ -96,8 +96,8 @@ double *doubleDest;
 int hex;
 
 void *userPtr;
-void (*okFunc)(Widget,XtPointer,XtPointer);
-void (*cancelFunc)(Widget,XtPointer,XtPointer);
+void (*okFunc)(Widget, XtPointer, XtPointer);
+void (*cancelFunc)(Widget, XtPointer, XtPointer);
 
 public:
 
