@@ -439,6 +439,12 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
 
   setBlinkFunction( (void *) doBlink );
 
+  doAccSubs( alarmPvExpStr );
+  doAccSubs( visPvExpStr );
+  doAccSubs( value );
+  doAccSubs( minVisString, 39 );
+  doAccSubs( maxVisString, 39 );
+
 }
 
 activeXTextClass::~activeXTextClass ( void ) {
@@ -1272,7 +1278,6 @@ int blink = 0;
   if ( !init ) {
     if ( needToDrawUnconnected ) {
       actWin->executeGc.saveFg();
-      //actWin->executeGc.setFG( fgColor.getDisconnected() );
       actWin->executeGc.setFG( fgColor.getDisconnectedIndex(), &blink );
       if ( strcmp( fontTag, "" ) != 0 ) {
         actWin->executeGc.setFontTag( fontTag, actWin->fi );
@@ -1288,13 +1293,16 @@ int blink = 0;
     }
   }
   else if ( needToEraseUnconnected ) {
+    actWin->executeGc.saveFg();
     needToEraseUnconnected = 0;
     if ( strcmp( fontTag, "" ) != 0 ) {
       actWin->executeGc.setFontTag( fontTag, actWin->fi );
     }
+    clipStat = actWin->executeGc.addEraseXClipRectangle( xR );
     XDrawStringsAligned( actWin->d, drawable(actWin->executeWidget),
-     actWin->executeGc.normGC(), x, stringY, w,
+     actWin->executeGc.eraseGC(), x, stringY, w,
      value.getExpanded(), stringLength, &fs, alignment );
+    if ( clipStat & 1 ) actWin->executeGc.removeEraseXClipRectangle();
     actWin->executeGc.restoreFg();
   }
 
@@ -2071,35 +2079,39 @@ pvValType pvV;
 
     change = 0;
 
-    if ( curStatus != alarmPvId->get_status() ) {
-      curStatus = alarmPvId->get_status();
-      change = 1;
-    }
+    if ( alarmPvId ) {
 
-    if ( curSeverity != alarmPvId->get_severity() ) {
-      curSeverity = alarmPvId->get_severity();
-      change = 1;
-    }
+      if ( curStatus != alarmPvId->get_status() ) {
+        curStatus = alarmPvId->get_status();
+        change = 1;
+      }
 
-    if ( change ) {
-      fgColor.setStatus( curStatus, curSeverity );
-      bgColor.setStatus( curStatus, curSeverity );
-    }
+      if ( curSeverity != alarmPvId->get_severity() ) {
+        curSeverity = alarmPvId->get_severity();
+        change = 1;
+      }
 
-    index = actWin->ci->evalRule( fgColor.pixelIndex(),
-     alarmPvId->get_double() );
+      if ( change ) {
+        fgColor.setStatus( curStatus, curSeverity );
+        bgColor.setStatus( curStatus, curSeverity );
+      }
 
-    if ( curFgColorIndex != index ) {
-      curFgColorIndex = index;
-      change = 1;
-    }
+      index = actWin->ci->evalRule( fgColor.pixelIndex(),
+       alarmPvId->get_double() );
 
-    index = actWin->ci->evalRule( bgColor.pixelIndex(),
-     alarmPvId->get_double() );
+      if ( curFgColorIndex != index ) {
+        curFgColorIndex = index;
+        change = 1;
+      }
 
-    if ( curBgColorIndex != index ) {
-      curBgColorIndex = index;
-      change = 1;
+      index = actWin->ci->evalRule( bgColor.pixelIndex(),
+       alarmPvId->get_double() );
+
+      if ( curBgColorIndex != index ) {
+        curBgColorIndex = index;
+        change = 1;
+      }
+
     }
 
     if ( change ) {
@@ -2414,18 +2426,22 @@ int index, change;
 
   change = 0;
 
-  if ( curStatus != alarmPvId->get_status() ) {
-    curStatus = alarmPvId->get_status();
-    change = 1;
-  }
+  if ( alarmPvId ) {
 
-  if ( curSeverity != alarmPvId->get_severity() ) {
-    curSeverity = alarmPvId->get_severity();
-    change = 1;
+    if ( curStatus != alarmPvId->get_status() ) {
+      curStatus = alarmPvId->get_status();
+      change = 1;
+    }
+
+    if ( curSeverity != alarmPvId->get_severity() ) {
+      curSeverity = alarmPvId->get_severity();
+      change = 1;
+    }
+
   }
 
   index = actWin->ci->evalRule( fgColor.pixelIndex(),
-   alarmPvId->get_double() );
+   colorValue );
 
   if ( curFgColorIndex != index ) {
     curFgColorIndex = index;
@@ -2433,7 +2449,7 @@ int index, change;
   }
 
   index = actWin->ci->evalRule( bgColor.pixelIndex(),
-   alarmPvId->get_double() );
+   colorValue );
 
   if ( curBgColorIndex != index ) {
     curBgColorIndex = index;
@@ -2487,6 +2503,67 @@ void activeXTextClass::getPvs (
   *n = 2;
   pvs[0] = alarmPvId;
   pvs[1] = visPvId;
+
+}
+
+char *activeXTextClass::getSearchString (
+  int i
+) {
+
+  if ( i == 0 ) {
+    return value.getRaw();
+  }
+  else if ( i == 1 ) {
+    return alarmPvExpStr.getRaw();
+  }
+  else if ( i == 2 ) {
+    return visPvExpStr.getRaw();
+  }
+  else if ( i == 3 ) {
+    return minVisString;
+  }
+  else if ( i == 4 ) {
+    return maxVisString;
+  }
+
+  return NULL;
+
+}
+
+void activeXTextClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+  if ( i == 0 ) {
+    value.setRaw( string );
+  }
+  else if ( i == 1 ) {
+    alarmPvExpStr.setRaw( string );
+  }
+  else if ( i == 2 ) {
+    visPvExpStr.setRaw( string );
+  }
+  else if ( i == 3 ) {
+    int l = max;
+    if ( 39 < max ) l = 39;
+    strncpy( minVisString, string, l );
+    minVisString[l] = 0;
+  }
+  else if ( i == 4 ) {
+    int l = max;
+    if ( 39 < max ) l = 39;
+    strncpy( maxVisString, string, l );
+    maxVisString[l] = 0;
+  }
+
+  updateDimensions();
+
+  if ( autoSize && fs ) {
+    sboxW = w = stringBoxWidth;
+    sboxH = h = stringBoxHeight;
+  }
 
 }
 

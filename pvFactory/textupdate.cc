@@ -13,6 +13,10 @@
 #include "pv_factory.h"
 #include "cvtFast.h"
 
+#ifdef SOLARIS
+  #include "ieeefp.h"
+#endif
+
 static int g_transInit = 1;
 static XtTranslations g_parsedTrans;
 
@@ -133,6 +137,8 @@ void edmTextupdateClass::init(const char *classname)
 edmTextupdateClass::edmTextupdateClass(edmTextupdateClass *rhs)
 {
     clone(rhs, TEXTUPDATE_CLASSNAME);
+    doAccSubs( pv_name );
+    doAccSubs( color_pv_name );
 }
 
 void edmTextupdateClass::clone(const edmTextupdateClass *rhs,
@@ -923,7 +929,37 @@ void edmTextupdateClass::getPvs(int max,
   pvs[1] = color_pv;
 
 }
-    
+
+char *edmTextupdateClass::getSearchString (
+  int i
+) {
+
+  if ( i == 0 ) {
+    return pv_name.getRaw();
+  }
+  else if ( i == 1 ) {
+    return color_pv_name.getRaw();
+  }
+
+  return NULL;
+
+}
+
+void edmTextupdateClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+  if ( i == 0 ) {
+    pv_name.setRaw( string );
+  }
+  else if ( i == 1 ) {
+    color_pv_name.setRaw( string );
+  }
+
+}
+
 // --------------------------------------------------------
 // Macro support
 // --------------------------------------------------------
@@ -1306,7 +1342,9 @@ static void pvInfo (
 int edmTextentryClass::activate(int pass, void *ptr)
 {
     XmFontList fonts;
+    /*** SJS addition  from unknown source ***/
     int margin, off;
+    /*** End of SJS addition ***/
     if (! edmTextupdateClass::activate(pass, ptr))
         return 0;
     
@@ -1322,19 +1360,28 @@ int edmTextentryClass::activate(int pass, void *ptr)
 	    }
             actWin->appCtx->addActions( g_dragActions,
 					XtNumber(g_dragActions) );
+            /*** SJS addition from unknown source ***/
             margin = (h - 7 - fontAscent - line_width.value())/ 2;
             if (margin < 0) margin = 0;
             off = (line_width.value() + 1)/2;
+            /*** End of SJS addition ***/
 
             widget = XtVaCreateManagedWidget("TextEntry",
                                              xmTextFieldWidgetClass,
                                              actWin->executeWidgetId(),
+            /*** SJS change from unknown source - replace
+                                             XtNx, (XtArgVal)x,
+                                             XtNy, (XtArgVal)y,
+                                             XtNheight,(XtArgVal)h,
+                                             XtNwidth, (XtArgVal)w,
+            **** by */
                                              XtNx, (XtArgVal)(x + off),
                                              XtNy, (XtArgVal)(y + off),
                                              XtNheight,(XtArgVal)(h - off*2),
                                              XtNwidth, (XtArgVal)(w - off*2),
                                              XmNmarginHeight, (XtArgVal) margin,
-                                             XmNmarginWidth, (XtArgVal) 3,                                             
+                                             XmNmarginWidth, (XtArgVal) 3,
+            /*** End of SJS change ***/
                                              XmNforeground,
                                              (XtArgVal)
                                              textColor.getPixel(actWin->ci),
@@ -1350,7 +1397,11 @@ int edmTextentryClass::activate(int pass, void *ptr)
                                              XmNuserData,
                                                  this,// obj accessible to d&d
                                              XmNhighlightThickness,
+            /*** SJS  change from unknown source - replace
+                                                 (XtArgVal) 3,
+            **** by */
                                                  (XtArgVal) 0,
+            /*** End of SJS change ***/
                                              NULL);
             // callback: text entered ==> send it to the PV
             XtAddCallback(widget, XmNactivateCallback,
@@ -1446,6 +1497,9 @@ void edmTextentryClass::text_edit_callback(Widget w,
                                            XtPointer clientData,
                                            XtPointer pCallbackData)
 {
+#ifdef DEBUG
+    printf ("Start of edmTextentryClass::text_edit_callback\n");
+#endif
     edmTextentryClass *me = (edmTextentryClass *) clientData;
     XmTextVerifyCallbackStruct *pcbs =
         (XmTextVerifyCallbackStruct *) pCallbackData;

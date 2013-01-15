@@ -21,11 +21,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
 #include <sys/time.h>
+
+extern "C"
+{
+#include <regex.h>
+}
 
 #if defined(darwin) || defined(HP_UX)
 	#include <sys/wait.h>
@@ -46,6 +52,34 @@
 #include "expString.h"
 #include "remFileOpen.h"
 
+int doReSearchReplace (
+  int caseInsensivite,
+  char *expression,
+  char *newText,
+  int max,
+  char *oldString,
+  char *newString
+);
+
+int doSearchReplace (
+  int caseInsensivite,
+  int useRegExpr,
+  char *expression,
+  char *newText,
+  int max,
+  char *oldString,
+  char *newString
+);
+
+void enableAccumulator ( void );
+void disableAccumulator ( void );
+int useAccumulator ( void );
+void setAccumulator ( int );
+int getAccumulator ( void );
+void incAccumulator ( void );
+void doAccSubs( expStringClass & );
+void doAccSubs( char *, int );
+
 int useAppTopParent ( void );
 
 int debugMode ( void );
@@ -55,6 +89,10 @@ int diagnosticMode ( void );
 int logDiagnostic (
   char *text
 );
+
+void disableBadWindowErrors ( int arg );
+
+int badWindowErrorsDisabled ( void );
 
 char *getEnvironmentVar (
   char *name
@@ -102,6 +140,9 @@ void processAllEventsWithSync (
 void processAllEvents (
   XtAppContext app,
   Display *d );
+
+void trimWhiteSpace (
+  char *str );
 
 int isLegalInteger (
   char *str );

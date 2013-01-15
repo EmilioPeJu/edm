@@ -33,11 +33,11 @@
 #define ASC_MINOR_VERSION 0
 #define ASC_RELEASE 0
 
-// ***** SJS Change requested by Austen Rose 23/04/08 - replace *****
-// #define SYMBOL_K_NUM_STATES 64
-// ***** by *****
+/***** SJS Change requested by Austen Rose 23/04/08 - replace *****
+#define SYMBOL_K_NUM_STATES 64
+***** by *****/
 #define SYMBOL_K_NUM_STATES 128
-// ***** End of SJS change *****
+/***** End of SJS change *****/
 #define SYMBOL_K_MAX_PVS 5
 
 #define OR_ORIG 0
@@ -320,6 +320,12 @@ int drawActive ( void );
 
 int eraseActive ( void );
 
+// ***** SJS addition 21/11/12 to disable widgets within a symbol when ******
+// ***** the symbol is disabled ******
+void enable (void);
+void disable (void);
+// ***** End of SJS addition ******
+
 void removePrevBlink ( void );
 
 int activate (
@@ -563,6 +569,16 @@ void getPvs (
   int max,
   ProcessVariable *pvs[],
   int *n );
+
+char *getSearchString (
+  int i
+);
+
+void replaceString (
+  int i,
+  int max,
+  char *string
+);
 
 char *crawlerGetFirstPv ( void );
 

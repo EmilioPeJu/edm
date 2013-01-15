@@ -55,6 +55,9 @@ class pvBindingClass {
 private:
 
 int cur_index, max;
+
+/* MGA changes to allow variable size access to Waveform records - add */
+
 /* Returns the function named <name>_<class>Ptr from the dynamic module
  * associated with <class>, or NULL if not found. */
 void *lookup_function(const char *class_name, const char *name);
@@ -69,10 +72,20 @@ char *firstPvName ( void );
 
 char *nextPvName ( void );
 
+/* MGA changes to allow variable size access to Waveform records - replace
+
+class ProcessVariable *createNew (
+  const char *oneName,
+  const char *PV_name );
+
+by */
+
 class ProcessVariable *createNew (
   const char *oneName, const char *PV_name );
 class ProcessVariable *createNew_size (
   const char *oneName, const char *PV_name, size_t size );
+
+/* End of MGA change */
 
 char *getPvName (
   int i );

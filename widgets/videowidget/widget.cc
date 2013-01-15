@@ -1,5 +1,7 @@
 #include <sys/time.h>
+/****** SJS modification 05/12/12 for RHEL6 - remove *******
 #include <stream.h> // cout
+******* End of SJS modification ******/
 #include <stdio.h> // sprintf ()
 #include <X11/X.h> // Xlib
 #include <X11/Intrinsic.h> // Xt

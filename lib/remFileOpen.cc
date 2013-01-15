@@ -7,6 +7,8 @@
 #include <time.h>
 #include <sys/time.h>
 #include "sys_types.h"
+#include <sys/stat.h>
+#include <unistd.h>
 #include "avl.h"
 #include "utility.h"
 #include "environment.str"
@@ -27,8 +29,6 @@ typedef struct nameListTag {
   char *cmd;
 } nameListType, *nameListPtr;
 
-static int gPipeIsOpen = 0;
-static FILE *gPipeF = NULL;
 static int gInitList = 1;
 static AVL_HANDLE gFilterH = NULL;
 static int gNumFilters = 0;
@@ -81,11 +81,11 @@ nameListPtr p1, p2;
 static void initFilters ( void ) {
 
 char *ptr, *tk, *ctx, file[255+1], line[255+1];
-int l, stat, dup;
+int l, status, dup;
 FILE *f;
 nameListPtr cur;
 
-  stat = avl_init_tree( compare_nodes,
+  status = avl_init_tree( compare_nodes,
    compare_key, copy_node, &gFilterH );
 
   ptr = getenv( environment_str12 );
@@ -125,8 +125,8 @@ nameListPtr cur;
         cur->cmd = new char[l+1];
         strcpy( cur->cmd, tk );
 
-        stat = avl_insert_node( gFilterH, (void *) cur, &dup );
-	if ( !( stat & 1 ) ) goto errRet;
+        status = avl_insert_node( gFilterH, (void *) cur, &dup );
+	if ( !( status & 1 ) ) goto errRet;
 
         if ( dup ) {
           delete[] cur->ext;
@@ -145,13 +145,13 @@ nameListPtr cur;
 
   }
 
-  stat = avl_get_first( gFilterH, (void **) &cur );
-  if ( !( stat & 1 ) ) goto errRet;
+  status = avl_get_first( gFilterH, (void **) &cur );
+  if ( !( status & 1 ) ) goto errRet;
 
   while ( cur ) {
 
-    stat = avl_get_next( gFilterH, (void **) &cur );
-    if ( !( stat & 1 ) ) goto errRet;
+    status = avl_get_next( gFilterH, (void **) &cur );
+    if ( !( status & 1 ) ) goto errRet;
 
   }
 
@@ -165,13 +165,13 @@ static char *findFilter (
   char *oneExt
 ) {
 
-int stat;
+int status;
 nameListPtr cur;
 
   if ( !gFilterH ) return NULL;
 
-  stat = avl_get_match( gFilterH, (void *) oneExt, (void **) &cur );
-  if ( !( stat & 1 ) ) return NULL;
+  status = avl_get_match( gFilterH, (void *) oneExt, (void **) &cur );
+  if ( !( status & 1 ) ) return NULL;
   if ( !cur ) return NULL;
   if ( !cur->cmd ) return NULL;
 
@@ -342,20 +342,23 @@ int fileClose (
   FILE *f
 ) {
 
-  if ( gPipeIsOpen ) {
-
-    if ( f == gPipeF ) {
-
-      gPipeF = NULL;
-      gPipeIsOpen = 0;
-      return pclose( f );
-
-    }
-
-  }
+struct stat buf;
+int status;
 
   if ( diagnosticMode() ) {
     logDiagnostic( "close file\n" );
+  }
+
+  status = fstat( fileno(f), &buf );
+  if ( status == -1 ) {
+    if ( debugMode() ) {
+      perror( "in fileClose " );
+    }
+    return status;
+  }
+
+  if ( buf.st_mode & S_IFIFO ) {
+    return pclose( f );
   }
 
   return fclose( f );
@@ -368,7 +371,7 @@ static int checkForHttp (
 ) {
 
 unsigned int i;
-int stat;
+int status;
 char buf[255+1], namePart[255+1], postPart[255+1], *tk, *context;
 
   strncpy( buf, fullName, 255 );
@@ -391,14 +394,14 @@ char buf[255+1], namePart[255+1], postPart[255+1], *tk, *context;
        ( strcmp( tk, "HTTPS" ) == 0 ) 
      ) {
 
-    stat = getFileName( namePart, fullName, 255 );
-    if ( stat & 1 ) {
+    status = getFileName( namePart, fullName, 255 );
+    if ( status & 1 ) {
 
       strncpy( name, namePart, 255 );
       name[255] = 0;
 
-      stat = getFilePostfix( postPart, fullName, 255 );
-      if ( stat & 1 ) Strncat( name, postPart, 255 );
+      status = getFilePostfix( postPart, fullName, 255 );
+      if ( status & 1 ) Strncat( name, postPart, 255 );
 
       return 1;
 
@@ -424,9 +427,9 @@ char *first, *last;
 
   // if filename is of the form name[parm].ext,
   // use name.ext in the "is readable check".
-  first = index( (const char *) fname, (int) '[' );
+  first = index( fname, (int) '[' );
   if ( first ) {
-    last = rindex( (const char *) fname, (int) ']' );
+    last = rindex( fname, (int) ']' );
   }
   if ( first && last && ( first < last ) ) {
     len1 = (long) first - (long) fname;
@@ -446,7 +449,7 @@ char *first, *last;
 
     // else if filename is of the form name.ext?params,
     // use name.ext in the "is readable check".
-    first = index( (const char *) nameToCheck, (int) '?' );
+    first = index( nameToCheck, (int) '?' );
     if ( first ) {
       *first = (char) 0;
     }
@@ -479,9 +482,9 @@ char buf[255+1];
  if ( maxlen > 255 ) maxlen = 255;
   strcpy( buf, "" );
 
-  first = index( (const char *) name, (int) '[' );
+  first = index( name, (int) '[' );
   if ( first ) {
-    last = rindex( (const char *) name, (int) ']' );
+    last = rindex( name, (int) ']' );
   }
   if ( first && last && ( first < last ) ) {
 
@@ -503,7 +506,7 @@ char buf[255+1];
   }
   else {
 
-    first = index( (const char *) name, (int) '?' );
+    first = index( name, (int) '?' );
 
     if ( first ) {
       // filename is of the form name.ext?params
@@ -525,9 +528,9 @@ int len, i;
 
   strcpy( params, "" );
 
-  first = index( (const char *) fullNameWithParams, (int) '[' );
+  first = index( fullNameWithParams, (int) '[' );
   if ( first ) {
-    last = rindex( (const char *) fullNameWithParams, (int) ']' );
+    last = rindex( fullNameWithParams, (int) ']' );
   }
   if ( first && last && ( first < last ) ) {
 
@@ -545,7 +548,7 @@ int len, i;
   }
   else {
 
-    first = index( (const char *) fullNameWithParams, (int) '?' );
+    first = index( fullNameWithParams, (int) '?' );
 
     if ( first ) {
       // filename is of the form name.ext?params
@@ -567,7 +570,7 @@ static void reassemble (
 char *first;
 int len, i, loc=0;
 
-  first = index( (const char *) params, (int) '[' );
+  first = index( params, (int) '[' );
   if ( first ) {
 
     first = 0;
@@ -610,11 +613,11 @@ FILE *f;
 
 #ifdef USECURL
 char buf[255+1], name[255+1], allPaths[10239+1], plainName[255+1],
- *urlList, *tk, *context;
-int gotFile, useHttp;
+ tmpName[255+1], *urlList, *tk, *context;
+int gotFile, useHttp, f_open_successful;
 char errBuf[CURL_ERROR_SIZE+1];
 CURLcode result;
-mode_t curMode, newMode;
+mode_t curMode=0, newMode=0;
 struct stat sbuf;
 time_t tsDiff;
 static time_t expireSeconds = 0;
@@ -639,7 +642,7 @@ static int disableCache = 0;
       expireSeconds = 5;
     }
     if ( debugMode() ) fprintf( stderr, "disableCache = %-d\n", disableCache );
-    if ( debugMode() ) fprintf( stderr, "expireSeconds = %-d\n", expireSeconds );
+    if ( debugMode() ) fprintf( stderr, "expireSeconds = %-d\n", (int) expireSeconds );
   }
 #endif
 
@@ -703,19 +706,11 @@ static int disableCache = 0;
           return NULL;
         }
 
-        if ( gPipeIsOpen ) {
-          fprintf( stderr, "Pipe is already open (1)\n" );
-          pclose( gPipeF );
-          //return NULL;
-        }
-
-        gPipeIsOpen = 1;
-
         if ( debugMode() ) fprintf( stderr, "1 Filter cmd is [%s]\n", cmd );
 
-        gPipeF = popen( cmd, "r" );
+        f = popen( cmd, "r" );
 
-        return gPipeF;
+        return f;
 
       }
       else {
@@ -827,6 +822,8 @@ static int disableCache = 0;
         umask( curMode );
       }
       if ( !f ) return NULL;
+      strncpy( tmpName, buf, 255 );
+      tmpName[255] = 0;
 
       strncpy( buf, fullName, 255 );
 
@@ -840,13 +837,17 @@ static int disableCache = 0;
       curl_easy_setopt( curlH, CURLOPT_SSL_VERIFYHOST, 0 );
       strcpy( errBuf, "" );
       result = curl_easy_perform( curlH );
-      if ( debugMode() ) fprintf( stderr, "result = %-d, errno = %-d\n",
+      if ( debugMode() ) fprintf( stderr, "1 result = %-d, errno = %-d\n",
        (int) result, errno );
-      if ( debugMode() ) fprintf( stderr, "errBuf = [%s]\n", errBuf );
+      if ( debugMode() ) fprintf( stderr, "1 errBuf = [%s]\n", errBuf );
 
       fclose( f );
 
-      if ( result ) return NULL;
+      if ( result ) {
+        if ( debugMode() ) fprintf( stderr, "unlink [%s]\n", tmpName );
+        unlink( tmpName );
+        return NULL;
+      }
 
     }
 
@@ -868,19 +869,11 @@ static int disableCache = 0;
             return NULL;
           }
 
-          if ( gPipeIsOpen ) {
-            fprintf( stderr, "Pipe is already open (2)\n" );
-            pclose( gPipeF );
-            //return NULL;
-          }
-
-          gPipeIsOpen = 1;
-
           if ( debugMode() ) fprintf( stderr, "2 Filter cmd is [%s]\n", cmd );
 
-          gPipeF = popen( cmd, "r" );
+          f = popen( cmd, "r" );
 
-          return gPipeF;
+          return f;
 
         }
         else {
@@ -953,19 +946,11 @@ static int disableCache = 0;
             return NULL;
           }
 
-          if ( gPipeIsOpen ) {
-            fprintf( stderr, "Pipe is already open (3)\n" );
-            pclose( gPipeF );
-            //return NULL;
-          }
-
-          gPipeIsOpen = 1;
-
           if ( debugMode() ) fprintf( stderr, "3 Filter cmd is [%s]\n", cmd );
 
-          gPipeF = popen( cmd, "r" );
+          f = popen( cmd, "r" );
 
-          return gPipeF;
+          return f;
 
         }
         else {
@@ -1052,6 +1037,8 @@ static int disableCache = 0;
     tk = strtok_r( allPaths, "|", &context );
 
     gotFile = 0;
+    result = (CURLcode) -1;
+    f_open_successful = 0;
 
     while ( tk && !gotFile ) {
 
@@ -1084,6 +1071,9 @@ static int disableCache = 0;
           umask( curMode );
         }
         if ( !f ) return NULL;
+        f_open_successful = 1;
+        strncpy( tmpName, buf, 255 );
+        tmpName[255] = 0;
 
         strcpy( buf, tk );
         Strncat( buf, fullName, 255 );
@@ -1098,11 +1088,16 @@ static int disableCache = 0;
         curl_easy_setopt( curlH, CURLOPT_SSL_VERIFYHOST, 0 );
         strcpy( errBuf, "" );
         result = curl_easy_perform( curlH );
-        if ( debugMode() ) fprintf( stderr, "result = %-d, errno = %-d\n",
+        if ( debugMode() ) fprintf( stderr, "2 result = %-d, errno = %-d\n",
          (int) result, errno );
-        if ( debugMode() ) fprintf( stderr, "errBuf = [%s]\n", errBuf );
+        if ( debugMode() ) fprintf( stderr, "2 errBuf = [%s]\n", errBuf );
 
         fclose( f );
+
+        if ( result ) {
+          if ( debugMode() ) fprintf( stderr, "2 unlink [%s]\n", tmpName );
+          unlink( tmpName );
+        }
 
         gotFile = !result;
 
@@ -1121,7 +1116,9 @@ static int disableCache = 0;
 
     f = NULL;
 
-    if ( result ) return NULL;
+    if ( result ) {
+      return NULL;
+    }
 
     strncpy( buf, tmpDir, 255 );
     Strncat( buf, name, 255 );
@@ -1141,19 +1138,11 @@ static int disableCache = 0;
             return NULL;
           }
 
-          if ( gPipeIsOpen ) {
-            fprintf( stderr, "Pipe is already open (4)\n" );
-            pclose( gPipeF );
-            //return NULL;
-          }
-
-          gPipeIsOpen = 1;
-
           if ( debugMode() ) fprintf( stderr, "4 Filter cmd is [%s]\n", cmd );
 
-          gPipeF = popen( cmd, "r" );
+          f = popen( cmd, "r" );
 
-          return gPipeF;
+          return f;
 
         }
         else {

@@ -200,14 +200,16 @@ int n, l;
 
     if ( axtdo->changeValOnLoseFocus ) {
 
-      buf = XmTextGetString( axtdo->tf_widget );
-      strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
-      axtdo->entryValue[XTDC_K_MAX] = 0;
-      XtFree( buf );
-      strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
-      axtdo->curValue[XTDC_K_MAX] = 0;
-      strncpy( string, axtdo->entryValue, XTDC_K_MAX );
-      string[XTDC_K_MAX] = 0;
+      if ( axtdo->pvType == ProcessVariable::specificType::text ) {
+        buf = XmTextGetString( axtdo->tf_widget );
+        strncpy( axtdo->entryValue, buf, XTDC_K_MAX );
+        axtdo->entryValue[XTDC_K_MAX] = 0;
+        XtFree( buf );
+        strncpy( axtdo->curValue, axtdo->entryValue, XTDC_K_MAX );
+        axtdo->curValue[XTDC_K_MAX] = 0;
+        strncpy( string, axtdo->entryValue, XTDC_K_MAX );
+        string[XTDC_K_MAX] = 0;
+      }
     
       if ( axtdo->pvExists ) {
 
@@ -1749,7 +1751,8 @@ activeXTextDspClass *axtdo = (activeXTextDspClass *) userarg;
 
     axtdo->noSval = 0;
     axtdo->bufInvalidate();
-    axtdo->needRefresh = 1;
+    //axtdo->needRefresh = 1;
+    axtdo->needUpdate = 1;
     axtdo->actWin->addDefExeNode( axtdo->aglPtr );
 
   }
@@ -1775,7 +1778,8 @@ int index;
     index = axtdo->actWin->ci->evalRule( axtdo->fgColor.pixelIndex(), val );
     axtdo->fgColor.changeIndex( index, axtdo->actWin->ci );
     axtdo->bufInvalidate();
-    axtdo->needRefresh = 1;
+    //axtdo->needRefresh = 1;
+    axtdo->needUpdate = 1;
     axtdo->actWin->addDefExeNode( axtdo->aglPtr );
 
   }
@@ -2394,6 +2398,14 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
 
   setBlinkFunction( (void *) doBlink );
 
+  doAccSubs( value, XTDC_K_MAX );
+  doAccSubs( pvName, PV_Factory::MAX_PV_NAME );
+  doAccSubs( pvExpStr );
+  doAccSubs( svalPvExpStr );
+  doAccSubs( fgPvExpStr );
+  doAccSubs( defDir );
+  doAccSubs( pattern );
+
 }
 
 activeXTextDspClass::~activeXTextDspClass ( void ) {
@@ -2711,21 +2723,23 @@ static int nullCondEnum[3] = {
 };
 
 int formatTypeDefault = 0;
-static char *formatTypeEnumStr[6] = {
+static char *formatTypeEnumStr[7] = {
   "default",
   "float",
+  "gfloat",
   "exponential",
   "decimal",
   "hex",
   "string"
 };
-static int formatTypeEnum[6] = {
+static int formatTypeEnum[7] = {
   0,
   1,
   2,
   3,
   4,
-  5
+  5,
+  6
 };
 
 int fileCompFullPath = 0;
@@ -2768,7 +2782,7 @@ static int objTypeEnum[4] = {
   tag.loadW( "w", &w );
   tag.loadW( "h", &h );
   tag.loadW( "controlPv", &pvExpStr, emptyStr );
-  tag.loadW( "format", 6, formatTypeEnumStr, formatTypeEnum, &formatType,
+  tag.loadW( "format", 7, formatTypeEnumStr, formatTypeEnum, &formatType,
    &formatTypeDefault );
   tag.loadW( "font", fontTag );
   tag.loadW( "fontAlign", 3, alignEnumStr, alignEnum, &alignment, &left );
@@ -2972,21 +2986,23 @@ static int nullCondEnum[3] = {
 };
 
 int formatTypeDefault = 0;
-static char *formatTypeEnumStr[6] = {
+static char *formatTypeEnumStr[7] = {
   "default",
   "float",
+  "gfloat",
   "exponential",
   "decimal",
   "hex",
   "string"
 };
-static int formatTypeEnum[6] = {
+static int formatTypeEnum[7] = {
   0,
   1,
   2,
   3,
   4,
-  5
+  5,
+  6
 };
 
 int fileCompFullPath = 0;
@@ -3028,7 +3044,7 @@ static int objTypeEnum[4] = {
   tag.loadR( "w", &w );
   tag.loadR( "h", &h );
   tag.loadR( "controlPv", &pvExpStr, emptyStr );
-  tag.loadR( "format", 6, formatTypeEnumStr, formatTypeEnum, &formatType,
+  tag.loadR( "format", 7, formatTypeEnumStr, formatTypeEnum, &formatType,
    &formatTypeDefault );
   tag.loadR( "font", 63, fontTag );
   tag.loadR( "fontAlign", 3, alignEnumStr, alignEnum, &alignment, &left );
@@ -3235,6 +3251,10 @@ int tmpFgColor, tmpSvalColor;
   }
 
   fscanf( f, "%d\n", &formatType ); actWin->incLine();
+  if ( formatType > 1 ) {
+    formatType++;
+  }
+
   fscanf( f, "%d\n", &colorMode ); actWin->incLine();
   fscanf( f, "%d\n", &editable ); actWin->incLine();
 
@@ -5467,6 +5487,9 @@ char locFieldLenInfo[7+1];
           case XTDC_K_FORMAT_EXPONENTIAL:
             sprintf( format, "%%%s.%-de", locFieldLenInfo, precision );
             break;
+          case XTDC_K_FORMAT_GFLOAT:
+            sprintf( format, "%%%s.%-dg", locFieldLenInfo, precision );
+            break;
           default:
             sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
             break;
@@ -5496,6 +5519,9 @@ char locFieldLenInfo[7+1];
             break;
           case XTDC_K_FORMAT_EXPONENTIAL:
             sprintf( format, "%%%s.%-de", locFieldLenInfo, precision );
+            break;
+          case XTDC_K_FORMAT_GFLOAT:
+            sprintf( format, "%%%s.%-dg", locFieldLenInfo, precision );
             break;
           default:
             sprintf( format, "%%%s.%-df", locFieldLenInfo, precision );
@@ -5747,7 +5773,6 @@ char locFieldLenInfo[7+1];
 
           XtAddCallback( tf_widget, XmNfocusCallback,
            xtdoSetSelection, this );
-
 //****** SJS modification 16/06/05 ******
 //****** Comment out the following statement to allow 'Alt Tab' to work ******
 #ifdef COMMENT_OUT
@@ -6180,6 +6205,69 @@ void activeXTextDspClass::unmap ( void ) {
     if ( tf_widget ) {
       XtUnmapWidget( tf_widget );
     }
+  }
+
+}
+
+char *activeXTextDspClass::getSearchString (
+  int i
+) {
+
+  if ( i == 0 ) {
+    return pvExpStr.getRaw();
+  }
+  else if ( i == 1 ) {
+    return svalPvExpStr.getRaw();
+  }
+  else if ( i == 2 ) {
+    return fgPvExpStr.getRaw();
+  }
+  else if ( i == 3 ) {
+    return defDir.getRaw();
+  }
+  else if ( i == 4 ) {
+    return pattern.getRaw();
+  }
+  else {
+    return NULL;
+  }
+
+}
+
+void activeXTextDspClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+  if ( i == 0 ) {
+    pvExpStr.setRaw( string );
+    strncpy( pvName, pvExpStr.getRaw(), PV_Factory::MAX_PV_NAME );
+    pvName[PV_Factory::MAX_PV_NAME] = 0;
+    strncpy( value, string, minStringSize() );
+    value[minStringSize()] = 0;
+    strncpy( curValue, string, minStringSize() );
+    value[minStringSize()] = 0;
+  }
+  else if ( i == 1 ) {
+    svalPvExpStr.setRaw( string );
+  }
+  else if ( i == 2 ) {
+    fgPvExpStr.setRaw( string );
+  }
+  else if ( i == 3 ) {
+    defDir.setRaw( string );
+  }
+  else if ( i == 4 ) {
+    pattern.setRaw( string );
+  }
+
+  updateDimensions();
+
+  if ( autoHeight && fs ) {
+    h = fontHeight;
+    if ( isWidget ) h += 4;
+    sboxH = h;
   }
 
 }

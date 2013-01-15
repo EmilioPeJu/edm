@@ -19,8 +19,79 @@
 #define __expString_cc 1
 
 #include "expString.h"
+#include "utility.h"
+#include "environment.str"
 
 static char *g_expStrBlank = "";
+
+static int valFromExec (
+  char *val,
+  int max,
+  int *execBufSize,
+  char *execBuf
+) {
+
+FILE *f;
+int i, i0, i1, saveLoc, result;
+static int ignoreExec = -1;
+
+  if ( ignoreExec == -1 ) {
+    if ( getenv( environment_str35 ) ) {
+      ignoreExec = 1;
+    }
+    else {
+      ignoreExec = 0;
+    }
+  }
+
+  execBuf[0] = 0;
+  *execBufSize = 0;
+
+  if ( ignoreExec ) return 0;
+
+  result = 0;
+  saveLoc = 0;
+
+  if ( val ) {
+
+    if ( val[0] == '`' ) {
+
+      i0 = 1;
+      i1 = strlen( val ) - 1;
+      if ( i1 >= i0 ) {
+
+	for ( i=i1; i>i0; i-- ) {
+          if ( val[i] == '`' ) {
+            val[i] = 0;
+            saveLoc = i;
+	  }
+	}
+
+        val[i1] = 0;
+        f = popen( &val[1], "r" );
+        if ( f ) {
+
+          fgets( execBuf, max, f );
+          execBuf[max] = 0;
+          trimWhiteSpace( execBuf );
+          *execBufSize = strlen( execBuf );
+          fclose( f );
+
+	  result = 1;
+
+	}
+
+	if ( saveLoc ) val[saveLoc] = '`';
+
+      }
+
+    }
+
+  }
+
+  return result;
+
+}
 
 static int expand (
   int numMacros,
@@ -38,8 +109,10 @@ static int expand (
 {
 
 char buf[MAX_EXPAND_SIZE+1];
+char execBuf[MAX_EXPAND_SIZE+1];
 char thisMacro[MAX_EXPAND_SIZE+1];
-int state, foundOne, i, ii, nOut, nIn, nMacro, outStrLen;
+int state, foundOne, i, ii, nOut, nIn, nMacro,
+ outStrLen, execBufSize, needSpace;
 
   *numSymbolsFound = 0;
 
@@ -83,28 +156,6 @@ int state, foundOne, i, ii, nOut, nIn, nMacro, outStrLen;
       }
 
       break;
-
-    // ====================================================================
-
-//    case STATE_FIND_LEFT_PAREN:
-//
-//      if ( nIn >= inStringLen ) {
-//
-//        return EXPSTR_SYNTAX;
-//
-//      }
-//      else if ( inString[nIn] == '(' ) {
-//
-//        state = STATE_FIND_NON_WHITE;
-//
-//      }
-//      else if ( ( inString[nIn] != ' ' ) || ( inString[nIn] != '\t' ) ) {
-//
-//        return EXPSTR_SYNTAX;
-//
-//      }
-//
-//      break;
 
     // ====================================================================
 
@@ -154,7 +205,7 @@ int state, foundOne, i, ii, nOut, nIn, nMacro, outStrLen;
         return EXPSTR_SYNTAX;
 
       }
-      else if ( ( inString[nIn] != ' ' ) || ( inString[nIn] != '\t' ) ) {
+      else if ( ( inString[nIn] != ' ' ) && ( inString[nIn] != '\t' ) ) {
 
         state = STATE_COPY_MACRO;
 
@@ -187,16 +238,55 @@ int state, foundOne, i, ii, nOut, nIn, nMacro, outStrLen;
         // do substitution
         // fprintf( stderr, "processing [%s]\n", thisMacro );
         for ( i=0; i<numMacros; i++ ) {
+
           if ( strcmp( thisMacro, macro[i] ) == 0 ) {
-            for ( ii=0; ii<(int) strlen(expansion[i]); ii++ ) {
-              if ( nOut+1 >= MAX_EXPAND_SIZE ) return EXPSTR_OUTOVFL;
-              buf[nOut] = expansion[i][ii];
-              nOut++;
-            }
+
+            if ( valFromExec( expansion[i], MAX_EXPAND_SIZE,
+             &execBufSize, execBuf ) ) {
+
+	      needSpace = 0;
+              for ( ii=0; ii<execBufSize; ii++ ) {
+                if ( nOut+1 >= MAX_EXPAND_SIZE ) return EXPSTR_OUTOVFL;
+                if ( execBuf[ii] == '\n' ) {
+                  needSpace = 1;
+		}
+                else if ( execBuf[ii] == '\t' ) {
+                  buf[nOut] = ' ';
+                  nOut++;
+		}
+		else {
+                  if ( needSpace ) {
+                    needSpace = 0;
+                    buf[nOut] = ' ';
+                    nOut++;
+                    if ( nOut+1 >= MAX_EXPAND_SIZE ) return EXPSTR_OUTOVFL;
+                    buf[nOut] = execBuf[ii];
+                    nOut++;
+		  }
+		  else {
+                    buf[nOut] = execBuf[ii];
+                    nOut++;
+		  }
+		}
+              }
+
+	    }
+	    else {
+
+              for ( ii=0; ii<(int) strlen(expansion[i]); ii++ ) {
+                if ( nOut+1 >= MAX_EXPAND_SIZE ) return EXPSTR_OUTOVFL;
+                buf[nOut] = expansion[i][ii];
+                nOut++;
+              }
+
+	    }
+
             (*numSymbolsFound)++;
             foundOne = 1;
             break; // found one, don't continue testing for more
+
           }
+
         }
 
         if ( !foundOne && preserveSymbols ) {
@@ -217,13 +307,40 @@ int state, foundOne, i, ii, nOut, nIn, nMacro, outStrLen;
         }
 
       }
-      else if ( ( inString[nIn] != ' ' ) || ( inString[nIn] != '\t' ) ) {
+      /****** SJS change 22_11_12 - remove spaces from beginning or end *******
+       ****** of macros but not the middle - replace
+      else if ( ( inString[nIn] != ' ' ) && ( inString[nIn] != '\t' ) ) {
 
         if ( nMacro+1 >= MAX_EXPAND_SIZE ) return EXPSTR_MACOVFL;
         thisMacro[nMacro] = inString[nIn];
         nMacro++;
 
       }
+      by ******/
+      else
+      {
+        bool ignoreChar = False;
+        if (inString[nIn] == ' ' || inString[nIn] == '\t')
+        {
+          bool ignoreWhiteSpace = True;
+          int tempnIn = nIn + 1;
+          while (tempnIn < (int) strlen (inString) && inString[tempnIn] != ')')
+          {
+            if (inString[tempnIn] != ' ' && inString[tempnIn] != '\t')
+              ignoreWhiteSpace = False;
+            tempnIn++;
+          }
+          if (ignoreWhiteSpace)
+            ignoreChar = True;
+        }
+        if (!ignoreChar)
+        {
+          if ( nMacro + 1 >= MAX_EXPAND_SIZE ) return EXPSTR_MACOVFL;
+          thisMacro[nMacro] = inString[nIn];
+          nMacro++;
+        }
+      }
+      /***** End of SJS change *****/
 
       break;
 

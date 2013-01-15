@@ -24,6 +24,7 @@ edmByteClass::edmByteClass() : activeGraphicClass(), init(0),
 edmByteClass::edmByteClass(edmByteClass *rhs)
 {
     clone(rhs, BYTE_CLASSNAME);
+    doAccSubs( pv_exp_str );
 }
 
 void edmByteClass::clone(const edmByteClass *rhs,
@@ -292,7 +293,7 @@ static int endianEnum[2] = {
   nobt = (temp < 1)?1:((temp > 16)?16:temp);
 
   temp = shft;
-  shft = (temp < 0)?0:((temp > 15)?15:temp);
+  shft = (temp < 0)?0:((temp > 31)?31:temp);
   
   updateDimensions();
 
@@ -368,7 +369,7 @@ int edmByteClass::old_createFromFile(FILE *f, char *filename,
   fscanf( f, "%d\n", &temp ); actWin->incLine();
   nobt = (temp < 1)?1:((temp > 16)?16:temp);
   fscanf( f, "%d\n", &temp ); actWin->incLine();
-  shft = (temp < 0)?0:((temp > 15)?15:temp);
+  shft = (temp < 0)?0:((temp > 31)?31:temp);
   
   updateDimensions();
 
@@ -392,7 +393,11 @@ int edmByteClass::createInteractive(activeWindowClass *aw_obj,
     yOrigin = 0;
     x = _x; y = _y; w = _w; h = _h;
 
-    offPixel = actWin->ci->getPixelByIndex(actWin->bgColor);
+    offPixel = actWin->ci->getPixelByIndex(actWin->defaultBgColor);
+    offColor = actWin->defaultBgColor;
+    onPixel = actWin->ci->getPixelByIndex(actWin->defaultTextFgColor);
+    onColor = actWin->defaultTextFgColor;
+    fgPixel = actWin->ci->getPixelByIndex(actWin->defaultTextFgColor);
     lineColor = actWin->fgColor;
     lineWidth = 1;
     lineStyle = 0;
@@ -671,7 +676,7 @@ void edmByteClass::edit_update(Widget w, XtPointer client,XtPointer call)
 
     me->theDir = me->bufTheDir;
     me->nobt = (me->bufNobt < 1)?1:((me->bufNobt > 16)?16:me->bufNobt);
-    me->shft = (me->bufShft < 0)?0:((me->bufShft > 15)?15:me->bufShft);
+    me->shft = (me->bufShft < 0)?0:((me->bufShft > 31)?31:me->bufShft);
 
     me->x = me->bufX;
     me->sboxX = me->bufX;
@@ -781,7 +786,30 @@ void edmByteClass::getPvs(int max,
   pvs[0] = valuePvId;
 
 }
-    
+
+char *edmByteClass::getSearchString (
+  int i
+) {
+
+  if ( i == 0 ) {
+    return pv_exp_str.getRaw();
+  }
+
+  return NULL;
+
+}
+
+void edmByteClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+  if ( i == 0 ) {
+    pv_exp_str.setRaw( string );
+  }
+
+}    
 // --------------------------------------------------------
 // Macro support
 // --------------------------------------------------------
@@ -911,11 +939,11 @@ int edmByteClass::drawActive()
          if (valuePvId->is_valid())
          {
             unsigned int severity;
-            // logic for non-invalid alarm colors would go here.  
+            // logic for non-invalid alarm colors would go here.
             severity = valuePvId->get_severity();
             switch(severity)
             {
-            case NO_ALARM:  
+            case NO_ALARM:
                fgPixel = onPixel;
                break;
             case MINOR_ALARM:
@@ -927,7 +955,7 @@ int edmByteClass::drawActive()
             default:
                fgPixel = invalidPixel;
             }
-            if (!validFlag || lastsev != severity) 
+            if (!validFlag || lastsev != severity)
             {
                validFlag = true;
                lastsev = severity;
@@ -1143,8 +1171,12 @@ void edmByteClass::pv_callback(ProcessVariable *pv, void *userarg)
 
 void edmByteClass::executeDeferred()
 {   // Called as a result of addDefExeNode
-
+    /* SJS 15/11/12 - undo this change to allow my change of 15/06/09 to work
+     * replace
+    if (is_executing && valuePvId->is_valid())
+    by */
     if (is_executing)
+    /* End SJS change 15/11/12 */
     {
        lastval = value;
        /****** SJS Modification 15/06/09 to allow byte widgets to ******

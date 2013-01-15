@@ -413,6 +413,53 @@ char *pvBindingClass::nextPvName ( void )
 
 }
 
+/* MGA changes to allow variable size access to Waveform records - replace
+
+class ProcessVariable *pvBindingClass::createNew (
+  const char *oneClassName,
+  const char *PV_name )
+{
+
+typedef void *(*VPFUNC)( const char *PV_name );
+VPFUNC func;
+ProcessVariable *cur;
+int i;
+char name[127+1], *error;
+
+  // fprintf( stderr, "pvBindingClass::createNew - name = [%s]\n", oneClassName );
+
+  for ( i=0; i<max; i++ ) {
+
+    if ( strcmp( oneClassName, classNames[i] ) == 0 ) {
+
+      strcpy( name, "create_" );
+      Strncat( name, classNames[i], 127 );
+      Strncat( name, "Ptr", 127 );
+
+      //fprintf( stderr, "func name = [%s]\n", name );
+
+      func = (VPFUNC) dlsym( dllHandle[i], name );
+      if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        fputs( "\n", stderr );
+        return NULL;
+      }
+
+// fprintf( stderr, "1\n" );
+      cur = (ProcessVariable *) (*func)( PV_name );
+// fprintf( stderr, "2\n" );
+      return cur;
+
+    }
+
+  }
+
+  return NULL;
+
+}
+
+by */
+
 void *pvBindingClass::lookup_function(
     const char *class_name, const char *name)
 {
@@ -457,6 +504,8 @@ class ProcessVariable *pvBindingClass::createNew_size (
     else
         return NULL;
 }
+
+/* End of MGA change */
 
 char *pvBindingClass::getPvName (
   int i )

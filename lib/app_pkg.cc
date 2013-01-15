@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <X11/Intrinsic.h>
+#include <sys/wait.h>
 
 typedef struct libRecTag {
   struct libRecTag *flink;
@@ -34,6 +35,44 @@ typedef struct libRecTag {
 } libRecType, *libRecPtr;
 
 static int g_needXtInit = 1;
+
+static int checkDisplay (
+  char *dspName
+) {
+
+char *envPtr;
+char cmd[1023+1];
+int result;
+
+  result = 0; // success
+
+  envPtr = getenv( "EDMCHECKDISPLAY" );
+  if ( envPtr ) {
+
+    if ( !dspName ) return result;
+    if ( strcmp( dspName, "" ) == 0 ) return result;
+
+    if ( debugMode() ) {
+      fprintf( stderr, "checking display %s with %s\n", dspName, envPtr );
+    }
+
+    snprintf( cmd, 1023, "%s %s", envPtr, dspName );
+
+    result = system( cmd );
+
+    if ( result ) {
+      result = result >> 8;
+    }
+
+    if ( debugMode() ) {
+      fprintf( stderr, "return value = %-d\n", result );
+    }
+
+  }
+
+  return result;
+
+}
 
 static int ignoreIconic ( void ) {
 
@@ -1298,6 +1337,12 @@ SYS_PROC_ID_TYPE procId;
     pv->putText( str );
     return;
   }
+  else if ( strcmp( name, "* READONLY *" ) == 0 ) {
+    setReadOnly();
+    strcpy( str, "" );
+    pv->putText( str );
+    return;
+  }
 
   if ( name[0] == ' ' ) {
     return;
@@ -2330,6 +2375,8 @@ appContextClass::appContextClass (
   useStdErrFlag = 0;
   errMsgPrefix = NULL;
 
+  msgDialogOpenCount = 0;
+
 }
 
 appContextClass::~appContextClass (
@@ -2586,6 +2633,52 @@ activeWindowListPtr cur;
         cur->requestActivateClear = 1;
         requestFlag++;
       }
+      cur->node.reloadSelf();
+    }
+    cur = cur->flink;
+  }
+  processAllEvents( app, display );
+
+}
+
+void appContextClass::requestSelectedReload ( void )
+{
+
+  reloadFlag = 3;
+
+}
+
+void appContextClass::reloadSelected ( void )
+{
+
+activeWindowListPtr cur;
+
+  // walk activeWindowList and reload
+  cur = head->flink;
+  while ( cur != head ) {
+    if ( !cur->requestDelete && cur->node.reloadRequestFlag ) {
+      cur->requestActivate = 0;
+      cur->requestActivateClear = 0;
+      cur->requestReactivate = 0;
+      cur->requestOpen = 1;
+      requestFlag++;
+      cur->requestPosition = 1;
+      cur->requestImport = 0;
+      cur->requestRefresh = 0;
+      cur->requestActiveRedraw = 0;
+      cur->requestIconize = 0;
+      cur->requestConvertAndExit = 0;
+      cur->x = cur->node.x;
+      cur->y = cur->node.y;
+      if ( cur->node.mode == AWC_EXECUTE ) {
+        cur->node.returnToEdit( 0 );
+        cur->node.noRaise = 1;
+        processAllEvents( app, display );
+        cur->requestActivate = 1;
+        cur->requestActivateClear = 1;
+        requestFlag++;
+      }
+      cur->node.reloadRequestFlag = 0;
       cur->node.reloadSelf();
     }
     cur = cur->flink;
@@ -3696,7 +3789,7 @@ int i, numVisible;
   fileCascade = XtVaCreateManagedWidget( "filemenu", xmCascadeButtonWidgetClass,
    menuBar,
    XmNlabelString, menuStr,
-   XmNmnemonic, 'f',
+   XmNmnemonic, XStringToKeysym("f"),
    XmNsubMenuId, filePullDown,
    NULL );
   XmStringFree( menuStr );
@@ -3793,7 +3886,7 @@ int i, numVisible;
   viewCascade = XtVaCreateManagedWidget( "viewmenu", xmCascadeButtonWidgetClass,
    menuBar,
    XmNlabelString, menuStr,
-   XmNmnemonic, 'v',
+   XmNmnemonic, XStringToKeysym("v"),
    XmNsubMenuId, viewPullDown,
    NULL );
   XmStringFree( menuStr );
@@ -3880,7 +3973,7 @@ int i, numVisible;
     pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
      menuBar,
      XmNlabelString, menuStr,
-     XmNmnemonic, 'v',
+     XmNmnemonic, XStringToKeysym("p"),
      XmNsubMenuId, pathPullDown,
      NULL );
     XmStringFree( menuStr );
@@ -3918,7 +4011,7 @@ int i, numVisible;
     pathCascade = XtVaCreateManagedWidget( "pathmenu", xmCascadeButtonWidgetClass,
      menuBar,
      XmNlabelString, menuStr,
-     XmNmnemonic, 'v',
+     XmNmnemonic, XStringToKeysym("p"),
      XmNsubMenuId, pathPullDown,
      NULL );
     XmStringFree( menuStr );
@@ -3953,7 +4046,7 @@ int i, numVisible;
   helpCascade = XtVaCreateManagedWidget( "helpmenu", xmCascadeButtonWidgetClass,
    menuBar,
    XmNlabelString, menuStr,
-   XmNmnemonic, 'h',
+   XmNmnemonic, XStringToKeysym("h"),
    XmNsubMenuId, helpPullDown,
    NULL );
   XmStringFree( menuStr );
@@ -4324,6 +4417,8 @@ static void displayParamInfo ( void ) {
 
   fprintf( stderr, global_str141 );
 
+  fprintf( stderr, global_str147 );
+
   fprintf( stderr, global_str97 );
 
   fprintf( stderr, global_str107 );
@@ -4437,7 +4532,11 @@ int appContextClass::getParams(
   char **argv )
 {
 
+/* SJS change to allow larger macro expansions - replace
+char buf[1023+1], mac[1023+1], exp[1023+1];
+by */
 char buf[2047+1], mac[2047+1], exp[2047+1];
+/* End of SJS change */
 int state = SWITCHES;
 int i, n = 1;
 char *tk;
@@ -4556,6 +4655,8 @@ fileListPtr curFile;
         }
         else if ( strcmp( argv[n], global_str140 ) == 0 ) {
         }
+        else if ( strcmp( argv[n], global_str146 ) == 0 ) {
+        }
         else if ( strcmp( argv[n], global_str86 ) == 0 ) {
           n++; // just ignore, not used here
           if ( n >= argc ) return 2;
@@ -4566,10 +4667,18 @@ fileListPtr curFile;
         else if ( strcmp( argv[n], global_str19 ) == 0 ) {
           n++;
           if ( n >= argc ) return 2; // missing macro arg
+          /* SJS change to allow larger macro expansions - replace
+          strncpy( buf, argv[n], 1023 );
+          by */
           strncpy( buf, argv[n], 2047 );
+          /* End of SJS change */
           tk = strtok( buf, "=," );
           while ( tk ) {
+            /* SJS change to allow larger macro expansions - replace
+            strncpy( mac, tk, 1023 );
+            by */
             strncpy( mac, tk, 2047 );
+          /* End of SJS change */
             tk = strtok( NULL, "=," );
             if ( tk ) {
               if ( strcmp( tk, "\"\"" ) == 0 ) {
@@ -4582,7 +4691,11 @@ fileListPtr curFile;
                 strcpy( exp, "" );
 	      }
 	      else {
+                /* SJS change to allow larger macro expansions - replace
+                strncpy( exp, tk, 1023 );
+                by */
                 strncpy( exp, tk, 2047 );
+                /* End of SJS change */
 	      }
             }
             else {
@@ -4621,7 +4734,7 @@ fileListPtr curFile;
         else if ( strcmp( argv[n], global_str21 ) == 0 ) {
           n++;
           if ( n >= argc ) return 2;
-          strncpy( displayName, argv[n], 127 );
+          strncpy( displayName, argv[n], 63 );
         }
         else if ( strcmp( argv[n], global_str73 ) == 0 ) {
           n++; // just ignore, not used here
@@ -4732,7 +4845,7 @@ int appContextClass::startApplication (
 int stat, opStat;
 activeWindowListPtr cur;
 char *name, *envPtr;
-char prefix[255+1], fname[255+1], msg[127+1];
+char dspName[63+1], prefix[255+1], fname[255+1], msg[127+1];
 fileListPtr curFile;
 expStringClass expStr;
 Atom wm_delete_window;
@@ -4745,6 +4858,15 @@ XmString xmStr1;
   primaryServer = _primaryServer;
   oneInstance = _oneInstance;
   convertOnly = _convertOnly;
+
+  envPtr = getenv("DISPLAY");
+  if ( envPtr ) {
+    strncpy( dspName, envPtr, 63 );
+    dspName[63] = 0;
+  }
+  else {
+    strcpy( dspName, ":0.0" );
+  }
 
   name = argv[0];
 
@@ -4849,8 +4971,35 @@ err_return:
       XtAppSetFallbackResources(app, fbr);
     }
 
-    display = XtOpenDisplay( app, NULL, NULL, "edm", NULL, 0, &argCount,
-     args );
+    for ( int i=0; i<argCount; i++ ) {
+      if ( strcmp( args[i], "-display" ) == 0 ) {
+        if ( i+1 < argCount ) {
+          strncpy( dspName, args[i+1], 63 );
+	  dspName[63] = 0;
+	  break;
+	}
+      }
+    }
+
+    int result = 0;
+    result = checkDisplay( dspName );
+    if ( result ) {
+      fprintf( stderr, appContextClass_str145, dspName );
+      exitFlag = 1;
+      return 0; // error
+    }
+
+    display = XtOpenDisplay( app, NULL, NULL, "edm", NULL, 0,
+     &argCount, args );
+    if ( !display ) {
+      display = XtOpenDisplay( app, dspName, NULL, "edm", NULL, 0,
+       &argCount, args );
+      if ( !display ) {
+        fprintf( stderr, appContextClass_str146 );
+        exitFlag = 1;
+        return 0; // error
+      }
+    }
 
     if ( executeOnOpen ) {
       appTop = XtVaAppCreateShell( NULL, "edm", applicationShellWidgetClass,
@@ -5036,7 +5185,8 @@ err_return:
 
   opStat = fi.initFromFile( app, display, fname );
 
-  closeNote();
+  msgDialogOpenCount = 20; // close note in applicationLoop function
+  //closeNote();
 
   if ( !( opStat & 1 ) ) {
     fprintf( stderr, appContextClass_str107 );
@@ -5399,7 +5549,8 @@ char controlCmd[31+1];
         ( strcmp( tk, global_str134 ) == 0 ) ||
         ( strcmp( tk, global_str136 ) == 0 ) ||
         ( strcmp( tk, global_str138 ) == 0 ) ||
-        ( strcmp( tk, global_str140 ) == 0 )
+        ( strcmp( tk, global_str140 ) == 0 ) ||
+        ( strcmp( tk, global_str146 ) == 0 )
       ) {
 
         state = GETTING_FILES;
@@ -5446,7 +5597,8 @@ char controlCmd[31+1];
         ( strcmp( tk, global_str134 ) != 0 ) &&
         ( strcmp( tk, global_str136 ) != 0 ) &&
         ( strcmp( tk, global_str138 ) != 0 ) &&
-        ( strcmp( tk, global_str140 ) != 0 )
+        ( strcmp( tk, global_str140 ) != 0 ) &&
+        ( strcmp( tk, global_str146 ) != 0 )
       ) {
 
         extractPosition( tk, filePart, 255, &gotPosition, &posx, &posy );
@@ -5753,7 +5905,6 @@ activeWindowListPtr cur;
 
 void appContextClass::applicationLoop ( void ) {
 
-static int msgCount = 0;
 int stat, nodeCount, actionCount, iconNodeCount,
  iconActionCount, n;
 activeWindowListPtr cur, next;
@@ -5771,7 +5922,7 @@ char msg[127+1];
 
     if ( epc.printFinished() ) {
       postNote( appContextClass_str138 );
-      msgCount = 20;
+      msgDialogOpenCount = 20;
     }
 
     if ( epc.printFailure() ) {
@@ -5780,11 +5931,11 @@ char msg[127+1];
 
   }
 
-  if ( msgCount > 0 ) {
-    if ( msgCount == 1 ) {
+  if ( msgDialogOpenCount > 0 ) {
+    if ( msgDialogOpenCount == 1 ) {
       closeNote();
     }
-    msgCount--;
+    msgDialogOpenCount--;
   }
 
   if ( reloadFlag == 2 ) {
@@ -5793,6 +5944,10 @@ char msg[127+1];
   }
   else if ( reloadFlag == 1 ) {
     reloadAll();
+    reloadFlag = 2;
+  }
+  else if ( reloadFlag == 3 ) {
+    reloadSelected();
     reloadFlag = 2;
   }
 
@@ -6336,11 +6491,15 @@ int _x, _y;
   _x = XDisplayWidth( display, DefaultScreen(display) ) / 2;
   _y = XDisplayHeight( display, DefaultScreen(display) ) / 2;
 
+  // printf( "postNote - msgDialog = %-X\n", (int) &msgDialog );
+
   msgDialog.popup( msg, _x, _y );
 
 }
 
 void appContextClass::closeNote ( void ) {
+
+  // printf( "closeNote - msgDialog = %-X\n", (int) &msgDialog );
 
   msgDialog.popdown();
 

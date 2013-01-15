@@ -26,6 +26,7 @@
 #include "pip.h"
 #include <sys/stat.h>
 #include <unistd.h>
+#include "utility.h"
 #include "app_pkg.h"
 #include "act_win.h"
 
@@ -158,6 +159,7 @@ int i, ii;
   pipo->eraseSelectBoxCorners();
   pipo->erase();
 
+  trimWhiteSpace( pipo->buf->bufDisplayFileName[0] );
   pipo->displayFileName[0].setRaw( pipo->buf->bufDisplayFileName[0] );
   if ( blank( pipo->displayFileName[0].getRaw() ) ) {
     pipo->propagateMacros[0] = 1;
@@ -178,6 +180,7 @@ int i, ii;
 
   for ( i=ii; i<pipo->maxDsps; i++ ) {
     if ( !blank( pipo->buf->bufDisplayFileName[i] ) ) {
+      trimWhiteSpace( pipo->buf->bufDisplayFileName[i] );
       pipo->displayFileName[ii].setRaw( pipo->buf->bufDisplayFileName[i] );
       pipo->propagateMacros[ii] = pipo->buf->bufPropagateMacros[i];
       pipo->label[ii].setRaw( pipo->buf->bufLabel[i] );
@@ -211,6 +214,7 @@ int i, ii;
 
   pipo->labelPvExpStr.setRaw( pipo->buf->bufLabelPvName );
 
+  trimWhiteSpace( pipo->buf->bufFileName );
   pipo->fileNameExpStr.setRaw( pipo->buf->bufFileName );
 
   pipo->displaySource = pipo->buf->bufDisplaySource;
@@ -425,8 +429,13 @@ int i;
   name = new char[strlen("activePipClass")+1];
   strcpy( name, "activePipClass" );
   checkBaseClassVersion( activeGraphicClass::MAJOR_VERSION, name );
+  // SJS modification - reduce minimum size for window - replace
+  // minW = 50;
+  // minH = 50;
+  // by
   minW = 10;
   minH = 10;
+  // End of modification
   center = 0;
   setSize = 0;
   sizeOfs = 5;
@@ -483,8 +492,14 @@ int i;
   labelPvExpStr.copy( source->labelPvExpStr );
   fileNameExpStr.copy( source->fileNameExpStr );
 
+  // SJS modification - reduce minimum size for window - replace
+  // minW = 50;
+  // minH = 50;
+  // by
   minW = 10;
   minH = 10;
+  // End of SJS modification
+
   center = source->center;
   setSize = source->setSize;
   sizeOfs = source->sizeOfs;
@@ -514,6 +529,15 @@ int i;
   buf = NULL;
 
   consecutiveDeactivateErrors = 0;
+
+  doAccSubs( readPvExpStr );
+  doAccSubs( labelPvExpStr );
+  doAccSubs( fileNameExpStr );
+  for ( i=0; i<numDsps; i++ ) {
+    doAccSubs( symbolsExpStr[i] );
+    doAccSubs( label[i] );
+    doAccSubs( displayFileName[i] );
+  }
 
 }
 
@@ -1665,7 +1689,7 @@ int stat, retStat, i;
   stat = labelPvExpStr.expand2nd( numMacros, macros, expansions );
   if ( !( stat & 1 ) ) retStat = stat;
 
-  stat = fileNameExpStr.expand1st( numMacros, macros, expansions );
+  stat = fileNameExpStr.expand2nd( numMacros, macros, expansions );
   if ( !( stat & 1 ) ) retStat = stat;
 
   for ( i=0; i<numDsps; i++ ) {
@@ -1868,7 +1892,7 @@ void activePipClass::openEmbeddedByIndex (
 
 activeWindowListPtr cur;
 int i, l, stat;
-char symbolsWithSubs[maxSymbolLen+1];
+char symbolsWithSubs[maxSymbolLen+1], nameWithSubs[maxSymbolLen+1];
 int useSmallArrays, symbolCount, maxSymbolLength;
 char smallNewMacros[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
 char smallNewValues[SMALL_SYM_ARRAY_SIZE+1][SMALL_SYM_ARRAY_LEN+1+1];
@@ -2133,6 +2157,7 @@ void activePipClass::executeDeferred ( void ) {
 
 int iv;
 char v[39+1];
+char nameWithSubs[maxSymbolLen+1];
 int i, nc, nu, nmc, nmu, nd, nfo, nimfo, ncto, nmap, nunmap, okToClose, stat;
 activeWindowListPtr cur;
 Window root, child;
@@ -3014,6 +3039,72 @@ void activePipClass::unmap ( void ) {
 
   needUnmap = 1;
   actWin->addDefExeNode( aglPtr );
+
+}
+
+char *activePipClass::getSearchString (
+  int i
+) {
+
+int index, ii;
+
+  if ( i == 0 ) {
+    return readPvExpStr.getRaw();
+  }
+  else if ( i == 1 ) {
+    return labelPvExpStr.getRaw();
+  }
+  else if ( i == 2 ) {
+    return fileNameExpStr.getRaw();
+  }
+  else if ( ( i > 2 ) && ( i < numDsps * 3 + 3 ) ) {
+    ii = i % 3;
+    index = ( i - 3 ) / 3;
+    if ( ii == 0 ) {
+      return symbolsExpStr[index].getRaw();
+    }
+    else if ( ii == 1 ) {
+      return label[index].getRaw();
+    }
+    else if ( ii == 2 ) {
+      return displayFileName[index].getRaw();
+    }
+  }
+
+  return NULL;
+
+}
+
+void activePipClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+int index, ii;
+
+  if ( i == 0 ) {
+    readPvExpStr.setRaw( string );
+  }
+  else if ( i == 1 ) {
+    labelPvExpStr.setRaw( string );
+  }
+  else if ( i == 2 ) {
+    fileNameExpStr.setRaw( string );
+  }
+  else if ( ( i > 2 ) && ( i < numDsps * 3 + 3 ) ) {
+    ii = i % 3;
+    index = ( i - 3 ) / 3;
+    if ( ii == 0 ) {
+      symbolsExpStr[index].setRaw( string );
+    }
+    else if ( ii == 1 ) {
+      label[index].setRaw( string );
+    }
+    else if ( ii == 2 ) {
+      displayFileName[index].setRaw( string );
+    }
+  }
 
 }
 

@@ -18,7 +18,9 @@ public:
     EPICS_PV_Factory();
     ~EPICS_PV_Factory();
     ProcessVariable *create(const char *PV_name);
+/* MGA changes to allow specification of size of waveform PVs - add */
     ProcessVariable *create_size(const char *PV_name, size_t size);
+/* End of MGA change */
 private:
     friend class EPICS_ProcessVariable;
     static void forget(EPICS_ProcessVariable *pv);
@@ -35,11 +37,12 @@ public:
     double      get_double() const;
     size_t      get_string(char *strbuf, size_t buflen) const;
     size_t      get_dimension() const;
-    const char   *get_char_array() const;
-    const int    *get_int_array() const;
+    const char  *get_char_array() const;
+    const short *get_short_array() const;
+    const int   *get_int_array() const;
     const double *get_double_array() const;
     size_t      get_enum_count() const;
-    const char *get_enum(size_t i) const;
+    const char  *get_enum(size_t i) const;
 
 	time_t get_time_t() const;
 	unsigned long get_nano() const;
@@ -70,7 +73,11 @@ private:
     friend class EPICS_PV_Factory;
     
     // hidden, use create/release
+/* MGA changes to allow specification of size of waveform PVs - replace
+    EPICS_ProcessVariable(const char *_name);
+by */
     EPICS_ProcessVariable(const char *_name, size_t size);
+/* End of MGA change */
     EPICS_ProcessVariable(const ProcessVariable &rhs); // not impl.
     EPICS_ProcessVariable &operator = (const ProcessVariable &rhs); // not impl.
     virtual ~EPICS_ProcessVariable();
@@ -84,7 +91,10 @@ private:
     class PVValue *value;  // current value, type-dependent
     bool read_access;
     bool write_access;
+/* MGA changes to allow specification of size of waveform PVs - add */
     size_t forced_size;    // Used to force subscription size
+/* End of MGA change */
+
     
     static void ca_connect_callback(struct connection_handler_args arg);
     static void ca_ctrlinfo_callback(struct event_handler_args args);
@@ -110,6 +120,7 @@ public:
     virtual double      get_double() const = 0;
     virtual size_t      get_string(char *strbuf, size_t buflen) const;
     virtual const char *get_char_array() const;
+    virtual const short *get_short_array() const;
     virtual const int  *get_int_array() const;
     virtual const double *get_double_array() const;
     virtual size_t      get_enum_count() const;
@@ -225,6 +236,24 @@ private:
     size_t len;
 };
 
+class PVValueShort : public PVValue
+{
+public:
+    PVValueShort(EPICS_ProcessVariable *epv);
+    ~PVValueShort();
+    const ProcessVariable::Type &get_type() const;
+    short       get_DBR() const;
+    int         get_int() const;
+    double      get_double() const;
+    const short *get_short_array() const;
+    size_t      get_string(char *strbuf, size_t buflen) const;
+    void read_ctrlinfo(const void *buf);
+    void read_value(const void *buf);
+private:
+    short *value;
+    size_t len;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -239,9 +268,15 @@ int epics_pend_event (
 
 void epics_task_exit ( void );
 
+/* MGA changes to allow specification of size of waveform PVs - replace
+ProcessVariable *create_EPICSPtr (
+  const char *PV_name
+);
+by */
 ProcessVariable *create_EPICSPtr(const char *PV_name);
 ProcessVariable *create_size_EPICSPtr(
     const char *PV_name, size_t size);
+/* End of MGA changes */
 
 #ifdef __cplusplus
 }

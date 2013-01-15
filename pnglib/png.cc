@@ -361,6 +361,8 @@ activeGraphicClass *ago = (activeGraphicClass *) this;
    compare_key_by_pixel, copy_nodes, &(colorCacheByPixelH) );
   if ( !( status & 1 ) ) colorCacheByPixelH = (AVL_HANDLE) NULL;
 
+  doAccSubs( pngFileName, 127 );
+
   status = readPngFile();
 
 }
@@ -811,11 +813,12 @@ expStringClass expStr;
 
   fileClose(fp);
 
-  /***** SJS addition 31/05/11 ******/
+  /***** SJS addition 31/05/11 to fix fail if image file not accessible ******/
   if (imageData == NULL)
   {
       goto error_return;
   }
+
   /***** End of SJS addition *****/
 
   w = image_width;
@@ -1909,7 +1912,6 @@ uch *src;
         for ( col=imageWidth; col>0; col-- )
         // ****** End of modification **********************
         {
-
           alpha = 255;
           if ( *pChannels == 3 ) {
             red = *src++;
@@ -1952,6 +1954,50 @@ void activePngClass::readpng_cleanup (
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
     png_ptr = NULL;
     info_ptr = NULL;
+  }
+
+}
+
+char *activePngClass::getSearchString (
+  int index
+) {
+
+  if ( index == 0 ) {
+    return pngFileName;
+  }
+  else {
+    return NULL;
+  }
+
+}
+
+void activePngClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+int status;
+int l = 127;
+
+  if ( max < l ) l = max;
+
+  if ( i == 0 ) {
+
+    strncpy( pngFileName, string, l );
+    pngFileName[l] = 0;
+
+    status = readPngFile();
+
+    initSelectBox();
+
+    if ( !( status & 1 ) ) {
+      char msg[255+1];
+      snprintf( msg, 255, activePngClass_str1, actWin->fileName,
+       pngFileName );
+      actWin->appCtx->postMessage( msg );
+    }
+
   }
 
 }

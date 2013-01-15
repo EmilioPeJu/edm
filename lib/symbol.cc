@@ -266,7 +266,6 @@ int i;
               aso->curControlSevr = aso->controlSevr[i];
       }
 // ****** End of SJS addition ******
-
     }
     else {
 
@@ -280,6 +279,7 @@ int i;
 // ****** SJS addition  17/10/05 ******
           aso->curControlSevr = pv->get_severity ();
 // ****** End of SJS addition ******
+
 	}
 	else {
 
@@ -312,6 +312,7 @@ int i;
                   aso->curControlSevr = aso->controlSevr[i];
           }
 // ****** End of SJS addition ******
+
 	}
 
       }
@@ -831,6 +832,12 @@ int i;
   unconnectedTimer = 0;
 
   eBuf = NULL;
+
+  doAccSubs( symbolFileName, 127 );
+  doAccSubs( colorPvExpStr );
+  for ( i=0; i<SYMBOL_K_MAX_PVS; i++ ) {
+    doAccSubs( controlPvExpStr[i] );
+  }
 
 }
 
@@ -2341,6 +2348,52 @@ pvColorClass tmpColor;
   return 1;
 
 }
+
+// ****** SJS addition 21/11/12 to disable widgets within symbols when ******
+// ****** symbol is disabled ******
+void activeSymbolClass::enable ( void ) {
+
+activeGraphicListPtr head;
+activeGraphicListPtr cur;
+
+  activeGraphicClass::enable();
+
+  for ( int i=0; i<numStates; i++ ) {
+    head = (activeGraphicListPtr) voidHead[i];
+    cur = head->flink;
+    while ( cur != head ) {
+
+      cur->node->enable();
+      cur = cur->flink;
+    }
+  }
+
+  actWin->requestActiveRefresh();
+
+}
+
+void activeSymbolClass::disable ( void ) {
+
+activeGraphicListPtr head;
+activeGraphicListPtr cur;
+
+  enabled = 0;
+
+  for ( int i=0; i<numStates; i++ ) {
+    head = (activeGraphicListPtr) voidHead[i];
+    cur = head->flink;
+    while ( cur != head ) {
+
+      cur->node->disable();
+      cur = cur->flink;
+
+    }
+  }
+
+  actWin->requestActiveRefresh();
+}
+
+// ****** End of SJS addition ********
 
 void activeSymbolClass::removePrevBlink ( void ) {
 
@@ -4526,6 +4579,40 @@ int i;
     pvs[i] = controlPvId[i];
   }
   pvs[i] = colorPvId;
+
+}
+
+char *activeSymbolClass::getSearchString (
+  int i
+) {
+
+int num = 1 + numPvs;
+
+  if ( i == 0 ) {
+    return colorPvExpStr.getRaw();
+  }
+  else if ( ( i > 0 ) && ( i < num ) ) {
+    return controlPvExpStr[i-1].getRaw();
+  }
+
+  return NULL;
+
+}
+
+void activeSymbolClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+int num = 1 + numPvs;
+
+  if ( i == 0 ) {
+    colorPvExpStr.setRaw( string );
+  }
+  else if ( ( i > 0 ) && ( i < num ) ) {
+    controlPvExpStr[i-1].setRaw( string );
+  }
 
 }
 

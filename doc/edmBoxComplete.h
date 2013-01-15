@@ -1,5 +1,5 @@
 //  component: 2ed7d2e8-f439-11d2-8fed-00104b8742df
-// shared lib: EdmDoc
+// shared lib: 3014b6ee-f439-11d2-ad99-00104b8742df
 
 #ifndef __edmBoxComplete_h
 #define __edmBoxComplete_h 1

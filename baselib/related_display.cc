@@ -27,6 +27,7 @@
 #define SMALL_SYM_ARRAY_SIZE 10
 #define SMALL_SYM_ARRAY_LEN 31
 
+#include "utility.h"
 #include "related_display.h"
 #include "app_pkg.h"
 #include "act_win.h"
@@ -210,6 +211,7 @@ relatedDisplayClass *rdo = (relatedDisplayClass *) client;
   rdo->eraseSelectBoxCorners();
   rdo->erase();
 
+  trimWhiteSpace( rdo->buf->bufDisplayFileName[0] );
   rdo->displayFileName[0].setRaw( rdo->buf->bufDisplayFileName[0] );
   if ( blank( rdo->displayFileName[0].getRaw() ) ) {
     rdo->closeAction[0] = 0;
@@ -237,7 +239,9 @@ relatedDisplayClass *rdo = (relatedDisplayClass *) client;
   }
 
   for ( i=ii; i<rdo->maxDsps; i++ ) {
+    rdo->displayFileName[i].setRaw( rdo->buf->bufDisplayFileName[i] );
     if ( !blank( rdo->buf->bufDisplayFileName[i] ) ) {
+      trimWhiteSpace( rdo->buf->bufDisplayFileName[i] );
       rdo->displayFileName[ii].setRaw( rdo->buf->bufDisplayFileName[i] );
       rdo->closeAction[ii] = rdo->buf->bufCloseAction[i];
       rdo->setPostion[ii] = rdo->buf->bufSetPostion[i];
@@ -553,6 +557,18 @@ activeGraphicClass *rdo = (activeGraphicClass *) this;
   connection.setMaxPvs( NUMPVS + 1 );
 
   setBlinkFunction( (void *) doBlink );
+
+  doAccSubs( buttonLabel );
+  doAccSubs( helpCommandExpString );
+  doAccSubs( colorPvExpString );
+  for ( i=0; i<NUMPVS; i++ ) {
+    doAccSubs( destPvExpString[i] );
+  }
+  for ( i=0; i<maxDsps; i++ ) {
+    doAccSubs( displayFileName[i] );
+    doAccSubs( symbolsExpStr[i] );
+    doAccSubs( label[i] );
+  }
 
 }
 
@@ -1745,25 +1761,48 @@ char title[32], *ptr;
    &actWin->appCtx->entryFormH, &actWin->appCtx->largestH,
    title, NULL, NULL, NULL );
 
+  i = 0;
+
   ef.addTextField( relatedDisplayClass_str4, 35, &buf->bufX );
   ef.addTextField( relatedDisplayClass_str5, 35, &buf->bufY );
   ef.addTextField( relatedDisplayClass_str6, 35, &buf->bufW );
   ef.addTextField( relatedDisplayClass_str7, 35, &buf->bufH );
 
-  ef.addTextField( relatedDisplayClass_str36, 35, buf->bufLabel[0], 127 );
   ef.addTextField( relatedDisplayClass_str37, 35, buf->bufDisplayFileName[0],
    127 );
+  fileEntry[i] = ef.getCurItem();
+  ef.addTextField( relatedDisplayClass_str36, 35, buf->bufLabel[0], 127 );
+  labelEntry[i] = ef.getCurItem();
   ef.addTextField( relatedDisplayClass_str26, 35, buf->bufSymbols[0],
    maxSymbolLen );
+  macrosEntry[i] = ef.getCurItem();
   ef.addOption( relatedDisplayClass_str23, relatedDisplayClass_str24,
    &buf->bufReplaceSymbols[0] );
+  modeEntry[i] = ef.getCurItem();
   ef.addToggle( relatedDisplayClass_str25, &buf->bufPropagateMacros[0] );
+  propagateEntry[i] = ef.getCurItem();
   ef.addOption( relatedDisplayClass_str30, relatedDisplayClass_str31,
    &buf->bufSetPostion[0] );
+  positionEntry[i] = ef.getCurItem();
   ef.addTextField( relatedDisplayClass_str32, 35, &buf->bufOfsX );
+  xOfsEntry[i] = ef.getCurItem();
   ef.addTextField( relatedDisplayClass_str33, 35, &buf->bufOfsY );
+  yOfsEntry[i] = ef.getCurItem();
   ef.addToggle( relatedDisplayClass_str20, &buf->bufCloseAction[0] );
+  closeCurEntry[i] = ef.getCurItem();
   ef.addToggle( relatedDisplayClass_str21, &buf->bufAllowDups[0] );
+  dupsAllowedEntry[i] = ef.getCurItem();
+
+  fileEntry[i]->addDependency( labelEntry[i] );
+  fileEntry[i]->addDependency( macrosEntry[i] );
+  fileEntry[i]->addDependency( modeEntry[i] );
+  fileEntry[i]->addDependency( propagateEntry[i] );
+  fileEntry[i]->addDependency( positionEntry[i] );
+  fileEntry[i]->addDependency( xOfsEntry[i] );
+  fileEntry[i]->addDependency( yOfsEntry[i] );
+  fileEntry[i]->addDependency( closeCurEntry[i] );
+  fileEntry[i]->addDependency( dupsAllowedEntry[i] );
+  fileEntry[i]->addDependencyCallbacks();
 
   ef.addEmbeddedEf( relatedDisplayClass_str14, "...", &ef1 );
 
@@ -1776,30 +1815,47 @@ char title[32], *ptr;
   for ( i=1; i<maxDsps; i++ ) {
 
     ef1->beginLeftSubForm();
-    ef1->addTextField( relatedDisplayClass_str38, 35, buf->bufLabel[i], 127 );
-    ef1->addLabel( relatedDisplayClass_str39 );
-    ef1->addTextField( "", 35, buf->bufDisplayFileName[i], 127 );
+    ef1->addTextField( relatedDisplayClass_str39, 35, buf->bufDisplayFileName[i], 127 );
+    fileEntry[i] = ef1->getCurItem();
+    ef1->addLabel( relatedDisplayClass_str38 );
+    ef1->addTextField( "", 35, buf->bufLabel[i], 127 );
+    labelEntry[i] = ef1->getCurItem();
     ef1->addLabel( relatedDisplayClass_str40 );
     ef1->addTextField( "", 35, buf->bufSymbols[i], maxSymbolLen );
+    macrosEntry[i] = ef1->getCurItem();
     ef1->endSubForm();
 
     ef1->beginLeftSubForm();
     ef1->addLabel( relatedDisplayClass_str41 );
     ef1->addOption( "", relatedDisplayClass_str24,
      &buf->bufReplaceSymbols[i] );
+    modeEntry[i] = ef1->getCurItem();
     ef1->addLabel( " " );
     ef1->addToggle( " ", &buf->bufPropagateMacros[i] );
+    propagateEntry[i] = ef1->getCurItem();
     ef1->addLabel( relatedDisplayClass_str42 );
     ef1->addLabel( relatedDisplayClass_str30 );
     ef1->addOption( " ", relatedDisplayClass_str31, &buf->bufSetPostion[i] );
+    positionEntry[i] = ef1->getCurItem();
     ef1->addLabel( " " );
     ef1->addToggle( " ", &buf->bufCloseAction[i] );
+    closeCurEntry[i] = ef1->getCurItem();
     ef1->addLabel( relatedDisplayClass_str35 );
     ef1->addToggle( " ", &buf->bufAllowDups[i] );
+    dupsAllowedEntry[i] = ef1->getCurItem();
     ef1->addLabel( relatedDisplayClass_str43 );
     //ef1->addToggle( " ", &buf->bufCascade[i] );
     //ef1->addLabel( relatedDisplayClass_str22 );
     ef1->endSubForm();
+
+    fileEntry[i]->addDependency( labelEntry[i] );
+    fileEntry[i]->addDependency( macrosEntry[i] );
+    fileEntry[i]->addDependency( modeEntry[i] );
+    fileEntry[i]->addDependency( propagateEntry[i] );
+    fileEntry[i]->addDependency( positionEntry[i] );
+    fileEntry[i]->addDependency( closeCurEntry[i] );
+    fileEntry[i]->addDependency( dupsAllowedEntry[i] );
+    fileEntry[i]->addDependencyCallbacks();
 
   }
 
@@ -1970,7 +2026,7 @@ int blink = 0;
 	// no icon
 
         tX = x + w/2;
-        tY = y + h/2 - fontHeight/2;
+        tY = y + h/2 - fontAscent/2;
 
         actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
         actWin->drawGc.setFontTag( fontTag, actWin->fi );
@@ -1988,27 +2044,27 @@ int blink = 0;
 
         tX = x + (int) ( w/2+0.5 ) - (int) ( strW/2+0.5 ) +
          (int) ( 1.2*fontAscent+0.5 );
-        tY = y + (int) ( h/2+0.5 ) - (int) ( fontHeight/2+0.5 );
+        tY = y + (int) ( h/2+0.5 ) - (int) ( fontAscent/2+0.5 );
 
+        ofs = (int) ( fontAscent*0.1+0.5 );
+        size = (int) ( fontAscent-2.0*ofs+0.5 );
         cx = tX - (int) ( 1.5*fontAscent+0.5 );
-        cy = tY + (int) ( fontHeight*0.1+0.5 );
-        ofs = (int) ( fontHeight*0.2+0.5 );
-        size = (int) ( fontHeight-2.0*ofs+0.5 );
+        cy = tY + ofs;
 
         actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
 
         XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-         actWin->drawGc.normGC(), cx+ofs, cy+ofs, size, size );
+         actWin->drawGc.normGC(), cx+2*ofs, cy+ofs, size, size );
 
         actWin->drawGc.setFG( bgColor.pixelIndex(), &blink );
 
         XFillRectangle( actWin->d, XtWindow(actWin->drawWidget),
-         actWin->drawGc.normGC(), cx, cy, size, size );
+         actWin->drawGc.normGC(), cx, cy-ofs, size, size );
 
         actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
 
         XDrawRectangle( actWin->d, XtWindow(actWin->drawWidget),
-         actWin->drawGc.normGC(), cx, cy, size, size );
+         actWin->drawGc.normGC(), cx, cy-ofs, size, size );
 
         actWin->drawGc.setFG( fgColor.pixelIndex(), &blink );
         actWin->drawGc.setFontTag( fontTag, actWin->fi );
@@ -2171,7 +2227,7 @@ int blink = 0;
 	// no icon
 
         tX = x + w/2;
-        tY = y + h/2 - fontHeight/2;
+        tY = y + h/2 - fontAscent/2;
 
         actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
         actWin->executeGc.setFontTag( fontTag, actWin->fi );
@@ -2189,27 +2245,27 @@ int blink = 0;
 
         tX = x + (int) ( w/2+0.5 ) - (int) ( strW/2+0.5 ) +
          (int) ( 1.2*fontAscent+0.5 );
-        tY = y + (int) ( h/2+0.5 ) - (int) ( fontHeight/2+0.5 );
+        tY = y + (int) ( h/2+0.5 ) - (int) ( fontAscent/2+0.5 );
 
+        ofs = (int) ( fontAscent*0.1+0.5 );
+        size = (int) ( fontAscent-2.0*ofs+0.5 );
         cx = tX - (int) ( 1.5*fontAscent+0.5 );
-        cy = tY + (int) ( fontHeight*0.1+0.5 );
-        ofs = (int) ( fontHeight*0.2+0.5 );
-        size = (int) ( fontHeight-2.0*ofs+0.5 );
+        cy = tY + ofs;
 
         actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
 
         XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
-         actWin->executeGc.normGC(), cx+ofs, cy+ofs, size, size );
+         actWin->executeGc.normGC(), cx+2*ofs, cy+ofs, size, size );
 
         actWin->executeGc.setFG( bgColor.pixelIndex(), &blink );
 
         XFillRectangle( actWin->d, drawable(actWin->executeWidget),
-         actWin->executeGc.normGC(), cx, cy, size, size );
+         actWin->executeGc.normGC(), cx, cy-ofs, size, size );
 
         actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
 
         XDrawRectangle( actWin->d, drawable(actWin->executeWidget),
-         actWin->executeGc.normGC(), cx, cy, size, size );
+         actWin->executeGc.normGC(), cx, cy-ofs, size, size );
 
         actWin->executeGc.setFG( fgColor.pixelIndex(), &blink );
         actWin->executeGc.setFontTag( fontTag, actWin->fi );
@@ -2737,7 +2793,7 @@ void relatedDisplayClass::popupDisplay (
 
 activeWindowListPtr cur;
 int i, ii, dup, numDeleted, l, stat, newX, newY;
-char name[127+1], symbolsWithSubs[maxSymbolLen+1];
+char name[127+1], symbolsWithSubs[maxSymbolLen+1], nameWithSubs[maxSymbolLen+1];
 pvValType destV;
 unsigned int crc;
 char *tk, *context, buf[maxSymbolLen+1], *fileTk, *fileContext, fileBuf[maxSymbolLen+1],
@@ -2756,6 +2812,8 @@ char *newValues[100];
 int numNewMacros, max, numFound;
 
 char prefix[127+1];
+
+activeWindowClass *aw0, *aw1;
 
   focus = useFocus;
   //if ( numDsps > 1 ) {
@@ -3178,9 +3236,27 @@ char prefix[127+1];
 done:
 
   if ( !actWin->isEmbedded ) {
+
     if ( !focus && !button3Popup && closeAction[index] ) {
       actWin->closeDeferred( 2 );
     }
+
+  }
+  else {
+
+    aw1 = NULL;
+    aw0 = actWin->parent;
+    while ( aw0 ) {
+
+      aw1 = aw0;
+      aw0 = aw0->parent;
+
+    }
+
+    if ( aw1 && !focus && !button3Popup && closeAction[index] ) {
+      aw1->closeDeferred( 2 );
+    }
+
   }
 
 }
@@ -3550,19 +3626,120 @@ activeWindowListPtr cur;
 
 }
 
+void relatedDisplayClass::getPvs (
+  int max,
+  ProcessVariable *pvs[],
+  int *n ) {
+
+int i, num = NUMPVS + 1;
+
+  if ( max < num ) {
+    *n = 0;
+    return;
+  }
+
+  *n = num;
+
+  for ( i=0; i<NUMPVS; i++ ) {
+    pvs[i] = destPvId[i];
+  }
+  pvs[NUMPVS+1] = colorPvId;
+
+}
+
+char *relatedDisplayClass::getSearchString (
+  int i
+) {
+
+int num1 = 1 + 1 + 1 + NUMPVS;
+int num2 = 1 + 1 + 1 + NUMPVS + maxDsps + maxDsps + maxDsps;
+int ii, selector, index;
+
+  if ( i == 0 ) {
+    return buttonLabel.getRaw();
+  }
+  else if ( i == 1 ) {
+    return helpCommandExpString.getRaw();
+  }
+  else if ( i == 2 ) {
+    return colorPvExpString.getRaw();
+  }
+  else if ( ( i > 2 ) && ( i < num1 ) ) {
+    index = i - 3;
+    return destPvExpString[index].getRaw();
+  }
+  else if ( ( i >= num1 ) && ( i < num2 ) ) {
+    ii = i - num1;
+    selector = ii % 3;
+    index = ii / 3;
+    if ( selector == 0 ) {
+      return displayFileName[index].getRaw();
+    }
+    else if ( selector == 1 ) {
+      return symbolsExpStr[index].getRaw();
+    }
+    else if ( selector == 2 ) {
+      return label[index].getRaw();
+    }
+  }
+
+  return NULL;
+
+}
+
+void relatedDisplayClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+int num1 = 1 + 1 + 1 + NUMPVS;
+int num2 = 1 + 1 + 1 + NUMPVS + maxDsps + maxDsps + maxDsps;
+int ii, selector, index;
+
+  if ( i == 0 ) {
+    buttonLabel.setRaw( string );
+  }
+  else if ( i == 1 ) {
+    helpCommandExpString.setRaw( string );
+  }
+  else if ( i == 2 ) {
+    colorPvExpString.setRaw( string );
+  }
+  else if ( ( i > 2 ) && ( i < num1 ) ) {
+    index = i - 3;
+    destPvExpString[index].setRaw( string );
+  }
+  else if ( ( i >= num1 ) && ( i < num2 ) ) {
+    ii = i - num1;
+    selector = ii % 3;
+    index = ii / 3;
+    if ( selector == 0 ) {
+      displayFileName[index].setRaw( string );
+    }
+    else if ( selector == 1 ) {
+      symbolsExpStr[index].setRaw( string );
+    }
+    else if ( selector == 2 ) {
+      label[index].setRaw( string );
+    }
+  }
+
+}
+
 // crawler functions may return blank pv names
 char *relatedDisplayClass::crawlerGetFirstPv ( void ) {
 
   crawlerPvIndex = 0;
-  return destPvExpString[crawlerPvIndex].getExpanded();
+  return colorPvExpString.getExpanded();
 
 }
 
 char *relatedDisplayClass::crawlerGetNextPv ( void ) {
 
-  if ( crawlerPvIndex >= NUMPVS-1 ) return NULL;
+  if ( crawlerPvIndex >= NUMPVS ) return NULL;
   crawlerPvIndex++;
-  return destPvExpString[crawlerPvIndex].getExpanded();
+  return destPvExpString[crawlerPvIndex-1].getExpanded();
 
 }
 

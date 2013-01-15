@@ -44,11 +44,17 @@ public:
     
     // Result is referenced once, call release() when no longer needed.
     virtual class ProcessVariable *create(const char *PV_name);
+
+/* MGA change to allow variable size waveform PV access - replace
+    virtual class ProcessVariable *createWithInitialCallbacks (
+      const char *PV_name );
+by */
     virtual class ProcessVariable *create_size(const char *PV_name, size_t size);
 
     /* Parses a full PV name into two components, class and PV. */
     void parse_pv_name(
         const char *full_pv_name, char *pv_class, char *pv_name);
+/* End of MGA change */
 
     char default_pv_type[31+1];
 
@@ -228,6 +234,8 @@ public:
 
     // Use this when get_specific_type().type == chr
     virtual const char   *get_char_array() const = 0;
+    // Use this when get_specific_type().type == shrt
+    virtual const short   *get_short_array() const = 0;
     // Use this when get_type().type == integer
     virtual const int    *get_int_array() const = 0;
     // Use this when get_type().type == real

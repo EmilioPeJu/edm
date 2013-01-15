@@ -79,7 +79,11 @@ EPICS_PV_Factory::~EPICS_PV_Factory()
 #endif
 }
 
+/* MGA changes to allow specification of size of waveform PVs - replace
+ProcessVariable *EPICS_PV_Factory::create(const char *PV_name)
+by */
 ProcessVariable *EPICS_PV_Factory::create_size(const char *PV_name, size_t size)
+/* End of MGA change */
 {
     EPICS_ProcessVariable *pv;
     HashTableItem item;
@@ -94,7 +98,11 @@ ProcessVariable *EPICS_PV_Factory::create_size(const char *PV_name, size_t size)
     else
     {
         HashTableItem *n_item = new HashTableItem();
+/* MGA changes to allow specification of size of waveform PVs - replace
+        pv = new EPICS_ProcessVariable(PV_name);
+by */
         pv = new EPICS_ProcessVariable(PV_name, size);
+/* End of MGA change */
         n_item->name = pv->get_name();
         n_item->pv = pv;
         processvariables.insert(n_item);
@@ -102,10 +110,12 @@ ProcessVariable *EPICS_PV_Factory::create_size(const char *PV_name, size_t size)
     return pv;
 }
 
+/* MGA changes to allow specification of size of waveform PVs - add */
 ProcessVariable *EPICS_PV_Factory::create(const char *PV_name)
 {
     return create_size(PV_name, 0);
 }
+/* End of MGA change */
 
 void EPICS_PV_Factory::forget(EPICS_ProcessVariable *pv)
 {
@@ -125,8 +135,14 @@ void EPICS_PV_Factory::forget(EPICS_ProcessVariable *pv)
 
 // ---------------------- EPICS_ProcessVariable -------------------------
 
+/* MGA changes to allow specification of size of waveform PVs - replace
+EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name)
+        : ProcessVariable(_name)
+by */
 EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name, size_t size)
         : ProcessVariable(_name)
+/* End of MGA change */
+
 {
     is_connected = false;
     have_ctrlinfo = false;
@@ -134,7 +150,9 @@ EPICS_ProcessVariable::EPICS_ProcessVariable(const char *_name, size_t size)
     pv_chid = 0;
     pv_value_evid = 0;
     value = 0;
+/* MGA changes to allow specification of size of waveform PVs - add */
     forced_size = size;
+/* End of MGA change */
 
     //fprintf( stderr,"EPICS_ProcessVariable %s created\n", get_name());
     int stat = ca_search_and_connect(get_name(), &pv_chid,
@@ -201,7 +219,7 @@ void EPICS_ProcessVariable::ca_connect_callback(
                     me->value = new PVValueChar(me);
                     break;
                 case DBF_INT:
-                    me->value = new PVValueInt(me,"short");
+                    me->value = new PVValueShort(me);
                     break;
                 case DBF_LONG:
                     me->value = new PVValueInt(me);
@@ -361,6 +379,9 @@ size_t EPICS_ProcessVariable::get_string(char *strbuf, size_t buflen) const
 {   return value->get_string(strbuf, buflen); }
 
 size_t EPICS_ProcessVariable::get_dimension() const
+/* MGA changes to allow specification of size of waveform PVs - replace
+{   return ca_element_count(pv_chid); }
+by */
 {
     size_t count = ca_element_count(pv_chid);
     if (0 < forced_size && forced_size < count)
@@ -368,9 +389,13 @@ size_t EPICS_ProcessVariable::get_dimension() const
     else
         return count;
 }
+/* End of MGA change */
 
 const char *EPICS_ProcessVariable::get_char_array() const
 {   return value->get_char_array(); }
+
+const short *EPICS_ProcessVariable::get_short_array() const
+{   return value->get_short_array(); }
 
 const int *EPICS_ProcessVariable::get_int_array() const
 {   return value->get_int_array(); }
@@ -589,6 +614,9 @@ size_t PVValue::get_string(char *strbuf, size_t len) const
 const char *PVValue::get_char_array() const
 {   return 0; }
 
+const short *PVValue::get_short_array() const
+{   return 0; }
+
 const int  *PVValue::get_int_array() const
 {   return 0; }
 
@@ -702,6 +730,86 @@ void PVValueInt::read_value(const void *buf)
     status = val->status;
     severity = val->severity;
     memcpy(value, &val->value, sizeof(int) * epv->get_dimension());
+}
+
+// ---------------------- PVValueShort ---------------------------
+
+static ProcessVariable::specificType shrt_type =
+{ ProcessVariable::specificType::shrt, 16 };
+
+PVValueShort::PVValueShort(EPICS_ProcessVariable *epv)
+        : PVValue(epv)
+{
+    unsigned int i;
+    value = new short[epv->get_dimension()];
+    for ( i=0; i<epv->get_dimension(); i++ ) value[i] = 0;
+    specific_type = shrt_type;
+}
+
+PVValueShort::~PVValueShort()
+{
+    delete [] value;
+}
+
+const ProcessVariable::Type &PVValueShort::get_type() const
+{   return integer_type; }
+
+short PVValueShort::get_DBR() const
+{   return DBR_SHORT; }
+
+int PVValueShort::get_int() const
+{   return (int) value[0]; }
+
+double PVValueShort::get_double() const
+{   return (double) value[0]; }
+
+size_t PVValueShort::get_string(char *strbuf, size_t len) const
+{
+    // TODO: Handle arrays?
+    int printed;
+    if (units[0])
+        printed = snprintf(strbuf, len, "%d %s", (int) value[0], units);
+    else
+        printed = snprintf(strbuf, len, "%d", (int) value[0]);
+    // snprintf stops printing at len. But some versions return
+    // full string length even if that would have been > len
+    if (printed > (int)len)
+        return len;
+    if (printed < 0)
+        return 0;
+    return (size_t) printed;
+}
+
+const short * PVValueShort::get_short_array() const
+{   return value; }
+
+void PVValueShort::read_ctrlinfo(const void *buf)
+{
+    const  dbr_ctrl_short *val = (const dbr_ctrl_short *)buf;
+    status = val->status;
+    severity = val->severity;
+    precision = 0;
+    strncpy(units, val->units, MAX_UNITS_SIZE);
+    units[MAX_UNITS_SIZE] = '\0';
+    upper_disp_limit = val->upper_disp_limit;
+    lower_disp_limit = val->lower_disp_limit;
+    upper_alarm_limit = val->upper_alarm_limit; 
+    upper_warning_limit = val->upper_warning_limit;
+    lower_warning_limit = val->lower_warning_limit;
+    lower_alarm_limit = val->lower_alarm_limit;
+    upper_ctrl_limit = val->upper_ctrl_limit;
+    lower_ctrl_limit = val->lower_ctrl_limit;
+    *value = val->value;
+}
+
+void PVValueShort::read_value(const void *buf)
+{
+    const dbr_time_short *val = (const dbr_time_short *)buf;
+    time = val->stamp.secPastEpoch + epochSecPast1970;
+    nano = val->stamp.nsec;
+    status = val->status;
+    severity = val->severity;
+    memcpy(value, &val->value, sizeof(short) * epv->get_dimension());
 }
 
 // ---------------------- PVValueDouble ---------------------------
@@ -1077,6 +1185,18 @@ void epics_task_exit ( void ) {
 
 }
 
+/* MGA changes to allow specification of size of waveform PVs - replace
+ProcessVariable *create_EPICSPtr (
+  const char *PV_name
+) {
+
+ProcessVariable *ptr;
+
+  ptr = epics_pv_factory->create( PV_name );
+  return ptr;
+
+}
+by */
 ProcessVariable *create_EPICSPtr(const char *PV_name)
 {
     return epics_pv_factory->create( PV_name );
@@ -1087,6 +1207,7 @@ ProcessVariable *create_size_EPICSPtr(
 {
     return epics_pv_factory->create_size(PV_name, size);
 }
+/* End of MGA change */
 
 #ifdef __cplusplus
 }

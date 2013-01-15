@@ -416,6 +416,7 @@ confirmDialogClass confirm;
 int local;
 
 msgDialogClass msgDialog;
+int msgDialogOpenCount;
 
 THREAD_LOCK_HANDLE actionsLock;
 actionsPtr actHead, actTail;
@@ -429,7 +430,7 @@ macroListPtr macroHead;
 int numFiles;
 fileListPtr fileHead;
 
-char displayName[127+1];
+char displayName[63+1];
 
 int numSchemeSets;
 char **schemeSetList;
@@ -742,6 +743,10 @@ void performShutdown (
 int getShutdownFlag ( void );
 
 void reloadAll ( void );
+
+void requestSelectedReload ( void );
+
+void reloadSelected ( void );
 
 void refreshAll ( void );
 

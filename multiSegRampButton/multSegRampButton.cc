@@ -501,6 +501,7 @@ static void msrbtc_decrement (
 activeMultSegRampButtonClass *msrbto = (activeMultSegRampButtonClass *) client;
 double dval, seconds, adjust;
 struct timeval curTime;
+int needToAddTimeout = 1;
 
   //fprintf( stderr, "msrbtc_decrement\n" );
   //fprintf( stderr, "msrbto->rampSegment = %-d\n", msrbto->rampSegment );
@@ -529,35 +530,9 @@ struct timeval curTime;
 
   dval -= msrbto->increment[msrbto->rampSegment]; // * adjust;
 
-  if ( dval <= msrbto->minDv ) {
-    dval = msrbto->minDv;
-    msrbto->incrementTimerActive = 0;
-    msrbto->buttonPressed = 0;
-    if ( msrbto->rampStateExists ) {
-      msrbto->rampStatePvId->put(
-       XDisplayName(msrbto->actWin->appCtx->displayName),
-       msrbto->buttonPressed );
-    }
-    msrbto->actWin->appCtx->proc->lock();
-    msrbto->needRefresh = 1;
-    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
-    msrbto->actWin->appCtx->proc->unlock();
-  }
-  else if ( dval >= msrbto->maxDv ) {
-    dval = msrbto->maxDv;
-    msrbto->incrementTimerActive = 0;
-    msrbto->buttonPressed = 0;
-    if ( msrbto->rampStateExists ) {
-      msrbto->rampStatePvId->put(
-       XDisplayName(msrbto->actWin->appCtx->displayName),
-       msrbto->buttonPressed );
-    }
-    msrbto->actWin->appCtx->proc->lock();
-    msrbto->needRefresh = 1;
-    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
-    msrbto->actWin->appCtx->proc->unlock();
-  }
-  else if ( dval <= msrbto->rampFinalV[msrbto->rampSegment] ) {
+  if ( dval <= msrbto->rampFinalV[msrbto->rampSegment] ) {
+
+    needToAddTimeout = 0;
 
     dval = msrbto->rampFinalV[msrbto->rampSegment];
 
@@ -607,7 +582,38 @@ struct timeval curTime;
     msrbto->actWin->appCtx->proc->unlock();
 
   }
-  else {
+
+  if ( dval <= msrbto->minDv ) {
+    needToAddTimeout = 0;
+    dval = msrbto->minDv;
+    msrbto->incrementTimerActive = 0;
+    msrbto->buttonPressed = 0;
+    if ( msrbto->rampStateExists ) {
+      msrbto->rampStatePvId->put(
+       XDisplayName(msrbto->actWin->appCtx->displayName),
+       msrbto->buttonPressed );
+    }
+    msrbto->actWin->appCtx->proc->lock();
+    msrbto->needRefresh = 1;
+    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
+    msrbto->actWin->appCtx->proc->unlock();
+  }
+  else if ( dval >= msrbto->maxDv ) {
+    needToAddTimeout = 0;
+    dval = msrbto->maxDv;
+    msrbto->incrementTimerActive = 0;
+    msrbto->buttonPressed = 0;
+    if ( msrbto->rampStateExists ) {
+      msrbto->rampStatePvId->put(
+       XDisplayName(msrbto->actWin->appCtx->displayName),
+       msrbto->buttonPressed );
+    }
+    msrbto->actWin->appCtx->proc->lock();
+    msrbto->needRefresh = 1;
+    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
+    msrbto->actWin->appCtx->proc->unlock();
+  }
+  if ( needToAddTimeout ) {
 
     msrbto->incrementTimer = appAddTimeOut(
      msrbto->actWin->appCtx->appContext(),
@@ -631,6 +637,7 @@ static void msrbtc_increment (
 activeMultSegRampButtonClass *msrbto = (activeMultSegRampButtonClass *) client;
 double dval, seconds, adjust;
 struct timeval curTime;
+int needToAddTimeout = 1;
 
   //fprintf( stderr, "msrbtc_increment\n" );
   //fprintf( stderr, "msrbto->rampSegment = %-d\n", msrbto->rampSegment );
@@ -659,35 +666,9 @@ struct timeval curTime;
 
   dval += msrbto->increment[msrbto->rampSegment]; // * adjust;
 
-  if ( dval <= msrbto->minDv ) {
-    dval = msrbto->minDv;
-    msrbto->incrementTimerActive = 0;
-    msrbto->buttonPressed = 0;
-    if ( msrbto->rampStateExists ) {
-      msrbto->rampStatePvId->put(
-       XDisplayName(msrbto->actWin->appCtx->displayName),
-       msrbto->buttonPressed );
-    }
-    msrbto->actWin->appCtx->proc->lock();
-    msrbto->needRefresh = 1;
-    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
-    msrbto->actWin->appCtx->proc->unlock();
-  }
-  else if ( dval >= msrbto->maxDv ) {
-    dval = msrbto->maxDv;
-    msrbto->incrementTimerActive = 0;
-    msrbto->buttonPressed = 0;
-    if ( msrbto->rampStateExists ) {
-      msrbto->rampStatePvId->put(
-       XDisplayName(msrbto->actWin->appCtx->displayName),
-       msrbto->buttonPressed );
-    }
-    msrbto->actWin->appCtx->proc->lock();
-    msrbto->needRefresh = 1;
-    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
-    msrbto->actWin->appCtx->proc->unlock();
-  }
-  else if ( dval >= msrbto->rampFinalV[msrbto->rampSegment] ) {
+  if ( dval >= msrbto->rampFinalV[msrbto->rampSegment] ) {
+
+    needToAddTimeout = 0;
 
     dval = msrbto->rampFinalV[msrbto->rampSegment];
 
@@ -737,7 +718,39 @@ struct timeval curTime;
     msrbto->actWin->appCtx->proc->unlock();
 
   }
-  else {
+
+  if ( dval <= msrbto->minDv ) {
+    needToAddTimeout = 0;
+    dval = msrbto->minDv;
+    msrbto->incrementTimerActive = 0;
+    msrbto->buttonPressed = 0;
+    if ( msrbto->rampStateExists ) {
+      msrbto->rampStatePvId->put(
+       XDisplayName(msrbto->actWin->appCtx->displayName),
+       msrbto->buttonPressed );
+    }
+    msrbto->actWin->appCtx->proc->lock();
+    msrbto->needRefresh = 1;
+    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
+    msrbto->actWin->appCtx->proc->unlock();
+  }
+  else if ( dval >= msrbto->maxDv ) {
+    needToAddTimeout = 0;
+    dval = msrbto->maxDv;
+    msrbto->incrementTimerActive = 0;
+    msrbto->buttonPressed = 0;
+    if ( msrbto->rampStateExists ) {
+      msrbto->rampStatePvId->put(
+       XDisplayName(msrbto->actWin->appCtx->displayName),
+       msrbto->buttonPressed );
+    }
+    msrbto->actWin->appCtx->proc->lock();
+    msrbto->needRefresh = 1;
+    msrbto->actWin->addDefExeNode( msrbto->aglPtr );
+    msrbto->actWin->appCtx->proc->unlock();
+  }
+
+  if ( needToAddTimeout ) {
 
     msrbto->incrementTimer = appAddTimeOut(
      msrbto->actWin->appCtx->appContext(),
@@ -864,6 +877,18 @@ int i;
   connection.setMaxPvs( 9 );
 
   setBlinkFunction( (void *) doBlink );
+
+  doAccSubs( destPvExpString );
+  doAccSubs( rampStatePvExpString );
+  doAccSubs( visPvExpString );
+  doAccSubs( colorPvExpString );
+  doAccSubs( label );
+  doAccSubs( minVisString, 39 );
+  doAccSubs( maxVisString, 39 );
+  for ( i=0; i<MAXSEGS; i++ ) {
+    doAccSubs( finalPvExpString[i] );
+    doAccSubs( rampRatePvExpString[i] );
+  }
 
   updateDimensions();
 
@@ -2922,6 +2947,102 @@ int i;
   }
   for ( i=0; i<MAXSEGS; i++ ) {
     pvs[i+MAXSEGS+1] = rampRatePvId[i];
+  }
+
+}
+
+char *activeMultSegRampButtonClass::getSearchString (
+  int i
+) {
+
+int num = MAXSEGS + MAXSEGS + 7;
+int ii, selector, index;
+
+  if ( i == 0 ) {
+    return destPvExpString.getRaw();
+  }
+  else if ( i == 1 ) {
+    return rampStatePvExpString.getRaw();
+  }
+  else if ( i == 2 ) {
+    return colorPvExpString.getRaw();
+  }
+  else if ( i == 3 ) {
+    return visPvExpString.getRaw();
+  }
+  else if ( i == 4 ) {
+    return label.getRaw();
+  }
+  else if ( i == 5 ) {
+    return minVisString;
+  }
+  else if ( i == 6 ) {
+    return maxVisString;
+  }
+  else if ( ( i > 6 ) && ( i < num ) ) {
+    ii = i - 7;
+    selector = ii % 2;
+    index = ii / 2;
+    if ( selector == 0 ) {
+      return finalPvExpString[index].getRaw();
+    }
+    else if ( selector == 1 ) {
+      return rampRatePvExpString[index].getRaw();
+    }
+
+  }
+
+  return NULL;
+
+}
+
+void activeMultSegRampButtonClass::replaceString (
+  int i,
+  int max,
+  char *string
+) {
+
+int num = MAXSEGS + MAXSEGS + 7;
+int ii, selector, index;
+
+  if ( i == 0 ) {
+    destPvExpString.setRaw( string );
+  }
+  else if ( i == 1 ) {
+    rampStatePvExpString.setRaw( string );
+  }
+  else if ( i == 2 ) {
+    colorPvExpString.setRaw( string );
+  }
+  else if ( i == 3 ) {
+    visPvExpString.setRaw( string );
+  }
+  else if ( i == 4 ) {
+    label.setRaw( string );
+  }
+  else if ( i == 5 ) {
+    int l = max;
+    if ( 39 < max ) l = 39;
+    strncpy( minVisString, string, l );
+    minVisString[l] = 0;
+  }
+  else if ( i == 6 ) {
+    int l = max;
+    if ( 39 < max ) l = 39;
+    strncpy( maxVisString, string, l );
+    maxVisString[l] = 0;
+  }
+  else if ( ( i > 6 ) && ( i < num ) ) {
+    ii = i - 7;
+    selector = ii % 2;
+    index = ii / 2;
+    if ( selector == 0 ) {
+      finalPvExpString[index].setRaw( string );
+    }
+    else if ( selector == 1 ) {
+      rampRatePvExpString[index].setRaw( string );
+    }
+
   }
 
 }

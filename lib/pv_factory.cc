@@ -125,7 +125,11 @@ void PV_Factory::clear_default_pv_type ( void )
 void PV_Factory::parse_pv_name(
     const char *full_pv_name, char *pv_class, char *pv_name)
 {
+    /****** SJS modification 05_12_12 for RHEL6 - replace ******
     char *slash = strchr(full_pv_name, '\\');
+    ******* by ******/
+    const char *slash = strchr(full_pv_name, '\\');
+    /****** End of SJS modification *****/
     if (slash)
     {
         /* Compound name: split at first \ character. */
