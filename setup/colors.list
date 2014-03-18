@@ -116,6 +116,11 @@ rule 83  vacStatus {
  >=1 : "Red LED: On"
 }
 
+rule 84  alert {
+ >=0 && <1 : "Canvas"
+ >=1 : "Red LED: On"
+}
+
 menumap { 
  "Disconn/Invalid"
  "Canvas"
