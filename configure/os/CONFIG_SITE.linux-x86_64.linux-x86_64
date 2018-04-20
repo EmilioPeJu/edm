@@ -1,0 +1,49 @@
+#
+# $Id$
+#
+# Site Specific Configuration Information
+# Only the local epics system manager should modify this file
+
+# Where to find utilities/libraries
+#       If you do not have a certain product,
+#       leave the line empty.
+#
+
+-include $(TOP)/configure/os/CONFIG_SITE.linux-x86.linux-x86
+
+X11_LIB=/usr/lib64
+X11_INC=/usr/include
+
+# OpenMotif location
+MOTIF_LIB=/usr/lib64
+MOTIF_INC=/usr/include
+#MOTIF_LIB=/usr/X11R6/lib64
+#MOTIF_INC=/usr/X11R6/include
+
+# testing pre-compiled versions
+CLAPACK_LIB    = /usr/local/oag/3rdParty/ATLAS/Linux_Core2Duo64SSE3/lib
+ATLAS_LIB      = /usr/local/oag/3rdParty/ATLAS/Linux_Core2Duo64SSE3/lib
+ATLAS_INCLUDE  = /usr/local/oag/3rdParty/ATLAS/Linux_Core2Duo64SSE3/include
+INTEL_MKL_LIB  = /usr/local/oag/3rdParty/IntelMKL-11.1/lib/intel64
+INTEL_MKL_INCLUDE = /usr/local/oag/3rdParty/IntelMKL-11.1/include
+
+
+JAVA_DIR=/usr
+
+# Sciplot and XRTgraph used by medm
+#XRTGRAPH_EXTENSIONS = YES
+#XRTGRAPH = /usr/local/xrtgraph64
+XRTGRAPH_EXTENSIONS =
+XRTGRAPH =
+SCIPLOT=YES
+
+# Ubuntu 12 on 64-bit has X11 at /usr/lib/x86_64-linux-gnu, Motif at /usr/lib
+#X11_LIB=/usr/lib/x86_64-linux-gnu
+#X11_INC=/usr/include/X11
+#MOTIF_LIB=/usr/lib
+#MOTIF_INC=/usr/include
+
+# Ubuntu 12 64-bit is at Python 2.6
+#PYTHON_DIR=/usr/lib/python2.6
+#PYTHON_INCLUDE=/usr/include/python2.6
+
