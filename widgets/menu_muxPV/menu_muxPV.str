@@ -1,0 +1,28 @@
+#ifndef __menu_mux_str
+#define __menu_mux_str 1
+
+#define menuMuxPVClass_str1 (char *) "Mux PV"
+#define menuMuxPVClass_str2 (char *) "Unknown object"
+#define menuMuxPVClass_str3 (char *) " Properties"
+#define menuMuxPVClass_str4 (char *) "X"
+#define menuMuxPVClass_str5 (char *) "Y"
+#define menuMuxPVClass_str6 (char *) "Width"
+#define menuMuxPVClass_str7 (char *) "Height"
+#define menuMuxPVClass_str8 (char *) "FG Colour"
+#define menuMuxPVClass_str9 (char *) "FG Colour Mode"
+#define menuMuxPVClass_str10 (char *) "Alarm Sensitive"
+#define menuMuxPVClass_str11 (char *) "BG Colour"
+#define menuMuxPVClass_str12 (char *) "BG Colour Mode"
+#define menuMuxPVClass_str13 (char *) "Static|Alarm"
+#define menuMuxPVClass_str14 (char *) "Top Shadow"
+#define menuMuxPVClass_str15 (char *) "Bottom Shadow"
+#define menuMuxPVClass_str16 (char *) "Font"
+#define menuMuxPVClass_str17 (char *) "PV Name"
+#define menuMuxPVClass_str18 (char *) "Initial State"
+#define menuMuxPVClass_str19 (char *) "Tag"
+#define menuMuxPVClass_str20 (char *) "Symbol"
+#define menuMuxPVClass_str21 (char *) "PV"
+#define menuMuxPVClass_str22 (char *) "Mux"
+#define menuMuxPVClass_str23 (char *) "error creating pv\n"
+
+#endif

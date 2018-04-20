@@ -1,0 +1,69 @@
+This diff was found to be required when compling EDM on SuSE 13.1.  The
+main issue is an change to the GIF library API, and there are a couple of
+other changes to avoid compiler errors.
+
+The issues are:
+1. The API for DGifOpenFileName has changed incompatibly (an error code
+   is now returned via an extra parameter)
+2. The ungif library is no longer a separate library.
+
+diff -urN extensions/src/edm/giflib/gif.cc extensions/src/edm/giflib/gif.cc
+--- extensions/src/edm/giflib/gif.cc	2013-01-15 12:30:05.000000000 +0100
++++ extensions/src/edm/giflib/gif.cc	2015-02-03 09:15:39.180639484 +0100
+@@ -431,7 +431,8 @@
+   do {
+     this->actWin->appCtx->expandFileName( i, name, expStr.getExpanded(),
+      ".gif", 127 );
+-    gif = DGifOpenFileName( name );
++    int ret;
++    gif = DGifOpenFileName( name, &ret );
+     i++;
+   } while ( ( i < actWin->appCtx->numPaths ) && !gif );
+   if ( !gif ) {
+diff -urN extensions/src/edm/giflib/Makefile extensions/src/edm/giflib/Makefile
+--- extensions/src/edm/giflib/Makefile	2013-01-15 12:30:05.000000000 +0100
++++ extensions/src/edm/giflib/Makefile	2015-02-03 09:16:01.436929017 +0100
+@@ -21,16 +21,16 @@
+    USR_LIBS += 114135a4-6f6c-11d3-95bc-00104b8742df
+ 
+    USR_LIBS_Linux += Xm Xt Xp Xtst X11
+-   USR_SYS_LIBS_Linux += pthread dl ungif gif
++   USR_SYS_LIBS_Linux += pthread dl gif
+ 
+    USR_LIBS_Darwin += Xm Xt Xp Xtst X11
+-   USR_SYS_LIBS_Darwin += pthread dl ungif gif
++   USR_SYS_LIBS_Darwin += pthread dl gif
+ 
+    USR_LIBS_solaris += Xm Xt Xmu X11 Xext
+-   USR_SYS_LIBS_solaris += pthread dl rt ungif gif
++   USR_SYS_LIBS_solaris += pthread dl rt gif
+ 
+    USR_LIBS_hpux11_11_mt = Xm Xt X11 Xext
+-   USR_SYS_LIBS_hpux11_11_mt = pthread ungif gif
++   USR_SYS_LIBS_hpux11_11_mt = pthread gif
+ 
+    LIBRARY = cf322683-513e-4570-a44b-7cdd7cae0de5
+ 
+diff -urN extensions/src/edm/pnglib/png.cc extensions/src/edm/pnglib/png.cc
+--- extensions/src/edm/pnglib/png.cc	2013-01-15 12:30:05.000000000 +0100
++++ extensions/src/edm/pnglib/png.cc	2015-02-03 09:16:32.220329579 +0100
+@@ -1643,8 +1643,6 @@
+   fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
+    PNG_LIBPNG_VER_STRING, png_libpng_ver);
+ 
+-  fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
+-   ZLIB_VERSION, zlib_version);
+ }
+ 
+ 
+diff -urN extensions/src/edm/widgets/videowidget/TwoDProfileMonitor.cc extensions/src/edm/widgets/videowidget/TwoDProfileMonitor.cc
+--- extensions/src/edm/widgets/videowidget/TwoDProfileMonitor.cc	2012-11-08 15:14:19.000000000 +0100
++++ extensions/src/edm/widgets/videowidget/TwoDProfileMonitor.cc	2015-02-03 09:16:49.292551290 +0100
+@@ -16,7 +16,6 @@
+ #define VIDEO_RELEASE 1
+ 
+ #include <time.h>
+-#include <stream.h>
+ 
+ #include <act_grf.h>
+ #include <act_win.h>

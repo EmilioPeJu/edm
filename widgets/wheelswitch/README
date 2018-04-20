@@ -1,0 +1,7 @@
+
+Copy files to your edm folder (subdirectories are already
+made properly), use 'make' in directories 'lib' and 'baselib'
+(Makefile is in this zip file too so you don't have to change
+it yourself). Then run setup.sh in setup directory to set up
+edmObjects file.
+It should work then.
