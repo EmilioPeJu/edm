@@ -1,0 +1,12 @@
+PROGRAM=edm
+VERSION=<insert version here>
+# EXTENSION=<The tar or zip extension, defaults to .tar.gz.>
+# TAR_FILE=<The tar file name or list of tar files. Defaults to ${PROGRAM}-${VERSION}${EXTENSION}>
+
+build()
+{
+    # Insert build instructions here. For example, for a Python tool with a setupegg.py:
+    # setuptools_build setupegg.py
+}
+
+# vim: set filetype=sh:
