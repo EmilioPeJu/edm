@@ -18,8 +18,8 @@
 # Location of external products
 
 # Location of external products
-EPICS_BASE=$(TOP)/../base
+EPICS_BASE=/dls_sw/epics/R3.14.12.3/base
 #EPICS_EXTENSIONS = /usr/local/epics/extensions
-EPICS_EXTENSIONS=$(TOP)
+#EPICS_EXTENSIONS=$(TOP)
 
-OAG_APPS=$(TOP)/../../oag/apps
+#OAG_APPS=$(TOP)/../../oag/apps

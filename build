@@ -1,12 +1,18 @@
 PROGRAM=edm
-VERSION=<insert version here>
+VERSION=1.12.89
 # EXTENSION=<The tar or zip extension, defaults to .tar.gz.>
 # TAR_FILE=<The tar file name or list of tar files. Defaults to ${PROGRAM}-${VERSION}${EXTENSION}>
+TAR_FILE=none
 
 build()
 {
     # Insert build instructions here. For example, for a Python tool with a setupegg.py:
     # setuptools_build setupegg.py
+  env | grep -i epics
+  cd ..
+  make
+  mkdir -p ${TARGET_BIN}
+  ln -s `pwd`/bin/${EPICS_HOST_ARCH}/edm ${TARGET_BIN}/edm
 }
 
 # vim: set filetype=sh:
