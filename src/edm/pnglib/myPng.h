@@ -22,6 +22,7 @@
 #include "act_grf.h"
 #include "entry_form.h"
 #include "avl.h"
+#include <zlib.h>
 #include "png.h"
 #include <sys/stat.h>
 #include <unistd.h>
