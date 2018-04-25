@@ -23,7 +23,7 @@ else
    endif
 endif   
 
-MSI=$(INSTALL_BIN)/msi
+MSI=msi
 
 % : ../%.sh
 	$(MSI) -MEDM_CONFIGS=$(shell $(MKDIR) -p $(INSTALL_TEMPLATES)/edm; cd $(INSTALL_TEMPLATES)/edm; pwd) \
