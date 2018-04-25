@@ -1,0 +1,11 @@
+bin/
+lib/
+prefix/
+html/
+include/
+templates/
+O.*/
+*.sta
+*.log
+*~
+
