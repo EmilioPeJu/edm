@@ -16,7 +16,7 @@
 #define VIDEO_RELEASE 1
 
 #include <time.h>
-#include <stream.h>
+//#include <stream.h>
 
 #include <act_grf.h>
 #include <act_win.h>
