@@ -6,13 +6,25 @@ TAR_FILE=none
 
 build()
 {
-    # Insert build instructions here. For example, for a Python tool with a setupegg.py:
-    # setuptools_build setupegg.py
+  export EPICS_EXTENSIONS=$BUILD_SCRIPT_DIR
+  SRC=$BUILD_SCRIPT_DIR/src/edm
   env | grep -i epics
+  
   cd ..
   make
   mkdir -p ${TARGET_BIN}
   ln -s `pwd`/bin/${EPICS_HOST_ARCH}/edm ${TARGET_BIN}/edm
 }
 
-# vim: set filetype=sh:
+# Overriding the clean() function from build_program because this tool include
+# the source in the src/ dir and we don't want to wipe it out everytime we
+# rebuild the tool!
+clean()
+{
+    echo $PWD
+    echo "Removing prefix dir"
+    rm -rf "$TARGET_PREFIX" "$BUILD_SCRIPT_DIR/build.log"
+    echo "Cleaning previous build files"
+    make -C $BUILD_SCRIPT_DIR clean uninstall
+}
+
