@@ -6,6 +6,8 @@ TAR_FILE=none
 
 build()
 {
+  path_depends MSI
+  which msi
   export EPICS_EXTENSIONS=$BUILD_SCRIPT_DIR
   SRC=$BUILD_SCRIPT_DIR/src/edm
   env | grep -i epics
