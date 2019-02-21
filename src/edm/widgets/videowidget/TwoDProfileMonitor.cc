@@ -859,8 +859,14 @@ public:
             case ProcessVariable::Type::integer:
                 // printf ("int\n");
                 {
-                    double *temp = int_to_double (dataPv->get_dimension (),
-                                                  dataPv->get_int_array ());
+                    double *temp;
+
+                    if (dataPv->get_specific_type().type == ProcessVariable::specificType::shrt)
+                        temp = to_double<short>(dataPv->get_dimension (),
+                                                dataPv->get_short_array ());
+                    else
+                        temp = to_double<int>(dataPv->get_dimension (),
+                                              dataPv->get_int_array ());
 #ifdef DEBUG
                     printf ("TwoDProfMon::execDef case int - calling widgetNewDispData\n");
 #endif
