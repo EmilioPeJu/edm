@@ -784,15 +784,49 @@ public:
 #endif
         if (dataPv && dataPv->is_valid ())
         {
+            // for holding double casted values
+            double *temp = NULL;
+            bool free_temp_required = true;
 
             switch (dataPv->get_type ().type)
             {
 
             case ProcessVariable::Type::real:
+                temp = (double *) dataPv->get_double_array();
+                free_temp_required = false;
 #ifdef DEBUG
                 printf ("TwoDProfMon::execDef case real - calling widgetNewDispData\n");
 #endif
-                // printf ("real\n");
+                break;
+
+            case ProcessVariable::Type::text:
+                temp = to_double<char> (
+                        dataPv->get_dimension (),
+                        dataPv->get_char_array ());
+#ifdef DEBUG
+                printf ("TwoDProfMon::execDef case text - calling widgetNewDispData\n");
+#endif
+                break;
+
+            case ProcessVariable::Type::integer:
+                if (dataPv->get_specific_type().type == ProcessVariable::specificType::shrt)
+                    temp = to_double<short>(dataPv->get_dimension (),
+                                            dataPv->get_short_array ());
+                else
+                    temp = to_double<int>(dataPv->get_dimension (),
+                                          dataPv->get_int_array ());
+#ifdef DEBUG
+                printf ("TwoDProfMon::execDef case int - calling widgetNewDispData\n");
+#endif
+                break;
+
+            default:
+                // nothing to do!
+                break;
+            }
+
+            if (temp != NULL)
+            {
                 widgetNewDisplayData (
                     wd, dataPv->get_time_t (), dataPv->get_nano (),
                     (unsigned long) w, (unsigned long) h, dataWidth,
@@ -803,7 +837,7 @@ public:
                     widthOffset,
                     heightOffset,
                     gridSize,
-                    (const double *) dataPv->get_double_array (),
+                    temp,
                     useFalseColour,
                     showGrid,
                     gridColour,
@@ -812,80 +846,11 @@ public:
                     dataRangeMax,
                     transposeXY
                     );
-                break;
 
-            case ProcessVariable::Type::text:
-                {
-                    double *temp = to_double<char> (
-                                        dataPv->get_dimension (),
-                                        dataPv->get_char_array ());
-#ifdef DEBUG
-                    printf ("TwoDProfMon::execDef case text - calling widgetNewDispData\n");
-#endif
-                    widgetNewDisplayData (
-                        wd, dataPv->get_time_t (), dataPv->get_nano (),
-                        (unsigned long)w, (unsigned long) h, dataWidth,
-                        (dataHeight > 0 ? dataHeight
-                                        : dataPv->get_dimension () / dataWidth),
-                        maxDataWidth,
-                        maxDataHeight,
-                        widthOffset,
-                        heightOffset,
-                        gridSize,
-                        temp,
-                        useFalseColour,
-                        showGrid,
-                        gridColour,
-                        rescaleData,
-                        dataRangeMin,
-                        dataRangeMax,
-                        transposeXY
-                        );
-                   free (temp);
-                }
-                break;
-
-            case ProcessVariable::Type::integer:
-                // printf ("int\n");
-                {
-                    double *temp;
-
-                    if (dataPv->get_specific_type().type == ProcessVariable::specificType::shrt)
-                        temp = to_double<short>(dataPv->get_dimension (),
-                                                dataPv->get_short_array ());
-                    else
-                        temp = to_double<int>(dataPv->get_dimension (),
-                                              dataPv->get_int_array ());
-#ifdef DEBUG
-                    printf ("TwoDProfMon::execDef case int - calling widgetNewDispData\n");
-#endif
-                    widgetNewDisplayData (
-                        wd, dataPv->get_time_t (), dataPv->get_nano (),
-                        (unsigned long) w, (unsigned long) h, dataWidth,
-                        (dataHeight > 0 ? dataHeight
-                                        : dataPv->get_dimension () / dataWidth),
-                        maxDataWidth,
-                        maxDataHeight,
-                        widthOffset,
-                        heightOffset,
-                        gridSize,
-                        temp,
-                        useFalseColour,
-                        showGrid,
-                        gridColour,
-                        rescaleData,
-                        dataRangeMin,
-                        dataRangeMax,
-                        transposeXY
-                        );
-                    free (temp);
-                }
-                break;
-
-            default:
-                // nothing to do!
-                break;
+                if (free_temp_required)
+                    free(temp);
             }
+
 #ifdef DEBUG
             printf ("TwoDProfMon::execDef after widgetNewDispData call switch\n");
 #endif
