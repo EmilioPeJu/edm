@@ -331,17 +331,6 @@ public:
         return temp;
     }
 
-    static double *int_to_double (size_t s, const int *i)
-    {
-
-        double *d = (double *) malloc (sizeof (double)* s);
-        if (!d) return d;
-        for (size_t index = 0; index < s; index++)
-        {
-            d[index] = i[index];
-        }
-        return d;
-    }
     // here is where we deal with updating the execute-mode widget (data and
     //  connect state)
     virtual void executeDeferred ( void )
